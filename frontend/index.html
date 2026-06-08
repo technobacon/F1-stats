@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" data-team="mclaren">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F1 StatGuesser — Prototype</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <!-- Dynamic Countdown Header / HUD (PRD §5.1) -->
+  <header class="hud">
+    <div class="hud-brand">🏁 F1 <span>StatGuesser</span></div>
+    <div class="hud-countdown">
+      <span class="hud-label" id="countdown-label">NEXT SESSION · Race</span>
+      <span class="hud-timer" id="countdown-timer">--:--:--:--</span>
+    </div>
+    <div class="hud-profile">
+      <select id="team-select" title="Tribal theming (PRD §5.3)">
+        <option value="ferrari">Ferrari</option>
+        <option value="mercedes">Mercedes</option>
+        <option value="mclaren" selected>McLaren</option>
+        <option value="red_bull">Red Bull</option>
+      </select>
+      <span class="hud-points" id="hud-points">0 pts</span>
+    </div>
+  </header>
+
+  <nav class="modes">
+    <button class="mode-tab active" data-view="daily">Daily Quiz</button>
+    <button class="mode-tab" data-view="arcade">Arcade Over/Under</button>
+    <button class="mode-tab" data-view="profile">Profile</button>
+  </nav>
+
+  <main>
+    <!-- DAILY QUIZ (PRD §4.1) -->
+    <section id="view-daily" class="view active">
+      <div id="daily-intro" class="card">
+        <h2>Daily General Quiz</h2>
+        <p>Five questions. Guess the stat — the closer you are, the more of the
+           5,000 points you keep. Scoring runs server-side.</p>
+        <button class="btn-primary" id="start-daily">Start Today's Session</button>
+        <p class="muted" id="daily-status"></p>
+      </div>
+
+      <div id="daily-play" class="card hidden">
+        <div class="q-progress"><span id="q-index">1</span> / <span id="q-total">5</span></div>
+        <h3 id="q-text">…</h3>
+        <div class="guess-row">
+          <input type="range" id="q-slider" min="0" max="100" value="0" />
+          <input type="number" id="q-input" min="0" value="0" />
+        </div>
+        <button class="btn-primary" id="submit-guess">Lock In Guess</button>
+      </div>
+
+      <!-- Odometer Score Reveal (Architecture §3.2) -->
+      <div id="daily-reveal" class="card reveal hidden">
+        <!-- Ad zone: Reveal Transition banner (PRD §6) -->
+        <div class="ad-slot ad-reveal" data-ad="reveal-banner">ad · reveal banner</div>
+        <div class="timeline">
+          <div class="timeline-track"></div>
+          <div class="timeline-node guess" id="node-guess"><span>You</span></div>
+          <div class="timeline-node actual" id="node-actual"><span>Actual</span></div>
+        </div>
+        <div class="reveal-numbers">
+          <div>Your guess: <strong id="reveal-guess">—</strong></div>
+          <div>Actual: <strong id="reveal-actual">—</strong></div>
+        </div>
+        <div class="odometer" id="odometer">0</div>
+        <button class="btn-primary" id="next-question">Next</button>
+      </div>
+
+      <!-- Finish Summary (PRD §6) -->
+      <div id="daily-summary" class="card hidden">
+        <h2>Session Complete</h2>
+        <div class="summary-score" id="summary-score">0</div>
+        <p>points this session</p>
+        <!-- Ad zone: Finish Summary display ad (PRD §6) -->
+        <div class="ad-slot ad-summary" data-ad="summary-display">ad · summary display</div>
+        <button class="btn-primary" id="share-result">Copy Shareable Result</button>
+        <p class="muted" id="share-status"></p>
+      </div>
+    </section>
+
+    <!-- ARCADE OVER/UNDER (PRD §4.2) -->
+    <section id="view-arcade" class="view">
+      <div class="card">
+        <h2>Arcade Over/Under <span class="badge">∞ unlimited</span></h2>
+        <p>Who has more? Personal streak only (non-competitive in v1).</p>
+        <div class="arcade-metric" id="arcade-metric">…</div>
+        <div class="arcade-pair">
+          <button class="arcade-card" id="arcade-a"><span class="name">—</span><span class="val">?</span></button>
+          <div class="vs">VS</div>
+          <button class="arcade-card" id="arcade-b"><span class="name">—</span><span class="val">?</span></button>
+        </div>
+        <div class="arcade-streak">Streak: <strong id="arcade-streak">0</strong></div>
+        <p class="muted" id="arcade-result"></p>
+      </div>
+    </section>
+
+    <!-- PROFILE (guest-first localStorage, PRD §5.2) -->
+    <section id="view-profile" class="view">
+      <div class="card">
+        <h2>Profile <span class="badge" id="guest-badge">guest</span></h2>
+        <dl class="stats">
+          <dt>Favourite team</dt><dd id="p-team">—</dd>
+          <dt>Lifetime points</dt><dd id="p-points">0</dd>
+          <dt>Games played</dt><dd id="p-games">0</dd>
+          <dt>Daily streak</dt><dd id="p-streak">0</dd>
+          <dt>Achievements</dt><dd id="p-achievements">none yet</dd>
+        </dl>
+        <p class="muted">All progress is stored locally in your browser. We only ask
+           you to sign in when you post to the Global Leaderboard (PRD §5.2).</p>
+        <button class="btn-secondary" id="sync-btn">Sync Progress Across Devices →</button>
+        <button class="btn-secondary danger" id="reset-btn">Reset local progress</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    F1 StatGuesser · prototype · server-authoritative scoring · anti-hallucination validated
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

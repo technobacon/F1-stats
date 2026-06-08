@@ -1,0 +1,103 @@
+"""SQLite persistence layer.
+
+Prototype stand-in for the production PostgreSQL database (Architecture §0).
+SQLite keeps the prototype zero-dependency and runnable anywhere; the schema
+mirrors the staging + production tables defined in the Technical Pipeline Specs
+so the migration to Postgres is mechanical (SERIAL->bigserial, NUMERIC->numeric,
+gen_random_uuid() etc.).
+
+Tables:
+    staging_race_results      (Pipeline §1.1) -- wins, podiums, points, fastest laps
+    staging_qualifying_results(Pipeline §1.1) -- poles (quali P1, NOT race grid)
+    staging_drivers           (Pipeline §1.1)
+    staging_constructors      (Pipeline §1.1)
+    production_trivia_questions(Pipeline §4)  -- verified, client-facing questions
+"""
+
+from __future__ import annotations
+
+import sqlite3
+from pathlib import Path
+
+DB_PATH = Path(__file__).resolve().parent.parent / "f1stats.db"
+
+
+def connect(db_path: Path | str = DB_PATH) -> sqlite3.Connection:
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
+
+SCHEMA = """
+-- Race results: used for wins, podiums, points, fastest laps (Pipeline §1.1)
+CREATE TABLE IF NOT EXISTS staging_race_results (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    driver_id      TEXT    NOT NULL,
+    constructor_id TEXT,
+    year           INTEGER NOT NULL,
+    round          INTEGER NOT NULL,
+    position       INTEGER,            -- finish position; NULL = DNF/DNS
+    grid           INTEGER,            -- starting grid position
+    fastest_lap    INTEGER DEFAULT 0,  -- boolean (0/1)
+    points         REAL    NOT NULL    -- REAL preserves half-points (e.g. 0.5)
+);
+
+-- Qualifying results: pole counts use quali P1, NOT race grid (Pipeline §1.1, §3)
+CREATE TABLE IF NOT EXISTS staging_qualifying_results (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    driver_id      TEXT    NOT NULL,
+    constructor_id TEXT,
+    year           INTEGER NOT NULL,
+    round          INTEGER NOT NULL,
+    quali_position INTEGER NOT NULL    -- 1 = pole position
+);
+
+CREATE TABLE IF NOT EXISTS staging_drivers (
+    driver_id   TEXT PRIMARY KEY,
+    full_name   TEXT NOT NULL,
+    nationality TEXT,
+    active_from INTEGER,
+    active_to   INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS staging_constructors (
+    constructor_id TEXT PRIMARY KEY,
+    name           TEXT NOT NULL,
+    nationality    TEXT
+);
+
+-- Verified, client-facing questions (Pipeline §4)
+CREATE TABLE IF NOT EXISTS production_trivia_questions (
+    id                TEXT PRIMARY KEY,            -- UUID
+    question_string   TEXT NOT NULL UNIQUE,
+    verified_answer   REAL NOT NULL,               -- REAL not INT: F1 has half-points
+    difficulty_weight REAL DEFAULT 1.0,
+    game_mode         TEXT NOT NULL,               -- 'daily','race_week','one_shot'
+    is_active         INTEGER DEFAULT 1,
+    scheduled_date    TEXT,                        -- ISO date for cron rotations
+    created_at        TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_ptq_game_mode      ON production_trivia_questions (game_mode);
+CREATE INDEX IF NOT EXISTS idx_ptq_is_active      ON production_trivia_questions (is_active);
+CREATE INDEX IF NOT EXISTS idx_ptq_scheduled_date ON production_trivia_questions (scheduled_date);
+"""
+
+
+def init_db(conn: sqlite3.Connection) -> None:
+    conn.executescript(SCHEMA)
+    conn.commit()
+
+
+def reset_db(conn: sqlite3.Connection) -> None:
+    """Drop and recreate all tables. Used by the seed script and tests."""
+    for table in (
+        "staging_race_results",
+        "staging_qualifying_results",
+        "staging_drivers",
+        "staging_constructors",
+        "production_trivia_questions",
+    ):
+        conn.execute(f"DROP TABLE IF EXISTS {table}")
+    init_db(conn)

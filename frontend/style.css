@@ -1,0 +1,92 @@
+/* Constructor theming via CSS variables (Architecture §3.1).
+   Production target is Tailwind + data-team; this prototype uses raw CSS vars. */
+:root { --bg:#0d1117; --surface:#161b22; --line:#262d36; --text:#e8edf3; --muted:#8a94a3;
+        --color-primary:#FF8700; --color-accent:#1B2425; }
+:root[data-team="ferrari"]  { --color-primary:#EF3829; --color-accent:#F9C900; }
+:root[data-team="mercedes"] { --color-primary:#6CD3BF; --color-accent:#111111; }
+:root[data-team="mclaren"]  { --color-primary:#FF8700; --color-accent:#1B2425; }
+:root[data-team="red_bull"] { --color-primary:#3671C6; --color-accent:#FFC906; }
+
+* { box-sizing:border-box; }
+body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg);
+       color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+
+.hud { display:flex; align-items:center; justify-content:space-between; gap:1rem;
+       padding:.75rem 1.25rem; background:var(--surface); border-bottom:3px solid var(--color-primary); }
+.hud-brand { font-weight:800; letter-spacing:.5px; }
+.hud-brand span { color:var(--color-primary); }
+.hud-countdown { text-align:center; display:flex; flex-direction:column; }
+.hud-label { font-size:.65rem; color:var(--muted); letter-spacing:1px; }
+.hud-timer { font-variant-numeric:tabular-nums; font-weight:700; font-size:1.1rem; }
+.hud-profile { display:flex; align-items:center; gap:.75rem; }
+.hud-points { font-weight:700; color:var(--color-primary); }
+#team-select { background:var(--bg); color:var(--text); border:1px solid var(--line);
+               border-radius:6px; padding:.3rem .5rem; }
+
+.modes { display:flex; gap:.5rem; padding:1rem 1.25rem 0; max-width:760px; margin:0 auto; width:100%; }
+.mode-tab { flex:1; background:transparent; color:var(--muted); border:1px solid var(--line);
+            border-bottom:none; border-radius:8px 8px 0 0; padding:.6rem; cursor:pointer; font-weight:600; }
+.mode-tab.active { color:var(--text); border-color:var(--color-primary); background:var(--surface); }
+
+main { flex:1; max-width:760px; margin:0 auto; width:100%; padding:0 1.25rem 2rem; }
+.view { display:none; } .view.active { display:block; }
+.hidden { display:none !important; }
+
+.card { background:var(--surface); border:1px solid var(--line); border-radius:0 10px 10px 10px;
+        padding:1.5rem; margin-top:-1px; }
+.card h2 { margin-top:0; }
+.muted { color:var(--muted); font-size:.85rem; }
+.badge { font-size:.65rem; background:var(--color-primary); color:#000; padding:.15rem .5rem;
+         border-radius:99px; vertical-align:middle; font-weight:700; }
+
+.btn-primary { background:var(--color-primary); color:#000; border:none; border-radius:8px;
+               padding:.7rem 1.4rem; font-weight:700; cursor:pointer; font-size:1rem; }
+.btn-primary:hover { filter:brightness(1.1); }
+.btn-secondary { background:transparent; color:var(--text); border:1px solid var(--line);
+                 border-radius:8px; padding:.6rem 1rem; cursor:pointer; margin-top:.5rem; display:block; width:100%; }
+.btn-secondary.danger { color:#ff6b6b; border-color:#5a2a2a; }
+
+.q-progress { color:var(--muted); font-weight:700; margin-bottom:.5rem; }
+.guess-row { display:flex; gap:1rem; align-items:center; margin:1.25rem 0; }
+#q-slider { flex:1; accent-color:var(--color-primary); }
+#q-input { width:110px; background:var(--bg); color:var(--text); border:1px solid var(--line);
+           border-radius:8px; padding:.6rem; font-size:1.1rem; text-align:center; }
+
+/* Odometer reveal */
+.reveal .timeline { position:relative; height:70px; margin:2rem 0 1rem; }
+.timeline-track { position:absolute; top:50%; left:0; right:0; height:4px; background:var(--line); border-radius:2px; }
+.timeline-node { position:absolute; top:50%; transform:translate(-50%,-50%);
+                 width:18px; height:18px; border-radius:50%; transition:left 1s cubic-bezier(.2,.8,.2,1); }
+.timeline-node span { position:absolute; top:-22px; left:50%; transform:translateX(-50%);
+                      font-size:.65rem; white-space:nowrap; color:var(--muted); }
+.timeline-node.guess { background:var(--color-primary); }
+.timeline-node.actual { background:#fff; top:50%; }
+.timeline-node.actual span { color:#fff; }
+.reveal-numbers { display:flex; justify-content:space-between; font-size:.9rem; color:var(--muted); }
+.odometer { font-size:3.5rem; font-weight:800; text-align:center; color:var(--color-primary);
+            font-variant-numeric:tabular-nums; margin:1rem 0; }
+.summary-score { font-size:4rem; font-weight:800; color:var(--color-primary); text-align:center; }
+
+/* Ads (PRD §6) */
+.ad-slot { border:1px dashed var(--line); color:var(--muted); text-align:center; font-size:.7rem;
+           padding:.6rem; border-radius:6px; margin:1rem 0; letter-spacing:1px; text-transform:uppercase; }
+.ad-summary { min-height:90px; display:flex; align-items:center; justify-content:center; }
+
+/* Arcade */
+.arcade-metric { text-align:center; font-weight:700; font-size:1.2rem; margin:1rem 0;
+                 color:var(--color-primary); }
+.arcade-pair { display:flex; align-items:center; gap:1rem; }
+.arcade-card { flex:1; background:var(--bg); border:2px solid var(--line); border-radius:10px;
+               padding:1.5rem 1rem; cursor:pointer; color:var(--text); display:flex;
+               flex-direction:column; gap:.5rem; transition:border-color .2s; }
+.arcade-card:hover { border-color:var(--color-primary); }
+.arcade-card.correct { border-color:#3fb950; } .arcade-card.wrong { border-color:#ff6b6b; }
+.arcade-card .name { font-weight:700; font-size:1.1rem; }
+.arcade-card .val { font-size:1.6rem; color:var(--color-primary); }
+.vs { font-weight:800; color:var(--muted); }
+.arcade-streak { text-align:center; margin-top:1.25rem; }
+
+.stats { display:grid; grid-template-columns:1fr 1fr; gap:.4rem 1rem; }
+.stats dt { color:var(--muted); } .stats dd { margin:0; font-weight:700; text-align:right; }
+
+.foot { text-align:center; color:var(--muted); font-size:.7rem; padding:1.5rem; border-top:1px solid var(--line); }
