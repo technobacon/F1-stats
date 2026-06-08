@@ -16,14 +16,19 @@ Tables:
 
 from __future__ import annotations
 
+import os
 import sqlite3
 from pathlib import Path
 
-DB_PATH = Path(__file__).resolve().parent.parent / "f1stats.db"
+# Configurable so hosts with an ephemeral/read-only app dir can point at a
+# writable path (e.g. F1_DB_PATH=/tmp/f1stats.db). Defaults next to the app.
+DB_PATH = Path(os.environ.get("F1_DB_PATH", Path(__file__).resolve().parent.parent / "f1stats.db"))
 
 
-def connect(db_path: Path | str = DB_PATH) -> sqlite3.Connection:
-    conn = sqlite3.connect(str(db_path))
+def connect(db_path: Path | str | None = None) -> sqlite3.Connection:
+    # Resolve DB_PATH at call time (not as a default arg) so tests/hosts can
+    # override the module attribute and have it take effect.
+    conn = sqlite3.connect(str(db_path if db_path is not None else DB_PATH))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn

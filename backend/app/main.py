@@ -13,18 +13,35 @@ guess is submitted — never in the question payload.
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import db, service
+from . import db, seed, service
 from .models import ArcadePairResponse, DailyQuizResponse, VerifyRequest, VerifyResponse
 
 FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
 
-app = FastAPI(title="F1 StatGuesser API", version="0.1.0-prototype")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Self-seed on boot so a fresh deploy (ephemeral filesystem) is playable with
+    # no manual step. If questions already exist, leave the DB untouched.
+    conn = db.connect()
+    db.init_db(conn)
+    count = conn.execute(
+        "SELECT COUNT(*) AS n FROM production_trivia_questions"
+    ).fetchone()["n"]
+    conn.close()
+    if count == 0:
+        seed.seed_all()
+    yield
+
+
+app = FastAPI(title="F1 StatGuesser API", version="0.1.0-prototype", lifespan=lifespan)
 
 
 def get_conn():

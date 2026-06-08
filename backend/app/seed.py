@@ -282,9 +282,9 @@ def run_validation_pipeline(conn: sqlite3.Connection, today: str | None = None) 
     return {"committed": committed, "rejected": len(rejections), "rejections": rejections}
 
 
-def seed_all(db_path=db.DB_PATH) -> dict:
+def seed_all(db_path=None) -> dict:
     """Full reset: rebuild schema, seed staging, run the validation pipeline."""
-    conn = db.connect(db_path)
+    conn = db.connect(db_path)  # None -> resolves db.DB_PATH at call time
     try:
         db.reset_db(conn)
         seed_staging(conn)

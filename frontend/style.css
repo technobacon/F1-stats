@@ -90,3 +90,21 @@ main { flex:1; max-width:760px; margin:0 auto; width:100%; padding:0 1.25rem 2re
 .stats dt { color:var(--muted); } .stats dd { margin:0; font-weight:700; text-align:right; }
 
 .foot { text-align:center; color:var(--muted); font-size:.7rem; padding:1.5rem; border-top:1px solid var(--line); }
+
+/* ---- Mobile / iPhone ---- */
+@media (max-width: 560px) {
+  .hud { flex-wrap:wrap; gap:.5rem .75rem; padding:.6rem .9rem; }
+  .hud-brand { font-size:.95rem; }
+  .hud-countdown { order:3; flex:1 0 100%; align-items:center; }
+  .hud-timer { font-size:1rem; }
+  .modes, main { padding-left:.75rem; padding-right:.75rem; }
+  .mode-tab { padding:.55rem .25rem; font-size:.85rem; }
+  .card { padding:1.1rem; }
+  .odometer { font-size:2.8rem; }
+  .summary-score { font-size:3rem; }
+  .arcade-card { padding:1.1rem .75rem; }
+  .arcade-card .name { font-size:1rem; }
+  /* Comfortable tap targets */
+  .btn-primary, .btn-secondary { padding:.8rem 1.2rem; }
+  #q-input { font-size:16px; } /* >=16px stops iOS Safari auto-zoom on focus */
+}
