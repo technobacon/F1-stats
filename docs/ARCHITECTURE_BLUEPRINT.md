@@ -37,7 +37,14 @@ Before requiring account registration blocks, client states must write immediate
 ```
 
 #### 2.2 Anonymous Data Synchronization (Account Merging)
-When an unauthenticated player requests an explicit login upgrade to secure global scoreboard indexing, a migration controller handles syncing. The frontend client pushes the current `localStorage` string to the backend configuration endpoint, integrating their guest history into their new permanent row matrix securely.
+When an unauthenticated player requests an explicit login upgrade to secure global scoreboard indexing, a migration controller handles syncing.
+
+> **Trust Boundary (Critical):** The backend must **never** trust client-supplied aggregate totals (`lifetime_points`, `average_closeness`, streak counters) when populating the Global Leaderboard or Constructors Championship standings. The `localStorage` blob is fully editable by the user; accepting it verbatim would allow a player to inject an arbitrary score (e.g., editing `lifetime_points` to `24500`) directly onto the leaderboard. This is consistent with the server-side scoring stance in §1.1.
+
+Two acceptable migration strategies:
+
+1. **Verified-event merge (preferred):** Only individually server-verified round events (each carrying its tracking token and server-computed score) are accepted from the guest history. Aggregate totals are then recomputed server-side from those trusted rows.
+2. **Cosmetic-only merge:** Non-competitive state (e.g., `selected_team`, unlocked achievement flags that do not affect ranking) may be carried over from `localStorage` directly, while all leaderboard-affecting totals are reconstructed exclusively from server-side logs.
 
 ### 3. Tribal Personalization & Animation Engineering
 
@@ -52,7 +59,7 @@ F1 fan bases are inherently fragmented across constructor lines. Custom UI dynam
 }
 :root[data-team="mercedes"] {
   --color-primary: #6CD3BF;     /* Petronas Turquoise */
-  --color-accent: #000000;      /* Silver Arrows Black */
+  --color-accent: #000000;      /* Mercedes Black (modern livery) */
 }
 :root[data-team="mclaren"] {
   --color-primary: #FF8700;     /* Papaya Orange */

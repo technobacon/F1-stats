@@ -13,6 +13,12 @@ The absolute maximum score per question is **5,000 points**. The minimum score i
 
 The formula to calculate the score for any given question is defined as:
 
+```
+Score = 5000 × e^(−λ × |Guess − Actual| / Actual)
+```
+
+This produces the worked examples below: a 10% error yields `5000 × e^(−0.3) ≈ 3,704`, and a 50% error yields `5000 × e^(−1.5) ≈ 1,116`. The result must be clamped to the range `[0, 5000]` and rounded to the nearest integer.
+
 ### Parameter Definitions
 - **Guess**: The raw numerical value inputted by the player.
 - **Actual**: The true statistical value fetched from the validated database.

@@ -7,8 +7,9 @@
 The ingestion pipeline acts as an isolated, asynchronous system responsible for transforming highly nested external API entities into relational database matrices. To safeguard production systems against downtime, direct runtime execution loops during user client sessions are strictly prohibited.
 
 #### 1.1 API Ingestion Framework
-- **Endpoint Targeting:** Primary historical extractions must map against the Jolpica F1 API endpoints (e.g., `http://api.jolpi.ca/ergast/f1/drivers/`).
-- **Rate-Limit Strategy:** Implement a sliding-window token bucket controller. Outbound API requests must be limited to a maximum of 40 requests per minute. Violations caught via `429 Too Many Requests` statuses must halt the pipeline for 300 seconds sequentially.
+- **Endpoint Targeting:** Primary historical extractions must map against the Jolpica F1 API endpoints (e.g., `https://api.jolpi.ca/ergast/f1/drivers/`). Always use `https://`; do not issue ingestion requests over plain `http://`.
+- **Rate-Limit Strategy:** Implement a sliding-window token bucket controller. Violations caught via `429 Too Many Requests` statuses must halt the pipeline for 300 seconds sequentially.
+  - **⚠️ Verify against Jolpica's published limits before launch.** A naive cap of 40 requests/minute sustains ≈ 2,400 requests/hour, which can exceed Jolpica's documented hourly ceiling for unauthenticated traffic (historically on the order of ~500/hour). The controller must respect **both** the burst (per-second/per-minute) and the sustained (per-hour) limits simultaneously, throttling to whichever is more restrictive. Confirm current values at the Jolpica documentation at ingestion-build time, as these limits change.
 - **Data Normalization Block:** Raw JSON trees must be flattened and committed to interim staging database tables. Data engineers should optimize local structural schemas specifically for the following master tables: `staging_drivers`, `staging_constructors`, and `staging_race_results`.
 
 ### 2. LLM Context Chunking & Prompt Specification
@@ -40,27 +41,45 @@ To preserve accuracy across thousands of trivia challenges, every single generat
 > **The Automated Verification Invariant:** The pipeline must never trust the integer supplied in the `proposed_answer` key by the language model. Instead, a dedicated validation module must interpret the structural contents of the `validation_parameters` payload block, re-compile a completely independent programmatic database query, and match outputs.
 
 #### 3.1 Pseudocode Blueprint: The Validation Runner
+The runner must dispatch on the `metric_target` field so that it generalizes across every supported statistic (wins, poles, podiums, points, fastest laps, etc.) rather than only validating win-counts. Hardcoding a single filter such as `position=1` would silently pass any non-win question without a real check.
+
 ```python
+# Maps each supported metric_target onto a deterministic query predicate.
+METRIC_QUERY_MAP = {
+    "wins":         lambda q: q.filter(position=1).count(),
+    "poles":        lambda q: q.filter(grid=1).count(),
+    "podiums":      lambda q: q.filter(position__in=[1, 2, 3]).count(),
+    "fastest_laps": lambda q: q.filter(fastest_lap=True).count(),
+    "points":       lambda q: q.aggregate_sum("points"),
+}
+
 def validate_ai_question(llm_output_json):
     params = llm_output_json["validation_parameters"]
     ai_answer = llm_output_json["proposed_answer"]
+    metric = params["metric_target"]
 
-    # Construct a programmatic, deterministic query against trusted data
-    factual_count = db.table("staging_race_results") \
-                      .filter(driver_id=params["entity_id"]) \
-                      .filter(constructor_id=params["filter_constructor_id"]) \
-                      .filter(year__range=(params["start_year"], params["end_year"])) \
-                      .filter(position=1) \
-                      .count()
+    # Reject unknown metrics outright rather than passing them unchecked.
+    if metric not in METRIC_QUERY_MAP:
+        log_validation_failure(reason="Unsupported metric_target", expected=None, got=metric)
+        return False
+
+    # Build the shared, deterministic base query against trusted data.
+    base_query = db.table("staging_race_results") \
+                   .filter(driver_id=params["entity_id"]) \
+                   .filter(constructor_id=params["filter_constructor_id"]) \
+                   .filter(year__range=(params["start_year"], params["end_year"]))
+
+    # Apply the metric-specific predicate.
+    factual_value = METRIC_QUERY_MAP[metric](base_query)
 
     # Rigid Boolean Verification Gate
-    if factual_count == ai_answer:
+    if factual_value == ai_answer:
         # Move records smoothly into production storage
-        commit_to_production_db(llm_output_json["question_text"], factual_count)
+        commit_to_production_db(llm_output_json["question_text"], factual_value)
         return True
     else:
         # Log AI miscalculations cleanly to diagnostic registers and discard
-        log_validation_failure(reason="Hallucination detected", expected=factual_count, got=ai_answer)
+        log_validation_failure(reason="Hallucination detected", expected=factual_value, got=ai_answer)
         return False
 ```
 
@@ -72,7 +91,7 @@ CREATE TABLE production_trivia_questions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     question_string TEXT NOT NULL UNIQUE,
     verified_answer INT NOT NULL,
-    difficulty_scalar FLOAT DEFAULT 1.0,
+    difficulty_weight FLOAT DEFAULT 1.0, -- matches `difficulty_weight` from the LLM output schema (§2.2)
     game_mode VARCHAR(30) NOT NULL, -- 'daily', 'race_week', 'one_shot'
     scheduled_date DATE NULL,       -- Used by cron systems for daily rotations
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
