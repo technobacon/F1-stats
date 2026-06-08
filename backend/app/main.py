@@ -64,11 +64,13 @@ def health():
     return {"status": "ok", "active_questions": count}
 
 
-@app.get("/api/v1/quiz/daily", response_model=DailyQuizResponse)
-def daily_quiz():
+@app.get("/api/v1/quiz/{mode}", response_model=DailyQuizResponse)
+def quiz(mode: str):
+    if mode not in service.MODE_QUESTION_COUNT:
+        raise HTTPException(404, f"Unknown game mode '{mode}'.")
     conn = get_conn()
     try:
-        payload = service.build_daily_quiz(conn, game_mode="daily", limit=5)
+        payload = service.build_quiz(conn, game_mode=mode)
     finally:
         conn.close()
     if not payload["questions"]:
@@ -76,12 +78,18 @@ def daily_quiz():
     return payload
 
 
-@app.post("/api/v1/quiz/daily/verify", response_model=VerifyResponse)
-def daily_verify(req: VerifyRequest):
+@app.post("/api/v1/quiz/verify", response_model=VerifyResponse)
+def quiz_verify(req: VerifyRequest):
     result = service.verify_guess(req.tracking_token, req.guess)
     if result is None:
         raise HTTPException(404, "Unknown or expired tracking token.")
     return result
+
+
+# Back-compat aliases for the original daily-only endpoints.
+@app.post("/api/v1/quiz/daily/verify", response_model=VerifyResponse)
+def daily_verify(req: VerifyRequest):
+    return quiz_verify(req)
 
 
 @app.get("/api/v1/arcade/pair", response_model=ArcadePairResponse)

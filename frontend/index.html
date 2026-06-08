@@ -2,8 +2,18 @@
 <html lang="en" data-team="mclaren">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>F1 StatGuesser — Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>F1 StatGuesser</title>
+
+  <!-- PWA / iOS add-to-home-screen -->
+  <link rel="manifest" href="/static/manifest.json" />
+  <meta name="theme-color" content="#FF8700" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="StatGuesser" />
+  <link rel="apple-touch-icon" href="/static/icon-180.png" />
+  <link rel="icon" href="/static/icon-180.png" />
+
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
@@ -11,7 +21,7 @@
   <header class="hud">
     <div class="hud-brand">🏁 F1 <span>StatGuesser</span></div>
     <div class="hud-countdown">
-      <span class="hud-label" id="countdown-label">NEXT SESSION · Race</span>
+      <span class="hud-label" id="countdown-label">NEXT SESSION</span>
       <span class="hud-timer" id="countdown-timer">--:--:--:--</span>
     </div>
     <div class="hud-profile">
@@ -25,25 +35,30 @@
     </div>
   </header>
 
-  <nav class="modes">
-    <button class="mode-tab active" data-view="daily">Daily Quiz</button>
-    <button class="mode-tab" data-view="arcade">Arcade Over/Under</button>
+  <nav class="modes" id="modes">
+    <button class="mode-tab active" data-view="quiz" data-mode="daily">Daily</button>
+    <button class="mode-tab" data-view="quiz" data-mode="race_week">Race Week</button>
+    <button class="mode-tab" data-view="quiz" data-mode="one_shot">One-Shots</button>
+    <button class="mode-tab" data-view="arcade">Arcade</button>
     <button class="mode-tab" data-view="profile">Profile</button>
   </nav>
 
   <main>
-    <!-- DAILY QUIZ (PRD §4.1) -->
-    <section id="view-daily" class="view active">
-      <div id="daily-intro" class="card">
-        <h2>Daily General Quiz</h2>
-        <p>Five questions. Guess the stat — the closer you are, the more of the
-           5,000 points you keep. Scoring runs server-side.</p>
-        <button class="btn-primary" id="start-daily">Start Today's Session</button>
-        <p class="muted" id="daily-status"></p>
+    <!-- UNIFIED QUIZ VIEW (Daily / Race-Week / One-Shots — PRD §4.1) -->
+    <section id="view-quiz" class="view active">
+      <div id="quiz-intro" class="card">
+        <h2 id="quiz-title">Daily General Quiz</h2>
+        <p id="quiz-desc">Five questions. Guess the stat — the closer you are, the more
+           of the 5,000 points you keep. Scoring runs server-side.</p>
+        <div id="quiz-cap" class="cap-note hidden"></div>
+        <button class="btn-primary" id="start-quiz">Start Session</button>
+        <button class="btn-secondary hidden" id="replay-quiz">Replay (testing)</button>
+        <p class="muted" id="quiz-status"></p>
       </div>
 
-      <div id="daily-play" class="card hidden">
-        <div class="q-progress"><span id="q-index">1</span> / <span id="q-total">5</span></div>
+      <div id="quiz-play" class="card hidden">
+        <div class="q-progress"><span id="q-index">1</span> / <span id="q-total">5</span>
+          · <span id="q-mode-badge" class="badge">daily</span></div>
         <h3 id="q-text">…</h3>
         <div class="guess-row">
           <input type="range" id="q-slider" min="0" max="100" value="0" />
@@ -53,8 +68,7 @@
       </div>
 
       <!-- Odometer Score Reveal (Architecture §3.2) -->
-      <div id="daily-reveal" class="card reveal hidden">
-        <!-- Ad zone: Reveal Transition banner (PRD §6) -->
+      <div id="quiz-reveal" class="card reveal hidden">
         <div class="ad-slot ad-reveal" data-ad="reveal-banner">ad · reveal banner</div>
         <div class="timeline">
           <div class="timeline-track"></div>
@@ -70,13 +84,14 @@
       </div>
 
       <!-- Finish Summary (PRD §6) -->
-      <div id="daily-summary" class="card hidden">
+      <div id="quiz-summary" class="card hidden">
         <h2>Session Complete</h2>
         <div class="summary-score" id="summary-score">0</div>
         <p>points this session</p>
-        <!-- Ad zone: Finish Summary display ad (PRD §6) -->
+        <div class="accuracy-row" id="accuracy-row"></div>
         <div class="ad-slot ad-summary" data-ad="summary-display">ad · summary display</div>
-        <button class="btn-primary" id="share-result">Copy Shareable Result</button>
+        <button class="btn-primary" id="share-result">Share Result</button>
+        <button class="btn-secondary" id="summary-back">Back to Modes</button>
         <p class="muted" id="share-status"></p>
       </div>
     </section>
@@ -92,7 +107,8 @@
           <div class="vs">VS</div>
           <button class="arcade-card" id="arcade-b"><span class="name">—</span><span class="val">?</span></button>
         </div>
-        <div class="arcade-streak">Streak: <strong id="arcade-streak">0</strong></div>
+        <div class="arcade-streak">Streak: <strong id="arcade-streak">0</strong>
+          · Best: <strong id="arcade-best">0</strong></div>
         <p class="muted" id="arcade-result"></p>
       </div>
     </section>
@@ -105,6 +121,7 @@
           <dt>Favourite team</dt><dd id="p-team">—</dd>
           <dt>Lifetime points</dt><dd id="p-points">0</dd>
           <dt>Games played</dt><dd id="p-games">0</dd>
+          <dt>Avg. accuracy</dt><dd id="p-accuracy">—</dd>
           <dt>Daily streak</dt><dd id="p-streak">0</dd>
           <dt>Achievements</dt><dd id="p-achievements">none yet</dd>
         </dl>
@@ -120,6 +137,7 @@
     F1 StatGuesser · prototype · server-authoritative scoring · anti-hallucination validated
   </footer>
 
+  <div id="toast" class="toast hidden"></div>
   <script src="/static/app.js"></script>
 </body>
 </html>

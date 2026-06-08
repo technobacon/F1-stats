@@ -67,6 +67,10 @@ CONSTRUCTORS = [
     Constructor("red_bull", "Red Bull", "Austrian"),
     Constructor("lotus", "Lotus", "British"),
     Constructor("renault", "Renault", "French"),
+    Constructor("williams", "Williams", "British"),
+    Constructor("brawn", "Brawn GP", "British"),
+    Constructor("sauber", "Sauber", "Swiss"),
+    Constructor("racing_point", "Racing Point", "British"),
 ]
 
 DRIVERS = [
@@ -89,7 +93,51 @@ DRIVERS = [
     Driver("verstappen", "Max Verstappen", "Dutch", 2015, 2024, stints=[
         Stint("verstappen", "red_bull", 2016, 2023, wins=54, podiums=98, fastest_laps=30, poles=36, points=2500.0),
     ]),
+    Driver("senna", "Ayrton Senna", "Brazilian", 1984, 1994, stints=[
+        Stint("senna", "lotus", 1985, 1987, wins=6, podiums=18, fastest_laps=10, poles=16, points=180.0),
+        Stint("senna", "mclaren", 1988, 1993, wins=35, podiums=60, fastest_laps=15, poles=46, points=480.0),
+    ]),
+    Driver("prost", "Alain Prost", "French", 1980, 1993, stints=[
+        Stint("prost", "mclaren", 1984, 1989, wins=30, podiums=55, fastest_laps=25, poles=18, points=500.0),
+        Stint("prost", "williams", 1993, 1993, wins=7, podiums=12, fastest_laps=6, poles=13, points=99.0),
+    ]),
+    Driver("vettel", "Sebastian Vettel", "German", 2007, 2022, stints=[
+        Stint("vettel", "red_bull", 2009, 2014, wins=38, podiums=64, fastest_laps=24, poles=44, points=1800.0),
+        Stint("vettel", "ferrari", 2015, 2020, wins=14, podiums=55, fastest_laps=14, poles=12, points=1400.0),
+    ]),
+    Driver("button", "Jenson Button", "British", 2000, 2017, stints=[
+        Stint("button", "brawn", 2009, 2009, wins=6, podiums=9, fastest_laps=3, poles=4, points=95.0),
+        Stint("button", "mclaren", 2010, 2016, wins=8, podiums=33, fastest_laps=4, poles=4, points=900.0),
+    ]),
+    Driver("rosberg", "Nico Rosberg", "German", 2006, 2016, stints=[
+        Stint("rosberg", "williams", 2006, 2009, wins=0, podiums=0, fastest_laps=4, poles=1, points=170.0),
+        Stint("rosberg", "mercedes", 2010, 2016, wins=23, podiums=57, fastest_laps=20, poles=30, points=1500.0),
+    ]),
+    Driver("ricciardo", "Daniel Ricciardo", "Australian", 2011, 2024, stints=[
+        Stint("ricciardo", "red_bull", 2014, 2018, wins=7, podiums=29, fastest_laps=13, poles=3, points=900.0),
+    ]),
+    Driver("leclerc", "Charles Leclerc", "Monegasque", 2018, 2024, stints=[
+        Stint("leclerc", "ferrari", 2019, 2024, wins=8, podiums=43, fastest_laps=9, poles=26, points=1300.0),
+    ]),
+    Driver("russell", "George Russell", "British", 2019, 2024, stints=[
+        Stint("russell", "mercedes", 2022, 2024, wins=3, podiums=15, fastest_laps=6, poles=4, points=600.0),
+    ]),
+    Driver("massa", "Felipe Massa", "Brazilian", 2002, 2017, stints=[
+        Stint("massa", "ferrari", 2006, 2013, wins=11, podiums=36, fastest_laps=15, poles=15, points=1100.0),
+    ]),
+    Driver("webber", "Mark Webber", "Australian", 2002, 2013, stints=[
+        Stint("webber", "red_bull", 2007, 2013, wins=9, podiums=42, fastest_laps=19, poles=13, points=1000.0),
+    ]),
+    Driver("perez", "Sergio Perez", "Mexican", 2011, 2024, stints=[
+        Stint("perez", "racing_point", 2014, 2020, wins=1, podiums=8, fastest_laps=5, poles=1, points=700.0),
+        Stint("perez", "red_bull", 2021, 2024, wins=5, podiums=30, fastest_laps=8, poles=3, points=1000.0),
+    ]),
 ]
+
+# (driver_id, constructor_id, metric) combos to skip during question generation —
+# reserved for the planted-hallucination demo so there is no duplicate/competing
+# valid question with the same wording.
+_GENERATION_SKIP = {("schumacher", "ferrari", "wins")}
 
 
 def _insert_stint_rows(conn: sqlite3.Connection, stint: Stint, round_offset: int) -> int:
@@ -153,98 +201,101 @@ def seed_staging(conn: sqlite3.Connection) -> None:
 
 
 # --- Mock LLM output (strict schema, Pipeline §2.2) -------------------------
-# Each item is exactly what the LLM prompt controller would receive: rigid JSON,
-# no markdown, no proposed answer the validator trusts. One item is a planted
-# hallucination to demonstrate that the validation layer rejects it.
+# In production a real LLM phrases these. Here a generator emits the same rigid
+# JSON the prompt controller would receive, then the deterministic validation
+# layer independently re-derives every answer before anything is committed.
+
+_CONSTRUCTOR_NAME = {c.constructor_id: c.name for c in CONSTRUCTORS}
+
+# metric -> (question template, difficulty_weight, game_mode). Spreads questions
+# across the three exact-numerical modes (PRD §4.1).
+_METRIC_TEMPLATE = {
+    "wins":         ("How many race wins did {name} take with {cname} ({y1}-{y2})?", 2.0, "daily"),
+    "podiums":      ("How many podiums did {name} score with {cname} ({y1}-{y2})?", 2.5, "race_week"),
+    "poles":        ("How many pole positions did {name} take with {cname} ({y1}-{y2})?", 3.0, "race_week"),
+    "fastest_laps": ("How many fastest laps did {name} set with {cname} ({y1}-{y2})?", 2.5, "one_shot"),
+    "points":       ("How many championship points did {name} score with {cname} ({y1}-{y2})?", 3.5, "one_shot"),
+}
+
+_METRIC_VALUE = {
+    "wins": lambda s: s.wins, "podiums": lambda s: s.podiums,
+    "poles": lambda s: s.poles, "fastest_laps": lambda s: s.fastest_laps,
+    "points": lambda s: s.points,
+}
+
+
+def generate_questions() -> list[dict]:
+    """Build the full validated-question pool from the seeded stints.
+
+    One question per (stint, metric) with a positive value, plus career-total
+    questions (constructor filter omitted) to exercise the optional-filter path.
+    Every proposed_answer is the true seeded value, so all of these pass
+    validation — the rejection demo is the separate planted hallucination below.
+    """
+    questions: list[dict] = []
+    for driver in DRIVERS:
+        for stint in driver.stints:
+            cname = _CONSTRUCTOR_NAME.get(stint.constructor_id, stint.constructor_id)
+            for metric, (template, weight, mode) in _METRIC_TEMPLATE.items():
+                value = _METRIC_VALUE[metric](stint)
+                if value <= 0:
+                    continue
+                if (driver.driver_id, stint.constructor_id, metric) in _GENERATION_SKIP:
+                    continue
+                questions.append({
+                    "question_text": template.format(
+                        name=driver.full_name, cname=cname,
+                        y1=stint.start_year, y2=stint.end_year),
+                    "difficulty_weight": weight,
+                    "game_mode": mode,
+                    "validation_parameters": {
+                        "target_entity": "driver", "entity_id": driver.driver_id,
+                        "filter_constructor_id": stint.constructor_id,
+                        "start_year": stint.start_year, "end_year": stint.end_year,
+                        "metric_target": metric,
+                    },
+                    "proposed_answer": value,
+                })
+
+        # Career-total questions (multi-stint drivers): NO constructor filter.
+        if len(driver.stints) > 1:
+            lo = min(s.start_year for s in driver.stints)
+            hi = max(s.end_year for s in driver.stints)
+            for metric, label in (("wins", "race wins"), ("podiums", "podiums")):
+                total = sum(_METRIC_VALUE[metric](s) for s in driver.stints)
+                if total <= 0:
+                    continue
+                questions.append({
+                    "question_text": f"How many career {label} did {driver.full_name} "
+                                     f"score across all teams?",
+                    "difficulty_weight": 3.0,
+                    "game_mode": "daily",
+                    "validation_parameters": {
+                        "target_entity": "driver", "entity_id": driver.driver_id,
+                        "start_year": lo, "end_year": hi, "metric_target": metric,
+                    },
+                    "proposed_answer": total,
+                })
+    return questions
+
 
 def mock_llm_questions() -> list[dict]:
-    return [
-        {
-            "question_text": "How many race wins did Michael Schumacher claim during his "
-                             "tenure with Benetton (1991-1995)?",
-            "difficulty_weight": 2.5,
-            "game_mode": "daily",
-            "validation_parameters": {
-                "target_entity": "driver", "entity_id": "schumacher",
-                "filter_constructor_id": "benetton",
-                "start_year": 1991, "end_year": 1995, "metric_target": "wins",
-            },
-            "proposed_answer": 19,
+    """Full mock LLM batch: the generated pool + exactly one planted hallucination."""
+    planted = {
+        # PLANTED HALLUCINATION: staging says 72, the LLM "remembers" 80.
+        # The validation layer must reject this and keep it out of production.
+        "question_text": "How many race wins did Michael Schumacher take with Ferrari "
+                         "(1996-2006)?",
+        "difficulty_weight": 2.0,
+        "game_mode": "daily",
+        "validation_parameters": {
+            "target_entity": "driver", "entity_id": "schumacher",
+            "filter_constructor_id": "ferrari",
+            "start_year": 1996, "end_year": 2006, "metric_target": "wins",
         },
-        {
-            "question_text": "How many pole positions did Lewis Hamilton take with McLaren "
-                             "(2007-2012)?",
-            "difficulty_weight": 2.0,
-            "game_mode": "daily",
-            "validation_parameters": {
-                "target_entity": "driver", "entity_id": "hamilton",
-                "filter_constructor_id": "mclaren",
-                "start_year": 2007, "end_year": 2012, "metric_target": "poles",
-            },
-            "proposed_answer": 26,
-        },
-        {
-            # Career-total question: filter_constructor_id intentionally OMITTED.
-            "question_text": "How many career podiums did Kimi Raikkonen score across all teams?",
-            "difficulty_weight": 3.0,
-            "game_mode": "daily",
-            "validation_parameters": {
-                "target_entity": "driver", "entity_id": "raikkonen",
-                "start_year": 2002, "end_year": 2009, "metric_target": "podiums",
-            },
-            "proposed_answer": 49,  # 25 (McLaren) + 24 (Ferrari)
-        },
-        {
-            "question_text": "How many fastest laps did Max Verstappen set with Red Bull "
-                             "(2016-2023)?",
-            "difficulty_weight": 2.5,
-            "game_mode": "daily",
-            "validation_parameters": {
-                "target_entity": "driver", "entity_id": "verstappen",
-                "filter_constructor_id": "red_bull",
-                "start_year": 2016, "end_year": 2023, "metric_target": "fastest_laps",
-            },
-            "proposed_answer": 30,
-        },
-        {
-            "question_text": "How many career wins did Fernando Alonso score with Renault "
-                             "(2003-2006)?",
-            "difficulty_weight": 2.0,
-            "game_mode": "daily",
-            "validation_parameters": {
-                "target_entity": "driver", "entity_id": "alonso",
-                "filter_constructor_id": "renault",
-                "start_year": 2003, "end_year": 2006, "metric_target": "wins",
-            },
-            "proposed_answer": 15,
-        },
-        {
-            "question_text": "How many championship points did Lewis Hamilton score with "
-                             "Mercedes (2013-2020)?",
-            "difficulty_weight": 3.5,
-            "game_mode": "race_week",
-            "validation_parameters": {
-                "target_entity": "driver", "entity_id": "hamilton",
-                "filter_constructor_id": "mercedes",
-                "start_year": 2013, "end_year": 2020, "metric_target": "points",
-            },
-            "proposed_answer": 3000,
-        },
-        {
-            # PLANTED HALLUCINATION: staging says 72, the LLM "remembers" 80.
-            # The validation layer must reject this and keep it out of production.
-            "question_text": "How many race wins did Michael Schumacher take with Ferrari "
-                             "(1996-2006)?",
-            "difficulty_weight": 2.0,
-            "game_mode": "daily",
-            "validation_parameters": {
-                "target_entity": "driver", "entity_id": "schumacher",
-                "filter_constructor_id": "ferrari",
-                "start_year": 1996, "end_year": 2006, "metric_target": "wins",
-            },
-            "proposed_answer": 80,  # WRONG — true staging value is 72
-        },
-    ]
+        "proposed_answer": 80,  # WRONG — true staging value is 72
+    }
+    return generate_questions() + [planted]
 
 
 def run_validation_pipeline(conn: sqlite3.Connection, today: str | None = None) -> dict:

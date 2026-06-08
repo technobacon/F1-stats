@@ -101,10 +101,12 @@ def test_pipeline_commits_valid_rejects_hallucination(conn):
     assert summary["committed"] == total - 1
     assert summary["rejections"][0]["proposed"] == 80
 
-    # The hallucinated Schumacher/Ferrari question must NOT reach production.
+    # The hallucinated Schumacher/Ferrari WINS question must NOT reach production
+    # (other metrics for that stint are legitimately generated and may exist).
     rows = conn.execute(
-        "SELECT verified_answer FROM production_trivia_questions "
-        "WHERE question_string LIKE '%Ferrari (1996-2006)%'"
+        "SELECT 1 FROM production_trivia_questions "
+        "WHERE question_string = "
+        "'How many race wins did Michael Schumacher take with Ferrari (1996-2006)?'"
     ).fetchall()
     assert rows == []
 

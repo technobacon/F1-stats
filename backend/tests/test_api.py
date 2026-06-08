@@ -70,6 +70,27 @@ def test_unknown_token_404(client):
     assert r.status_code == 404
 
 
+@pytest.mark.parametrize("mode,count", [("daily", 5), ("race_week", 5), ("one_shot", 3)])
+def test_all_modes_serve_and_hide_answers(client, mode, count):
+    r = client.get(f"/api/v1/quiz/{mode}")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["game_mode"] == mode
+    assert len(body["questions"]) == count
+    for q in body["questions"]:
+        assert "actual" not in q and "verified_answer" not in q
+
+
+def test_unknown_mode_404(client):
+    assert client.get("/api/v1/quiz/bogus").status_code == 404
+
+
+def test_daily_set_is_deterministic_within_period(client):
+    a = [q["question_text"] for q in client.get("/api/v1/quiz/daily").json()["questions"]]
+    b = [q["question_text"] for q in client.get("/api/v1/quiz/daily").json()["questions"]]
+    assert a == b  # stable provisioning for the same UTC day
+
+
 def test_arcade_pair_shape(client):
     r = client.get("/api/v1/arcade/pair")
     assert r.status_code == 200

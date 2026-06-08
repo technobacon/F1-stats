@@ -12,9 +12,11 @@ change behind these functions.
 
 from __future__ import annotations
 
+import hashlib
 import random
 import secrets
 import sqlite3
+from datetime import datetime, timezone
 
 from . import scoring
 from .validation import compute_metric
@@ -29,6 +31,20 @@ ARCADE_METRICS = {
     "poles": "Pole Positions",
     "fastest_laps": "Fastest Laps",
 }
+
+# Per-mode session size (PRD §4.1). One-Shots is the short, hardcore set.
+MODE_QUESTION_COUNT = {"daily": 5, "race_week": 5, "one_shot": 3}
+
+
+def _utc_today() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+def _deterministic_rng(*parts: str) -> random.Random:
+    """Stable RNG seeded by the given parts (e.g. mode + UTC date), so every
+    client gets the same provisioned set for the same period (Architecture §1.1)."""
+    digest = hashlib.sha256(":".join(parts).encode()).hexdigest()
+    return random.Random(int(digest[:16], 16))
 
 
 def _slider_bounds(answer: float) -> tuple[float, float]:
@@ -45,19 +61,27 @@ def _slider_bounds(answer: float) -> tuple[float, float]:
     return 0.0, round(upper)
 
 
-def build_daily_quiz(conn: sqlite3.Connection, game_mode: str = "daily", limit: int = 5) -> dict:
-    """Provision the daily quiz: pick verified questions, mint tracking tokens.
+def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str | None = None) -> dict:
+    """Provision a quiz session: deterministically pick verified questions for the
+    given mode + period, mint tracking tokens.
 
-    Mirrors the 00:00 UTC cron provisioning (Architecture §1.1). The verified
-    answer is stashed in the token store, NOT returned.
+    Mirrors the 00:00 UTC cron provisioning (Architecture §1.1): the selection is
+    seeded by (mode, period) so it is stable for everyone within the period and
+    rotates to a fresh set the next period. The verified answer is stashed in the
+    token store, NOT returned to the client.
     """
-    rows = conn.execute(
+    count = MODE_QUESTION_COUNT.get(game_mode, 5)
+    period = period or _utc_today()
+
+    pool = conn.execute(
         "SELECT id, question_string, verified_answer, difficulty_weight "
         "FROM production_trivia_questions "
-        "WHERE is_active = 1 AND game_mode = ? "
-        "ORDER BY id LIMIT ?",
-        (game_mode, limit),
+        "WHERE is_active = 1 AND game_mode = ? ORDER BY id",
+        (game_mode,),
     ).fetchall()
+
+    rng = _deterministic_rng(game_mode, period)
+    rows = rng.sample(pool, min(count, len(pool)))
 
     questions = []
     for row in rows:

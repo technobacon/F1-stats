@@ -12,7 +12,8 @@ body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:var(--b
        color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
 
 .hud { display:flex; align-items:center; justify-content:space-between; gap:1rem;
-       padding:.75rem 1.25rem; background:var(--surface); border-bottom:3px solid var(--color-primary); }
+       padding:calc(.75rem + env(safe-area-inset-top)) 1.25rem .75rem; background:var(--surface);
+       border-bottom:3px solid var(--color-primary); position:sticky; top:0; z-index:20; }
 .hud-brand { font-weight:800; letter-spacing:.5px; }
 .hud-brand span { color:var(--color-primary); }
 .hud-countdown { text-align:center; display:flex; flex-direction:column; }
@@ -23,9 +24,12 @@ body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:var(--b
 #team-select { background:var(--bg); color:var(--text); border:1px solid var(--line);
                border-radius:6px; padding:.3rem .5rem; }
 
-.modes { display:flex; gap:.5rem; padding:1rem 1.25rem 0; max-width:760px; margin:0 auto; width:100%; }
-.mode-tab { flex:1; background:transparent; color:var(--muted); border:1px solid var(--line);
-            border-bottom:none; border-radius:8px 8px 0 0; padding:.6rem; cursor:pointer; font-weight:600; }
+.modes { display:flex; gap:.4rem; padding:1rem 1.25rem 0; max-width:760px; margin:0 auto; width:100%;
+         overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.modes::-webkit-scrollbar { display:none; }
+.mode-tab { flex:1 0 auto; background:transparent; color:var(--muted); border:1px solid var(--line);
+            border-bottom:none; border-radius:8px 8px 0 0; padding:.6rem .8rem; cursor:pointer;
+            font-weight:600; white-space:nowrap; }
 .mode-tab.active { color:var(--text); border-color:var(--color-primary); background:var(--surface); }
 
 main { flex:1; max-width:760px; margin:0 auto; width:100%; padding:0 1.25rem 2rem; }
@@ -90,6 +94,16 @@ main { flex:1; max-width:760px; margin:0 auto; width:100%; padding:0 1.25rem 2re
 .stats dt { color:var(--muted); } .stats dd { margin:0; font-weight:700; text-align:right; }
 
 .foot { text-align:center; color:var(--muted); font-size:.7rem; padding:1.5rem; border-top:1px solid var(--line); }
+
+/* Cap note, accuracy, toast */
+.cap-note { background:rgba(63,185,80,.12); border:1px solid #2e6b3a; color:#9fe0ab;
+            border-radius:8px; padding:.7rem .9rem; margin-bottom:1rem; font-size:.9rem; }
+.accuracy-row { color:var(--muted); margin:.5rem 0 1rem; font-size:.9rem; }
+#replay-quiz { margin-top:.6rem; }
+.toast { position:fixed; left:50%; bottom:calc(1.25rem + env(safe-area-inset-bottom));
+         transform:translateX(-50%); background:#000; color:#fff; border:1px solid var(--color-primary);
+         padding:.7rem 1.1rem; border-radius:10px; font-size:.9rem; z-index:50; max-width:90%;
+         text-align:center; box-shadow:0 6px 24px rgba(0,0,0,.5); }
 
 /* ---- Mobile / iPhone ---- */
 @media (max-width: 560px) {
