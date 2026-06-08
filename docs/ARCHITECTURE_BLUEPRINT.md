@@ -3,6 +3,19 @@
 **Module:** Full-Stack Deployment
 **Target Audience:** Full-Stack Developers / DevOps Engineers
 
+### 0. Adopted Technology Stack
+
+| Layer | Technology | Rationale |
+|---|---|---|
+| **Frontend** | Next.js (React) | SSR/SSG for SEO, edge rendering for the countdown HUD, React ecosystem for Framer Motion animations |
+| **Backend API** | Python / FastAPI | Matches ETL + LLM pipeline language; Pydantic enforces the strict JSON schema from Pipeline §2.1; async-native for concurrent scoring |
+| **Database** | PostgreSQL | Implied by `gen_random_uuid()`; `NUMERIC` type handles half-points; strong index support for cron/scheduling queries |
+| **Cache** | Redis | Daily quiz provisioning cache (Architecture §1.1); Arcade matchup buffer |
+| **Background Jobs** | Celery + Redis broker | Weekly Jolpica ingestion, daily cron reset at 00:00 UTC |
+| **Auth** | NextAuth.js | Email + Google OAuth; integrates cleanly with Next.js; guest-first flow (no session required until leaderboard) |
+| **Styling** | Tailwind CSS | Required for the CSS variable constructor theming (Architecture §3.1) |
+| **Hosting** | Vercel (frontend) + Railway/Render (API + DB) | Standard pairing for Next.js + Python; horizontal scaling available |
+
 ### 1. Game Logic & API State Architecture
 To prevent client-side tampering and ensure a unified competitive experience, core score calculations and round caching configurations must remain isolated to secure server environments.
 
@@ -14,6 +27,8 @@ A cron service running daily at 00:00 UTC queries the master database to provisi
 
 #### 1.2 High-Performance Arcade Querying Engine
 To preserve sub-second response parameters during heavy concurrent scaling phases, database queries mapping driver matchups must never employ arbitrary `ORDER BY RANDOM()` filters. Engineers should use index-based random offset targeting to fetch two competing entities within an intersecting historical runtime threshold.
+
+> **Scope (v1):** Arcade Over/Under is **non-competitive**. Points are tracked locally as a personal streak counter only and do not feed the Global Leaderboard or the Constructors Championship standings. Server-side validation per pick and leaderboard integration are deferred to a future milestone. Pick evaluation may therefore be handled client-side in v1, but the API should be designed to accept a server-validation extension without a breaking change.
 
 ### 2. Frontend Infrastructure & Frictionless Client State
 The client-side infrastructure leverages frameworks equipped for performant edge rendering (such as Next.js, React, or Nuxt.js) alongside optimized localized object management models.

@@ -36,8 +36,8 @@ This produces the worked examples below: a 10% error yields `5000 × e^(−0.3) 
 ```
 
 ### 3.1 Data Sourcing
-- **Primary Source:** Historical telemetry, driver, constructor, and circuit statistics must be integrated using the **Jolpica F1 API** (api.jolpi.ca).
-- **Secondary Source:** Modern live timing and tire telemetry data can optionally expand into the **OpenF1 API** (openf1.org).
+- **Primary Source:** Historical results, standings, driver, constructor, qualifying, and circuit statistics must be integrated using the **Jolpica F1 API** (api.jolpi.ca). Note: Jolpica provides structured results and standings data — not raw telemetry.
+- **Secondary Source:** Modern live timing and car telemetry data (~2018 onwards) can optionally expand into the **OpenF1 API** (openf1.org).
 
 ### 3.2 Automated Question Generation Pipeline (Anti-Hallucination)
 To protect user experience, data must **never** be fetched live from the external APIs during consumer gameplay. Developers must build an offline ETL (Extract, Transform, Load) pipeline:
@@ -55,8 +55,8 @@ The frontend application must support four distinct operational views:
 |---|---|---|---|
 | **Daily General Quiz** | Precise Text Box + Slider | 1 Session (5 Questions) per 24 hours | Global cron job reset at 00:00 UTC |
 | **Race-Week Quiz** | Precise Text Box + Slider | 1 Session (5 Questions) per active race week | Conditioned on real-world F1 weekend schedules |
-| **The One-Shots** | Hardcore Text Input | Max 3–5 unique questions per 24 hours | Tracks individual user attempt arrays |
-| **Arcade Over/Under** | Twin Button Clicks (A/B) | **Unlimited** | Algorithmic pairing matrix of database entities |
+| **The One-Shots** | Hardcore Text Input | Max 3–5 unique questions per 24 hours | Tracks individual user attempt arrays. Scoring TBD — leaning towards the same percentage-error exponential decay formula as Daily/Race-Week. |
+| **Arcade Over/Under** | Twin Button Clicks (A/B) | **Unlimited** | Non-competitive (personal streak only, v1). Algorithmic pairing matrix of database entities. |
 
 ### 4.2 The Arcade Over/Under Matrix Engine
 To ensure infinite replayability without manual question writing, the backend must dynamically generate "Who Has More?" pairs.
