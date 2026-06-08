@@ -21,12 +21,14 @@ reality is the ETL's responsibility.
 
 from __future__ import annotations
 
+import hashlib
+import random
 import sqlite3
 import uuid
 from dataclasses import dataclass, field
 
 from . import db
-from .validation import validate_ai_question
+from .validation import compute_metric, validate_ai_question
 
 
 @dataclass
@@ -134,52 +136,113 @@ DRIVERS = [
     ]),
 ]
 
-# (driver_id, constructor_id, metric) combos to skip during question generation —
-# reserved for the planted-hallucination demo so there is no duplicate/competing
-# valid question with the same wording.
+# Reserve Schumacher/Ferrari career wins (total) for the planted-hallucination
+# demo, so no competing valid question with the same wording reaches production.
 _GENERATION_SKIP = {("schumacher", "ferrari", "wins")}
 
+# Circuit calendar used to lay out the synthetic race log (display name, country).
+CIRCUITS = [
+    ("monaco", "Monaco", "Monaco"), ("silverstone", "Silverstone", "UK"),
+    ("monza", "Monza", "Italy"), ("spa", "Spa-Francorchamps", "Belgium"),
+    ("suzuka", "Suzuka", "Japan"), ("interlagos", "Interlagos", "Brazil"),
+    ("montreal", "Montreal", "Canada"), ("hungaroring", "Hungaroring", "Hungary"),
+    ("barcelona", "Barcelona", "Spain"), ("red_bull_ring", "Red Bull Ring", "Austria"),
+    ("zandvoort", "Zandvoort", "Netherlands"), ("marina_bay", "Marina Bay", "Singapore"),
+    ("cota", "Circuit of the Americas", "USA"), ("mexico_city", "Mexico City", "Mexico"),
+    ("sakhir", "Sakhir", "Bahrain"), ("imola", "Imola", "Italy"),
+    ("albert_park", "Albert Park", "Australia"), ("baku", "Baku", "Azerbaijan"),
+    ("jeddah", "Jeddah", "Saudi Arabia"), ("las_vegas", "Las Vegas", "USA"),
+]
+_CIRCUIT_NAME = {c[0]: c[1] for c in CIRCUITS}
 
-def _insert_stint_rows(conn: sqlite3.Connection, stint: Stint, round_offset: int) -> int:
-    """Generate granular staging rows for a stint so the metric queries recompute
-    the stint totals exactly. Returns the next free round offset.
+# Illustrative modern points table; applied to every era for a self-consistent log.
+_POINTS_TABLE = {1: 25, 2: 18, 3: 15, 4: 12, 5: 10, 6: 8, 7: 6, 8: 4, 9: 2, 10: 1}
 
-    Layout (each row a distinct round so the validation COUNTs are exact):
-      * `wins` rows           position=1
-      * `podiums - wins` rows position=2  (fills out the podium total)
-      * `fastest_laps` rows   position=8, fastest_lap=1 (kept off the podium)
-      * one summary row       position=11 carrying the whole `points` total
-      * `poles` quali rows    quali_position=1
-    """
-    rnd = round_offset
-    rows: list[tuple] = []
 
-    for _ in range(stint.wins):
-        rows.append((stint.driver_id, stint.constructor_id, stint.start_year, rnd, 1, 1, 0, 0.0)); rnd += 1
-    for _ in range(stint.podiums - stint.wins):
-        rows.append((stint.driver_id, stint.constructor_id, stint.start_year, rnd, 2, 3, 0, 0.0)); rnd += 1
-    for _ in range(stint.fastest_laps):
-        rows.append((stint.driver_id, stint.constructor_id, stint.start_year, rnd, 8, 9, 1, 0.0)); rnd += 1
-    # Single summary row carries the full points total (SUM is what validation checks).
-    rows.append((stint.driver_id, stint.constructor_id, stint.start_year, rnd, 11, 12, 0, stint.points)); rnd += 1
+def _races_in_year(year: int) -> int:
+    if year < 1995:
+        return 16
+    if year < 2005:
+        return 17
+    if year < 2012:
+        return 18
+    return min(20, len(CIRCUITS))
 
-    conn.executemany(
-        "INSERT INTO staging_race_results "
-        "(driver_id, constructor_id, year, round, position, grid, fastest_lap, points) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        rows,
-    )
 
-    quali_rows = [
-        (stint.driver_id, stint.constructor_id, stint.start_year, round_offset + i, 1)
-        for i in range(stint.poles)
-    ]
-    conn.executemany(
-        "INSERT INTO staging_qualifying_results "
-        "(driver_id, constructor_id, year, round, quali_position) VALUES (?, ?, ?, ?, ?)",
-        quali_rows,
-    )
-    return rnd
+def _dnf_rate(year: int) -> float:
+    if year < 1995:
+        return 0.22
+    if year < 2005:
+        return 0.15
+    if year < 2015:
+        return 0.09
+    return 0.06
+
+
+def _stint_rng(stint: Stint) -> random.Random:
+    """Deterministic RNG per stint (hashlib, not salted hash()) so the generated
+    log — and therefore every derived answer — is identical across redeploys."""
+    key = f"{stint.driver_id}|{stint.constructor_id}|{stint.start_year}|{stint.end_year}"
+    return random.Random(int(hashlib.md5(key.encode()).hexdigest()[:16], 16))
+
+
+def _generate_log(stint: Stint) -> tuple[list[tuple], list[tuple]]:
+    """Build a realistic race-by-race log for a stint. The targeted aggregates
+    (wins, podiums, poles, fastest laps) are placed EXACTLY; everything else
+    (points, DNFs, grids, positions gained) emerges from the log so derived
+    metrics are internally consistent. Returns (race_rows, quali_rows)."""
+    rng = _stint_rng(stint)
+    entries = [(y, i + 1, CIRCUITS[i][0])
+               for y in range(stint.start_year, stint.end_year + 1)
+               for i in range(_races_in_year(y))]
+    total = len(entries)
+    if total == 0:
+        return [], []
+
+    idx = list(range(total))
+    rng.shuffle(idx)
+    W = max(0, min(stint.wins, total))
+    Pe = max(0, min(stint.podiums - stint.wins, total - W))
+    win_idx, pod_idx = set(idx[:W]), set(idx[W:W + Pe])
+    rest = idx[W + Pe:]
+    D = min(int(round(total * _dnf_rate(stint.start_year))), len(rest))
+    dnf_idx, fin_idx = set(rest[:D]), rest[D:]
+
+    position: dict[int, int | None] = {}
+    for i in win_idx:
+        position[i] = 1
+    for i in pod_idx:
+        position[i] = rng.choice([2, 3])
+    for i in dnf_idx:
+        position[i] = None
+    fin_pos, fin_w = list(range(4, 17)), [13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+    for i in fin_idx:
+        position[i] = rng.choices(fin_pos, weights=fin_w)[0]
+
+    classified = [i for i in idx if position[i] is not None]
+    F = min(stint.fastest_laps, len(classified))
+    fl_idx = set(rng.sample(classified, F)) if F else set()
+
+    Pol = max(0, min(stint.poles, total))
+    pole_idx = set(rng.sample(idx, Pol)) if Pol else set()
+    remaining = [i for i in idx if i not in pole_idx]
+    f2n = min(len(remaining), round(Pol * 0.6) + rng.randint(0, 3))
+    front2_idx = set(rng.sample(remaining, f2n)) if f2n else set()
+
+    race_rows, quali_rows = [], []
+    for i, (year, rnd, cid) in enumerate(entries):
+        pos = position[i]
+        quali = 1 if i in pole_idx else 2 if i in front2_idx else rng.randint(3, 18)
+        # Grid usually matches qualifying; occasional grid penalty diverges them.
+        grid = min(20, quali + rng.randint(3, 8)) if rng.random() < 0.12 else quali
+        fl = 1 if i in fl_idx else 0
+        pts = _POINTS_TABLE.get(pos, 0) if pos else 0
+        if fl and pos and pos <= 10:
+            pts += 1
+        race_rows.append((stint.driver_id, stint.constructor_id, year, rnd, cid,
+                          pos, grid, fl, float(pts)))
+        quali_rows.append((stint.driver_id, stint.constructor_id, year, rnd, quali))
+    return race_rows, quali_rows
 
 
 def seed_staging(conn: sqlite3.Connection) -> None:
@@ -189,105 +252,193 @@ def seed_staging(conn: sqlite3.Connection) -> None:
         [(c.constructor_id, c.name, c.nationality) for c in CONSTRUCTORS],
     )
     conn.executemany(
+        "INSERT INTO staging_circuits (circuit_id, name, country) VALUES (?, ?, ?)", CIRCUITS,
+    )
+    conn.executemany(
         "INSERT INTO staging_drivers (driver_id, full_name, nationality, active_from, active_to) "
         "VALUES (?, ?, ?, ?, ?)",
         [(d.driver_id, d.full_name, d.nationality, d.active_from, d.active_to) for d in DRIVERS],
     )
-    round_offset = 1
     for driver in DRIVERS:
         for stint in driver.stints:
-            round_offset = _insert_stint_rows(conn, stint, round_offset)
+            race_rows, quali_rows = _generate_log(stint)
+            conn.executemany(
+                "INSERT INTO staging_race_results "
+                "(driver_id, constructor_id, year, round, circuit_id, position, grid, "
+                " fastest_lap, points) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                race_rows,
+            )
+            conn.executemany(
+                "INSERT INTO staging_qualifying_results "
+                "(driver_id, constructor_id, year, round, quali_position) VALUES (?, ?, ?, ?, ?)",
+                quali_rows,
+            )
     conn.commit()
 
 
 # --- Mock LLM output (strict schema, Pipeline §2.2) -------------------------
-# In production a real LLM phrases these. Here a generator emits the same rigid
-# JSON the prompt controller would receive, then the deterministic validation
-# layer independently re-derives every answer before anything is committed.
+# In production a real LLM phrases these. Here a data-driven generator emits the
+# same rigid JSON the prompt controller would receive (querying the seeded
+# staging data for each answer, exactly as an accurate LLM would). The
+# deterministic validation layer then independently re-derives every answer
+# before anything is committed — including catching the planted hallucination.
 
 _CONSTRUCTOR_NAME = {c.constructor_id: c.name for c in CONSTRUCTORS}
-
-# metric -> (question template, difficulty_weight, game_mode). Spreads questions
-# across the three exact-numerical modes (PRD §4.1).
-_METRIC_TEMPLATE = {
-    "wins":         ("How many race wins did {name} take with {cname} ({y1}-{y2})?", 2.0, "daily"),
-    "podiums":      ("How many podiums did {name} score with {cname} ({y1}-{y2})?", 2.5, "race_week"),
-    "poles":        ("How many pole positions did {name} take with {cname} ({y1}-{y2})?", 3.0, "race_week"),
-    "fastest_laps": ("How many fastest laps did {name} set with {cname} ({y1}-{y2})?", 2.5, "one_shot"),
-    "points":       ("How many championship points did {name} score with {cname} ({y1}-{y2})?", 3.5, "one_shot"),
+_DRIVER_NAME = {d.driver_id: d.full_name for d in DRIVERS}
+_DRIVER_SPAN = {
+    d.driver_id: (min(s.start_year for s in d.stints), max(s.end_year for s in d.stints))
+    for d in DRIVERS
 }
 
-_METRIC_VALUE = {
-    "wins": lambda s: s.wins, "podiums": lambda s: s.podiums,
-    "poles": lambda s: s.poles, "fastest_laps": lambda s: s.fastest_laps,
-    "points": lambda s: s.points,
-}
+# Curated overlapping-era rivalries for head-to-head questions.
+_HEAD_TO_HEAD = [
+    ("senna", "prost"), ("hamilton", "vettel"), ("hamilton", "alonso"),
+    ("verstappen", "leclerc"), ("verstappen", "russell"), ("alonso", "raikkonen"),
+    ("vettel", "webber"), ("rosberg", "hamilton"), ("button", "hamilton"),
+    ("massa", "raikkonen"),
+]
+_H2H_METRICS = [("wins", "race wins"), ("podiums", "podiums")]
 
 
-def generate_questions() -> list[dict]:
-    """Build the full validated-question pool from the seeded stints.
-
-    One question per (stint, metric) with a positive value, plus career-total
-    questions (constructor filter omitted) to exercise the optional-filter path.
-    Every proposed_answer is the true seeded value, so all of these pass
-    validation — the rejection demo is the separate planted hallucination below.
-    """
-    questions: list[dict] = []
-    for driver in DRIVERS:
-        for stint in driver.stints:
-            cname = _CONSTRUCTOR_NAME.get(stint.constructor_id, stint.constructor_id)
-            for metric, (template, weight, mode) in _METRIC_TEMPLATE.items():
-                value = _METRIC_VALUE[metric](stint)
-                if value <= 0:
-                    continue
-                if (driver.driver_id, stint.constructor_id, metric) in _GENERATION_SKIP:
-                    continue
-                questions.append({
-                    "question_text": template.format(
-                        name=driver.full_name, cname=cname,
-                        y1=stint.start_year, y2=stint.end_year),
-                    "difficulty_weight": weight,
-                    "game_mode": mode,
-                    "validation_parameters": {
-                        "target_entity": "driver", "entity_id": driver.driver_id,
-                        "filter_constructor_id": stint.constructor_id,
-                        "start_year": stint.start_year, "end_year": stint.end_year,
-                        "metric_target": metric,
-                    },
-                    "proposed_answer": value,
-                })
-
-        # Career-total questions (multi-stint drivers): NO constructor filter.
-        if len(driver.stints) > 1:
-            lo = min(s.start_year for s in driver.stints)
-            hi = max(s.end_year for s in driver.stints)
-            for metric, label in (("wins", "race wins"), ("podiums", "podiums")):
-                total = sum(_METRIC_VALUE[metric](s) for s in driver.stints)
-                if total <= 0:
-                    continue
-                questions.append({
-                    "question_text": f"How many career {label} did {driver.full_name} "
-                                     f"score across all teams?",
-                    "difficulty_weight": 3.0,
-                    "game_mode": "daily",
-                    "validation_parameters": {
-                        "target_entity": "driver", "entity_id": driver.driver_id,
-                        "start_year": lo, "end_year": hi, "metric_target": metric,
-                    },
-                    "proposed_answer": total,
-                })
-    return questions
+def _p(entity: str, **kw) -> dict:
+    """Build a validation_parameters payload."""
+    return {"target_entity": "driver", "entity_id": entity, **kw}
 
 
-def mock_llm_questions() -> list[dict]:
+def _emit(conn, out, seen, text, params, mode, weight,
+          kind="count", category="", dmin=None, dmax=None) -> None:
+    """Compute the true answer for a question and stage it as an LLM output.
+    Skips empty/trivial answers so the pool stays interesting."""
+    if text in seen:
+        return
+    try:
+        ans = compute_metric(conn, params)
+    except Exception:  # noqa: BLE001 — malformed combo, just skip
+        return
+    if kind in ("count", "points", "percentage", "year") and ans <= 0:
+        return
+    pv = int(ans) if ans == ans.to_integral_value() else float(ans)
+    seen.add(text)
+    out.append({
+        "question_text": text, "difficulty_weight": weight, "game_mode": mode,
+        "answer_kind": kind, "category": category, "display_min": dmin, "display_max": dmax,
+        "validation_parameters": params, "proposed_answer": pv,
+    })
+
+
+def generate_questions(conn: sqlite3.Connection) -> list[dict]:
+    """Build the full validated-question pool by querying the seeded staging data
+    across a wide variety of metrics and aggregations (PRD §4)."""
+    out: list[dict] = []
+    seen: set[str] = set()
+
+    def E(*a, **k):
+        _emit(conn, out, seen, *a, **k)
+
+    for d in DRIVERS:
+        name, did = d.full_name, d.driver_id
+        lo, hi = _DRIVER_SPAN[did]
+
+        # ---- Per-stint questions ----
+        for s in d.stints:
+            c, y1, y2 = s.constructor_id, s.start_year, s.end_year
+            cn = _CONSTRUCTOR_NAME.get(c, c)
+            P = lambda **kw: _p(did, filter_constructor_id=c, start_year=y1, end_year=y2, **kw)
+
+            if (did, c, "wins") not in _GENERATION_SKIP:
+                E(f"How many race wins did {name} take with {cn} ({y1}-{y2})?",
+                  P(metric_target="wins"), "daily", 2.0, category="career")
+            E(f"How many podium finishes did {name} score for {cn} ({y1}-{y2})?",
+              P(metric_target="podiums"), "daily", 2.5, category="career")
+            E(f"How many pole positions did {name} take for {cn} ({y1}-{y2})?",
+              P(metric_target="poles"), "race_week", 3.0, category="qualifying")
+            E(f"How many fastest laps did {name} set for {cn} ({y1}-{y2})?",
+              P(metric_target="fastest_laps"), "race_week", 2.5, category="career")
+            E(f"Roughly how many championship points did {name} score for {cn} ({y1}-{y2})?",
+              P(metric_target="points"), "daily", 3.0, kind="points", category="career")
+            E(f"How many times did {name} fail to finish (DNF) for {cn} ({y1}-{y2})?",
+              P(metric_target="dnfs"), "one_shot", 3.0, category="reliability")
+            E(f"How many points-scoring finishes (top 10) did {name} record for {cn} ({y1}-{y2})?",
+              P(metric_target="points_finishes"), "race_week", 2.5, category="consistency")
+            E(f"How many front-row starts did {name} qualify for {cn} ({y1}-{y2})?",
+              P(metric_target="front_rows"), "one_shot", 3.0, category="qualifying")
+            E(f"Net across every start, how many positions did {name} gain from the grid for {cn} ({y1}-{y2})?",
+              P(metric_target="positions_gained"), "one_shot", 4.0, category="racecraft")
+            E(f"What is the most race wins {name} scored in a single season for {cn}?",
+              P(metric_target="wins", aggregation="best_season"), "one_shot", 3.5, category="single_season")
+            E(f"In which season did {name} win the most races for {cn}?",
+              P(metric_target="wins", aggregation="which_year"), "one_shot", 3.5,
+              kind="year", category="milestone", dmin=y1, dmax=y2)
+            E(f"In which year did {name} score their first win for {cn}?",
+              P(metric_target="wins", aggregation="first_season"), "one_shot", 3.5,
+              kind="year", category="milestone", dmin=y1, dmax=y2)
+            E(f"Driving for {cn}, in what percentage of races did {name} finish on the podium?",
+              P(metric_target="podiums", aggregation="percentage_of_races"), "one_shot", 4.0,
+              kind="percentage", category="rates", dmin=0, dmax=100)
+            E(f"How many of {name}'s pole positions for {cn} converted into a win?",
+              P(metric_target="poles_converted"), "one_shot", 3.5, category="rates")
+
+        # ---- Career-level questions (no constructor filter) ----
+        C = lambda **kw: _p(did, start_year=lo, end_year=hi, **kw)
+        E(f"How many career race wins does {name} have in our database?",
+          C(metric_target="wins"), "daily", 2.5, category="career")
+        E(f"How many career podiums does {name} have in our database?",
+          C(metric_target="podiums"), "daily", 2.5, category="career")
+        E(f"How many career pole positions does {name} have in our database?",
+          C(metric_target="poles"), "daily", 3.0, category="qualifying")
+        E(f"Roughly how many career points has {name} scored in our database?",
+          C(metric_target="points"), "daily", 3.0, kind="points", category="career")
+        E(f"How many different constructors has {name} driven for in our database?",
+          C(metric_target="distinct_constructors"), "daily", 2.0, category="career")
+        E(f"How many seasons has {name} contested in our database?",
+          C(metric_target="seasons_active"), "daily", 2.0, category="career")
+        E(f"In which season did {name} take the most wins of their career?",
+          C(metric_target="wins", aggregation="which_year"), "one_shot", 3.5,
+          kind="year", category="milestone", dmin=lo, dmax=hi)
+        E(f"In which year did {name} score the very first win of their career?",
+          C(metric_target="wins", aggregation="first_season"), "one_shot", 3.5,
+          kind="year", category="milestone", dmin=lo, dmax=hi)
+        E(f"Across their whole career, in what percentage of races did {name} finish on the podium?",
+          C(metric_target="podiums", aggregation="percentage_of_races"), "one_shot", 4.0,
+          kind="percentage", category="rates", dmin=0, dmax=100)
+
+        # ---- Per-circuit wins (the driver's three best tracks) ----
+        for r in conn.execute(
+            "SELECT circuit_id, COUNT(*) AS w FROM staging_race_results "
+            "WHERE driver_id = ? AND position = 1 GROUP BY circuit_id "
+            "ORDER BY w DESC, circuit_id LIMIT 3", (did,)
+        ).fetchall():
+            track = _CIRCUIT_NAME.get(r["circuit_id"], r["circuit_id"])
+            E(f"How many times did {name} win at {track}?",
+              C(metric_target="wins", filter_circuit_id=r["circuit_id"]),
+              "race_week", 3.0, category="circuit")
+
+    # ---- Head-to-head differences (overlapping eras) ----
+    for a, b in _HEAD_TO_HEAD:
+        span = (min(_DRIVER_SPAN[a][0], _DRIVER_SPAN[b][0]),
+                max(_DRIVER_SPAN[a][1], _DRIVER_SPAN[b][1]))
+        for metric, label in _H2H_METRICS:
+            va = compute_metric(conn, _p(a, start_year=span[0], end_year=span[1], metric_target=metric))
+            vb = compute_metric(conn, _p(b, start_year=span[0], end_year=span[1], metric_target=metric))
+            if va == vb:
+                continue
+            hi_id, lo_id = (a, b) if va > vb else (b, a)
+            E(f"How many more career {label} does {_DRIVER_NAME[hi_id]} have than {_DRIVER_NAME[lo_id]}?",
+              _p(hi_id, entity_id_b=lo_id, start_year=span[0], end_year=span[1],
+                 metric_target=metric, aggregation="difference"),
+              "one_shot", 3.5, category="head_to_head")
+
+    return out
+
+
+def mock_llm_questions(conn: sqlite3.Connection) -> list[dict]:
     """Full mock LLM batch: the generated pool + exactly one planted hallucination."""
     planted = {
         # PLANTED HALLUCINATION: staging says 72, the LLM "remembers" 80.
         # The validation layer must reject this and keep it out of production.
-        "question_text": "How many race wins did Michael Schumacher take with Ferrari "
-                         "(1996-2006)?",
-        "difficulty_weight": 2.0,
-        "game_mode": "daily",
+        "question_text": "How many race wins did Michael Schumacher take with Ferrari (1996-2006)?",
+        "difficulty_weight": 2.0, "game_mode": "daily",
+        "answer_kind": "count", "category": "career", "display_min": None, "display_max": None,
         "validation_parameters": {
             "target_entity": "driver", "entity_id": "schumacher",
             "filter_constructor_id": "ferrari",
@@ -295,7 +446,7 @@ def mock_llm_questions() -> list[dict]:
         },
         "proposed_answer": 80,  # WRONG — true staging value is 72
     }
-    return generate_questions() + [planted]
+    return generate_questions(conn) + [planted]
 
 
 def run_validation_pipeline(conn: sqlite3.Connection, today: str | None = None) -> dict:
@@ -304,7 +455,7 @@ def run_validation_pipeline(conn: sqlite3.Connection, today: str | None = None) 
     Returns a summary {committed, rejected, rejections:[...]} for logging/CLI.
     """
     committed, rejections = 0, []
-    for q in mock_llm_questions():
+    for q in mock_llm_questions(conn):
         result = validate_ai_question(conn, q)
         if not result.ok:
             rejections.append({
@@ -317,12 +468,17 @@ def run_validation_pipeline(conn: sqlite3.Connection, today: str | None = None) 
             continue
         conn.execute(
             "INSERT OR IGNORE INTO production_trivia_questions "
-            "(id, question_string, verified_answer, difficulty_weight, game_mode, "
-            " is_active, scheduled_date) VALUES (?, ?, ?, ?, ?, 1, ?)",
+            "(id, question_string, verified_answer, answer_kind, category, display_min, "
+            " display_max, difficulty_weight, game_mode, is_active, scheduled_date) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)",
             (
                 str(uuid.uuid4()),
                 q["question_text"],
                 float(result.expected),       # store the TRUSTED value, not the LLM's
+                q.get("answer_kind", "count"),
+                q.get("category", ""),
+                q.get("display_min"),
+                q.get("display_max"),
                 q.get("difficulty_weight", 1.0),
                 q.get("game_mode", "daily"),
                 today,

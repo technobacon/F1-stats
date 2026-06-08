@@ -35,13 +35,15 @@ def connect(db_path: Path | str | None = None) -> sqlite3.Connection:
 
 
 SCHEMA = """
--- Race results: used for wins, podiums, points, fastest laps (Pipeline §1.1)
+-- Race results: used for wins, podiums, points, fastest laps, DNFs,
+-- positions gained, per-circuit stats (Pipeline §1.1)
 CREATE TABLE IF NOT EXISTS staging_race_results (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
     driver_id      TEXT    NOT NULL,
     constructor_id TEXT,
     year           INTEGER NOT NULL,
     round          INTEGER NOT NULL,
+    circuit_id     TEXT,               -- enables per-circuit questions
     position       INTEGER,            -- finish position; NULL = DNF/DNS
     grid           INTEGER,            -- starting grid position
     fastest_lap    INTEGER DEFAULT 0,  -- boolean (0/1)
@@ -72,11 +74,21 @@ CREATE TABLE IF NOT EXISTS staging_constructors (
     nationality    TEXT
 );
 
+CREATE TABLE IF NOT EXISTS staging_circuits (
+    circuit_id TEXT PRIMARY KEY,
+    name       TEXT NOT NULL,
+    country    TEXT
+);
+
 -- Verified, client-facing questions (Pipeline §4)
 CREATE TABLE IF NOT EXISTS production_trivia_questions (
     id                TEXT PRIMARY KEY,            -- UUID
     question_string   TEXT NOT NULL UNIQUE,
     verified_answer   REAL NOT NULL,               -- REAL not INT: F1 has half-points
+    answer_kind       TEXT DEFAULT 'count',        -- 'count' | 'points' | 'year' | 'percentage'
+    category          TEXT,                        -- UI grouping, e.g. 'reliability'
+    display_min       REAL,                        -- optional slider bounds (year/percentage)
+    display_max       REAL,
     difficulty_weight REAL DEFAULT 1.0,
     game_mode         TEXT NOT NULL,               -- 'daily','race_week','one_shot'
     is_active         INTEGER DEFAULT 1,
@@ -102,6 +114,7 @@ def reset_db(conn: sqlite3.Connection) -> None:
         "staging_qualifying_results",
         "staging_drivers",
         "staging_constructors",
+        "staging_circuits",
         "production_trivia_questions",
     ):
         conn.execute(f"DROP TABLE IF EXISTS {table}")

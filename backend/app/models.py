@@ -15,6 +15,8 @@ class DailyQuestion(BaseModel):
     tracking_token: str = Field(..., description="Opaque server-side handle for scoring")
     question_text: str
     difficulty_weight: float
+    answer_kind: str = "count"   # 'count' | 'points' | 'year' | 'percentage'
+    category: str = ""           # UI grouping hint, e.g. 'reliability'
     # Optional UI hint for the odometer slider bounds (Architecture §3.2). The
     # true answer is NOT derivable from these bounds.
     slider_min: float

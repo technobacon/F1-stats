@@ -30,6 +30,9 @@ ARCADE_METRICS = {
     "podiums": "Podiums",
     "poles": "Pole Positions",
     "fastest_laps": "Fastest Laps",
+    "points_finishes": "Points Finishes",
+    "front_rows": "Front-Row Starts",
+    "dnfs": "DNFs",
 }
 
 # Per-mode session size (PRD §4.1). One-Shots is the short, hardcore set.
@@ -74,7 +77,8 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     period = period or _utc_today()
 
     pool = conn.execute(
-        "SELECT id, question_string, verified_answer, difficulty_weight "
+        "SELECT id, question_string, verified_answer, answer_kind, category, "
+        "       display_min, display_max, difficulty_weight "
         "FROM production_trivia_questions "
         "WHERE is_active = 1 AND game_mode = ? ORDER BY id",
         (game_mode,),
@@ -87,11 +91,17 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     for row in rows:
         token = secrets.token_urlsafe(16)
         _TOKEN_STORE[token] = (row["id"], row["verified_answer"])
-        smin, smax = _slider_bounds(row["verified_answer"])
+        # Prefer explicit display bounds (year/percentage); else a non-revealing band.
+        if row["display_min"] is not None and row["display_max"] is not None:
+            smin, smax = row["display_min"], row["display_max"]
+        else:
+            smin, smax = _slider_bounds(row["verified_answer"])
         questions.append({
             "tracking_token": token,
             "question_text": row["question_string"],
             "difficulty_weight": row["difficulty_weight"],
+            "answer_kind": row["answer_kind"],
+            "category": row["category"] or "",
             "slider_min": smin,
             "slider_max": smax,
         })

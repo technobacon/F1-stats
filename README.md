@@ -108,8 +108,23 @@ the prototype's stand-in for the 00:00 UTC cron provisioning (Architecture §1.1
 
 - Three exact-numerical modes (Daily / Race-Week / One-Shots) + Arcade Over/Under
 - Server-authoritative exp-decay scoring; answers never leave the server
-- Deterministic anti-hallucination validation over ~150 generated questions
+- Deterministic anti-hallucination validation over **~560 generated questions**
 - Guest-first localStorage: lifetime points, accuracy, streaks, achievements
+
+### Question variety
+
+The validation engine is metric + aggregation based, so a single deterministic
+SQL path verifies many creative question shapes against a synthetic but
+internally-consistent race-by-race log (grids, DNFs, points, circuits):
+
+- **Metrics:** wins, podiums, poles, fastest laps, points, DNFs, points-finishes,
+  front-row starts, net positions gained, distinct constructors, seasons, poles
+  converted to wins.
+- **Aggregations:** career/stint totals, single-season best, "in which year…",
+  first-season milestones, percentage-of-races, and head-to-head differences.
+- **Categories:** career, qualifying, reliability, racecraft, rates, milestones,
+  single-season, consistency, per-circuit, head-to-head — surfaced as UI chips,
+  with `answer_kind` (count / points / year / percentage) driving the input.
 - Per-period play caps with a testing-replay override
 - Live countdown HUD from a 2026 calendar with off-season pivot
 - Constructor theming, odometer score reveal, native share, PWA/add-to-home-screen

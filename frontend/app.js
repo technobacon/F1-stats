@@ -182,17 +182,33 @@ async function startQuiz() {
   }
 }
 
+const KIND_HINT = {
+  count: "Enter a whole number.",
+  points: "Enter a championship points total.",
+  year: "Enter a year (season).",
+  percentage: "Enter a percentage from 0 to 100.",
+};
+
 function renderQuestion() {
   const q = quiz.questions[qPos];
+  const kind = q.answer_kind || "count";
   document.getElementById("q-index").textContent = qPos + 1;
   document.getElementById("q-text").textContent = q.question_text;
+  document.getElementById("q-cat").textContent = (q.category || "").replace(/_/g, " ");
+  document.getElementById("q-hint").textContent = KIND_HINT[kind] || "";
+
   const slider = document.getElementById("q-slider"), input = document.getElementById("q-input");
-  // One-Shots is hardcore: no slider hand-holding.
-  slider.style.display = MODES[currentMode].slider ? "" : "none";
+  // Year answers always use a labelled slider (the scope is in the question anyway);
+  // One-Shots otherwise hides the slider for a hardcore feel.
+  const useSlider = kind === "year" || MODES[currentMode].slider;
+  slider.style.display = useSlider ? "" : "none";
   slider.min = q.slider_min; slider.max = q.slider_max;
-  slider.value = q.slider_min; input.value = MODES[currentMode].slider ? q.slider_min : "";
+  slider.step = "1";
+  slider.value = q.slider_min; input.value = useSlider ? q.slider_min : "";
+  input.step = "1"; input.min = q.slider_min;
+  input.max = kind === "percentage" ? 100 : q.slider_max;
   slider.oninput = () => (input.value = slider.value);
-  input.oninput = () => { if (MODES[currentMode].slider) slider.value = input.value; };
+  input.oninput = () => { if (useSlider) slider.value = input.value; };
   const btn = document.getElementById("submit-guess");
   btn.disabled = false; btn.textContent = "Lock In Guess";
 }

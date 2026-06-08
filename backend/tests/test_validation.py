@@ -1,14 +1,15 @@
-"""Tests for the anti-hallucination validation layer (Pipeline §3) and the
-seed pipeline, run against an in-memory SQLite database."""
+"""Tests for the generalized anti-hallucination validation engine (Pipeline §3)
+and the seed pipeline, run against an in-memory SQLite database.
+
+Metrics that the generator places EXACTLY (wins, podiums, poles, fastest_laps)
+get exact assertions; emergent metrics (points, DNFs, positions_gained, …) are
+checked for internal consistency against an independent direct query.
+"""
 
 import pytest
 
 from app import db
-from app.seed import (
-    mock_llm_questions,
-    run_validation_pipeline,
-    seed_staging,
-)
+from app.seed import mock_llm_questions, run_validation_pipeline, seed_staging
 from app.validation import compute_metric, validate_ai_question
 
 
@@ -23,98 +24,187 @@ def conn():
 
 def _params(**kw):
     base = {
-        "target_entity": "driver",
-        "entity_id": "schumacher",
+        "target_entity": "driver", "entity_id": "schumacher",
         "filter_constructor_id": "benetton",
-        "start_year": 1991,
-        "end_year": 1995,
-        "metric_target": "wins",
+        "start_year": 1991, "end_year": 1995, "metric_target": "wins",
     }
     base.update(kw)
     return base
 
 
-def test_wins_recomputed_from_rows(conn):
+# ---- Exact placements -------------------------------------------------------
+
+def test_wins_placed_exactly(conn):
     assert compute_metric(conn, _params()) == 19
 
 
 def test_poles_use_qualifying_not_grid(conn):
-    # Schumacher @ Benetton seeded with 4 poles in staging_qualifying_results.
     assert compute_metric(conn, _params(metric_target="poles")) == 4
 
 
+def test_podiums_placed_exactly(conn):
+    assert compute_metric(conn, _params(metric_target="podiums")) == 36
+
+
 def test_career_total_omits_constructor_filter(conn):
-    # Raikkonen career podiums across McLaren (25) + Ferrari (24) = 49, no filter.
-    params = {
-        "target_entity": "driver", "entity_id": "raikkonen",
-        "start_year": 2002, "end_year": 2009, "metric_target": "podiums",
-    }
+    # Raikkonen career podiums = McLaren (25) + Ferrari (24) = 49, no filter.
+    params = {"target_entity": "driver", "entity_id": "raikkonen",
+              "start_year": 2002, "end_year": 2009, "metric_target": "podiums"}
     assert "filter_constructor_id" not in params
     assert compute_metric(conn, params) == 49
 
 
-def test_points_preserve_decimal(conn):
-    val = compute_metric(conn, _params(
-        entity_id="hamilton", filter_constructor_id="mercedes",
-        start_year=2013, end_year=2020, metric_target="points",
-    ))
-    assert val == 3000
+# ---- Emergent metrics: consistent with an independent query -----------------
 
+def test_points_match_direct_sum(conn):
+    val = compute_metric(conn, _params(metric_target="points"))
+    direct = conn.execute(
+        "SELECT COALESCE(SUM(points),0) FROM staging_race_results "
+        "WHERE driver_id='schumacher' AND constructor_id='benetton' "
+        "AND year BETWEEN 1991 AND 1995"
+    ).fetchone()[0]
+    assert float(val) == direct and val > 0
+
+
+def test_dnfs_match_direct_count(conn):
+    val = compute_metric(conn, _params(metric_target="dnfs"))
+    direct = conn.execute(
+        "SELECT COUNT(*) FROM staging_race_results WHERE driver_id='schumacher' "
+        "AND constructor_id='benetton' AND year BETWEEN 1991 AND 1995 AND position IS NULL"
+    ).fetchone()[0]
+    assert int(val) == direct
+
+
+def test_positions_gained_match_direct(conn):
+    val = compute_metric(conn, _params(metric_target="positions_gained"))
+    direct = conn.execute(
+        "SELECT COALESCE(SUM(grid-position),0) FROM staging_race_results "
+        "WHERE driver_id='schumacher' AND constructor_id='benetton' "
+        "AND year BETWEEN 1991 AND 1995 AND position IS NOT NULL AND grid IS NOT NULL"
+    ).fetchone()[0]
+    assert int(val) == direct
+
+
+def test_front_rows_at_least_poles(conn):
+    # Front-row starts (quali P1 or P2) must include all poles (quali P1).
+    poles = compute_metric(conn, _params(metric_target="poles"))
+    front = compute_metric(conn, _params(metric_target="front_rows"))
+    assert front >= poles
+
+
+def test_points_finishes_at_least_podiums(conn):
+    pod = compute_metric(conn, _params(metric_target="podiums"))
+    pts_fin = compute_metric(conn, _params(metric_target="points_finishes"))
+    assert pts_fin >= pod  # every podium is a top-10 finish
+
+
+# ---- Aggregations -----------------------------------------------------------
+
+def test_best_season_within_total(conn):
+    best = compute_metric(conn, _params(aggregation="best_season"))
+    total = compute_metric(conn, _params())
+    assert 1 <= best <= total
+
+
+def test_which_year_returns_year_in_range(conn):
+    yr = compute_metric(conn, _params(aggregation="which_year"))
+    assert 1991 <= yr <= 1995
+
+
+def test_first_season_returns_year_in_range(conn):
+    yr = compute_metric(conn, _params(aggregation="first_season"))
+    assert 1991 <= yr <= 1995
+
+
+def test_percentage_in_bounds(conn):
+    pct = compute_metric(conn, _params(metric_target="podiums", aggregation="percentage_of_races"))
+    assert 0 <= pct <= 100
+
+
+def test_head_to_head_difference_exact(conn):
+    # Career wins placed exactly: Hamilton 103 (21+82) vs Rosberg 23 (0+23) = 80.
+    diff = compute_metric(conn, {
+        "target_entity": "driver", "entity_id": "hamilton", "entity_id_b": "rosberg",
+        "start_year": 2006, "end_year": 2024, "metric_target": "wins", "aggregation": "difference",
+    })
+    assert diff == 80
+
+
+def test_poles_converted_not_above_poles(conn):
+    conv = compute_metric(conn, _params(metric_target="poles_converted"))
+    poles = compute_metric(conn, _params(metric_target="poles"))
+    assert 0 <= conv <= poles
+
+
+def test_per_circuit_filter(conn):
+    # Sum of per-circuit wins equals total wins for the scope.
+    total = compute_metric(conn, _params())
+    rows = conn.execute(
+        "SELECT DISTINCT circuit_id FROM staging_race_results WHERE driver_id='schumacher' "
+        "AND constructor_id='benetton' AND year BETWEEN 1991 AND 1995"
+    ).fetchall()
+    summed = sum(compute_metric(conn, _params(filter_circuit_id=r["circuit_id"])) for r in rows)
+    assert summed == total
+
+
+# ---- Validation gate --------------------------------------------------------
 
 def test_unsupported_metric_rejected(conn):
-    q = {
-        "question_text": "bogus",
-        "validation_parameters": _params(metric_target="lap_records"),
-        "proposed_answer": 5,
-    }
-    result = validate_ai_question(conn, q)
+    result = validate_ai_question(conn, {
+        "question_text": "bogus", "validation_parameters": _params(metric_target="lap_records"),
+        "proposed_answer": 5})
+    assert result.ok is False and "Unsupported" in result.reason
+
+
+def test_unsupported_aggregation_rejected(conn):
+    result = validate_ai_question(conn, {
+        "question_text": "bogus", "validation_parameters": _params(aggregation="median"),
+        "proposed_answer": 5})
     assert result.ok is False
-    assert "Unsupported" in result.reason
 
 
 def test_correct_answer_validates(conn):
-    q = {
-        "question_text": "wins?",
-        "validation_parameters": _params(),
-        "proposed_answer": 19,
-    }
-    assert validate_ai_question(conn, q).ok is True
+    assert validate_ai_question(conn, {
+        "question_text": "wins?", "validation_parameters": _params(),
+        "proposed_answer": 19}).ok is True
 
 
 def test_hallucinated_answer_rejected(conn):
-    q = {
-        "question_text": "wins?",
-        "validation_parameters": _params(),
-        "proposed_answer": 25,  # staging says 19
-    }
-    result = validate_ai_question(conn, q)
-    assert result.ok is False
-    assert result.expected == 19
-    assert result.proposed == 25
+    result = validate_ai_question(conn, {
+        "question_text": "wins?", "validation_parameters": _params(), "proposed_answer": 25})
+    assert result.ok is False and result.expected == 19 and result.proposed == 25
 
+
+# ---- Pipeline ---------------------------------------------------------------
 
 def test_pipeline_commits_valid_rejects_hallucination(conn):
     summary = run_validation_pipeline(conn)
-    total = len(mock_llm_questions())
-    # Exactly one planted hallucination in the mock set.
+    total = len(mock_llm_questions(conn))
     assert summary["rejected"] == 1
     assert summary["committed"] == total - 1
     assert summary["rejections"][0]["proposed"] == 80
 
-    # The hallucinated Schumacher/Ferrari WINS question must NOT reach production
-    # (other metrics for that stint are legitimately generated and may exist).
+    # The hallucinated Schumacher/Ferrari WINS question must NOT reach production.
     rows = conn.execute(
-        "SELECT 1 FROM production_trivia_questions "
-        "WHERE question_string = "
+        "SELECT 1 FROM production_trivia_questions WHERE question_string = "
         "'How many race wins did Michael Schumacher take with Ferrari (1996-2006)?'"
     ).fetchall()
     assert rows == []
 
 
-def test_production_stores_trusted_value_not_llm_value(conn):
+def test_production_stores_trusted_value_and_metadata(conn):
     run_validation_pipeline(conn)
     row = conn.execute(
-        "SELECT verified_answer FROM production_trivia_questions "
-        "WHERE question_string LIKE '%Benetton (1991-1995)%'"
+        "SELECT verified_answer, answer_kind FROM production_trivia_questions "
+        "WHERE question_string = "
+        "'How many race wins did Michael Schumacher take with Benetton (1991-1995)?'"
     ).fetchone()
-    assert row["verified_answer"] == 19
+    assert row["verified_answer"] == 19 and row["answer_kind"] == "count"
+
+
+def test_year_questions_carry_year_kind(conn):
+    run_validation_pipeline(conn)
+    n = conn.execute(
+        "SELECT COUNT(*) FROM production_trivia_questions WHERE answer_kind='year'"
+    ).fetchone()[0]
+    assert n > 0
