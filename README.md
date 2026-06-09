@@ -30,10 +30,37 @@ Substitutions made to keep it runnable anywhere (each is a localized swap):
 | Production (docs) | Prototype | Why |
 |---|---|---|
 | PostgreSQL | SQLite (schema-compatible) | zero-dependency, runs anywhere |
-| Jolpica API + weekly ETL | offline seed of illustrative stints | PRD forbids live API calls during gameplay |
+| Jolpica API + weekly ETL | **implemented** (`backend/app/etl.py`) — rate-limited, disk-cached, weekly; synthetic seed is the offline fallback | real data when the network allows; still runs anywhere |
 | Real LLM synthesizer | `mock_llm_questions()` emitting the strict schema | deterministic, offline |
 | Redis token cache | in-memory dict | single-process prototype |
 | Next.js + Tailwind frontend | vanilla HTML/CSS/JS served by FastAPI | one runnable service |
+
+### Data source: real Jolpica ETL vs. synthetic seed
+
+The data layer can run from **real F1 history** or the **synthetic seed**, chosen
+by the `F1_DATA_SOURCE` env var (default `synthetic`):
+
+```bash
+# Real data: pull from the Jolpica F1 API into staging, cache it, regenerate
+# the validated question pool. Gated to a weekly cadence (the data updates once
+# a week), so re-runs are cheap until the data is stale.
+F1_DATA_SOURCE=jolpica python3 -m app.seed          # respects the weekly gate
+F1_DATA_SOURCE=jolpica python3 -m app.seed --force  # force a fresh pull now
+python3 -m app.etl --force                           # ETL-only (no question regen)
+```
+
+The ETL (`backend/app/etl.py`) implements the documented ingestion engine
+(Pipeline §1): a **token-bucket rate limiter** honoring both a per-second burst
+and a sustained hourly ceiling (with `429` backoff), an **on-disk cache** of
+every raw API page, and a **weekly freshness gate** so we don't re-fetch data
+that hasn't changed. If the API host (`api.jolpi.ca`) is unreachable and nothing
+is cached, it falls back to the synthetic seed so the app always runs.
+
+> **Network note:** pulling real data requires outbound access to
+> `https://api.jolpi.ca`. In sandboxes that block it you'll see the synthetic
+> fallback; add the host to the environment's network allowlist to fetch live.
+> Tune the ingest with `F1_ETL_START_YEAR` / `F1_ETL_END_YEAR` (default 2004→now;
+> set start to `1950` for the full archive).
 
 ---
 
@@ -58,7 +85,7 @@ Seed complete. Committed 6 questions, rejected 1.
 
 ```bash
 cd backend
-python3 -m pytest -q     # 28 tests: scoring math, validation layer, API trust boundary, all modes
+python3 -m pytest -q     # 52 tests: scoring, validation, API trust boundary, all modes, ETL ingestion
 ```
 
 ### Install on your phone (PWA)
@@ -78,7 +105,8 @@ backend/
     scoring.py      # exp-decay scoring engine (PRD §2)
     validation.py   # deterministic anti-hallucination layer (Pipeline §3)
     db.py           # SQLite schema mirroring the staging + production tables
-    seed.py         # offline ETL + mock-LLM generator + validation pipeline
+    etl.py          # real Jolpica ETL: rate-limited, disk-cached, weekly (Pipeline §1)
+    seed.py         # synthetic seed + data-driven generator + validation pipeline
     service.py      # deterministic per-mode provisioning, token store, scoring, arcade
     models.py       # Pydantic API contracts (no answer leaves the server)
     main.py         # FastAPI app + static frontend mount
@@ -132,8 +160,12 @@ internally-consistent race-by-race log (grids, DNFs, points, circuits):
 ## Next steps toward the full project
 
 - Swap SQLite → Postgres and the in-memory token store → Redis.
-- Replace the seed with the real Jolpica ETL (rate-limited token bucket,
-  Pipeline §1.1) and a real LLM synthesizer behind the same validation gate.
+- ~~Replace the seed with the real Jolpica ETL~~ — **done** (`backend/app/etl.py`:
+  rate-limited token bucket, disk cache, weekly cadence, Pipeline §1.1). Remaining:
+  put a real LLM synthesizer behind the same validation gate (currently the
+  data-driven `mock_llm_questions` generator stands in).
+- Run the weekly ETL on a real scheduler (cron / Celery beat) instead of the
+  boot-time freshness gate.
 - Split the frontend into the Next.js + Tailwind app (NextAuth guest-first flow,
   Framer Motion odometer).
 - Add the 00:00 UTC cron provisioning, the Global Leaderboard + Constructors

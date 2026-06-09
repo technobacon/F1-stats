@@ -5,9 +5,11 @@ to the spec docs (PRD / Pipeline / Architecture), and the concrete shape of the
 question-generation and validation systems. Where the spec describes intent,
 this describes the code as it actually runs.
 
-> **Status:** runnable offline prototype. The staging data is **synthetic and
-> illustrative** (a self-consistent stand-in for the Jolpica ETL extract), not a
-> historical import. The guarantee the prototype enforces is *internal*: every
+> **Status:** runnable prototype with two data sources. By default the staging
+> data is **synthetic and illustrative** (a self-consistent, offline stand-in),
+> but a **real Jolpica ETL** (`etl.py`, `F1_DATA_SOURCE=jolpica`) can populate
+> staging from live F1 history — rate-limited, disk-cached, and refreshed weekly.
+> Either way the guarantee the prototype enforces is *internal*: every
 > client-facing answer is recomputed from the staging tables, so questions can
 > never disagree with the data they were generated from.
 
@@ -17,8 +19,9 @@ this describes the code as it actually runs.
 
 | File | Responsibility |
 |------|----------------|
-| `backend/app/db.py` | SQLite schema (staging + production tables), connect/init/reset. |
-| `backend/app/seed.py` | Offline pipeline: synthetic race-log generator → mock-LLM question generator → validation → production. |
+| `backend/app/db.py` | SQLite schema (staging + production + `etl_metadata`), connect/init/reset. |
+| `backend/app/etl.py` | **Real Jolpica ETL** (Pipeline §1): rate-limited (token bucket), disk-cached, weekly-gated ingestion of drivers/constructors/circuits/results/qualifying into staging. |
+| `backend/app/seed.py` | Pipeline orchestrator: synthetic race-log generator (offline fallback) **and** `load_entities_from_staging` for real data → data-driven question generator → validation → production. `refresh()` selects the source. |
 | `backend/app/validation.py` | The deterministic anti-hallucination engine (metric + aggregation registry). |
 | `backend/app/service.py` | Quiz provisioning (deterministic question sampling), tracking tokens, arcade. |
 | `backend/app/scoring.py` | Server-authoritative exponential-decay scoring. |
@@ -26,13 +29,44 @@ this describes the code as it actually runs.
 | `backend/app/main.py` | FastAPI routes + static frontend mount. |
 | `frontend/*` | Guest-first PWA: modes, odometer reveal, localStorage stats. |
 
-The end-to-end offline pipeline is `seed.seed_all()`:
+The pipeline has two interchangeable front-ends into the same staging→validation
+→production path, selected by `seed.refresh(source=...)` (env `F1_DATA_SOURCE`):
 
 ```
-reset_db → seed_staging → run_validation_pipeline
-            (synthetic     (mock-LLM questions →
-             race log)      validate each → commit survivors)
+synthetic (default, offline):
+  reset_db → seed_staging → run_validation_pipeline
+              (synthetic     (mock-LLM questions →
+               race log)      validate each → commit survivors)
+
+jolpica (real, cached, weekly):
+  etl.refresh_if_stale → load_entities_from_staging → run_validation_pipeline
+   (Jolpica API → staging,   (derive drivers/stints     (recompute every answer
+    rate-limited + cached,     from real staging rows)    from staging → commit)
+    skipped if <7 days old)
 ```
+
+Both paths share `validation.py`, so the anti-hallucination guarantee — every
+client-facing answer is recomputed from staging — holds regardless of source.
+If the live API is unreachable and nothing is cached, `refresh` falls back to the
+synthetic seed so the app always runs.
+
+### Weekly ETL (etl.py)
+
+The real ingestion engine implements the three properties Pipeline §1 calls for:
+
+- **Rate limiting** — a `RateLimiter` token bucket enforcing *both* a per-second
+  burst and a sustained per-hour ceiling at once (throttling to whichever bites
+  first), with a 300s halt on `429`. Limits are env-tunable; verify Jolpica's
+  current published values before a large run.
+- **Caching** — every raw API page is written to an on-disk cache keyed by URL;
+  re-runs reuse it, and entries older than the weekly interval are re-fetched.
+  Processed rows persist in the SQLite staging tables.
+- **Weekly cadence** — `etl_metadata.last_refresh` gates `refresh_if_stale`: it's
+  a no-op (no network) until staging is older than `REFRESH_INTERVAL_DAYS` (7).
+
+The Ergast/Jolpica JSON is flattened by per-entity normalizers (`_norm_*`), with
+DNFs mapped from non-numeric `positionText`, poles taken from qualifying P1 (not
+race grid), and each driver's active span derived from the ingested race log.
 
 ---
 
@@ -233,7 +267,7 @@ front rows, DNFs), again computed through the same validation engine.
 ```bash
 cd backend
 python -m app.seed         # rebuild + seed + run the validation pipeline
-python -m pytest -q        # 42 tests
+python -m pytest -q        # 52 tests (incl. ETL ingestion, offline)
 python -m uvicorn app.main:app --reload
 ```
 

@@ -22,6 +22,7 @@ reality is the ETL's responsibility.
 from __future__ import annotations
 
 import hashlib
+import os
 import random
 import sqlite3
 import uuid
@@ -153,7 +154,6 @@ CIRCUITS = [
     ("albert_park", "Albert Park", "Australia"), ("baku", "Baku", "Azerbaijan"),
     ("jeddah", "Jeddah", "Saudi Arabia"), ("las_vegas", "Las Vegas", "USA"),
 ]
-_CIRCUIT_NAME = {c[0]: c[1] for c in CIRCUITS}
 
 # Illustrative modern points table; applied to every era for a self-consistent log.
 _POINTS_TABLE = {1: 25, 2: 18, 3: 15, 4: 12, 5: 10, 6: 8, 7: 6, 8: 4, 9: 2, 10: 1}
@@ -283,14 +283,7 @@ def seed_staging(conn: sqlite3.Connection) -> None:
 # deterministic validation layer then independently re-derives every answer
 # before anything is committed — including catching the planted hallucination.
 
-_CONSTRUCTOR_NAME = {c.constructor_id: c.name for c in CONSTRUCTORS}
-_DRIVER_NAME = {d.driver_id: d.full_name for d in DRIVERS}
-_DRIVER_SPAN = {
-    d.driver_id: (min(s.start_year for s in d.stints), max(s.end_year for s in d.stints))
-    for d in DRIVERS
-}
-
-# Curated overlapping-era rivalries for head-to-head questions.
+# Curated overlapping-era rivalries for head-to-head questions (synthetic ids).
 _HEAD_TO_HEAD = [
     ("senna", "prost"), ("hamilton", "vettel"), ("hamilton", "alonso"),
     ("verstappen", "leclerc"), ("verstappen", "russell"), ("alonso", "raikkonen"),
@@ -326,23 +319,71 @@ def _emit(conn, out, seen, text, params, mode, weight,
     })
 
 
-def generate_questions(conn: sqlite3.Connection) -> list[dict]:
-    """Build the full validated-question pool by querying the seeded staging data
-    across a wide variety of metrics and aggregations (PRD §4)."""
+def load_entities_from_staging(conn: sqlite3.Connection) -> list[Driver]:
+    """Reconstruct the Driver/Stint structure from whatever is in the staging
+    tables (the real Jolpica ETL extract). One stint per driver+constructor,
+    spanning that pairing's first..last season. Only the constructor id and year
+    range are needed for question generation — the answers themselves are always
+    recomputed from staging by the validation engine.
+    """
+    drivers: list[Driver] = []
+    for d in conn.execute(
+        "SELECT driver_id, full_name, nationality, active_from, active_to "
+        "FROM staging_drivers ORDER BY driver_id"
+    ).fetchall():
+        stints = [
+            Stint(d["driver_id"], s["constructor_id"], s["lo"], s["hi"])
+            for s in conn.execute(
+                "SELECT constructor_id, MIN(year) AS lo, MAX(year) AS hi "
+                "FROM staging_race_results WHERE driver_id = ? AND constructor_id IS NOT NULL "
+                "GROUP BY constructor_id ORDER BY lo, constructor_id",
+                (d["driver_id"],),
+            ).fetchall()
+        ]
+        if not stints:
+            continue  # driver has no races in the ingested range — skip
+        af = d["active_from"] if d["active_from"] is not None else min(s.start_year for s in stints)
+        at = d["active_to"] if d["active_to"] is not None else max(s.end_year for s in stints)
+        drivers.append(Driver(d["driver_id"], d["full_name"], d["nationality"] or "", af, at, stints))
+    return drivers
+
+
+def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = None) -> list[dict]:
+    """Build the full validated-question pool by querying the staging data across
+    a wide variety of metrics and aggregations (PRD §4).
+
+    `drivers` defaults to the synthetic in-code set; pass the result of
+    `load_entities_from_staging` to generate from real ETL'd data instead.
+    Name lookups (constructors, circuits) come from the staging tables so the
+    same code path works for both synthetic and real data.
+    """
+    drivers = drivers if drivers is not None else DRIVERS
+    name_by_id = {d.driver_id: d.full_name for d in drivers}
+    span_by_id = {
+        d.driver_id: (min(s.start_year for s in d.stints), max(s.end_year for s in d.stints))
+        for d in drivers if d.stints
+    }
+    cname = {r["constructor_id"]: r["name"]
+             for r in conn.execute("SELECT constructor_id, name FROM staging_constructors")}
+    circname = {r["circuit_id"]: r["name"]
+                for r in conn.execute("SELECT circuit_id, name FROM staging_circuits")}
+
     out: list[dict] = []
     seen: set[str] = set()
 
     def E(*a, **k):
         _emit(conn, out, seen, *a, **k)
 
-    for d in DRIVERS:
+    for d in drivers:
         name, did = d.full_name, d.driver_id
-        lo, hi = _DRIVER_SPAN[did]
+        if did not in span_by_id:
+            continue
+        lo, hi = span_by_id[did]
 
         # ---- Per-stint questions ----
         for s in d.stints:
             c, y1, y2 = s.constructor_id, s.start_year, s.end_year
-            cn = _CONSTRUCTOR_NAME.get(c, c)
+            cn = cname.get(c, c)
             P = lambda **kw: _p(did, filter_constructor_id=c, start_year=y1, end_year=y2, **kw)
 
             if (did, c, "wins") not in _GENERATION_SKIP:
@@ -408,22 +449,27 @@ def generate_questions(conn: sqlite3.Connection) -> list[dict]:
             "WHERE driver_id = ? AND position = 1 GROUP BY circuit_id "
             "ORDER BY w DESC, circuit_id LIMIT 3", (did,)
         ).fetchall():
-            track = _CIRCUIT_NAME.get(r["circuit_id"], r["circuit_id"])
+            track = circname.get(r["circuit_id"], r["circuit_id"])
             E(f"How many times did {name} win at {track}?",
               C(metric_target="wins", filter_circuit_id=r["circuit_id"]),
               "race_week", 3.0, category="circuit")
 
     # ---- Head-to-head differences (overlapping eras) ----
-    for a, b in _HEAD_TO_HEAD:
-        span = (min(_DRIVER_SPAN[a][0], _DRIVER_SPAN[b][0]),
-                max(_DRIVER_SPAN[a][1], _DRIVER_SPAN[b][1]))
+    # Curated rivalries when their drivers are present (synthetic seed); otherwise
+    # derive pairs from the top winners in the data (real ETL uses different ids).
+    pairs = [(a, b) for a, b in _HEAD_TO_HEAD if a in span_by_id and b in span_by_id]
+    if len(pairs) < 3:
+        pairs += _derive_h2h_pairs(conn, span_by_id, exclude=set(pairs))
+    for a, b in pairs:
+        span = (min(span_by_id[a][0], span_by_id[b][0]),
+                max(span_by_id[a][1], span_by_id[b][1]))
         for metric, label in _H2H_METRICS:
             va = compute_metric(conn, _p(a, start_year=span[0], end_year=span[1], metric_target=metric))
             vb = compute_metric(conn, _p(b, start_year=span[0], end_year=span[1], metric_target=metric))
             if va == vb:
                 continue
             hi_id, lo_id = (a, b) if va > vb else (b, a)
-            E(f"How many more career {label} does {_DRIVER_NAME[hi_id]} have than {_DRIVER_NAME[lo_id]}?",
+            E(f"How many more career {label} does {name_by_id[hi_id]} have than {name_by_id[lo_id]}?",
               _p(hi_id, entity_id_b=lo_id, start_year=span[0], end_year=span[1],
                  metric_target=metric, aggregation="difference"),
               "one_shot", 3.5, category="head_to_head")
@@ -431,31 +477,68 @@ def generate_questions(conn: sqlite3.Connection) -> list[dict]:
     return out
 
 
-def mock_llm_questions(conn: sqlite3.Connection) -> list[dict]:
-    """Full mock LLM batch: the generated pool + exactly one planted hallucination."""
-    planted = {
-        # PLANTED HALLUCINATION: staging says 72, the LLM "remembers" 80.
-        # The validation layer must reject this and keep it out of production.
-        "question_text": "How many race wins did Michael Schumacher take with Ferrari (1996-2006)?",
-        "difficulty_weight": 2.0, "game_mode": "daily",
-        "answer_kind": "count", "category": "career", "display_min": None, "display_max": None,
-        "validation_parameters": {
-            "target_entity": "driver", "entity_id": "schumacher",
-            "filter_constructor_id": "ferrari",
-            "start_year": 1996, "end_year": 2006, "metric_target": "wins",
-        },
-        "proposed_answer": 80,  # WRONG — true staging value is 72
-    }
-    return generate_questions(conn) + [planted]
+def _derive_h2h_pairs(conn: sqlite3.Connection, span_by_id: dict,
+                      exclude: set, limit: int = 8) -> list[tuple[str, str]]:
+    """Pick head-to-head pairs from the top race winners whose careers overlap.
+    Used when the curated rivalries aren't in the data (real ETL ids differ)."""
+    top = [
+        r["driver_id"]
+        for r in conn.execute(
+            "SELECT driver_id, SUM(CASE WHEN position = 1 THEN 1 ELSE 0 END) AS wins "
+            "FROM staging_race_results GROUP BY driver_id "
+            "HAVING wins > 0 ORDER BY wins DESC, driver_id LIMIT ?",
+            (limit,),
+        ).fetchall()
+        if r["driver_id"] in span_by_id
+    ]
+    pairs = []
+    for i, a in enumerate(top):
+        for b in top[i + 1:]:
+            if (a, b) in exclude or (b, a) in exclude:
+                continue
+            # overlapping eras only
+            if span_by_id[a][0] <= span_by_id[b][1] and span_by_id[b][0] <= span_by_id[a][1]:
+                pairs.append((a, b))
+    return pairs
 
 
-def run_validation_pipeline(conn: sqlite3.Connection, today: str | None = None) -> dict:
+# PLANTED HALLUCINATION (synthetic demo): staging says 72, the LLM "remembers"
+# 80. The validation layer must reject this and keep it out of production.
+_PLANTED_HALLUCINATION = {
+    "question_text": "How many race wins did Michael Schumacher take with Ferrari (1996-2006)?",
+    "difficulty_weight": 2.0, "game_mode": "daily",
+    "answer_kind": "count", "category": "career", "display_min": None, "display_max": None,
+    "validation_parameters": {
+        "target_entity": "driver", "entity_id": "schumacher",
+        "filter_constructor_id": "ferrari",
+        "start_year": 1996, "end_year": 2006, "metric_target": "wins",
+    },
+    "proposed_answer": 80,  # WRONG — true staging value is 72
+}
+
+
+def mock_llm_questions(
+    conn: sqlite3.Connection, drivers: list[Driver] | None = None, planted: bool = True
+) -> list[dict]:
+    """Full mock LLM batch: the generated pool, plus (for the synthetic demo) one
+    planted hallucination so the rejection path is exercised. Real ETL runs pass
+    `planted=False` — the demo question is meaningless against real driver ids."""
+    questions = generate_questions(conn, drivers)
+    if planted:
+        questions = questions + [_PLANTED_HALLUCINATION]
+    return questions
+
+
+def run_validation_pipeline(
+    conn: sqlite3.Connection, today: str | None = None,
+    drivers: list[Driver] | None = None, planted: bool = True,
+) -> dict:
     """Validate every mock question; commit the passing ones to production.
 
     Returns a summary {committed, rejected, rejections:[...]} for logging/CLI.
     """
     committed, rejections = 0, []
-    for q in mock_llm_questions(conn):
+    for q in mock_llm_questions(conn, drivers, planted):
         result = validate_ai_question(conn, q)
         if not result.ok:
             rejections.append({
@@ -490,7 +573,9 @@ def run_validation_pipeline(conn: sqlite3.Connection, today: str | None = None) 
 
 
 def seed_all(db_path=None) -> dict:
-    """Full reset: rebuild schema, seed staging, run the validation pipeline."""
+    """Full reset: rebuild schema, seed SYNTHETIC staging, run the validation
+    pipeline. This is the offline fallback (no network); see `refresh` for the
+    real Jolpica ETL path."""
     conn = db.connect(db_path)  # None -> resolves db.DB_PATH at call time
     try:
         db.reset_db(conn)
@@ -501,10 +586,74 @@ def seed_all(db_path=None) -> dict:
     return summary
 
 
+# Sources that select the real, cached, weekly Jolpica ETL.
+_REAL_SOURCES = {"jolpica", "jolpi", "ergast", "api"}
+
+
+def refresh(db_path=None, source: str | None = None, force: bool = False) -> dict:
+    """Build/refresh the playable database.
+
+    `source` (or env `F1_DATA_SOURCE`) selects the data origin:
+      * "synthetic" (default) — the offline in-code seed; resets and rebuilds.
+      * "jolpica" — the real, rate-limited, disk-cached Jolpica ETL into staging,
+        gated to the weekly cadence, then regenerate + validate production from
+        the real data. Falls back to the synthetic seed if the network is
+        unreachable and nothing is cached yet.
+
+    Returns a status dict (always includes "source").
+    """
+    source = (source or os.environ.get("F1_DATA_SOURCE", "synthetic")).lower()
+    if source not in _REAL_SOURCES:
+        return {"source": "synthetic", **seed_all(db_path)}
+
+    from . import etl  # local import: synthetic path never needs httpx
+
+    conn = db.connect(db_path)
+    try:
+        db.init_db(conn)
+        try:
+            etl_status = etl.refresh_if_stale(conn, force=force)
+        except etl.NetworkError as exc:
+            if not etl._staging_has_rows(conn):
+                # No live data and nothing cached: fall back so the app still runs.
+                conn.close()
+                return {"source": "synthetic", "fallback": str(exc), **seed_all(db_path)}
+            etl_status = {"status": "error", "skipped": True, "error": str(exc),
+                          "note": "served from previously-cached staging"}
+
+        # Regenerate production only when staging actually changed (or it's empty),
+        # so a fresh weekly no-op stays cheap.
+        prod_count = conn.execute(
+            "SELECT COUNT(*) FROM production_trivia_questions"
+        ).fetchone()[0]
+        if not etl_status.get("skipped") or prod_count == 0:
+            drivers = load_entities_from_staging(conn)
+            conn.execute("DELETE FROM production_trivia_questions")
+            summary = run_validation_pipeline(conn, drivers=drivers, planted=False)
+        else:
+            summary = {"committed": prod_count, "rejected": 0, "rejections": []}
+        conn.commit()
+    finally:
+        conn.close()
+    return {"source": "jolpica", "etl": etl_status, **summary}
+
+
 if __name__ == "__main__":
-    summary = seed_all()
-    print(f"Seed complete. Committed {summary['committed']} questions, "
-          f"rejected {summary['rejected']}.")
-    for r in summary["rejections"]:
+    import argparse
+
+    ap = argparse.ArgumentParser(description="Seed / refresh the F1 StatGuesser database.")
+    ap.add_argument("--source", default=None,
+                    help="synthetic (default) or jolpica (real cached weekly ETL). "
+                         "Falls back to env F1_DATA_SOURCE.")
+    ap.add_argument("--force", action="store_true",
+                    help="ignore the weekly freshness gate (jolpica only)")
+    args = ap.parse_args()
+
+    summary = refresh(source=args.source, force=args.force)
+    print(f"[{summary['source']}] Committed {summary.get('committed', 0)} questions, "
+          f"rejected {summary.get('rejected', 0)}.")
+    if "etl" in summary:
+        print("  ETL:", summary["etl"])
+    for r in summary.get("rejections", []):
         print(f"  REJECTED [{r['metric']}] {r['question']!r}: "
               f"expected {r['expected']}, LLM proposed {r['proposed']} -- {r['reason']}")

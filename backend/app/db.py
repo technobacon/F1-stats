@@ -12,6 +12,7 @@ Tables:
     staging_drivers           (Pipeline §1.1)
     staging_constructors      (Pipeline §1.1)
     production_trivia_questions(Pipeline §4)  -- verified, client-facing questions
+    etl_metadata                              -- weekly-refresh bookkeeping (etl.py)
 """
 
 from __future__ import annotations
@@ -99,6 +100,14 @@ CREATE TABLE IF NOT EXISTS production_trivia_questions (
 CREATE INDEX IF NOT EXISTS idx_ptq_game_mode      ON production_trivia_questions (game_mode);
 CREATE INDEX IF NOT EXISTS idx_ptq_is_active      ON production_trivia_questions (is_active);
 CREATE INDEX IF NOT EXISTS idx_ptq_scheduled_date ON production_trivia_questions (scheduled_date);
+
+-- ETL bookkeeping: tracks when staging was last refreshed from the live API so
+-- the ingest can honor the weekly cadence (data updates once a week) and skip
+-- redundant fetches. Keys: 'last_refresh' (ISO ts), 'source', 'row_counts'.
+CREATE TABLE IF NOT EXISTS etl_metadata (
+    key   TEXT PRIMARY KEY,
+    value TEXT
+);
 """
 
 
@@ -116,6 +125,7 @@ def reset_db(conn: sqlite3.Connection) -> None:
         "staging_constructors",
         "staging_circuits",
         "production_trivia_questions",
+        "etl_metadata",
     ):
         conn.execute(f"DROP TABLE IF EXISTS {table}")
     init_db(conn)

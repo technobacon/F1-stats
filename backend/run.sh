@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Seed the database (offline ETL stand-in) and launch the API + prototype UI.
+# Seed the database and launch the API + prototype UI.
+# Data source follows $F1_DATA_SOURCE (default: synthetic). Use the real,
+# cached, weekly Jolpica ETL with:  F1_DATA_SOURCE=jolpica ./run.sh
 set -euo pipefail
 cd "$(dirname "$0")"
 
