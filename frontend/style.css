@@ -60,16 +60,24 @@ main { flex:1; max-width:760px; margin:0 auto; width:100%; padding:0 1.25rem 2re
            border-radius:8px; padding:.6rem; font-size:1.1rem; text-align:center; }
 
 /* Odometer reveal */
-.reveal .timeline { position:relative; height:70px; margin:2rem 0 1rem; }
-.timeline-track { position:absolute; top:50%; left:0; right:0; height:4px; background:var(--line); border-radius:2px; }
-.timeline-node { position:absolute; top:50%; transform:translate(-50%,-50%);
-                 width:18px; height:18px; border-radius:50%; transition:left 1s cubic-bezier(.2,.8,.2,1); }
-.timeline-node span { position:absolute; top:-22px; left:50%; transform:translateX(-50%);
+.reveal .timeline { position:relative; height:80px; margin:2rem 0 1rem; }
+.timeline-track { position:absolute; top:50%; left:0; right:0; height:8px;
+                  transform:translateY(-50%); background:var(--line); border-radius:4px; }
+.timeline-node { position:absolute; top:50%; transform:translate(-50%,-50%); }
+.timeline-node span { position:absolute; top:-24px; left:50%; transform:translateX(-50%);
                       font-size:.65rem; white-space:nowrap; color:var(--muted); }
-.timeline-node.guess { background:var(--color-primary); }
-.timeline-node.actual { background:#fff; top:50%; }
+/* Your guess: a dot. */
+.timeline-node.guess { width:18px; height:18px; border-radius:50%;
+                       background:var(--color-primary); transition:left .5s cubic-bezier(.2,.8,.2,1); }
+/* The answer: a slider-style vertical bar (position driven in JS for easing). */
+.timeline-node.actual { width:6px; height:42px; border-radius:3px; background:#fff;
+                        box-shadow:0 0 0 2px rgba(0,0,0,.18), 0 0 14px 3px var(--color-primary); }
 .timeline-node.actual span { color:#fff; }
 .reveal-numbers { display:flex; justify-content:space-between; font-size:.9rem; color:var(--muted); }
+#reveal-actual { transition:opacity .25s, transform .25s; }
+#reveal-actual.pending { opacity:.35; }
+#reveal-actual.revealed { animation:pop .35s ease-out; }
+@keyframes pop { 0%{transform:scale(1.5);opacity:0} 60%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
 .odometer { font-size:3.5rem; font-weight:800; text-align:center; color:var(--color-primary);
             font-variant-numeric:tabular-nums; margin:1rem 0; }
 .summary-score { font-size:4rem; font-weight:800; color:var(--color-primary); text-align:center; }

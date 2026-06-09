@@ -32,7 +32,7 @@ def test_daily_quiz_hides_answer(client):
     r = client.get("/api/v1/quiz/daily")
     assert r.status_code == 200
     body = r.json()
-    assert len(body["questions"]) == 5
+    assert len(body["questions"]) == 10
     for q in body["questions"]:
         assert "tracking_token" in q
         # The trust boundary: no answer field in any client-facing question.
@@ -70,7 +70,7 @@ def test_unknown_token_404(client):
     assert r.status_code == 404
 
 
-@pytest.mark.parametrize("mode,count", [("daily", 5), ("race_week", 5), ("one_shot", 3)])
+@pytest.mark.parametrize("mode,count", [("daily", 10), ("race_week", 10), ("one_shot", 3)])
 def test_all_modes_serve_and_hide_answers(client, mode, count):
     r = client.get(f"/api/v1/quiz/{mode}")
     assert r.status_code == 200
