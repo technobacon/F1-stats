@@ -1,0 +1,15 @@
+# Render Blueprint — free, no credit card required.
+# Deploy: render.com -> New -> Blueprint -> connect this repo -> Apply.
+# Gives a public HTTPS URL you can open on your iPhone.
+services:
+  - type: web
+    name: f1-statguesser
+    runtime: python
+    plan: free
+    branch: claude/prototype-from-docs-s7msk2
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      # Render's filesystem is ephemeral; the app self-seeds on boot.
+      - key: F1_DB_PATH
+        value: /tmp/f1stats.db
