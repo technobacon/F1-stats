@@ -13,6 +13,7 @@ guess is submitted — never in the question payload.
 
 from __future__ import annotations
 
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -29,15 +30,20 @@ FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     # Self-seed on boot so a fresh deploy (ephemeral filesystem) is playable with
-    # no manual step. If questions already exist, leave the DB untouched.
+    # no manual step. With F1_DATA_SOURCE=jolpica this pulls the real, cached,
+    # weekly ETL (and is a cheap no-op when the data is still fresh); otherwise it
+    # builds the synthetic fallback. The data source never changes at runtime.
     conn = db.connect()
     db.init_db(conn)
     count = conn.execute(
         "SELECT COUNT(*) AS n FROM production_trivia_questions"
     ).fetchone()["n"]
     conn.close()
-    if count == 0:
-        seed.seed_all()
+    source = os.environ.get("F1_DATA_SOURCE", "synthetic").lower()
+    if count == 0 or source in seed._REAL_SOURCES:
+        # refresh() is weekly-gated for the real source, so re-running on every
+        # boot is safe and only hits the network when the data is stale.
+        seed.refresh(source=source)
     yield
 
 
