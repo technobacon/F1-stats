@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS production_trivia_questions (
     display_max       REAL,
     difficulty_weight REAL DEFAULT 1.0,
     game_mode         TEXT NOT NULL,               -- 'daily','race_week','one_shot'
+    era_year          INTEGER,                     -- representative year (mid-span) for era-biased serving
     is_active         INTEGER DEFAULT 1,
     scheduled_date    TEXT,                        -- ISO date for cron rotations
     created_at        TEXT DEFAULT CURRENT_TIMESTAMP
@@ -99,6 +100,7 @@ CREATE TABLE IF NOT EXISTS production_trivia_questions (
 
 CREATE INDEX IF NOT EXISTS idx_ptq_game_mode      ON production_trivia_questions (game_mode);
 CREATE INDEX IF NOT EXISTS idx_ptq_is_active      ON production_trivia_questions (is_active);
+CREATE INDEX IF NOT EXISTS idx_ptq_era_year       ON production_trivia_questions (era_year);
 CREATE INDEX IF NOT EXISTS idx_ptq_scheduled_date ON production_trivia_questions (scheduled_date);
 
 -- ETL bookkeeping: tracks when staging was last refreshed from the live API so

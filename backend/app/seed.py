@@ -292,6 +292,13 @@ _HEAD_TO_HEAD = [
 ]
 _H2H_METRICS = [("wins", "race wins"), ("podiums", "podiums")]
 
+# Head-to-head questions are only worth asking when they're hard: the two tallies
+# must be close (within ~20-30% of each other) and both substantial, so the answer
+# can't be eyeballed from a lopsided matchup.
+_H2H_MIN_GAP = 0.18   # >= ~18% apart -> a real, non-trivial difference to find
+_H2H_MAX_GAP = 0.32   # <= ~32% apart -> the two totals are genuinely close
+_H2H_MIN_VALUE = 8    # both drivers' tallies are meaningful (no "3 vs 4")
+
 
 def _p(entity: str, **kw) -> dict:
     """Build a validation_parameters payload."""
@@ -458,15 +465,22 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
     # Curated rivalries when their drivers are present (synthetic seed); otherwise
     # derive pairs from the top winners in the data (real ETL uses different ids).
     pairs = [(a, b) for a, b in _HEAD_TO_HEAD if a in span_by_id and b in span_by_id]
-    if len(pairs) < 3:
-        pairs += _derive_h2h_pairs(conn, span_by_id, exclude=set(pairs))
+    # Always enrich with derived top-winner pairs: the closeness filter below
+    # drops most lopsided matchups, so we need a wide candidate pool to keep a
+    # decent spread of hard head-to-head questions.
+    pairs += _derive_h2h_pairs(conn, span_by_id, exclude=set(pairs), limit=16)
     for a, b in pairs:
         span = (min(span_by_id[a][0], span_by_id[b][0]),
                 max(span_by_id[a][1], span_by_id[b][1]))
         for metric, label in _H2H_METRICS:
             va = compute_metric(conn, _p(a, start_year=span[0], end_year=span[1], metric_target=metric))
             vb = compute_metric(conn, _p(b, start_year=span[0], end_year=span[1], metric_target=metric))
-            if va == vb:
+            lo_val, hi_val = sorted((float(va), float(vb)))
+            # Keep only the hard ones: both substantial and the totals close.
+            if lo_val < _H2H_MIN_VALUE:
+                continue
+            gap = (hi_val - lo_val) / hi_val
+            if not (_H2H_MIN_GAP <= gap <= _H2H_MAX_GAP):
                 continue
             hi_id, lo_id = (a, b) if va > vb else (b, a)
             E(f"How many more career {label} does {name_by_id[hi_id]} have than {name_by_id[lo_id]}?",
@@ -529,6 +543,18 @@ def mock_llm_questions(
     return questions
 
 
+def _era_year(params: dict) -> int | None:
+    """Representative year for a question (mid-point of its season span), used by
+    the service layer to bias quiz selection toward the modern era. Returns None
+    when the params carry no year range (selection then uses a neutral weight)."""
+    lo, hi = params.get("start_year"), params.get("end_year")
+    if lo is None and hi is None:
+        return None
+    lo = lo if lo is not None else hi
+    hi = hi if hi is not None else lo
+    return round((lo + hi) / 2)
+
+
 def run_validation_pipeline(
     conn: sqlite3.Connection, today: str | None = None,
     drivers: list[Driver] | None = None, planted: bool = True,
@@ -552,8 +578,8 @@ def run_validation_pipeline(
         conn.execute(
             "INSERT OR IGNORE INTO production_trivia_questions "
             "(id, question_string, verified_answer, answer_kind, category, display_min, "
-            " display_max, difficulty_weight, game_mode, is_active, scheduled_date) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)",
+            " display_max, difficulty_weight, game_mode, era_year, is_active, scheduled_date) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)",
             (
                 str(uuid.uuid4()),
                 q["question_text"],
@@ -564,6 +590,7 @@ def run_validation_pipeline(
                 q.get("display_max"),
                 q.get("difficulty_weight", 1.0),
                 q.get("game_mode", "daily"),
+                _era_year(q.get("validation_parameters", {})),
                 today,
             ),
         )

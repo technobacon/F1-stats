@@ -18,3 +18,8 @@ services:
       # api.jolpi.ca is unreachable.
       - key: F1_DATA_SOURCE
         value: jolpica
+      # Pull from 1980 to the current season (end year is dynamic). Gives the
+      # Prost/Senna/Mansell/Piquet and Schumacher eras; serving is biased toward
+      # the modern era (see service.ERA_WEIGHT_BANDS).
+      - key: F1_ETL_START_YEAR
+        value: "1980"
