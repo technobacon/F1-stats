@@ -136,6 +136,77 @@ def test_poles_converted_not_above_poles(conn):
     assert 0 <= conv <= poles
 
 
+def test_second_and_third_make_up_non_win_podiums(conn):
+    podiums = compute_metric(conn, _params(metric_target="podiums"))
+    wins = compute_metric(conn, _params(metric_target="wins"))
+    p2 = compute_metric(conn, _params(metric_target="second_places"))
+    p3 = compute_metric(conn, _params(metric_target="third_places"))
+    assert p2 + p3 == podiums - wins
+
+
+def test_comeback_metrics_consistent(conn):
+    starts = compute_metric(conn, _params(metric_target="starts"))
+    big = compute_metric(conn, _params(metric_target="big_comebacks"))
+    best = compute_metric(conn, _params(metric_target="best_comeback"))
+    assert 0 <= big <= starts
+    assert best >= 0
+
+
+def test_avg_finish_in_range(conn):
+    avg = compute_metric(conn, _params(metric_target="avg_finish"))
+    assert 1 <= avg <= 24
+
+
+def test_distinct_circuits_won_and_winning_seasons_bounded(conn):
+    wins = compute_metric(conn, _params(metric_target="wins"))
+    dcw = compute_metric(conn, _params(metric_target="distinct_circuits_won"))
+    wseasons = compute_metric(conn, _params(metric_target="winning_seasons"))
+    seasons = compute_metric(conn, _params(metric_target="seasons_active"))
+    assert 0 <= dcw <= wins
+    assert 0 <= wseasons <= seasons
+
+
+def test_per_season_avg_points(conn):
+    total = compute_metric(conn, _params(metric_target="points"))
+    seasons = compute_metric(conn, _params(metric_target="seasons_active"))
+    avg = compute_metric(conn, _params(metric_target="points", aggregation="per_season_avg"))
+    assert avg == round(total / seasons)
+
+
+def test_best_circuit_not_above_total_wins(conn):
+    wins = compute_metric(conn, _params(metric_target="wins"))
+    best = compute_metric(conn, _params(metric_target="wins", aggregation="best_circuit"))
+    assert 0 <= best <= wins
+
+
+def test_constructor_entity_totals(conn):
+    # Synthetic data has only Schumacher at Benetton, so the team total equals his.
+    team = compute_metric(conn, {
+        "target_entity": "constructor", "entity_id": "benetton",
+        "start_year": 1991, "end_year": 1995, "metric_target": "wins",
+    })
+    driver = compute_metric(conn, _params(metric_target="wins"))
+    assert team == driver == 19
+
+
+def test_one_two_finishes_zero_for_single_car_team(conn):
+    # A 1-2 needs two cars in P1 and P2; Benetton fields one synthetic driver.
+    val = compute_metric(conn, {
+        "target_entity": "constructor", "entity_id": "benetton",
+        "start_year": 1991, "end_year": 1995, "metric_target": "one_two_finishes",
+    })
+    assert val == 0
+
+
+def test_circuit_facts(conn):
+    cid = conn.execute("SELECT circuit_id FROM staging_race_results LIMIT 1").fetchone()["circuit_id"]
+    p = {"target_entity": "circuit", "entity_id": cid, "start_year": 1980, "end_year": 2026}
+    winners = compute_metric(conn, {**p, "metric_target": "distinct_winners"})
+    held = compute_metric(conn, {**p, "metric_target": "races_held"})
+    assert held >= 1
+    assert 0 <= winners <= held
+
+
 def test_per_circuit_filter(conn):
     # Sum of per-circuit wins equals total wins for the scope.
     total = compute_metric(conn, _params())
