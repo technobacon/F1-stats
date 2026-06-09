@@ -402,7 +402,7 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
               P(metric_target="poles"), "race_week", 3.0, category="qualifying")
             E(f"How many fastest laps did {name} set for {cn} ({y1}-{y2})?",
               P(metric_target="fastest_laps"), "race_week", 2.5, category="career")
-            E(f"Roughly how many championship points did {name} score for {cn} ({y1}-{y2})?",
+            E(f"How many championship points did {name} score for {cn} ({y1}-{y2})?",
               P(metric_target="points"), "daily", 3.0, kind="points", category="career")
             E(f"How many times did {name} fail to finish (DNF) for {cn} ({y1}-{y2})?",
               P(metric_target="dnfs"), "one_shot", 3.0, category="reliability")
@@ -428,17 +428,17 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
 
         # ---- Career-level questions (no constructor filter) ----
         C = lambda **kw: _p(did, start_year=lo, end_year=hi, **kw)
-        E(f"How many career race wins does {name} have in our database?",
+        E(f"How many career race wins does {name} have?",
           C(metric_target="wins"), "daily", 2.5, category="career")
-        E(f"How many career podiums does {name} have in our database?",
+        E(f"How many career podiums does {name} have?",
           C(metric_target="podiums"), "daily", 2.5, category="career")
-        E(f"How many career pole positions does {name} have in our database?",
+        E(f"How many career pole positions does {name} have?",
           C(metric_target="poles"), "daily", 3.0, category="qualifying")
-        E(f"Roughly how many career points has {name} scored in our database?",
+        E(f"How many career points has {name} scored?",
           C(metric_target="points"), "daily", 3.0, kind="points", category="career")
-        E(f"How many different constructors has {name} driven for in our database?",
+        E(f"How many different constructors has {name} driven for?",
           C(metric_target="distinct_constructors"), "daily", 2.0, category="career")
-        E(f"How many seasons has {name} contested in our database?",
+        E(f"How many seasons has {name} contested?",
           C(metric_target="seasons_active"), "daily", 2.0, category="career")
         E(f"In which season did {name} take the most wins of their career?",
           C(metric_target="wins", aggregation="which_year"), "one_shot", 3.5,
