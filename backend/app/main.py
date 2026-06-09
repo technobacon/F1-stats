@@ -1,7 +1,7 @@
 """FastAPI application (Architecture §1).
 
 Endpoints:
-    GET  /api/v1/quiz/daily          -> 5 questions, NO answers, tracking tokens
+    GET  /api/v1/quiz/daily          -> 10 questions, NO answers, tracking tokens
     POST /api/v1/quiz/daily/verify   -> server-side score for one guess
     GET  /api/v1/arcade/pair         -> over/under matchup (non-competitive v1)
     GET  /api/v1/health              -> liveness + question count

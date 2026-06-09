@@ -9,12 +9,12 @@ const STORAGE_KEY = "f1statguesser_user_state";
 const MODES = {
   daily: {
     title: "Daily General Quiz",
-    desc: "Five questions. Guess the stat — the closer you are, the more of the 5,000 points you keep.",
+    desc: "Ten questions. Guess the stat — the closer you are, the more of the 5,000 points you keep.",
     capKey: () => utcDate(), capLabel: "today's Daily Quiz", slider: true,
   },
   race_week: {
     title: "Race-Week Quiz",
-    desc: "Five questions tied to the active race weekend. One run per race week.",
+    desc: "Ten questions tied to the active race weekend. One run per race week.",
     capKey: () => isoWeek(), capLabel: "this week's Race-Week Quiz", slider: true,
   },
   one_shot: {
@@ -240,19 +240,46 @@ async function submitGuess() {
 function revealScore(q, result) {
   hide("quiz-play"); show("quiz-reveal");
   const lo = +q.slider_min, hi = +q.slider_max, span = (hi - lo) || 1;
-  const pct = (v) => `${Math.min(100, Math.max(0, ((v - lo) / span) * 100))}%`;
+  const clampPct = (v) => Math.min(100, Math.max(0, ((v - lo) / span) * 100));
   const guessNode = document.getElementById("node-guess");
   const actualNode = document.getElementById("node-actual");
-  guessNode.style.left = "0%"; actualNode.style.left = "0%";
+  const actualText = document.getElementById("reveal-actual");
+
+  // Reset: park both markers at the start, keep the answer hidden for now.
+  guessNode.style.left = "0%";
+  actualNode.style.left = "0%";
   document.getElementById("reveal-guess").textContent = result.guess;
-  document.getElementById("reveal-actual").textContent = result.actual;
+  actualText.textContent = "?";
+  actualText.classList.remove("revealed");
+  actualText.classList.add("pending");
   document.getElementById("odometer").textContent = "0";
 
+  // Drop the guess marker in promptly, then slide the answer bar across slowly
+  // with an ease-in-out (speeds up, then eases into the answer — anticipation).
+  // The number and score stay hidden until the bar reaches its destination.
   requestAnimationFrame(() => {
-    guessNode.style.left = pct(result.guess);
-    setTimeout(() => { actualNode.style.left = pct(result.actual); }, 600);
-    setTimeout(() => tickOdometer(result.score), 1100);
+    guessNode.style.left = clampPct(result.guess) + "%";
+    setTimeout(() => slideToAnswer(actualNode, actualText, clampPct(result.actual), result), 500);
   });
+}
+
+function slideToAnswer(node, textEl, targetPct, result) {
+  const dur = 2600, start = performance.now();
+  // Cubic ease-in-out: accelerate away from 0, decelerate into the target.
+  const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  (function step(now) {
+    const t = Math.min(1, (now - start) / dur);
+    node.style.left = targetPct * easeInOut(t) + "%";
+    if (t < 1) {
+      requestAnimationFrame(step);
+    } else {
+      // Arrived: now reveal the answer and run the score odometer.
+      textEl.textContent = result.actual;
+      textEl.classList.remove("pending");
+      textEl.classList.add("revealed");
+      tickOdometer(result.score);
+    }
+  })(start);
 }
 
 function tickOdometer(target) {

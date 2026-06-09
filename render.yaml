@@ -13,3 +13,13 @@ services:
       # Render's filesystem is ephemeral; the app self-seeds on boot.
       - key: F1_DB_PATH
         value: /tmp/f1stats.db
+      # Pull real F1 history from the Jolpica API on boot (rate-limited, cached,
+      # weekly-gated) instead of the synthetic seed. Falls back to synthetic if
+      # api.jolpi.ca is unreachable.
+      - key: F1_DATA_SOURCE
+        value: jolpica
+      # Pull from 1980 to the current season (end year is dynamic). Gives the
+      # Prost/Senna/Mansell/Piquet and Schumacher eras; serving is biased toward
+      # the modern era (see service.ERA_WEIGHT_BANDS).
+      - key: F1_ETL_START_YEAR
+        value: "1980"

@@ -36,7 +36,46 @@ ARCADE_METRICS = {
 }
 
 # Per-mode session size (PRD §4.1). One-Shots is the short, hardcore set.
-MODE_QUESTION_COUNT = {"daily": 5, "race_week": 5, "one_shot": 3}
+MODE_QUESTION_COUNT = {"daily": 10, "race_week": 10, "one_shot": 3}
+
+# Era-biased serving: the quiz mix focuses on the modern era, dips into history
+# only occasionally, and leans a little extra on the two golden eras. Weights are
+# relative (only their ratios matter) and are applied per question by mid-span
+# year (production_trivia_questions.era_year). Tune the bands here.
+ERA_WEIGHT_BANDS = (
+    # (year_lo, year_hi, weight)
+    (2014, 9999, 1.00),   # modern turbo-hybrid era — the primary focus
+    (2007, 2013, 0.50),   # recent, but not current
+    (1994, 2006, 0.38),   # Schumacher era — occasional, with a lean
+    (1984, 1993, 0.42),   # Prost / Senna / Mansell / Piquet — a touch more
+    (1980, 1983, 0.16),   # early '80s — rare
+)
+DEFAULT_ERA_WEIGHT = 0.12  # outside the bands (pre-1980) or unknown era
+
+
+def _era_weight(era_year: int | None) -> float:
+    """Relative sampling weight for a question given its representative year."""
+    if era_year is None:
+        return DEFAULT_ERA_WEIGHT
+    for lo, hi, w in ERA_WEIGHT_BANDS:
+        if lo <= era_year <= hi:
+            return w
+    return DEFAULT_ERA_WEIGHT
+
+
+def _weighted_sample(rng: random.Random, rows: list, weights: list[float], k: int) -> list:
+    """Deterministic weighted sample WITHOUT replacement (Efraimidis-Spirakis
+    A-Res): draw a key u**(1/w) per row and take the top-k. Stable for a given
+    rng sequence, so the per-period selection stays identical across clients."""
+    if k >= len(rows):
+        return list(rows)
+    keyed = []
+    for row, w in zip(rows, weights):
+        u = rng.random()
+        key = u ** (1.0 / w) if w > 0 else 0.0
+        keyed.append((key, row))
+    keyed.sort(key=lambda t: t[0], reverse=True)
+    return [row for _key, row in keyed[:k]]
 
 
 def _utc_today() -> str:
@@ -78,14 +117,17 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
 
     pool = conn.execute(
         "SELECT id, question_string, verified_answer, answer_kind, category, "
-        "       display_min, display_max, difficulty_weight "
+        "       display_min, display_max, difficulty_weight, era_year "
         "FROM production_trivia_questions "
         "WHERE is_active = 1 AND game_mode = ? ORDER BY id",
         (game_mode,),
     ).fetchall()
 
     rng = _deterministic_rng(game_mode, period)
-    rows = rng.sample(pool, min(count, len(pool)))
+    # Bias the per-period selection toward the modern era (with a lean on the
+    # golden eras) while still surfacing older questions occasionally.
+    weights = [_era_weight(row["era_year"]) for row in pool]
+    rows = _weighted_sample(rng, pool, weights, count)
 
     questions = []
     for row in rows:
