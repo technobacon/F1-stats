@@ -36,12 +36,26 @@ from typing import Any
 _RACE_METRICS = {
     "wins":                 "SUM(CASE WHEN position = 1 THEN 1 ELSE 0 END)",
     "podiums":              "SUM(CASE WHEN position IN (1,2,3) THEN 1 ELSE 0 END)",
+    "second_places":        "SUM(CASE WHEN position = 2 THEN 1 ELSE 0 END)",
+    "third_places":         "SUM(CASE WHEN position = 3 THEN 1 ELSE 0 END)",
     "fastest_laps":         "SUM(CASE WHEN fastest_lap = 1 THEN 1 ELSE 0 END)",
     "points":               "COALESCE(SUM(points), 0)",
     "dnfs":                 "SUM(CASE WHEN position IS NULL THEN 1 ELSE 0 END)",
     "points_finishes":      "SUM(CASE WHEN position BETWEEN 1 AND 10 THEN 1 ELSE 0 END)",
     "positions_gained":     "COALESCE(SUM(CASE WHEN position IS NOT NULL AND grid IS NOT NULL "
                             "THEN grid - position ELSE 0 END), 0)",
+    # Races where the driver climbed 10+ places off the grid — "charge" drives.
+    "big_comebacks":        "SUM(CASE WHEN position IS NOT NULL AND grid IS NOT NULL "
+                            "AND grid - position >= 10 THEN 1 ELSE 0 END)",
+    # Biggest single-race climb from grid to flag (max over the scope).
+    "best_comeback":        "COALESCE(MAX(CASE WHEN position IS NOT NULL AND grid IS NOT NULL "
+                            "THEN grid - position END), 0)",
+    # Mean finishing position across classified (non-DNF) races, rounded.
+    "avg_finish":           "COALESCE(CAST(ROUND(AVG(position)) AS INTEGER), 0)",
+    # How many *different* circuits the entity has a win at.
+    "distinct_circuits_won":"COUNT(DISTINCT CASE WHEN position = 1 THEN circuit_id END)",
+    # How many distinct seasons featured at least one win.
+    "winning_seasons":      "COUNT(DISTINCT CASE WHEN position = 1 THEN year END)",
     "distinct_constructors":"COUNT(DISTINCT constructor_id)",
     "seasons_active":       "COUNT(DISTINCT year)",
     "starts":               "COUNT(*)",
@@ -51,13 +65,20 @@ _QUALI_METRICS = {
     "front_rows": "SUM(CASE WHEN quali_position <= 2 THEN 1 ELSE 0 END)",
 }
 
+# Special metrics computed by dedicated joins/group-bys rather than a single
+# scoped aggregate expression (entity_id meaning varies — see each function).
+_SPECIAL_METRICS = {"poles_converted", "one_two_finishes", "distinct_winners", "races_held"}
+
 _AGGREGATIONS = {
     "total", "best_season", "which_year", "first_season",
-    "percentage_of_races", "difference",
+    "percentage_of_races", "difference", "per_season_avg", "best_circuit",
 }
 
+# Which entity column a question is keyed on (driver questions vs team questions).
+_ENTITY_COL = {"driver": "driver_id", "constructor": "constructor_id"}
+
 # Metrics whose result is a count of races (used to pick slider/answer hints).
-SUPPORTED_METRICS = set(_RACE_METRICS) | set(_QUALI_METRICS) | {"poles_converted"}
+SUPPORTED_METRICS = set(_RACE_METRICS) | set(_QUALI_METRICS) | _SPECIAL_METRICS
 
 
 @dataclass
@@ -77,35 +98,84 @@ def _source(metric: str) -> tuple[str, str]:
     raise ValueError(f"Unsupported metric_target: {metric!r}")
 
 
-def _scalar(conn, metric, entity_id, params, year=None) -> float:
-    """Compute one metric for one driver over a scope (optionally a single year)."""
+def _entity_col(params) -> str:
+    return _ENTITY_COL.get(params.get("target_entity", "driver"), "driver_id")
+
+
+def _scalar(conn, metric, entity_id, params, year=None, circuit_id=None) -> float:
+    """Compute one metric for one entity (driver or constructor) over a scope,
+    optionally narrowed to a single year and/or circuit."""
     table, expr = _source(metric)
-    where = ["driver_id = ?"]
+    ecol = _entity_col(params)
+    where = [f"{ecol} = ?"]
     args: list[Any] = [entity_id]
     if year is not None:
         where.append("year = ?"); args.append(year)
     else:
         where.append("year BETWEEN ? AND ?")
         args += [params["start_year"], params["end_year"]]
-    if params.get("filter_constructor_id"):
+    # A constructor filter is only meaningful for driver-keyed questions
+    # (a constructor question is already scoped to that constructor).
+    if params.get("filter_constructor_id") and ecol != "constructor_id":
         where.append("constructor_id = ?"); args.append(params["filter_constructor_id"])
     # Circuit filtering only applies to race-sourced metrics.
-    if params.get("filter_circuit_id") and table == "staging_race_results":
-        where.append("circuit_id = ?"); args.append(params["filter_circuit_id"])
+    circuit = circuit_id if circuit_id is not None else params.get("filter_circuit_id")
+    if circuit and table == "staging_race_results":
+        where.append("circuit_id = ?"); args.append(circuit)
     sql = f"SELECT {expr} AS v FROM {table} WHERE {' AND '.join(where)}"
     return conn.execute(sql, args).fetchone()["v"] or 0
 
 
 def _scope_years(conn, metric, entity_id, params) -> list[int]:
     table, _ = _source(metric)
-    where = ["driver_id = ?", "year BETWEEN ? AND ?"]
+    ecol = _entity_col(params)
+    where = [f"{ecol} = ?", "year BETWEEN ? AND ?"]
     args = [entity_id, params["start_year"], params["end_year"]]
-    if params.get("filter_constructor_id"):
+    if params.get("filter_constructor_id") and ecol != "constructor_id":
         where.append("constructor_id = ?"); args.append(params["filter_constructor_id"])
     rows = conn.execute(
         f"SELECT DISTINCT year FROM {table} WHERE {' AND '.join(where)} ORDER BY year", args
     ).fetchall()
     return [r["year"] for r in rows]
+
+
+def _scope_circuits(conn, entity_id, params) -> list[str]:
+    """Distinct circuits the entity raced at in scope (for best_circuit)."""
+    ecol = _entity_col(params)
+    where = [f"{ecol} = ?", "year BETWEEN ? AND ?", "circuit_id IS NOT NULL"]
+    args = [entity_id, params["start_year"], params["end_year"]]
+    if params.get("filter_constructor_id") and ecol != "constructor_id":
+        where.append("constructor_id = ?"); args.append(params["filter_constructor_id"])
+    rows = conn.execute(
+        f"SELECT DISTINCT circuit_id FROM staging_race_results WHERE {' AND '.join(where)}", args
+    ).fetchall()
+    return [r["circuit_id"] for r in rows]
+
+
+def _one_two_finishes(conn, constructor_id, params) -> int:
+    """Races where one constructor took BOTH P1 and P2 (a team 1-2)."""
+    where = ["constructor_id = ?", "year BETWEEN ? AND ?"]
+    args = [constructor_id, params["start_year"], params["end_year"]]
+    if params.get("filter_circuit_id"):
+        where.append("circuit_id = ?"); args.append(params["filter_circuit_id"])
+    sql = ("SELECT COUNT(*) AS v FROM ("
+           "SELECT year, round FROM staging_race_results "
+           f"WHERE {' AND '.join(where)} GROUP BY year, round "
+           "HAVING SUM(CASE WHEN position = 1 THEN 1 ELSE 0 END) >= 1 "
+           "AND SUM(CASE WHEN position = 2 THEN 1 ELSE 0 END) >= 1)")
+    return conn.execute(sql, args).fetchone()["v"] or 0
+
+
+def _circuit_fact(conn, metric, circuit_id, params) -> int:
+    """Circuit-keyed facts: distinct race winners, or races hosted, in scope."""
+    args = [circuit_id, params["start_year"], params["end_year"]]
+    if metric == "distinct_winners":
+        sql = ("SELECT COUNT(DISTINCT driver_id) AS v FROM staging_race_results "
+               "WHERE circuit_id = ? AND year BETWEEN ? AND ? AND position = 1")
+    else:  # races_held
+        sql = ("SELECT COUNT(*) AS v FROM (SELECT DISTINCT year, round FROM staging_race_results "
+               "WHERE circuit_id = ? AND year BETWEEN ? AND ?)")
+    return conn.execute(sql, args).fetchone()["v"] or 0
 
 
 def _poles_converted(conn, entity_id, params) -> int:
@@ -133,10 +203,18 @@ def compute_metric(conn: sqlite3.Connection, params: dict) -> Decimal:
 
     if aggregation not in _AGGREGATIONS:
         raise ValueError(f"Unsupported aggregation: {aggregation!r}")
-    if metric == "poles_converted":
+
+    # --- Special metrics: dedicated queries, 'total' aggregation only. ---
+    if metric in _SPECIAL_METRICS:
         if aggregation != "total":
-            raise ValueError("poles_converted only supports the 'total' aggregation")
-        return Decimal(str(_poles_converted(conn, params["entity_id"], params)))
+            raise ValueError(f"{metric} only supports the 'total' aggregation")
+        entity = params["entity_id"]
+        if metric == "poles_converted":
+            return Decimal(str(_poles_converted(conn, entity, params)))
+        if metric == "one_two_finishes":
+            return Decimal(str(_one_two_finishes(conn, entity, params)))
+        return Decimal(str(_circuit_fact(conn, metric, entity, params)))  # distinct_winners | races_held
+
     if metric not in SUPPORTED_METRICS:
         raise ValueError(f"Unsupported metric_target: {metric!r}")
 
@@ -161,6 +239,12 @@ def compute_metric(conn: sqlite3.Connection, params: dict) -> Decimal:
         starts = _scalar(conn, "starts", entity, params)
         metric_total = _scalar(conn, metric, entity, params)
         value = round(100 * metric_total / starts) if starts else 0
+    elif aggregation == "per_season_avg":
+        years = _scope_years(conn, metric, entity, params)
+        value = round(_scalar(conn, metric, entity, params) / len(years)) if years else 0
+    elif aggregation == "best_circuit":
+        circuits = _scope_circuits(conn, entity, params)
+        value = max((_scalar(conn, metric, entity, params, circuit_id=c) for c in circuits), default=0)
 
     return Decimal(str(value))
 

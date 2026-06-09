@@ -13,10 +13,12 @@ change behind these functions.
 from __future__ import annotations
 
 import hashlib
+import json
 import random
 import secrets
 import sqlite3
 from datetime import datetime, timezone
+from pathlib import Path
 
 from . import scoring
 from .validation import compute_metric
@@ -189,6 +191,11 @@ def build_arcade_pair(conn: sqlite3.Connection, rng: random.Random | None = None
         "SELECT driver_id, full_name, active_from, active_to FROM staging_drivers"
     ).fetchall()
 
+    # No staging (e.g. serving from the committed question bank): use the
+    # arcade snapshot so Over/Under still works offline.
+    if not drivers:
+        return _arcade_from_dataset(rng)
+
     # Find all driver pairs whose careers overlap (shared era).
     overlapping = [
         (a, b)
@@ -210,4 +217,33 @@ def build_arcade_pair(conn: sqlite3.Connection, rng: random.Random | None = None
             "driver_id": b["driver_id"], "full_name": b["full_name"],
             "value": _career_total(conn, b["driver_id"], metric),
         },
+    }
+
+
+_ARCADE_DATASET: list | None = None
+
+
+def _arcade_from_dataset(rng: random.Random) -> dict:
+    """Build an Over/Under matchup from the committed arcade snapshot (career
+    totals per driver), used when staging tables aren't loaded."""
+    global _ARCADE_DATASET
+    if _ARCADE_DATASET is None:
+        from .seed import ARCADE_PATH
+        _ARCADE_DATASET = json.loads(Path(ARCADE_PATH).read_text())["drivers"]
+    ds = _ARCADE_DATASET
+    overlapping = [
+        (a, b)
+        for i, a in enumerate(ds)
+        for b in ds[i + 1:]
+        if a["active_from"] <= b["active_to"] and b["active_from"] <= a["active_to"]
+    ]
+    a, b = rng.choice(overlapping)
+    metric = rng.choice(list(ARCADE_METRICS))
+    return {
+        "metric": metric,
+        "metric_label": ARCADE_METRICS[metric],
+        "entity_a": {"driver_id": a["driver_id"], "full_name": a["full_name"],
+                     "value": float(a["stats"][metric])},
+        "entity_b": {"driver_id": b["driver_id"], "full_name": b["full_name"],
+                     "value": float(b["stats"][metric])},
     }

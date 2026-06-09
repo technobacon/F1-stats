@@ -22,14 +22,22 @@ reality is the ETL's responsibility.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import random
 import sqlite3
 import uuid
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from . import db
 from .validation import compute_metric, validate_ai_question
+
+# Curated, validated question bank committed to the repo. The site can serve
+# straight from this (F1_DATA_SOURCE=dataset) with no network or live ETL.
+DATA_DIR = Path(__file__).resolve().parent / "data"
+DATASET_PATH = DATA_DIR / "questions.json"
+ARCADE_PATH = DATA_DIR / "arcade.json"
 
 
 @dataclass
@@ -299,6 +307,16 @@ _H2H_MIN_GAP = 0.18   # >= ~18% apart -> a real, non-trivial difference to find
 _H2H_MAX_GAP = 0.32   # <= ~32% apart -> the two totals are genuinely close
 _H2H_MIN_VALUE = 8    # both drivers' tallies are meaningful (no "3 vs 4")
 
+# Era windows used to scope team/venue questions so each lands in a real period
+# (and gets a representative era_year for era-biased serving) rather than one
+# mushy all-time figure. Boundaries mirror service.ERA_WEIGHT_BANDS.
+_ERA_WINDOWS = [
+    (1980, 1993, "1980-1993"),
+    (1994, 2006, "1994-2006"),
+    (2007, 2013, "2007-2013"),
+    (2014, 2026, "2014-2026"),
+]
+
 
 def _p(entity: str, **kw) -> dict:
     """Build a validation_parameters payload."""
@@ -425,6 +443,10 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
               kind="percentage", category="rates", dmin=0, dmax=100)
             E(f"How many of {name}'s pole positions for {cn} converted into a win?",
               P(metric_target="poles_converted"), "one_shot", 3.5, category="rates")
+            E(f"How many runner-up (P2) finishes did {name} score for {cn} ({y1}-{y2})?",
+              P(metric_target="second_places"), "race_week", 2.5, category="career")
+            E(f"Driving for {cn} ({y1}-{y2}), how many times did {name} climb 10+ places from the grid?",
+              P(metric_target="big_comebacks"), "one_shot", 4.0, category="racecraft")
 
         # ---- Career-level questions (no constructor filter) ----
         C = lambda **kw: _p(did, start_year=lo, end_year=hi, **kw)
@@ -449,6 +471,25 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
         E(f"Across their whole career, in what percentage of races did {name} finish on the podium?",
           C(metric_target="podiums", aggregation="percentage_of_races"), "one_shot", 4.0,
           kind="percentage", category="rates", dmin=0, dmax=100)
+        E(f"How many career second-place (P2) finishes does {name} have?",
+          C(metric_target="second_places"), "race_week", 2.5, category="career")
+        E(f"How many career third-place (P3) finishes does {name} have?",
+          C(metric_target="third_places"), "race_week", 2.5, category="career")
+        E(f"At how many different circuits has {name} won a race?",
+          C(metric_target="distinct_circuits_won"), "daily", 3.0, category="circuit")
+        E(f"In how many separate seasons has {name} won at least one race?",
+          C(metric_target="winning_seasons"), "one_shot", 3.0, category="milestone")
+        E(f"How many times in their career did {name} climb 10+ places from the grid in a race?",
+          C(metric_target="big_comebacks"), "one_shot", 4.0, category="racecraft")
+        E(f"What is the most places {name} ever made up from grid to finish in a single race?",
+          C(metric_target="best_comeback"), "one_shot", 4.0, category="racecraft")
+        E(f"Across classified finishes, what is {name}'s average finishing position?",
+          C(metric_target="avg_finish"), "one_shot", 4.0, category="consistency", dmin=1, dmax=20)
+        E(f"On average, how many championship points has {name} scored per season?",
+          C(metric_target="points", aggregation="per_season_avg"), "one_shot", 4.0,
+          kind="points", category="career")
+        E(f"At their single most successful circuit, how many times has {name} won there?",
+          C(metric_target="wins", aggregation="best_circuit"), "one_shot", 3.5, category="circuit")
 
         # ---- Per-circuit wins (the driver's three best tracks) ----
         for r in conn.execute(
@@ -460,6 +501,59 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
             E(f"How many times did {name} win at {track}?",
               C(metric_target="wins", filter_circuit_id=r["circuit_id"]),
               "race_week", 3.0, category="circuit")
+
+    # ---- Constructor (team) questions, scoped per era window ----
+    # Real teams only (>= 5 career wins) so the pool stays interesting.
+    for tr in conn.execute(
+        "SELECT constructor_id, SUM(CASE WHEN position = 1 THEN 1 ELSE 0 END) AS w "
+        "FROM staging_race_results GROUP BY constructor_id HAVING w >= 5 ORDER BY w DESC"
+    ).fetchall():
+        cid = tr["constructor_id"]
+        tn = cname.get(cid, cid)
+        for w1, w2, wlabel in _ERA_WINDOWS:
+            T = lambda **kw: {"target_entity": "constructor", "entity_id": cid,
+                              "start_year": w1, "end_year": w2, **kw}
+            E(f"How many race wins did {tn} score in {wlabel}?",
+              T(metric_target="wins"), "daily", 2.5, category="team")
+            E(f"How many podium finishes did {tn} score in {wlabel}?",
+              T(metric_target="podiums"), "race_week", 3.0, category="team")
+            E(f"How many championship points did {tn} score in {wlabel}?",
+              T(metric_target="points"), "race_week", 3.5, kind="points", category="team")
+            E(f"How many pole positions did {tn} take in {wlabel}?",
+              T(metric_target="poles"), "one_shot", 3.5, category="team")
+            E(f"How many 1-2 finishes (both cars on the top two steps) did {tn} score in {wlabel}?",
+              T(metric_target="one_two_finishes"), "one_shot", 4.0, category="team")
+        span = conn.execute(
+            "SELECT MIN(year) AS lo, MAX(year) AS hi FROM staging_race_results WHERE constructor_id = ?",
+            (cid,),
+        ).fetchone()
+        clo, chi = span["lo"], span["hi"]
+        TC = lambda **kw: {"target_entity": "constructor", "entity_id": cid,
+                           "start_year": clo, "end_year": chi, **kw}
+        E(f"What is the most race wins {tn} scored in a single season?",
+          TC(metric_target="wins", aggregation="best_season"), "one_shot", 3.5, category="team")
+        E(f"In which season did {tn} take the most race wins?",
+          TC(metric_target="wins", aggregation="which_year"), "one_shot", 4.0,
+          kind="year", category="team", dmin=clo, dmax=chi)
+
+    # ---- Circuit (venue) questions ----
+    for cr in conn.execute(
+        "SELECT circuit_id, COUNT(DISTINCT year || '-' || round) AS n "
+        "FROM staging_race_results GROUP BY circuit_id HAVING n >= 5 ORDER BY n DESC"
+    ).fetchall():
+        ccid = cr["circuit_id"]
+        vn = circname.get(ccid, ccid)
+        span = conn.execute(
+            "SELECT MIN(year) AS lo, MAX(year) AS hi FROM staging_race_results WHERE circuit_id = ?",
+            (ccid,),
+        ).fetchone()
+        vlo, vhi = span["lo"], span["hi"]
+        V = lambda **kw: {"target_entity": "circuit", "entity_id": ccid,
+                          "start_year": vlo, "end_year": vhi, **kw}
+        E(f"How many different drivers have won a Grand Prix at {vn}?",
+          V(metric_target="distinct_winners"), "one_shot", 3.5, category="venue")
+        E(f"How many championship races has {vn} hosted?",
+          V(metric_target="races_held"), "race_week", 2.5, category="venue")
 
     # ---- Head-to-head differences (overlapping eras) ----
     # Curated rivalries when their drivers are present (synthetic seed); otherwise
@@ -599,6 +693,119 @@ def run_validation_pipeline(
     return {"committed": committed, "rejected": len(rejections), "rejections": rejections}
 
 
+# --- Committed question bank: export (build-time) + load (serve-time) ----------
+# Metrics surfaced in the arcade Over/Under (snapshot so it works with no staging).
+_ARCADE_STAT_KEYS = ["wins", "podiums", "poles", "fastest_laps",
+                     "points_finishes", "front_rows", "dnfs"]
+
+_DATASET_COLS = ("question_string", "verified_answer", "answer_kind", "category",
+                 "display_min", "display_max", "difficulty_weight", "game_mode", "era_year")
+
+
+def _era_weighted_sample(rng: random.Random, rows: list, k: int) -> list:
+    """Era-biased sample without replacement (Efraimidis-Spirakis A-Res), using
+    the same era weights the live service applies."""
+    from .service import _era_weight  # lazy import to avoid a load-time cycle
+    if k >= len(rows):
+        return list(rows)
+    keyed = []
+    for r in rows:
+        w = _era_weight(r["era_year"])
+        keyed.append((rng.random() ** (1.0 / w) if w > 0 else 0.0, r))
+    keyed.sort(key=lambda t: t[0], reverse=True)
+    return [r for _key, r in keyed[:k]]
+
+
+# Variety categories kept in full so the bank isn't all driver questions.
+_FLAVOR_CATEGORIES = {"team", "venue", "head_to_head"}
+
+
+def _mode_balanced(rng: random.Random, rows: list, n: int) -> list:
+    """Era-weighted sample of n rows that preserves the per-mode mix (so every
+    game mode keeps a deep enough pool to provision and rotate)."""
+    from collections import defaultdict
+    by_mode: dict[str, list] = defaultdict(list)
+    for r in rows:
+        by_mode[r["game_mode"]].append(r)
+    total = len(rows) or 1
+    raw = {m: n * len(g) / total for m, g in by_mode.items()}
+    alloc = {m: int(v) for m, v in raw.items()}
+    for m in sorted(raw, key=lambda m: raw[m] - alloc[m], reverse=True)[: n - sum(alloc.values())]:
+        alloc[m] += 1
+    out: list = []
+    for m, g in by_mode.items():
+        out += _era_weighted_sample(rng, g, min(alloc[m], len(g)))
+    return out
+
+
+def _sample_dataset(rows: list, n: int, seed: int = 42) -> list:
+    """Pick ~n questions: keep the variety (team/venue/head-to-head) categories in
+    full, then fill the rest era-weighted while preserving the per-mode mix."""
+    rng = random.Random(seed)
+    flavor = [r for r in rows if r["category"] in _FLAVOR_CATEGORIES]
+    rest = [r for r in rows if r["category"] not in _FLAVOR_CATEGORIES]
+    chosen = _era_weighted_sample(rng, flavor, min(len(flavor), n // 4))
+    chosen += _mode_balanced(rng, rest, max(0, n - len(chosen)))
+    return chosen
+
+
+def export_dataset(conn: sqlite3.Connection, n: int = 1000, out_path=None) -> dict:
+    """Regenerate the full validated pool from the staging already in `conn`, then
+    write an era-weighted, mode-balanced sample of ~n questions to JSON."""
+    drivers = load_entities_from_staging(conn)
+    conn.execute("DELETE FROM production_trivia_questions")
+    run_validation_pipeline(conn, drivers=drivers, planted=False)
+    rows = conn.execute(
+        f"SELECT {', '.join(_DATASET_COLS)} FROM production_trivia_questions"
+    ).fetchall()
+    data = [dict(r) for r in _sample_dataset(rows, n)]
+    out = Path(out_path or DATASET_PATH)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(data, indent=1, ensure_ascii=False))
+    return {"written": len(data), "pool": len(rows), "path": str(out)}
+
+
+def export_arcade(conn: sqlite3.Connection, out_path=None, min_starts: int = 40) -> dict:
+    """Snapshot per-driver career totals for the arcade metrics so Over/Under
+    runs from the committed bank with no staging tables present."""
+    rows = conn.execute(
+        "SELECT r.driver_id AS did, d.full_name AS nm, MIN(r.year) AS af, MAX(r.year) AS at, "
+        "COUNT(*) AS starts FROM staging_race_results r "
+        "JOIN staging_drivers d ON d.driver_id = r.driver_id "
+        "GROUP BY r.driver_id HAVING starts >= ? ORDER BY starts DESC", (min_starts,),
+    ).fetchall()
+    drivers = []
+    for r in rows:
+        base = {"target_entity": "driver", "entity_id": r["did"],
+                "start_year": r["af"], "end_year": r["at"]}
+        stats = {k: int(compute_metric(conn, {**base, "metric_target": k})) for k in _ARCADE_STAT_KEYS}
+        drivers.append({"driver_id": r["did"], "full_name": r["nm"],
+                        "active_from": r["af"], "active_to": r["at"], "stats": stats})
+    out = Path(out_path or ARCADE_PATH)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps({"drivers": drivers}, indent=1, ensure_ascii=False))
+    return {"drivers": len(drivers), "path": str(out)}
+
+
+def load_dataset(conn: sqlite3.Connection, path=None) -> dict:
+    """Serve from the committed question bank: rebuild the schema and load the
+    questions. No network, no live ETL — instant boot."""
+    data = json.loads(Path(path or DATASET_PATH).read_text())
+    db.reset_db(conn)
+    for q in data:
+        conn.execute(
+            "INSERT OR IGNORE INTO production_trivia_questions "
+            "(id, question_string, verified_answer, answer_kind, category, display_min, "
+            " display_max, difficulty_weight, game_mode, era_year, is_active, scheduled_date) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NULL)",
+            (str(uuid.uuid4()), q["question_string"], float(q["verified_answer"]),
+             q.get("answer_kind", "count"), q.get("category", ""), q.get("display_min"),
+             q.get("display_max"), q.get("difficulty_weight", 1.0), q["game_mode"], q.get("era_year")),
+        )
+    conn.commit()
+    return {"committed": len(data), "rejected": 0, "rejections": []}
+
+
 def seed_all(db_path=None) -> dict:
     """Full reset: rebuild schema, seed SYNTHETIC staging, run the validation
     pipeline. This is the offline fallback (no network); see `refresh` for the
@@ -615,13 +822,17 @@ def seed_all(db_path=None) -> dict:
 
 # Sources that select the real, cached, weekly Jolpica ETL.
 _REAL_SOURCES = {"jolpica", "jolpi", "ergast", "api"}
+# Sources that serve the curated, committed question bank (no network).
+_DATASET_SOURCES = {"dataset", "bank", "file"}
 
 
 def refresh(db_path=None, source: str | None = None, force: bool = False) -> dict:
     """Build/refresh the playable database.
 
     `source` (or env `F1_DATA_SOURCE`) selects the data origin:
-      * "synthetic" (default) — the offline in-code seed; resets and rebuilds.
+      * "dataset" — load the curated, validated question bank committed in the
+        repo (backend/app/data/questions.json). No network, instant boot.
+      * "synthetic" — the offline in-code seed; resets and rebuilds.
       * "jolpica" — the real, rate-limited, disk-cached Jolpica ETL into staging,
         gated to the weekly cadence, then regenerate + validate production from
         the real data. Falls back to the synthetic seed if the network is
@@ -630,6 +841,13 @@ def refresh(db_path=None, source: str | None = None, force: bool = False) -> dic
     Returns a status dict (always includes "source").
     """
     source = (source or os.environ.get("F1_DATA_SOURCE", "synthetic")).lower()
+    if source in _DATASET_SOURCES:
+        conn = db.connect(db_path)
+        try:
+            summary = load_dataset(conn)
+        finally:
+            conn.close()
+        return {"source": "dataset", **summary}
     if source not in _REAL_SOURCES:
         return {"source": "synthetic", **seed_all(db_path)}
 
@@ -674,7 +892,25 @@ if __name__ == "__main__":
                          "Falls back to env F1_DATA_SOURCE.")
     ap.add_argument("--force", action="store_true",
                     help="ignore the weekly freshness gate (jolpica only)")
+    ap.add_argument("--export", action="store_true",
+                    help="rebuild the committed question bank (questions.json + arcade.json) "
+                         "from the chosen source's staging, then exit")
+    ap.add_argument("--count", type=int, default=1000,
+                    help="number of questions to write to the bank with --export")
     args = ap.parse_args()
+
+    if args.export:
+        # Make sure staging is populated for the chosen source, then snapshot.
+        refresh(source=args.source or "jolpica", force=True)
+        conn = db.connect()
+        try:
+            d = export_dataset(conn, n=args.count)
+            a = export_arcade(conn)
+        finally:
+            conn.close()
+        print(f"Wrote {d['written']} questions (from a pool of {d['pool']}) -> {d['path']}")
+        print(f"Wrote {a['drivers']} driver stat lines -> {a['path']}")
+        raise SystemExit(0)
 
     summary = refresh(source=args.source, force=args.force)
     print(f"[{summary['source']}] Committed {summary.get('committed', 0)} questions, "

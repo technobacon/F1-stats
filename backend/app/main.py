@@ -40,9 +40,10 @@ async def lifespan(_app: FastAPI):
     ).fetchone()["n"]
     conn.close()
     source = os.environ.get("F1_DATA_SOURCE", "synthetic").lower()
-    if count == 0 or source in seed._REAL_SOURCES:
+    if count == 0 or source in seed._REAL_SOURCES or source in seed._DATASET_SOURCES:
         # refresh() is weekly-gated for the real source, so re-running on every
-        # boot is safe and only hits the network when the data is stale.
+        # boot is safe and only hits the network when the data is stale; the
+        # dataset source just reloads the committed bank (cheap, offline).
         seed.refresh(source=source)
     yield
 
