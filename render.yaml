@@ -6,7 +6,7 @@ services:
     name: f1-statguesser
     runtime: python
     plan: free
-    branch: claude/prototype-from-docs-s7msk2
+    branch: main
     buildCommand: pip install -r backend/requirements.txt
     startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
