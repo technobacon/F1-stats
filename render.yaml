@@ -13,3 +13,8 @@ services:
       # Render's filesystem is ephemeral; the app self-seeds on boot.
       - key: F1_DB_PATH
         value: /tmp/f1stats.db
+      # Pull real F1 history from the Jolpica API on boot (rate-limited, cached,
+      # weekly-gated) instead of the synthetic seed. Falls back to synthetic if
+      # api.jolpi.ca is unreachable.
+      - key: F1_DATA_SOURCE
+        value: jolpica
