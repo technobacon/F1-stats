@@ -63,6 +63,10 @@ RETRY_AFTER_429 = float(os.environ.get("F1_ETL_RETRY_429", "300"))  # seconds
 # Jolpica caps page size at 100 rows per request.
 PAGE_SIZE = int(os.environ.get("F1_ETL_PAGE_SIZE", "100"))
 
+# Sprint races (which award championship points) began in 2021; no point hitting
+# the /sprint endpoint for earlier seasons.
+FIRST_SPRINT_YEAR = int(os.environ.get("F1_ETL_FIRST_SPRINT_YEAR", "2021"))
+
 _DEFAULT_CACHE_DIR = Path(
     os.environ.get("F1_ETL_CACHE_DIR", Path(__file__).resolve().parent.parent / ".http_cache")
 )
@@ -286,6 +290,28 @@ def _norm_race_results(mr: dict) -> tuple[list[tuple], int]:
     return rows, int(mr.get("total", 0))
 
 
+def _norm_sprint(mr: dict) -> tuple[list[tuple], int]:
+    """Flatten RaceTable -> sprint point rows (driver, constructor, year, round,
+    circuit, points). Sprint races (2021+) award championship points that we fold
+    into the weekend's Grand Prix points. Returns (rows, total)."""
+    rows = []
+    for race in mr.get("RaceTable", {}).get("Races", []):
+        year = int(race["season"])
+        rnd = int(race["round"])
+        circuit_id = race.get("Circuit", {}).get("circuitId")
+        for r in race.get("SprintResults", []):
+            try:
+                points = float(r.get("points", 0) or 0)
+            except (TypeError, ValueError):
+                points = 0.0
+            rows.append((
+                r["Driver"]["driverId"],
+                r.get("Constructor", {}).get("constructorId"),
+                year, rnd, circuit_id, points,
+            ))
+    return rows, int(mr.get("total", 0))
+
+
 def _norm_qualifying(mr: dict) -> tuple[list[tuple], int]:
     """Flatten RaceTable -> staging_qualifying_results rows. Returns (rows, total)."""
     rows = []
@@ -329,6 +355,32 @@ def _paginate_results(client: JolpicaClient, path: str,
             return
 
 
+def _merge_sprint_points(conn: sqlite3.Connection, sprint_rows: list[tuple]) -> int:
+    """Add each driver's sprint points onto their Grand Prix result row for the
+    same weekend. If the driver scored sprint points but isn't classified in the
+    GP (rare), insert a non-classified row carrying only the points so the total
+    is still right without registering a phantom win/podium/start. Returns the
+    number of point-scoring sprint entries merged."""
+    merged = 0
+    for did, cid, year, rnd, circuit_id, points in sprint_rows:
+        if not points:
+            continue
+        cur = conn.execute(
+            "UPDATE staging_race_results SET points = points + ? "
+            "WHERE driver_id = ? AND year = ? AND round = ?",
+            (points, did, year, rnd),
+        )
+        if cur.rowcount == 0:
+            conn.execute(
+                "INSERT INTO staging_race_results "
+                "(driver_id, constructor_id, year, round, circuit_id, position, grid, "
+                " fastest_lap, points) VALUES (?,?,?,?,?,NULL,NULL,0,?)",
+                (did, cid, year, rnd, circuit_id, points),
+            )
+        merged += 1
+    return merged
+
+
 def run_etl(
     conn: sqlite3.Connection,
     client: JolpicaClient | None = None,
@@ -361,7 +413,7 @@ def run_etl(
     )
 
     # Per-season results + qualifying.
-    n_races = n_quali = 0
+    n_races = n_quali = n_sprint = 0
     for year in range(start_year, end_year + 1):
         race_rows = list(_paginate_results(client, f"{year}/results", _norm_race_results))
         conn.executemany(
@@ -380,6 +432,13 @@ def run_etl(
         )
         n_quali += len(quali_rows)
 
+        # Sprint points (2021+) count toward the championship: fold them into the
+        # weekend's Grand Prix points so every points aggregation includes them,
+        # without adding race entries that would distort win/podium/start counts.
+        if year >= FIRST_SPRINT_YEAR:
+            sprint_rows = list(_paginate_results(client, f"{year}/sprint", _norm_sprint))
+            n_sprint += _merge_sprint_points(conn, sprint_rows)
+
     # Derive each driver's active span from the race log (the drivers endpoint
     # doesn't carry it; build_arcade_pair needs it for era-overlap matching).
     conn.execute(
@@ -396,6 +455,7 @@ def run_etl(
         "circuits": conn.execute("SELECT COUNT(*) FROM staging_circuits").fetchone()[0],
         "race_results": n_races,
         "qualifying_results": n_quali,
+        "sprint_point_rows": n_sprint,
     }
     _record_metadata(conn, counts, start_year, end_year, client.stats)
     conn.commit()

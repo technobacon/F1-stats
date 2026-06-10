@@ -213,6 +213,36 @@ def test_refresh_if_stale_refetches_when_old(conn, client):
     assert status["skipped"] is False
 
 
+def test_merge_sprint_points_folds_into_race_points(conn):
+    """Sprint points are added onto the same weekend's GP points (so points
+    totals include them) without creating phantom race entries."""
+    conn.execute(
+        "INSERT INTO staging_race_results "
+        "(driver_id, constructor_id, year, round, circuit_id, position, grid, fastest_lap, points) "
+        "VALUES ('alpha','team',2023,1,'cir',2,3,0,18.0)"
+    )
+    rows_before = conn.execute("SELECT COUNT(*) FROM staging_race_results").fetchone()[0]
+    # alpha scored 8 sprint points round 1; bravo scored sprint points but has no
+    # GP classification that weekend -> a non-classified carrier row is inserted.
+    merged = etl._merge_sprint_points(conn, [
+        ("alpha", "team", 2023, 1, "cir", 8.0),
+        ("bravo", "team", 2023, 1, "cir", 6.0),
+        ("alpha", "team", 2023, 1, "cir", 0.0),  # zero -> skipped, no-op
+    ])
+    assert merged == 2
+    alpha = conn.execute(
+        "SELECT points, grid, position FROM staging_race_results "
+        "WHERE driver_id='alpha' AND year=2023 AND round=1"
+    ).fetchone()
+    assert alpha["points"] == 26.0 and alpha["grid"] == 3  # 18 + 8, grid untouched
+    bravo = conn.execute(
+        "SELECT points, position, grid FROM staging_race_results WHERE driver_id='bravo'"
+    ).fetchone()
+    assert bravo["points"] == 6.0 and bravo["position"] is None and bravo["grid"] is None
+    # exactly one carrier row added (bravo); alpha's points were merged in place
+    assert conn.execute("SELECT COUNT(*) FROM staging_race_results").fetchone()[0] == rows_before + 1
+
+
 def test_validation_runs_on_real_etl_data(conn, client):
     """End-to-end: real-style ETL -> data-driven generation -> validation ->
     production. Every committed answer is recomputed from staging."""

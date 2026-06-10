@@ -18,8 +18,10 @@ all reduce to deterministic SQL:
       difference           entity_id minus entity_id_b (head-to-head)
 
 Correctness notes carried from the spec:
-  * Poles/front-rows come from staging_qualifying_results (quali position), NOT
-    race grid, which diverges under grid penalties.
+  * Poles/front-rows are counted from the Grand Prix starting grid (grid == 1 /
+    grid <= 2). This matches the official record (where a driver actually started
+    the main race) and keeps sprint weekends honest — the qualifying session does
+    not set the GP grid on a sprint weekend, so grid is the right source.
   * filter_constructor_id and filter_circuit_id are OPTIONAL; absence = no filter
     (e.g. career-total questions omit the constructor).
 """
@@ -59,11 +61,13 @@ _RACE_METRICS = {
     "distinct_constructors":"COUNT(DISTINCT constructor_id)",
     "seasons_active":       "COUNT(DISTINCT year)",
     "starts":               "COUNT(*)",
+    # Poles / front rows from the Grand Prix starting grid (see module docstring).
+    "poles":                "SUM(CASE WHEN grid = 1 THEN 1 ELSE 0 END)",
+    "front_rows":           "SUM(CASE WHEN grid IN (1, 2) THEN 1 ELSE 0 END)",
 }
-_QUALI_METRICS = {
-    "poles":      "SUM(CASE WHEN quali_position = 1 THEN 1 ELSE 0 END)",
-    "front_rows": "SUM(CASE WHEN quali_position <= 2 THEN 1 ELSE 0 END)",
-}
+# All metrics are now sourced from staging_race_results; the qualifying table is
+# retained in staging but no longer drives any production metric.
+_QUALI_METRICS: dict[str, str] = {}
 
 # Special metrics computed by dedicated joins/group-bys rather than a single
 # scoped aggregate expression (entity_id meaning varies — see each function).
@@ -179,19 +183,15 @@ def _circuit_fact(conn, metric, circuit_id, params) -> int:
 
 
 def _poles_converted(conn, entity_id, params) -> int:
-    """Pole positions (quali P1) that the same driver converted into a win that
-    weekend. Independent join across the two staging tables."""
-    where = ["q.driver_id = ?", "q.quali_position = 1", "r.position = 1",
-             "r.year BETWEEN ? AND ?"]
+    """Pole positions (started the GP on grid P1) that the driver converted into a
+    win that same race."""
+    where = ["driver_id = ?", "grid = 1", "position = 1", "year BETWEEN ? AND ?"]
     args = [entity_id, params["start_year"], params["end_year"]]
     if params.get("filter_constructor_id"):
-        where.append("r.constructor_id = ?"); args.append(params["filter_constructor_id"])
+        where.append("constructor_id = ?"); args.append(params["filter_constructor_id"])
     if params.get("filter_circuit_id"):
-        where.append("r.circuit_id = ?"); args.append(params["filter_circuit_id"])
-    sql = ("SELECT COUNT(*) AS v FROM staging_qualifying_results q "
-           "JOIN staging_race_results r ON q.driver_id = r.driver_id "
-           "AND q.year = r.year AND q.round = r.round "
-           f"WHERE {' AND '.join(where)}")
+        where.append("circuit_id = ?"); args.append(params["filter_circuit_id"])
+    sql = f"SELECT COUNT(*) AS v FROM staging_race_results WHERE {' AND '.join(where)}"
     return conn.execute(sql, args).fetchone()["v"] or 0
 
 
