@@ -5,21 +5,21 @@
 const API = "/api/v1";
 const STORAGE_KEY = "f1statguesser_user_state";
 
-/* ---- Mode metadata (PRD §4.1) ---- */
+/* ---- Mode metadata ---- */
 const MODES = {
   daily: {
-    title: "Daily General Quiz",
-    desc: "Ten questions. Guess the stat — the closer you are, the more of the 5,000 points you keep.",
-    capKey: () => utcDate(), capLabel: "today's Daily Quiz", slider: true,
+    title: "Daily General Challenge",
+    desc: "Ten questions spanning all of F1 history. The closer your guess, the more of the 5,000 points per question you keep.",
+    capKey: () => utcDate(), capLabel: "today's Daily General Challenge", slider: true,
   },
   race_week: {
-    title: "Race-Week Quiz",
-    desc: "Ten questions tied to the active race weekend. One run per race week.",
-    capKey: () => isoWeek(), capLabel: "this week's Race-Week Quiz", slider: true,
+    title: "Daily Race Challenge",
+    desc: "Ten questions on teams, circuits and race-day feats from across the eras. The closer your guess, the bigger the score.",
+    capKey: () => utcDate(), capLabel: "today's Daily Race Challenge", slider: true,
   },
   one_shot: {
-    title: "The One-Shots",
-    desc: "Three hardcore questions. No slider — type your answer and commit.",
+    title: "Hardcore",
+    desc: "Three brutal questions. No slider, no safety net — type your answer and commit.",
     capKey: null, capLabel: "", slider: false,
   },
 };
@@ -115,16 +115,26 @@ function tickCountdown() {
 }
 
 /* ===================== VIEW SWITCHING ===================== */
+/* One router for everything that carries data-view: the top-nav tabs, the brand,
+ * the hero buttons and the landing-page mode cards. */
 let currentMode = "daily";
-document.querySelectorAll(".mode-tab").forEach((tab) => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".mode-tab").forEach((t) => t.classList.remove("active"));
-    document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
-    tab.classList.add("active");
-    document.getElementById("view-" + tab.dataset.view).classList.add("active");
-    if (tab.dataset.view === "quiz") { currentMode = tab.dataset.mode; renderQuizIntro(); }
-    if (tab.dataset.view === "arcade") loadArcade();
-    if (tab.dataset.view === "profile") renderProfile();
+function navigate(view, mode) {
+  document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+  document.getElementById("view-" + view).classList.add("active");
+  // Sync the top-nav highlight (tabs only; cards/buttons aren't tabs).
+  document.querySelectorAll(".mode-tab").forEach((t) => {
+    const match = t.dataset.view === view && (t.dataset.mode || null) === (mode || null);
+    t.classList.toggle("active", match);
+  });
+  if (view === "quiz") { currentMode = mode || currentMode; renderQuizIntro(); }
+  if (view === "arcade") loadArcade();
+  if (view === "profile") renderProfile();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+document.querySelectorAll("[data-view]").forEach((el) => {
+  el.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigate(el.dataset.view, el.dataset.mode);
   });
 });
 
@@ -335,7 +345,7 @@ function awardAchievements(acc) {
   if (state.daily_streak >= 3) add("podium_streak");
 }
 
-document.getElementById("summary-back").addEventListener("click", renderQuizIntro);
+document.getElementById("summary-back").addEventListener("click", () => navigate("home"));
 
 document.getElementById("share-result").addEventListener("click", async () => {
   const text = `🏁 F1 StatGuesser — I scored ${sessionScore.toLocaleString()} / ` +
