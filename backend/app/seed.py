@@ -323,11 +323,24 @@ def _p(entity: str, **kw) -> dict:
     return {"target_entity": "driver", "entity_id": entity, **kw}
 
 
+# F1 dropped a driver's worst results from the championship through 1990 (various
+# "best N of M" schemes). Ergast/Jolpica reports the points scored in each race,
+# so summing race points OVERCOUNTS the official championship total for any window
+# that touches 1950-1990 (e.g. Prost's raw 798.5 vs official 768.5). From 1991 on,
+# every result counts, so the race-points sum equals the official standings total
+# exactly (verified). We therefore only ask points questions scoped to 1991+.
+POINTS_ALL_COUNT_YEAR = 1991
+
+
 def _emit(conn, out, seen, text, params, mode, weight,
           kind="count", category="", dmin=None, dmax=None) -> None:
     """Compute the true answer for a question and stage it as an LLM output.
     Skips empty/trivial answers so the pool stays interesting."""
     if text in seen:
+        return
+    # Points only count cleanly in the all-results-count era; skip any points
+    # question whose scope reaches back into the dropped-scores years.
+    if kind == "points" and (params.get("start_year") or 0) < POINTS_ALL_COUNT_YEAR:
         return
     try:
         ans = compute_metric(conn, params)
