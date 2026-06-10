@@ -81,6 +81,44 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 .section-title { font-style:italic; text-transform:uppercase; letter-spacing:.04em;
                  font-size:1.2rem; margin:2.2rem .2rem 1rem; }
 
+/* ===================== NEXT RACE WEEKEND ===================== */
+.race-week { margin-top:1.6rem; background:linear-gradient(160deg, var(--surface), var(--surface2));
+             border:1px solid var(--line); border-radius:18px; padding:1.4rem 1.4rem 1rem;
+             box-shadow:var(--shadow); position:relative; overflow:hidden; }
+.race-week::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+                     background:var(--color-primary); }
+.rw-head { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem;
+           flex-wrap:wrap; margin-bottom:1rem; }
+.rw-eyebrow { letter-spacing:.32em; text-transform:uppercase; font-size:.64rem;
+              color:var(--color-primary); font-weight:700; margin:0 0 .25rem; }
+.rw-title { font-style:italic; font-weight:900; text-transform:uppercase; letter-spacing:.01em;
+            font-size:clamp(1.4rem,5vw,2rem); margin:0; }
+.rw-next { text-align:right; display:flex; flex-direction:column; line-height:1.15; }
+.rw-next-label { font-size:.58rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; }
+.rw-next-timer { font-variant-numeric:tabular-nums; font-weight:800; font-size:1.45rem;
+                 color:var(--color-primary); font-style:italic; }
+.rw-next-name { font-size:.72rem; color:var(--muted); }
+
+.rw-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.35rem; }
+.rw-row { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:.9rem;
+          padding:.7rem .85rem; border-radius:11px; background:var(--bg2);
+          border:1px solid var(--line); transition:border-color .15s, transform .1s; }
+.rw-row:hover { border-color:var(--color-primary); }
+.rw-row.is-next { border-color:var(--color-primary);
+                  box-shadow:0 0 0 1px var(--color-primary), 0 8px 24px rgba(0,0,0,.35); }
+.rw-row.is-past { opacity:.4; }
+.rw-day { display:flex; flex-direction:column; align-items:center; min-width:42px;
+          font-variant-numeric:tabular-nums; }
+.rw-day .dow { font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.rw-day .dnum { font-size:1.25rem; font-weight:800; font-style:italic; }
+.rw-meta { display:flex; flex-direction:column; gap:.1rem; min-width:0; }
+.rw-session { font-weight:700; font-size:.98rem; }
+.rw-kind { font-size:.62rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+.rw-kind.sprint, .rw-kind.race { color:var(--color-primary); }
+.rw-time { font-variant-numeric:tabular-nums; font-weight:700; font-size:.95rem; white-space:nowrap; }
+.rw-time small { display:block; font-weight:400; font-size:.6rem; color:var(--muted);
+                 text-align:right; letter-spacing:.05em; }
+
 /* ===================== MODE CARDS ===================== */
 .mode-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem; }
 .mode-card { position:relative; overflow:hidden; text-align:left; cursor:pointer; color:var(--text);

@@ -131,7 +131,7 @@ const SESSIONS_2026 = [
 const SEASON_2027_OPENER = ["Australian GP", "2027-03-08T04:00:00Z"]; // off-season pivot target
 
 const SESSIONS = SESSIONS_2026
-  .map(([iso, name, kind]) => ({ when: new Date(iso), text: `${name} · ${kind}` }))
+  .map(([iso, name, kind]) => ({ when: new Date(iso), name, kind, text: `${name} · ${kind}` }))
   .sort((a, b) => a.when - b.when);
 
 function tickCountdown() {
@@ -146,6 +146,49 @@ function tickCountdown() {
   const pad = (n) => String(n).padStart(2, "0");
   document.getElementById("countdown-label").textContent = label;
   document.getElementById("countdown-timer").textContent = `${pad(d)}:${pad(h)}:${pad(m)}:${pad(s)}`;
+
+  // Mirror the live countdown onto the home-page race-week panel.
+  const rwTimer = document.getElementById("rw-next-timer");
+  if (rwTimer) {
+    rwTimer.textContent = `${pad(d)}:${pad(h)}:${pad(m)}:${pad(s)}`;
+    document.getElementById("rw-next-name").textContent = target ? target.text : SEASON_2027_OPENER[0];
+  }
+}
+
+/* ===================== NEXT RACE WEEKEND PANEL ===================== */
+/* Renders every session of the upcoming Grand Prix weekend as a modern list,
+ * marking the next session and dimming any that have already run. */
+function renderRaceWeek() {
+  const list = document.getElementById("rw-list");
+  if (!list) return;
+  const now = new Date();
+  const next = SESSIONS.find((s) => s.when > now);
+  if (!next) {
+    document.getElementById("rw-title").textContent = `${SEASON_2027_OPENER[0]} · 2027`;
+    list.innerHTML = `<li class="muted" style="padding:.6rem .2rem">Season complete — see you in 2027.</li>`;
+    return;
+  }
+  const weekend = SESSIONS.filter((s) => s.name === next.name);
+  document.getElementById("rw-title").textContent = next.name;
+
+  const localZone = new Intl.DateTimeFormat(undefined, { timeZoneName: "short" })
+    .formatToParts(now).find((p) => p.type === "timeZoneName")?.value || "local";
+  const dow = (d) => d.toLocaleDateString(undefined, { weekday: "short" }).toUpperCase();
+  const time = (d) => d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  const sprintKinds = ["Sprint", "Sprint Qualifying"];
+
+  list.innerHTML = weekend.map((s) => {
+    const isNext = s === next;
+    const isPast = s.when <= now;
+    const kindClass = sprintKinds.includes(s.kind) ? "sprint" : (s.kind === "Race" ? "race" : "");
+    const cls = isNext ? "is-next" : (isPast ? "is-past" : "");
+    return `<li class="rw-row ${cls}">
+        <span class="rw-day"><span class="dow">${dow(s.when)}</span><span class="dnum">${s.when.getDate()}</span></span>
+        <span class="rw-meta"><span class="rw-session">${s.kind}</span>
+          <span class="rw-kind ${kindClass}">${isNext ? "Up next" : (isPast ? "Finished" : "Upcoming")}</span></span>
+        <span class="rw-time">${time(s.when)}<small>${localZone}</small></span>
+      </li>`;
+  }).join("");
 }
 
 /* ===================== VIEW SWITCHING ===================== */
@@ -467,3 +510,4 @@ applyTeam(state.selected_team);
 saveState(state);
 renderQuizIntro();
 tickCountdown(); setInterval(tickCountdown, 1000);
+renderRaceWeek(); setInterval(renderRaceWeek, 60000); // refresh past/next state each minute
