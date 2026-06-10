@@ -5,6 +5,10 @@ Website for F1 stat quizzes — a gamified Formula 1 statistics guessing platfor
 This repo contains the design docs in [`docs/`](./docs) and a **runnable
 prototype** that implements the defensible core of the system described there.
 
+> **Where we are & what's next:** see [`docs/STATUS.md`](./docs/STATUS.md) for a
+> full status snapshot and roadmap, and [`docs/question-types.md`](./docs/question-types.md)
+> for the question design.
+
 ---
 
 ## What the prototype is
@@ -134,9 +138,12 @@ the prototype's stand-in for the 00:00 UTC cron provisioning (Architecture §1.1
 
 ## Implemented systems
 
-- Three exact-numerical modes (Daily / Race-Week / One-Shots) + Arcade Over/Under
+- Polished landing page + three exact-numerical modes (Daily General / Daily Race
+  / Hardcore) + Arcade Over/Under
 - Server-authoritative exp-decay scoring; answers never leave the server
-- Deterministic anti-hallucination validation over **~560 generated questions**
+- Deterministic anti-hallucination validation; a **committed 1,000-question bank**
+  (`backend/app/data/questions.json`) drawn from a ~7,400-question validated pool
+- 20 question types across drivers, teams and circuits; era-biased serving
 - Guest-first localStorage: lifetime points, accuracy, streaks, achievements
 
 ### Question variety
