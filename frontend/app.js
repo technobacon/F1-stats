@@ -196,6 +196,8 @@ function renderRaceWeek() {
  * the hero buttons and the landing-page mode cards. */
 let currentMode = "daily";
 function navigate(view, mode) {
+  // Leaving the quiz (or re-entering its intro) always exits immersive mode.
+  if (view !== "quiz") document.body.classList.remove("in-game");
   document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
   document.getElementById("view-" + view).classList.add("active");
   // Sync the top-nav highlight (tabs only; cards/buttons aren't tabs).
@@ -229,6 +231,7 @@ function renderQuizIntro() {
   const cfg = MODES[currentMode];
   document.getElementById("quiz-title").textContent = cfg.title;
   document.getElementById("quiz-desc").textContent = cfg.desc;
+  document.body.classList.remove("in-game"); // intro is not part of the immersive run
   show("quiz-intro"); hide("quiz-play"); hide("quiz-reveal"); hide("quiz-summary");
   document.getElementById("quiz-status").textContent = "";
 
@@ -262,12 +265,103 @@ async function startQuiz() {
     document.getElementById("q-total").textContent = quiz.questions.length;
     document.getElementById("q-mode-badge").textContent = currentMode.replace("_", "-");
     hide("quiz-intro"); show("quiz-play"); hide("quiz-summary"); hide("quiz-reveal");
+    document.body.classList.add("in-game"); // go full-screen immersive
+    window.scrollTo({ top: 0 });
     renderQuestion();
   } catch (e) {
     status.textContent = "Could not load quiz. Tap to retry.";
     toast("Network error — is the server awake?");
   }
 }
+
+/* ===================== CURVED RACE-LINE SLIDER ===================== *
+ * A custom slider whose thumb is an F1 car riding an SVG curve. The viewBox
+ * (1000×280) maps linearly onto the box via preserveAspectRatio="none", so a
+ * path point (x,y) places the car at (x/1000, y/280) of the container. The
+ * curve is monotonic in x, so the pointer's x-position resolves to a value. */
+const CurveSlider = (() => {
+  let min = 0, max = 100, value = 0, visible = true, onChange = null;
+  let len = 0, samples = [], dragging = false, built = false;
+  const $ = (id) => document.getElementById(id);
+  const clamp01 = (t) => Math.min(1, Math.max(0, t));
+  const fmt = (v) => Math.round(v).toLocaleString();
+
+  function build() {
+    const path = $("curve-track");
+    len = path.getTotalLength();
+    samples = [];
+    const N = 240;
+    for (let i = 0; i <= N; i++) {
+      const p = path.getPointAtLength((len * i) / N);
+      samples.push({ t: i / N, x: p.x });
+    }
+    built = true;
+  }
+  function ptAtT(t) { return $("curve-track").getPointAtLength(len * clamp01(t)); }
+
+  function place() {
+    if (!built) build();
+    const t = clamp01((value - min) / ((max - min) || 1));
+    const p = ptAtT(t), box = $("curve-slider").getBoundingClientRect();
+    const car = $("car-thumb");
+    car.style.left = (p.x / 1000) * 100 + "%";
+    car.style.top = (p.y / 280) * 100 + "%";
+    // Rotate the car to the curve tangent (convert viewBox delta to screen delta).
+    const a = ptAtT(t - 0.012), b = ptAtT(t + 0.012);
+    const dx = (b.x - a.x) * (box.width / 1000), dy = (b.y - a.y) * (box.height / 280);
+    const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+    car.style.transform = `translate(-50%,-50%) rotate(${ang}deg)`;
+    car.setAttribute("aria-valuenow", Math.round(value));
+    const fill = $("curve-fill");
+    fill.style.strokeDasharray = len;
+    fill.style.strokeDashoffset = len * (1 - t);
+    $("curve-val").textContent = fmt(value);
+  }
+  function setValue(v, fire) {
+    value = Math.min(max, Math.max(min, Math.round(v)));
+    place();
+    if (fire && onChange) onChange(value);
+  }
+  function valueFromX(clientX) {
+    const box = $("curve-slider").getBoundingClientRect();
+    const vx = Math.min(1000, Math.max(0, ((clientX - box.left) / box.width) * 1000));
+    let best = samples[0], bd = Infinity;
+    for (const s of samples) { const d = Math.abs(s.x - vx); if (d < bd) { bd = d; best = s; } }
+    return min + best.t * (max - min);
+  }
+
+  function init() {
+    const slider = $("curve-slider"), car = $("car-thumb");
+    const onMove = (e) => { if (!dragging) return; setValue(valueFromX(e.clientX), true); e.preventDefault(); };
+    slider.addEventListener("pointerdown", (e) => {
+      if (!visible) return;
+      dragging = true; car.classList.add("dragging");
+      try { slider.setPointerCapture(e.pointerId); } catch {}
+      setValue(valueFromX(e.clientX), true);
+    });
+    slider.addEventListener("pointermove", onMove);
+    const end = () => { dragging = false; car.classList.remove("dragging"); };
+    slider.addEventListener("pointerup", end);
+    slider.addEventListener("pointercancel", end);
+    car.addEventListener("keydown", (e) => {
+      const step = Math.max(1, Math.round((max - min) / 100));
+      if (e.key === "ArrowRight" || e.key === "ArrowUp") { setValue(value + step, true); e.preventDefault(); }
+      if (e.key === "ArrowLeft" || e.key === "ArrowDown") { setValue(value - step, true); e.preventDefault(); }
+    });
+    window.addEventListener("resize", () => visible && place());
+  }
+  function configure(opts) {
+    min = opts.min; max = opts.max; visible = opts.visible !== false; onChange = opts.onChange || null;
+    $("curve-wrap").classList.toggle("no-curve", !visible);
+    $("curve-min").textContent = fmt(min);
+    $("curve-max").textContent = fmt(max);
+    const car = $("car-thumb");
+    car.setAttribute("aria-valuemin", Math.round(min));
+    car.setAttribute("aria-valuemax", Math.round(max));
+    setValue(opts.value, false);
+  }
+  return { init, configure, setValue: (v) => setValue(v, false), get: () => value };
+})();
 
 const KIND_HINT = {
   count: "Enter a whole number.",
@@ -284,18 +378,25 @@ function renderQuestion() {
   document.getElementById("q-cat").textContent = (q.category || "").replace(/_/g, " ");
   document.getElementById("q-hint").textContent = KIND_HINT[kind] || "";
 
-  const slider = document.getElementById("q-slider"), input = document.getElementById("q-input");
-  // Year answers always use a labelled slider (the scope is in the question anyway);
-  // One-Shots otherwise hides the slider for a hardcore feel.
+  const input = document.getElementById("q-input");
+  // Year answers always use the curved slider (the scope is in the question anyway);
+  // One-Shots otherwise hides it for a hardcore, type-it-in feel.
   const useSlider = kind === "year" || MODES[currentMode].slider;
-  slider.style.display = useSlider ? "" : "none";
-  slider.min = q.slider_min; slider.max = q.slider_max;
-  slider.step = "1";
-  slider.value = q.slider_min; input.value = useSlider ? q.slider_min : "";
   input.step = "1"; input.min = q.slider_min;
   input.max = kind === "percentage" ? 100 : q.slider_max;
-  slider.oninput = () => (input.value = slider.value);
-  input.oninput = () => { if (useSlider) slider.value = input.value; };
+  input.value = useSlider ? q.slider_min : "";
+  CurveSlider.configure({
+    min: +q.slider_min, max: +q.slider_max, value: +q.slider_min, visible: useSlider,
+    onChange: (v) => { input.value = v; },
+  });
+  input.oninput = () => { if (useSlider) CurveSlider.setValue(parseFloat(input.value) || q.slider_min); };
+
+  // Advance the immersive progress bar to reflect questions completed.
+  const fill = document.getElementById("game-progress-fill");
+  if (fill) fill.style.width = `${(qPos / quiz.questions.length) * 100}%`;
+  const gp = document.getElementById("game-points");
+  if (gp) gp.textContent = `${sessionScore.toLocaleString()} pts`;
+
   const btn = document.getElementById("submit-guess");
   btn.disabled = false; btn.textContent = "Lock In Guess";
 }
@@ -326,6 +427,8 @@ async function submitGuess() {
 /* Odometer Score Reveal (Architecture §3.2) */
 function revealScore(q, result) {
   hide("quiz-play"); show("quiz-reveal");
+  const gp = document.getElementById("game-points");
+  if (gp) gp.textContent = `${sessionScore.toLocaleString()} pts`;
   const lo = +q.slider_min, hi = +q.slider_max, span = (hi - lo) || 1;
   const clampPct = (v) => Math.min(100, Math.max(0, ((v - lo) / span) * 100));
   const guessNode = document.getElementById("node-guess");
@@ -509,5 +612,6 @@ function hide(id) { document.getElementById(id).classList.add("hidden"); }
 applyTeam(state.selected_team);
 saveState(state);
 renderQuizIntro();
+CurveSlider.init();
 tickCountdown(); setInterval(tickCountdown, 1000);
 renderRaceWeek(); setInterval(renderRaceWeek, 60000); // refresh past/next state each minute
