@@ -75,36 +75,70 @@ function toast(msg) {
 }
 
 /* ===================== COUNTDOWN HUD (PRD §5.1) ===================== */
-/* Illustrative 2026 schedule (race day, UTC). Production reads the FIA calendar API. */
-const CAL_2026 = [
-  ["Canadian GP", "2026-06-14"], ["Austrian GP", "2026-06-28"], ["British GP", "2026-07-05"],
-  ["Hungarian GP", "2026-07-26"], ["Belgian GP", "2026-08-30"], ["Italian GP", "2026-09-06"],
-  ["Singapore GP", "2026-09-20"], ["United States GP", "2026-10-25"], ["Mexico City GP", "2026-11-01"],
-  ["São Paulo GP", "2026-11-08"], ["Las Vegas GP", "2026-11-21"], ["Qatar GP", "2026-11-29"],
-  ["Abu Dhabi GP", "2026-12-06"],
+/* Real remaining 2026 F1 sessions (all UTC), mirrored in /static/schedule-2026.json.
+ * Every FP1/FP2/FP3, Sprint Qualifying, Sprint, Qualifying and Grand Prix after
+ * 2026-06-08. The HUD counts down to whichever of these is next. */
+const SESSIONS_2026 = [
+  ["2026-06-12T11:30:00Z", "Spanish GP", "FP1"], ["2026-06-12T15:00:00Z", "Spanish GP", "FP2"],
+  ["2026-06-13T10:30:00Z", "Spanish GP", "FP3"], ["2026-06-13T14:00:00Z", "Spanish GP", "Qualifying"],
+  ["2026-06-14T13:00:00Z", "Spanish GP", "Race"],
+  ["2026-06-26T11:30:00Z", "Austrian GP", "FP1"], ["2026-06-26T15:00:00Z", "Austrian GP", "FP2"],
+  ["2026-06-27T10:30:00Z", "Austrian GP", "FP3"], ["2026-06-27T14:00:00Z", "Austrian GP", "Qualifying"],
+  ["2026-06-28T13:00:00Z", "Austrian GP", "Race"],
+  ["2026-07-03T11:30:00Z", "British GP", "FP1"], ["2026-07-03T15:30:00Z", "British GP", "Sprint Qualifying"],
+  ["2026-07-04T11:00:00Z", "British GP", "Sprint"], ["2026-07-04T15:00:00Z", "British GP", "Qualifying"],
+  ["2026-07-05T14:00:00Z", "British GP", "Race"],
+  ["2026-07-17T11:30:00Z", "Belgian GP", "FP1"], ["2026-07-17T15:00:00Z", "Belgian GP", "FP2"],
+  ["2026-07-18T10:30:00Z", "Belgian GP", "FP3"], ["2026-07-18T14:00:00Z", "Belgian GP", "Qualifying"],
+  ["2026-07-19T13:00:00Z", "Belgian GP", "Race"],
+  ["2026-07-24T11:30:00Z", "Hungarian GP", "FP1"], ["2026-07-24T15:00:00Z", "Hungarian GP", "FP2"],
+  ["2026-07-25T10:30:00Z", "Hungarian GP", "FP3"], ["2026-07-25T14:00:00Z", "Hungarian GP", "Qualifying"],
+  ["2026-07-26T13:00:00Z", "Hungarian GP", "Race"],
+  ["2026-08-21T10:30:00Z", "Dutch GP", "FP1"], ["2026-08-21T14:30:00Z", "Dutch GP", "Sprint Qualifying"],
+  ["2026-08-22T10:00:00Z", "Dutch GP", "Sprint"], ["2026-08-22T14:00:00Z", "Dutch GP", "Qualifying"],
+  ["2026-08-23T13:00:00Z", "Dutch GP", "Race"],
+  ["2026-09-04T10:30:00Z", "Italian GP", "FP1"], ["2026-09-04T14:00:00Z", "Italian GP", "FP2"],
+  ["2026-09-05T10:30:00Z", "Italian GP", "FP3"], ["2026-09-05T14:00:00Z", "Italian GP", "Qualifying"],
+  ["2026-09-06T13:00:00Z", "Italian GP", "Race"],
+  ["2026-09-11T11:30:00Z", "Madrid GP", "FP1"], ["2026-09-11T15:00:00Z", "Madrid GP", "FP2"],
+  ["2026-09-12T10:30:00Z", "Madrid GP", "FP3"], ["2026-09-12T14:00:00Z", "Madrid GP", "Qualifying"],
+  ["2026-09-13T13:00:00Z", "Madrid GP", "Race"],
+  ["2026-09-24T08:30:00Z", "Azerbaijan GP", "FP1"], ["2026-09-24T12:00:00Z", "Azerbaijan GP", "FP2"],
+  ["2026-09-25T08:30:00Z", "Azerbaijan GP", "FP3"], ["2026-09-25T12:00:00Z", "Azerbaijan GP", "Qualifying"],
+  ["2026-09-26T11:00:00Z", "Azerbaijan GP", "Race"],
+  ["2026-10-09T08:30:00Z", "Singapore GP", "FP1"], ["2026-10-09T12:30:00Z", "Singapore GP", "Sprint Qualifying"],
+  ["2026-10-10T09:00:00Z", "Singapore GP", "Sprint"], ["2026-10-10T13:00:00Z", "Singapore GP", "Qualifying"],
+  ["2026-10-11T12:00:00Z", "Singapore GP", "Race"],
+  ["2026-10-23T17:30:00Z", "United States GP", "FP1"], ["2026-10-23T21:00:00Z", "United States GP", "FP2"],
+  ["2026-10-24T17:30:00Z", "United States GP", "FP3"], ["2026-10-24T21:00:00Z", "United States GP", "Qualifying"],
+  ["2026-10-25T20:00:00Z", "United States GP", "Race"],
+  ["2026-10-30T18:30:00Z", "Mexico City GP", "FP1"], ["2026-10-30T22:00:00Z", "Mexico City GP", "FP2"],
+  ["2026-10-31T17:30:00Z", "Mexico City GP", "FP3"], ["2026-10-31T21:00:00Z", "Mexico City GP", "Qualifying"],
+  ["2026-11-01T20:00:00Z", "Mexico City GP", "Race"],
+  ["2026-11-06T15:30:00Z", "São Paulo GP", "FP1"], ["2026-11-06T19:00:00Z", "São Paulo GP", "Sprint Qualifying"],
+  ["2026-11-07T14:30:00Z", "São Paulo GP", "Sprint"], ["2026-11-07T18:00:00Z", "São Paulo GP", "Qualifying"],
+  ["2026-11-08T17:00:00Z", "São Paulo GP", "Race"],
+  ["2026-11-20T00:30:00Z", "Las Vegas GP", "FP1"], ["2026-11-20T04:00:00Z", "Las Vegas GP", "FP2"],
+  ["2026-11-21T00:30:00Z", "Las Vegas GP", "FP3"], ["2026-11-21T04:00:00Z", "Las Vegas GP", "Qualifying"],
+  ["2026-11-22T04:00:00Z", "Las Vegas GP", "Race"],
+  ["2026-11-27T13:30:00Z", "Qatar GP", "FP1"], ["2026-11-27T17:00:00Z", "Qatar GP", "FP2"],
+  ["2026-11-28T14:30:00Z", "Qatar GP", "FP3"], ["2026-11-28T18:00:00Z", "Qatar GP", "Qualifying"],
+  ["2026-11-29T16:00:00Z", "Qatar GP", "Race"],
+  ["2026-12-04T09:30:00Z", "Abu Dhabi GP", "FP1"], ["2026-12-04T13:00:00Z", "Abu Dhabi GP", "FP2"],
+  ["2026-12-05T10:30:00Z", "Abu Dhabi GP", "FP3"], ["2026-12-05T14:00:00Z", "Abu Dhabi GP", "Qualifying"],
+  ["2026-12-06T13:00:00Z", "Abu Dhabi GP", "Race"],
 ];
-const SEASON_2027_OPENER = ["Australian GP", "2027-03-08"]; // off-season pivot target
+const SEASON_2027_OPENER = ["Australian GP", "2027-03-08T04:00:00Z"]; // off-season pivot target
 
-function buildSessions() {
-  // Each race day yields FP1 (−2d 11:00), Qualifying (−1d 14:00), Race (14:00 UTC).
-  const out = [];
-  for (const [name, raceDay] of CAL_2026) {
-    const race = new Date(`${raceDay}T14:00:00Z`);
-    const quali = new Date(race - 864e5); quali.setUTCHours(14);
-    const fp1 = new Date(race - 2 * 864e5); fp1.setUTCHours(11);
-    out.push({ when: fp1, text: `${name} · FP1` },
-             { when: quali, text: `${name} · Qualifying` },
-             { when: race, text: `${name} · Race` });
-  }
-  return out.sort((a, b) => a.when - b.when);
-}
-const SESSIONS = buildSessions();
+const SESSIONS = SESSIONS_2026
+  .map(([iso, name, kind]) => ({ when: new Date(iso), text: `${name} · ${kind}` }))
+  .sort((a, b) => a.when - b.when);
 
 function tickCountdown() {
   const now = new Date();
   let target = SESSIONS.find((s) => s.when > now);
   let label = target ? `NEXT · ${target.text}` : `SEASON 2027 · ${SEASON_2027_OPENER[0]}`;
-  let when = target ? target.when : new Date(`${SEASON_2027_OPENER[1]}T14:00:00Z`);
+  let when = target ? target.when : new Date(SEASON_2027_OPENER[1]);
 
   const diff = Math.max(0, when - now);
   const d = Math.floor(diff / 864e5), h = Math.floor(diff % 864e5 / 36e5),
