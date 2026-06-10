@@ -8,10 +8,10 @@
    "stats": {
     "wins": 32,
     "podiums": 106,
-    "poles": 23,
+    "poles": 22,
     "fastest_laps": 25,
     "points_finishes": 281,
-    "front_rows": 39,
+    "front_rows": 42,
     "dnfs": 75
    }
   },
@@ -23,10 +23,10 @@
    "stats": {
     "wins": 105,
     "podiums": 202,
-    "poles": 107,
+    "poles": 104,
     "fastest_laps": 68,
     "points_finishes": 331,
-    "front_rows": 182,
+    "front_rows": 176,
     "dnfs": 32
    }
   },
@@ -38,10 +38,10 @@
    "stats": {
     "wins": 21,
     "podiums": 103,
-    "poles": 19,
+    "poles": 18,
     "fastest_laps": 42,
     "points_finishes": 231,
-    "front_rows": 44,
+    "front_rows": 43,
     "dnfs": 67
    }
   },
@@ -53,10 +53,10 @@
    "stats": {
     "wins": 11,
     "podiums": 68,
-    "poles": 10,
+    "poles": 14,
     "fastest_laps": 6,
     "points_finishes": 172,
-    "front_rows": 22,
+    "front_rows": 34,
     "dnfs": 97
    }
   },
@@ -71,7 +71,7 @@
     "poles": 8,
     "fastest_laps": 8,
     "points_finishes": 180,
-    "front_rows": 22,
+    "front_rows": 24,
     "dnfs": 67
    }
   },
@@ -83,10 +83,10 @@
    "stats": {
     "wins": 91,
     "podiums": 155,
-    "poles": 36,
+    "poles": 68,
     "fastest_laps": 21,
     "points_finishes": 226,
-    "front_rows": 66,
+    "front_rows": 116,
     "dnfs": 67
    }
   },
@@ -101,7 +101,7 @@
     "poles": 57,
     "fastest_laps": 38,
     "points_finishes": 220,
-    "front_rows": 100,
+    "front_rows": 101,
     "dnfs": 38
    }
   },
@@ -116,7 +116,7 @@
     "poles": 3,
     "fastest_laps": 12,
     "points_finishes": 186,
-    "front_rows": 11,
+    "front_rows": 13,
     "dnfs": 32
    }
   },
@@ -146,7 +146,7 @@
     "poles": 3,
     "fastest_laps": 17,
     "points_finishes": 135,
-    "front_rows": 8,
+    "front_rows": 10,
     "dnfs": 39
    }
   },
@@ -158,10 +158,10 @@
    "stats": {
     "wins": 6,
     "podiums": 37,
-    "poles": 0,
+    "poles": 8,
     "fastest_laps": 0,
     "points_finishes": 108,
-    "front_rows": 0,
+    "front_rows": 28,
     "dnfs": 131
    }
   },
@@ -176,7 +176,7 @@
     "poles": 4,
     "fastest_laps": 1,
     "points_finishes": 106,
-    "front_rows": 13,
+    "front_rows": 15,
     "dnfs": 86
    }
   },
@@ -203,10 +203,10 @@
    "stats": {
     "wins": 13,
     "podiums": 62,
-    "poles": 6,
+    "poles": 12,
     "fastest_laps": 0,
     "points_finishes": 146,
-    "front_rows": 17,
+    "front_rows": 37,
     "dnfs": 78
    }
   },
@@ -218,10 +218,10 @@
    "stats": {
     "wins": 10,
     "podiums": 67,
-    "poles": 19,
+    "poles": 20,
     "fastest_laps": 19,
     "points_finishes": 145,
-    "front_rows": 48,
+    "front_rows": 46,
     "dnfs": 27
    }
   },
@@ -233,10 +233,10 @@
    "stats": {
     "wins": 71,
     "podiums": 127,
-    "poles": 51,
+    "poles": 48,
     "fastest_laps": 36,
     "points_finishes": 195,
-    "front_rows": 86,
+    "front_rows": 85,
     "dnfs": 31
    }
   },
@@ -248,10 +248,10 @@
    "stats": {
     "wins": 4,
     "podiums": 29,
-    "poles": 5,
+    "poles": 6,
     "fastest_laps": 4,
     "points_finishes": 149,
-    "front_rows": 16,
+    "front_rows": 15,
     "dnfs": 42
    }
   },
@@ -278,7 +278,7 @@
    "stats": {
     "wins": 9,
     "podiums": 42,
-    "poles": 12,
+    "poles": 13,
     "fastest_laps": 19,
     "points_finishes": 132,
     "front_rows": 37,
@@ -293,10 +293,10 @@
    "stats": {
     "wins": 10,
     "podiums": 48,
-    "poles": 4,
+    "poles": 12,
     "fastest_laps": 0,
     "points_finishes": 112,
-    "front_rows": 6,
+    "front_rows": 32,
     "dnfs": 86
    }
   },
@@ -308,10 +308,10 @@
    "stats": {
     "wins": 0,
     "podiums": 5,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 52,
-    "front_rows": 0,
+    "front_rows": 2,
     "dnfs": 138
    }
   },
@@ -338,10 +338,10 @@
    "stats": {
     "wins": 23,
     "podiums": 60,
-    "poles": 0,
+    "poles": 24,
     "fastest_laps": 0,
     "points_finishes": 115,
-    "front_rows": 0,
+    "front_rows": 44,
     "dnfs": 83
    }
   },
@@ -353,10 +353,10 @@
    "stats": {
     "wins": 51,
     "podiums": 106,
-    "poles": 0,
+    "poles": 33,
     "fastest_laps": 0,
     "points_finishes": 138,
-    "front_rows": 0,
+    "front_rows": 86,
     "dnfs": 59
    }
   },
@@ -368,10 +368,10 @@
    "stats": {
     "wins": 1,
     "podiums": 32,
-    "poles": 1,
+    "poles": 2,
     "fastest_laps": 0,
     "points_finishes": 106,
-    "front_rows": 7,
+    "front_rows": 10,
     "dnfs": 83
    }
   },
@@ -383,10 +383,10 @@
    "stats": {
     "wins": 5,
     "podiums": 23,
-    "poles": 0,
+    "poles": 2,
     "fastest_laps": 0,
     "points_finishes": 74,
-    "front_rows": 0,
+    "front_rows": 4,
     "dnfs": 92
    }
   },
@@ -401,7 +401,7 @@
     "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 66,
-    "front_rows": 1,
+    "front_rows": 2,
     "dnfs": 26
    }
   },
@@ -413,10 +413,10 @@
    "stats": {
     "wins": 31,
     "podiums": 59,
-    "poles": 1,
+    "poles": 32,
     "fastest_laps": 0,
     "points_finishes": 90,
-    "front_rows": 2,
+    "front_rows": 56,
     "dnfs": 92
    }
   },
@@ -428,10 +428,10 @@
    "stats": {
     "wins": 0,
     "podiums": 1,
-    "poles": 1,
+    "poles": 0,
     "fastest_laps": 3,
     "points_finishes": 49,
-    "front_rows": 1,
+    "front_rows": 0,
     "dnfs": 30
    }
   },
@@ -446,7 +446,7 @@
     "poles": 1,
     "fastest_laps": 2,
     "points_finishes": 101,
-    "front_rows": 1,
+    "front_rows": 2,
     "dnfs": 46
    }
   },
@@ -473,10 +473,10 @@
    "stats": {
     "wins": 6,
     "podiums": 27,
-    "poles": 5,
+    "poles": 6,
     "fastest_laps": 1,
     "points_finishes": 105,
-    "front_rows": 11,
+    "front_rows": 19,
     "dnfs": 58
    }
   },
@@ -506,7 +506,7 @@
     "poles": 0,
     "fastest_laps": 3,
     "points_finishes": 75,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 23
    }
   },
@@ -518,10 +518,10 @@
    "stats": {
     "wins": 6,
     "podiums": 33,
-    "poles": 0,
+    "poles": 7,
     "fastest_laps": 0,
     "points_finishes": 80,
-    "front_rows": 0,
+    "front_rows": 11,
     "dnfs": 83
    }
   },
@@ -533,10 +533,10 @@
    "stats": {
     "wins": 14,
     "podiums": 36,
-    "poles": 0,
+    "poles": 13,
     "fastest_laps": 0,
     "points_finishes": 86,
-    "front_rows": 0,
+    "front_rows": 31,
     "dnfs": 75
    }
   },
@@ -548,10 +548,10 @@
    "stats": {
     "wins": 8,
     "podiums": 50,
-    "poles": 24,
+    "poles": 27,
     "fastest_laps": 11,
     "points_finishes": 132,
-    "front_rows": 44,
+    "front_rows": 43,
     "dnfs": 25
    }
   },
@@ -563,10 +563,10 @@
    "stats": {
     "wins": 25,
     "podiums": 54,
-    "poles": 0,
+    "poles": 24,
     "fastest_laps": 0,
     "points_finishes": 81,
-    "front_rows": 0,
+    "front_rows": 31,
     "dnfs": 82
    }
   },
@@ -578,10 +578,10 @@
    "stats": {
     "wins": 11,
     "podiums": 23,
-    "poles": 7,
+    "poles": 13,
     "fastest_laps": 0,
     "points_finishes": 86,
-    "front_rows": 10,
+    "front_rows": 23,
     "dnfs": 57
    }
   },
@@ -593,10 +593,10 @@
    "stats": {
     "wins": 20,
     "podiums": 51,
-    "poles": 10,
+    "poles": 26,
     "fastest_laps": 0,
     "points_finishes": 96,
-    "front_rows": 11,
+    "front_rows": 39,
     "dnfs": 60
    }
   },
@@ -608,10 +608,10 @@
    "stats": {
     "wins": 3,
     "podiums": 15,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 79,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 66
    }
   },
@@ -638,10 +638,10 @@
    "stats": {
     "wins": 41,
     "podiums": 80,
-    "poles": 3,
+    "poles": 65,
     "fastest_laps": 0,
     "points_finishes": 104,
-    "front_rows": 3,
+    "front_rows": 87,
     "dnfs": 53
    }
   },
@@ -668,10 +668,10 @@
    "stats": {
     "wins": 3,
     "podiums": 18,
-    "poles": 1,
+    "poles": 2,
     "fastest_laps": 0,
     "points_finishes": 82,
-    "front_rows": 8,
+    "front_rows": 12,
     "dnfs": 62
    }
   },
@@ -698,10 +698,10 @@
    "stats": {
     "wins": 5,
     "podiums": 20,
-    "poles": 0,
+    "poles": 2,
     "fastest_laps": 0,
     "points_finishes": 75,
-    "front_rows": 0,
+    "front_rows": 11,
     "dnfs": 62
    }
   },
@@ -713,10 +713,10 @@
    "stats": {
     "wins": 5,
     "podiums": 24,
-    "poles": 6,
+    "poles": 8,
     "fastest_laps": 11,
     "points_finishes": 86,
-    "front_rows": 16,
+    "front_rows": 17,
     "dnfs": 16
    }
   },
@@ -731,7 +731,7 @@
     "poles": 16,
     "fastest_laps": 18,
     "points_finishes": 121,
-    "front_rows": 29,
+    "front_rows": 30,
     "dnfs": 10
    }
   },
@@ -743,10 +743,10 @@
    "stats": {
     "wins": 7,
     "podiums": 22,
-    "poles": 0,
+    "poles": 18,
     "fastest_laps": 0,
     "points_finishes": 68,
-    "front_rows": 0,
+    "front_rows": 34,
     "dnfs": 69
    }
   },
@@ -776,7 +776,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 76,
-    "front_rows": 0,
+    "front_rows": 4,
     "dnfs": 62
    }
   },
@@ -788,10 +788,10 @@
    "stats": {
     "wins": 12,
     "podiums": 45,
-    "poles": 0,
+    "poles": 6,
     "fastest_laps": 0,
     "points_finishes": 86,
-    "front_rows": 0,
+    "front_rows": 22,
     "dnfs": 49
    }
   },
@@ -803,10 +803,10 @@
    "stats": {
     "wins": 14,
     "podiums": 35,
-    "poles": 0,
+    "poles": 6,
     "fastest_laps": 0,
     "points_finishes": 76,
-    "front_rows": 0,
+    "front_rows": 13,
     "dnfs": 52
    }
   },
@@ -818,10 +818,10 @@
    "stats": {
     "wins": 0,
     "podiums": 3,
-    "poles": 0,
+    "poles": 3,
     "fastest_laps": 0,
     "points_finishes": 43,
-    "front_rows": 0,
+    "front_rows": 3,
     "dnfs": 75
    }
   },
@@ -836,7 +836,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 43,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 77
    }
   },
@@ -848,10 +848,10 @@
    "stats": {
     "wins": 5,
     "podiums": 28,
-    "poles": 0,
+    "poles": 5,
     "fastest_laps": 0,
     "points_finishes": 71,
-    "front_rows": 0,
+    "front_rows": 20,
     "dnfs": 48
    }
   },
@@ -863,10 +863,10 @@
    "stats": {
     "wins": 14,
     "podiums": 31,
-    "poles": 0,
+    "poles": 13,
     "fastest_laps": 0,
     "points_finishes": 67,
-    "front_rows": 0,
+    "front_rows": 27,
     "dnfs": 56
    }
   },
@@ -908,10 +908,10 @@
    "stats": {
     "wins": 12,
     "podiums": 19,
-    "poles": 0,
+    "poles": 18,
     "fastest_laps": 0,
     "points_finishes": 55,
-    "front_rows": 0,
+    "front_rows": 24,
     "dnfs": 66
    }
   },
@@ -923,10 +923,10 @@
    "stats": {
     "wins": 10,
     "podiums": 26,
-    "poles": 0,
+    "poles": 14,
     "fastest_laps": 0,
     "points_finishes": 60,
-    "front_rows": 0,
+    "front_rows": 24,
     "dnfs": 52
    }
   },
@@ -941,7 +941,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 37,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 65
    }
   },
@@ -953,10 +953,10 @@
    "stats": {
     "wins": 2,
     "podiums": 11,
-    "poles": 0,
+    "poles": 5,
     "fastest_laps": 0,
     "points_finishes": 52,
-    "front_rows": 0,
+    "front_rows": 9,
     "dnfs": 60
    }
   },
@@ -968,10 +968,10 @@
    "stats": {
     "wins": 12,
     "podiums": 24,
-    "poles": 0,
+    "poles": 6,
     "fastest_laps": 0,
     "points_finishes": 54,
-    "front_rows": 0,
+    "front_rows": 13,
     "dnfs": 49
    }
   },
@@ -983,10 +983,10 @@
    "stats": {
     "wins": 8,
     "podiums": 25,
-    "poles": 0,
+    "poles": 13,
     "fastest_laps": 0,
     "points_finishes": 56,
-    "front_rows": 0,
+    "front_rows": 19,
     "dnfs": 50
    }
   },
@@ -998,10 +998,10 @@
    "stats": {
     "wins": 22,
     "podiums": 42,
-    "poles": 13,
+    "poles": 20,
     "fastest_laps": 0,
     "points_finishes": 70,
-    "front_rows": 26,
+    "front_rows": 47,
     "dnfs": 39
    }
   },
@@ -1028,10 +1028,10 @@
    "stats": {
     "wins": 5,
     "podiums": 17,
-    "poles": 0,
+    "poles": 5,
     "fastest_laps": 0,
     "points_finishes": 52,
-    "front_rows": 0,
+    "front_rows": 10,
     "dnfs": 55
    }
   },
@@ -1043,10 +1043,10 @@
    "stats": {
     "wins": 6,
     "podiums": 24,
-    "poles": 0,
+    "poles": 8,
     "fastest_laps": 0,
     "points_finishes": 50,
-    "front_rows": 0,
+    "front_rows": 18,
     "dnfs": 58
    }
   },
@@ -1058,10 +1058,10 @@
    "stats": {
     "wins": 10,
     "podiums": 33,
-    "poles": 0,
+    "poles": 3,
     "fastest_laps": 0,
     "points_finishes": 68,
-    "front_rows": 0,
+    "front_rows": 12,
     "dnfs": 35
    }
   },
@@ -1103,10 +1103,10 @@
    "stats": {
     "wins": 8,
     "podiums": 33,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 72,
-    "front_rows": 0,
+    "front_rows": 15,
     "dnfs": 34
    }
   },
@@ -1148,10 +1148,10 @@
    "stats": {
     "wins": 2,
     "podiums": 9,
-    "poles": 0,
+    "poles": 3,
     "fastest_laps": 0,
     "points_finishes": 54,
-    "front_rows": 0,
+    "front_rows": 6,
     "dnfs": 50
    }
   },
@@ -1208,10 +1208,10 @@
    "stats": {
     "wins": 1,
     "podiums": 1,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 44,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 56
    }
   },
@@ -1226,7 +1226,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 58,
-    "front_rows": 0,
+    "front_rows": 3,
     "dnfs": 40
    }
   },
@@ -1238,10 +1238,10 @@
    "stats": {
     "wins": 0,
     "podiums": 11,
-    "poles": 0,
+    "poles": 5,
     "fastest_laps": 0,
     "points_finishes": 42,
-    "front_rows": 0,
+    "front_rows": 15,
     "dnfs": 51
    }
   },
@@ -1253,10 +1253,10 @@
    "stats": {
     "wins": 27,
     "podiums": 43,
-    "poles": 0,
+    "poles": 17,
     "fastest_laps": 0,
     "points_finishes": 61,
-    "front_rows": 0,
+    "front_rows": 33,
     "dnfs": 37
    }
   },
@@ -1298,10 +1298,10 @@
    "stats": {
     "wins": 2,
     "podiums": 6,
-    "poles": 0,
+    "poles": 2,
     "fastest_laps": 0,
     "points_finishes": 45,
-    "front_rows": 0,
+    "front_rows": 3,
     "dnfs": 45
    }
   },
@@ -1328,7 +1328,7 @@
    "stats": {
     "wins": 1,
     "podiums": 1,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 14,
     "front_rows": 2,
@@ -1343,10 +1343,10 @@
    "stats": {
     "wins": 7,
     "podiums": 30,
-    "poles": 2,
+    "poles": 13,
     "fastest_laps": 3,
     "points_finishes": 58,
-    "front_rows": 14,
+    "front_rows": 26,
     "dnfs": 33
    }
   },
@@ -1388,10 +1388,10 @@
    "stats": {
     "wins": 2,
     "podiums": 19,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 48,
-    "front_rows": 0,
+    "front_rows": 7,
     "dnfs": 41
    }
   },
@@ -1418,10 +1418,10 @@
    "stats": {
     "wins": 10,
     "podiums": 23,
-    "poles": 0,
+    "poles": 14,
     "fastest_laps": 0,
     "points_finishes": 45,
-    "front_rows": 0,
+    "front_rows": 24,
     "dnfs": 47
    }
   },
@@ -1448,10 +1448,10 @@
    "stats": {
     "wins": 4,
     "podiums": 19,
-    "poles": 0,
+    "poles": 3,
     "fastest_laps": 0,
     "points_finishes": 41,
-    "front_rows": 0,
+    "front_rows": 12,
     "dnfs": 43
    }
   },
@@ -1463,10 +1463,10 @@
    "stats": {
     "wins": 2,
     "podiums": 10,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 39,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 42
    }
   },
@@ -1481,7 +1481,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 43,
-    "front_rows": 0,
+    "front_rows": 2,
     "dnfs": 36
    }
   },
@@ -1541,7 +1541,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 38,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 35
    }
   },
@@ -1571,7 +1571,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 19,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 51
    }
   },
@@ -1643,10 +1643,10 @@
    "stats": {
     "wins": 1,
     "podiums": 1,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 25,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 37
    }
   },
@@ -1658,10 +1658,10 @@
    "stats": {
     "wins": 16,
     "podiums": 24,
-    "poles": 0,
+    "poles": 17,
     "fastest_laps": 0,
     "points_finishes": 36,
-    "front_rows": 0,
+    "front_rows": 26,
     "dnfs": 36
    }
   },
@@ -1676,7 +1676,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 13,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 43
    }
   },
@@ -1688,10 +1688,10 @@
    "stats": {
     "wins": 25,
     "podiums": 32,
-    "poles": 0,
+    "poles": 34,
     "fastest_laps": 0,
     "points_finishes": 46,
-    "front_rows": 0,
+    "front_rows": 42,
     "dnfs": 23
    }
   },
@@ -1703,10 +1703,10 @@
    "stats": {
     "wins": 3,
     "podiums": 13,
-    "poles": 0,
+    "poles": 4,
     "fastest_laps": 0,
     "points_finishes": 40,
-    "front_rows": 0,
+    "front_rows": 6,
     "dnfs": 28
    }
   },
@@ -1718,10 +1718,10 @@
    "stats": {
     "wins": 1,
     "podiums": 6,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 29,
-    "front_rows": 0,
+    "front_rows": 7,
     "dnfs": 35
    }
   },
@@ -1736,7 +1736,7 @@
     "poles": 6,
     "fastest_laps": 9,
     "points_finishes": 56,
-    "front_rows": 18,
+    "front_rows": 17,
     "dnfs": 5
    }
   },
@@ -1763,10 +1763,10 @@
    "stats": {
     "wins": 0,
     "podiums": 1,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 18,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 41
    }
   },
@@ -1808,10 +1808,10 @@
    "stats": {
     "wins": 6,
     "podiums": 13,
-    "poles": 0,
+    "poles": 2,
     "fastest_laps": 0,
     "points_finishes": 34,
-    "front_rows": 0,
+    "front_rows": 8,
     "dnfs": 29
    }
   },
@@ -1841,7 +1841,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 28,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 33
    }
   },
@@ -1853,10 +1853,10 @@
    "stats": {
     "wins": 0,
     "podiums": 2,
-    "poles": 0,
+    "poles": 3,
     "fastest_laps": 0,
     "points_finishes": 16,
-    "front_rows": 0,
+    "front_rows": 3,
     "dnfs": 46
    }
   },
@@ -1898,10 +1898,10 @@
    "stats": {
     "wins": 6,
     "podiums": 13,
-    "poles": 0,
+    "poles": 10,
     "fastest_laps": 0,
     "points_finishes": 22,
-    "front_rows": 0,
+    "front_rows": 15,
     "dnfs": 36
    }
   },
@@ -2033,10 +2033,10 @@
    "stats": {
     "wins": 24,
     "podiums": 35,
-    "poles": 0,
+    "poles": 29,
     "fastest_laps": 0,
     "points_finishes": 43,
-    "front_rows": 0,
+    "front_rows": 42,
     "dnfs": 14
    }
   },
@@ -2051,7 +2051,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 25,
-    "front_rows": 0,
+    "front_rows": 4,
     "dnfs": 32
    }
   },
@@ -2096,7 +2096,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 23,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 29
    }
   },
@@ -2156,7 +2156,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 28,
-    "front_rows": 0,
+    "front_rows": 3,
     "dnfs": 25
    }
   },
@@ -2171,7 +2171,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 35,
-    "front_rows": 0,
+    "front_rows": 4,
     "dnfs": 14
    }
   },
@@ -2198,10 +2198,10 @@
    "stats": {
     "wins": 3,
     "podiums": 16,
-    "poles": 0,
+    "poles": 6,
     "fastest_laps": 0,
     "points_finishes": 30,
-    "front_rows": 0,
+    "front_rows": 7,
     "dnfs": 18
    }
   },
@@ -2216,7 +2216,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 13,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 35
    }
   },
@@ -2261,7 +2261,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 17,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 31
    }
   },
@@ -2288,10 +2288,10 @@
    "stats": {
     "wins": 2,
     "podiums": 2,
-    "poles": 0,
+    "poles": 6,
     "fastest_laps": 0,
     "points_finishes": 6,
-    "front_rows": 0,
+    "front_rows": 11,
     "dnfs": 40
    }
   },
@@ -2333,10 +2333,10 @@
    "stats": {
     "wins": 3,
     "podiums": 18,
-    "poles": 0,
+    "poles": 4,
     "fastest_laps": 0,
     "points_finishes": 33,
-    "front_rows": 0,
+    "front_rows": 7,
     "dnfs": 15
    }
   },
@@ -2366,7 +2366,7 @@
     "poles": 0,
     "fastest_laps": 0,
     "points_finishes": 28,
-    "front_rows": 0,
+    "front_rows": 1,
     "dnfs": 18
    }
   },
@@ -2468,10 +2468,10 @@
    "stats": {
     "wins": 1,
     "podiums": 8,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 26,
-    "front_rows": 0,
+    "front_rows": 2,
     "dnfs": 16
    }
   },
@@ -2558,10 +2558,10 @@
    "stats": {
     "wins": 0,
     "podiums": 2,
-    "poles": 0,
+    "poles": 1,
     "fastest_laps": 0,
     "points_finishes": 20,
-    "front_rows": 0,
+    "front_rows": 2,
     "dnfs": 20
    }
   },
@@ -2603,10 +2603,10 @@
    "stats": {
     "wins": 6,
     "podiums": 10,
-    "poles": 0,
+    "poles": 4,
     "fastest_laps": 0,
     "points_finishes": 20,
-    "front_rows": 0,
+    "front_rows": 8,
     "dnfs": 19
    }
   },

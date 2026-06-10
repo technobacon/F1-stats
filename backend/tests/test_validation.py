@@ -38,8 +38,16 @@ def test_wins_placed_exactly(conn):
     assert compute_metric(conn, _params()) == 19
 
 
-def test_poles_use_qualifying_not_grid(conn):
-    assert compute_metric(conn, _params(metric_target="poles")) == 4
+def test_poles_use_grid_not_qualifying(conn):
+    # Poles count where the driver STARTED the race on grid P1 (the official
+    # definition), not where they were fastest in qualifying.
+    got = compute_metric(conn, _params(metric_target="poles"))
+    direct = conn.execute(
+        "SELECT SUM(CASE WHEN grid = 1 THEN 1 ELSE 0 END) AS v FROM staging_race_results "
+        "WHERE driver_id = 'schumacher' AND constructor_id = 'benetton' "
+        "AND year BETWEEN 1991 AND 1995"
+    ).fetchone()["v"]
+    assert got == direct
 
 
 def test_podiums_placed_exactly(conn):
