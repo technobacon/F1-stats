@@ -30,16 +30,18 @@ FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     # Self-seed on boot so a fresh deploy (ephemeral filesystem) is playable with
-    # no manual step. With F1_DATA_SOURCE=jolpica this pulls the real, cached,
-    # weekly ETL (and is a cheap no-op when the data is still fresh); otherwise it
-    # builds the synthetic fallback. The data source never changes at runtime.
+    # no manual step. The default serves the committed, validated real-data bank
+    # (backend/app/data/questions.json). With F1_DATA_SOURCE=jolpica this instead
+    # pulls the real, cached, weekly ETL (a cheap no-op when still fresh); only an
+    # explicit F1_DATA_SOURCE=synthetic falls back to the placeholder seed. The
+    # data source never changes at runtime.
     conn = db.connect()
     db.init_db(conn)
     count = conn.execute(
         "SELECT COUNT(*) AS n FROM production_trivia_questions"
     ).fetchone()["n"]
     conn.close()
-    source = os.environ.get("F1_DATA_SOURCE", "synthetic").lower()
+    source = os.environ.get("F1_DATA_SOURCE", "dataset").lower()
     if count == 0 or source in seed._REAL_SOURCES or source in seed._DATASET_SOURCES:
         # refresh() is weekly-gated for the real source, so re-running on every
         # boot is safe and only hits the network when the data is stale; the
