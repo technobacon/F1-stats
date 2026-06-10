@@ -853,7 +853,7 @@ def refresh(db_path=None, source: str | None = None, force: bool = False) -> dic
 
     Returns a status dict (always includes "source").
     """
-    source = (source or os.environ.get("F1_DATA_SOURCE", "synthetic")).lower()
+    source = (source or os.environ.get("F1_DATA_SOURCE", "dataset")).lower()
     if source in _DATASET_SOURCES:
         conn = db.connect(db_path)
         try:
