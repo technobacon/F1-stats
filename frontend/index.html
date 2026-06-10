@@ -3,29 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>F1 StatGuesser</title>
+  <title>F1 Stat Guesser</title>
 
   <!-- PWA / iOS add-to-home-screen -->
   <link rel="manifest" href="/static/manifest.json" />
   <meta name="theme-color" content="#FF8700" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="StatGuesser" />
+  <meta name="apple-mobile-web-app-title" content="Stat Guesser" />
   <link rel="apple-touch-icon" href="/static/icon-180.png" />
   <link rel="icon" href="/static/icon-180.png" />
 
-  <link rel="stylesheet" href="/static/style.css?v=2" />
+  <!-- Titillium Web: the open-source typeface F1 used across its own web properties -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/static/style.css?v=3" />
 </head>
 <body>
-  <!-- Dynamic Countdown Header / HUD (PRD §5.1) -->
+  <!-- ===================== TOP BAR ===================== -->
   <header class="hud">
-    <div class="hud-brand">🏁 F1 <span>StatGuesser</span></div>
-    <div class="hud-countdown">
-      <span class="hud-label" id="countdown-label">NEXT SESSION</span>
-      <span class="hud-timer" id="countdown-timer">--:--:--:--</span>
-    </div>
+    <a class="hud-brand" data-view="home" href="#home">
+      <span class="brand-mark">F1</span><span class="brand-word">STAT&nbsp;GUESSER</span>
+    </a>
+
+    <nav class="modes" id="modes">
+      <button class="mode-tab active" data-view="home">Home</button>
+      <button class="mode-tab" data-view="quiz" data-mode="daily">Daily</button>
+      <button class="mode-tab" data-view="quiz" data-mode="race_week">Race</button>
+      <button class="mode-tab" data-view="quiz" data-mode="one_shot">Hardcore</button>
+      <button class="mode-tab" data-view="arcade">Arcade</button>
+      <button class="mode-tab" data-view="profile">Profile</button>
+    </nav>
+
     <div class="hud-profile">
-      <select id="team-select" title="Tribal theming (PRD §5.3)">
+      <div class="hud-countdown">
+        <span class="hud-label" id="countdown-label">NEXT SESSION</span>
+        <span class="hud-timer" id="countdown-timer">--:--:--:--</span>
+      </div>
+      <select id="team-select" title="Team theme">
         <option value="ferrari">Ferrari</option>
         <option value="mercedes">Mercedes</option>
         <option value="mclaren" selected>McLaren</option>
@@ -35,21 +52,71 @@
     </div>
   </header>
 
-  <nav class="modes" id="modes">
-    <button class="mode-tab active" data-view="quiz" data-mode="daily">Daily</button>
-    <button class="mode-tab" data-view="quiz" data-mode="race_week">Race Week</button>
-    <button class="mode-tab" data-view="quiz" data-mode="one_shot">One-Shots</button>
-    <button class="mode-tab" data-view="arcade">Arcade</button>
-    <button class="mode-tab" data-view="profile">Profile</button>
-  </nav>
-
   <main>
-    <!-- UNIFIED QUIZ VIEW (Daily / Race-Week / One-Shots — PRD §4.1) -->
-    <section id="view-quiz" class="view active">
+    <!-- ===================== LANDING / HOME ===================== -->
+    <section id="view-home" class="view active">
+      <div class="hero">
+        <div class="hero-inner">
+          <p class="hero-eyebrow">Welcome to</p>
+          <h1 class="hero-title">F1 <span class="accent">Stat</span> Guesser</h1>
+          <p class="hero-sub">Test your Formula 1 knowledge across every era — from Senna and
+             Prost to the modern grid. Guess the stat, get scored on how close you are.</p>
+          <div class="hero-cta">
+            <button class="btn-primary" data-view="quiz" data-mode="daily">Play the Daily Challenge</button>
+            <button class="btn-ghost" data-view="arcade">Try Arcade</button>
+          </div>
+        </div>
+        <div class="hero-checkers" aria-hidden="true"></div>
+      </div>
+
+      <h2 class="section-title">Choose your challenge</h2>
+      <div class="mode-grid">
+        <button class="mode-card" data-view="quiz" data-mode="daily">
+          <span class="mc-icon">🏁</span>
+          <h3>Daily General Challenge</h3>
+          <p>Ten questions spanning all of F1 history — wins, poles, points, comebacks and more.
+             One run a day. How close can you get?</p>
+          <span class="mc-cta">Play now →</span>
+        </button>
+
+        <button class="mode-card" data-view="quiz" data-mode="race_week">
+          <span class="mc-icon">🏎️</span>
+          <h3>Daily Race Challenge</h3>
+          <p>Ten questions themed around teams, circuits and race-day feats. Sharpen up
+             before lights out.</p>
+          <span class="mc-cta">Play now →</span>
+        </button>
+
+        <button class="mode-card" data-view="quiz" data-mode="one_shot">
+          <span class="mc-icon">🔥</span>
+          <h3>Hardcore</h3>
+          <p>Three brutal questions. No slider, no safety net — type your answer and commit.
+             For the truly obsessed.</p>
+          <span class="mc-cta">Play now →</span>
+        </button>
+
+        <button class="mode-card" data-view="arcade">
+          <span class="mc-icon">⚡</span>
+          <h3>Arcade</h3>
+          <p>Endless "who has more?" head-to-heads between drivers. No timer, no cap — just
+             build the longest streak you can.</p>
+          <span class="mc-cta">Play now →</span>
+        </button>
+      </div>
+
+      <div class="feature-strip">
+        <div class="feature"><strong>1,000+</strong><span>validated questions</span></div>
+        <div class="feature"><strong>1980–今</strong><span>every modern era</span></div>
+        <div class="feature"><strong>Drivers · Teams · Tracks</strong><span>all on the grid</span></div>
+      </div>
+    </section>
+
+    <!-- ===================== QUIZ (Daily / Race / Hardcore) ===================== -->
+    <section id="view-quiz" class="view">
       <div id="quiz-intro" class="card">
-        <h2 id="quiz-title">Daily General Quiz</h2>
+        <h2 id="quiz-title">Daily General Challenge</h2>
         <p id="quiz-desc">Ten questions. Guess the stat — the closer you are, the more
-           of the 5,000 points you keep. Scoring runs server-side.</p>
+           of the 5,000 points you keep.</p>
         <div id="quiz-cap" class="cap-note hidden"></div>
         <button class="btn-primary" id="start-quiz">Start Session</button>
         <button class="btn-secondary hidden" id="replay-quiz">Replay (testing)</button>
@@ -57,7 +124,7 @@
       </div>
 
       <div id="quiz-play" class="card hidden">
-        <div class="q-progress"><span id="q-index">1</span> / <span id="q-total">5</span>
+        <div class="q-progress"><span id="q-index">1</span> / <span id="q-total">10</span>
           · <span id="q-mode-badge" class="badge">daily</span>
           <span id="q-cat" class="chip"></span></div>
         <h3 id="q-text">…</h3>
@@ -69,7 +136,7 @@
         <button class="btn-primary" id="submit-guess">Lock In Guess</button>
       </div>
 
-      <!-- Odometer Score Reveal (Architecture §3.2) -->
+      <!-- Score reveal -->
       <div id="quiz-reveal" class="card reveal hidden">
         <div class="ad-slot ad-reveal" data-ad="reveal-banner">ad · reveal banner</div>
         <div class="timeline">
@@ -85,7 +152,7 @@
         <button class="btn-primary" id="next-question">Next</button>
       </div>
 
-      <!-- Finish Summary (PRD §6) -->
+      <!-- Finish summary -->
       <div id="quiz-summary" class="card hidden">
         <h2>Session Complete</h2>
         <div class="summary-score" id="summary-score">0</div>
@@ -98,11 +165,11 @@
       </div>
     </section>
 
-    <!-- ARCADE OVER/UNDER (PRD §4.2) -->
+    <!-- ===================== ARCADE OVER/UNDER ===================== -->
     <section id="view-arcade" class="view">
       <div class="card">
         <h2>Arcade Over/Under <span class="badge">∞ unlimited</span></h2>
-        <p>Who has more? Personal streak only (non-competitive in v1).</p>
+        <p class="muted">Who has more? Build your streak — pick the driver with the higher total.</p>
         <div class="arcade-metric" id="arcade-metric">…</div>
         <div class="arcade-pair">
           <button class="arcade-card" id="arcade-a"><span class="name">—</span><span class="val">?</span></button>
@@ -115,7 +182,7 @@
       </div>
     </section>
 
-    <!-- PROFILE (guest-first localStorage, PRD §5.2) -->
+    <!-- ===================== PROFILE ===================== -->
     <section id="view-profile" class="view">
       <div class="card">
         <h2>Profile <span class="badge" id="guest-badge">guest</span></h2>
@@ -127,8 +194,8 @@
           <dt>Daily streak</dt><dd id="p-streak">0</dd>
           <dt>Achievements</dt><dd id="p-achievements">none yet</dd>
         </dl>
-        <p class="muted">All progress is stored locally in your browser. We only ask
-           you to sign in when you post to the Global Leaderboard (PRD §5.2).</p>
+        <p class="muted">All progress is stored locally in your browser. We only ask you to
+           sign in when you post to the Global Leaderboard.</p>
         <button class="btn-secondary" id="sync-btn">Sync Progress Across Devices →</button>
         <button class="btn-secondary danger" id="reset-btn">Reset local progress</button>
       </div>
@@ -136,10 +203,10 @@
   </main>
 
   <footer class="foot">
-    F1 StatGuesser · prototype · server-authoritative scoring · anti-hallucination validated
+    F1 Stat Guesser · a fan-made Formula 1 trivia game · not affiliated with Formula 1
   </footer>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/app.js?v=2"></script>
+  <script src="/static/app.js?v=3"></script>
 </body>
 </html>
