@@ -69,6 +69,22 @@
         <div class="hero-checkers" aria-hidden="true"></div>
       </div>
 
+      <!-- Next race weekend schedule -->
+      <section class="race-week" id="race-week" aria-live="polite">
+        <div class="rw-head">
+          <div>
+            <p class="rw-eyebrow">Next race weekend</p>
+            <h2 class="rw-title" id="rw-title">—</h2>
+          </div>
+          <div class="rw-next" id="rw-next">
+            <span class="rw-next-label">Next session in</span>
+            <span class="rw-next-timer" id="rw-next-timer">--:--:--:--</span>
+            <span class="rw-next-name" id="rw-next-name"></span>
+          </div>
+        </div>
+        <ol class="rw-list" id="rw-list"></ol>
+      </section>
+
       <h2 class="section-title">Choose your challenge</h2>
       <div class="mode-grid">
         <button class="mode-card" data-view="quiz" data-mode="daily">
@@ -113,6 +129,13 @@
 
     <!-- ===================== QUIZ (Daily / Race / Hardcore) ===================== -->
     <section id="view-quiz" class="view">
+      <!-- Immersive top bar — only visible once a session is in progress -->
+      <div class="game-bar">
+        <button class="game-exit" id="game-exit" data-view="home">✕ Exit</button>
+        <div class="game-progress"><span id="game-progress-fill"></span></div>
+        <span class="game-points" id="game-points">0 pts</span>
+      </div>
+
       <div id="quiz-intro" class="card">
         <h2 id="quiz-title">Daily General Challenge</h2>
         <p id="quiz-desc">Ten questions. Guess the stat — the closer you are, the more
@@ -129,10 +152,36 @@
           <span id="q-cat" class="chip"></span></div>
         <h3 id="q-text">…</h3>
         <p class="q-hint" id="q-hint"></p>
-        <div class="guess-row">
-          <input type="range" id="q-slider" min="0" max="100" value="0" />
+
+        <!-- Curved race-line slider: an F1 car rides the curve as the guess marker -->
+        <div class="curve-wrap" id="curve-wrap">
+          <div class="curve-readout" id="curve-val">0</div>
+          <div class="curve-slider" id="curve-slider">
+            <svg class="curve-svg" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-hidden="true">
+              <path class="curve-track" id="curve-track" d="M40 215 Q500 35 960 215" />
+              <path class="curve-fill"  id="curve-fill"  d="M40 215 Q500 35 960 215" />
+            </svg>
+            <div class="car-thumb" id="car-thumb" role="slider" tabindex="0"
+                 aria-label="Your guess" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <svg class="car-sprite" viewBox="0 0 90 40" aria-hidden="true">
+                <rect x="2" y="9" width="7" height="22" rx="3" class="car-dark" />
+                <rect x="16" y="1"  width="15" height="8" rx="4" class="car-tyre" />
+                <rect x="16" y="31" width="15" height="8" rx="4" class="car-tyre" />
+                <rect x="58" y="3"  width="12" height="7" rx="3.5" class="car-tyre" />
+                <rect x="58" y="30" width="12" height="7" rx="3.5" class="car-tyre" />
+                <path class="car-body"
+                  d="M9 20 C14 14 22 13 34 13 L58 12 C74 13 86 16 88 20 C86 24 74 27 58 28 L34 27 C22 27 14 26 9 20 Z" />
+                <ellipse cx="44" cy="20" rx="6" ry="4" class="car-dark" />
+                <circle cx="44" cy="20" r="1.6" class="car-cockpit" />
+                <rect x="82" y="12" width="6" height="16" rx="2" class="car-dark" />
+              </svg>
+            </div>
+            <span class="curve-end curve-min" id="curve-min">0</span>
+            <span class="curve-end curve-max" id="curve-max">100</span>
+          </div>
           <input type="number" id="q-input" min="0" value="0" />
         </div>
+
         <button class="btn-primary" id="submit-guess">Lock In Guess</button>
       </div>
 
