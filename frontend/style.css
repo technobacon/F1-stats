@@ -283,6 +283,9 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
                   border:1px dashed var(--line); border-radius:8px; padding:.35rem .8rem;
                   font-size:.72rem; cursor:pointer; font-family:inherit; transition:.15s; }
 .data-check-btn:hover { color:var(--color-primary); border-color:var(--color-primary); }
+.data-check-inline { display:block; width:100%; margin-top:.6rem; font-size:.85rem;
+                     color:var(--muted); border-style:dashed; }
+.data-check-inline:hover { color:var(--color-primary); border-color:var(--color-primary); }
 .data-overlay { position:fixed; inset:0; z-index:70; background:rgba(5,7,10,.78);
                 backdrop-filter:blur(6px); display:flex; align-items:stretch; justify-content:center;
                 padding:clamp(.6rem,3vw,2rem); }
