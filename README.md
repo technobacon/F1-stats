@@ -143,7 +143,8 @@ the prototype's stand-in for the 00:00 UTC cron provisioning (Architecture §1.1
   / Hardcore) + Arcade Over/Under
 - Server-authoritative exp-decay scoring; answers never leave the server
 - Deterministic anti-hallucination validation; a **committed 1,000-question bank**
-  (`backend/app/data/questions.json`) drawn from a ~7,400-question validated pool
+  (`backend/app/data/questions.json`) drawn from a ~3,100-question validated,
+  significance-gated pool
 - 30+ question types across drivers, teams and circuits; era-biased serving with
   an era-tiered driver significance gate (2020s: 50+ points · 2010s: race winners
   · 2000s: 3+ wins · pre-2000: world champions only)
