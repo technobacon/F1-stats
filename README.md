@@ -128,9 +128,10 @@ docs/               # original design documents
 | Method | Path | Notes |
 |---|---|---|
 | `GET`  | `/api/v1/health` | liveness + active question count |
-| `GET`  | `/api/v1/quiz/{mode}` | `daily` (5) / `race_week` (5) / `one_shot` (3); tracking tokens, **no answers** |
+| `GET`  | `/api/v1/quiz/{mode}` | `daily` (6) / `race_week` (6) / `one_shot` (3); tracking tokens, **no answers** |
 | `POST` | `/api/v1/quiz/verify` | `{tracking_token, guess}` → server-side score |
 | `GET`  | `/api/v1/arcade/pair` | over/under matchup (non-competitive v1) |
+| `GET`  | `/api/v1/dev/questions` | full bank **with answers** for proofreading ("Check the data" button); disable with `F1_DEV_TOOLS=0` |
 
 The daily/race-week/one-shot selection is **deterministic per period** (seeded by
 mode + UTC date), so everyone gets the same set within a period and it rotates —
@@ -143,7 +144,9 @@ the prototype's stand-in for the 00:00 UTC cron provisioning (Architecture §1.1
 - Server-authoritative exp-decay scoring; answers never leave the server
 - Deterministic anti-hallucination validation; a **committed 1,000-question bank**
   (`backend/app/data/questions.json`) drawn from a ~7,400-question validated pool
-- 20 question types across drivers, teams and circuits; era-biased serving
+- 30+ question types across drivers, teams and circuits; era-biased serving with
+  an era-tiered driver significance gate (2020s: 50+ points · 2010s: race winners
+  · 2000s: 3+ wins · pre-2000: world champions only)
 - Guest-first localStorage: lifetime points, accuracy, streaks, achievements
 
 ### Question variety

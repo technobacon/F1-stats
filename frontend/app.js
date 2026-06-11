@@ -9,12 +9,12 @@ const STORAGE_KEY = "f1statguesser_user_state";
 const MODES = {
   daily: {
     title: "Daily General Challenge",
-    desc: "Ten questions spanning all of F1 history. The closer your guess, the more of the 5,000 points per question you keep.",
+    desc: "Six questions spanning all of F1 history. The closer your guess, the more of the 5,000 points per question you keep.",
     capKey: () => utcDate(), capLabel: "today's Daily General Challenge", slider: true,
   },
   race_week: {
     title: "Daily Race Challenge",
-    desc: "Ten questions on teams, circuits and race-day feats from across the eras. The closer your guess, the bigger the score.",
+    desc: "Six questions on teams, circuits and race-day feats from across the eras. The closer your guess, the bigger the score.",
     capKey: () => utcDate(), capLabel: "today's Daily Race Challenge", slider: true,
   },
   one_shot: {
@@ -606,6 +606,79 @@ document.getElementById("reset-btn").addEventListener("click", () => {
 
 document.getElementById("team-select").addEventListener("change", (e) => { applyTeam(e.target.value); saveState(state); });
 
+/* ===================== DEV DATA CHECK (proofreading) ===================== */
+/* Renders the full question bank WITH verified answers in a filterable, sortable
+ * table so the underlying stats can be eyeballed against the record books.
+ * Backed by /api/v1/dev/questions — a development tool (disable: F1_DEV_TOOLS=0). */
+const DataCheck = (() => {
+  let rows = null, sortKey = "category", sortAsc = true;
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const fmtAnswer = (v) => (v % 1 === 0 ? (+v).toLocaleString() : (+v).toLocaleString(undefined, { minimumFractionDigits: 1 }));
+
+  function render() {
+    const needle = document.getElementById("data-search").value.trim().toLowerCase();
+    const mode = document.getElementById("data-mode-filter").value;
+    const view = rows.filter((r) =>
+      (!mode || r.game_mode === mode) &&
+      (!needle || `${r.question_string} ${r.category}`.toLowerCase().includes(needle)));
+    view.sort((a, b) => {
+      const va = a[sortKey] ?? "", vb = b[sortKey] ?? "";
+      const cmp = (typeof va === "number" && typeof vb === "number")
+        ? va - vb : String(va).localeCompare(String(vb));
+      return sortAsc ? cmp : -cmp;
+    });
+    document.getElementById("data-count").textContent = `${view.length} / ${rows.length}`;
+    document.getElementById("data-rows").innerHTML = view.map((r) => `
+      <tr>
+        <td class="dt-q">${esc(r.question_string)}</td>
+        <td class="num dt-a">${fmtAnswer(r.verified_answer)}</td>
+        <td>${esc(r.answer_kind)}</td>
+        <td>${esc((r.category || "").replace(/_/g, " "))}</td>
+        <td>${esc(r.game_mode.replace("_", "-"))}</td>
+        <td class="num">${r.era_year ?? "—"}</td>
+      </tr>`).join("");
+    document.querySelectorAll(".data-table th").forEach((th) => {
+      th.classList.toggle("sorted", th.dataset.sort === sortKey);
+      th.classList.toggle("desc", th.dataset.sort === sortKey && !sortAsc);
+    });
+  }
+
+  async function open() {
+    show("data-overlay");
+    if (rows) { render(); return; }
+    try {
+      const res = await fetch(`${API}/dev/questions`);
+      if (!res.ok) throw new Error(await res.text());
+      rows = (await res.json()).questions;
+      render();
+    } catch {
+      hide("data-overlay");
+      toast("Data check is unavailable (disabled on this server).");
+    }
+  }
+  const close = () => hide("data-overlay");
+
+  function init() {
+    document.getElementById("data-check").addEventListener("click", open);
+    document.getElementById("data-close").addEventListener("click", close);
+    document.getElementById("data-overlay").addEventListener("click", (e) => {
+      if (e.target.id === "data-overlay") close();
+    });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+    document.getElementById("data-search").addEventListener("input", () => rows && render());
+    document.getElementById("data-mode-filter").addEventListener("change", () => rows && render());
+    document.querySelectorAll(".data-table th").forEach((th) => {
+      th.addEventListener("click", () => {
+        const key = th.dataset.sort;
+        sortAsc = sortKey === key ? !sortAsc : true;
+        sortKey = key;
+        if (rows) render();
+      });
+    });
+  }
+  return { init };
+})();
+
 /* ---- Boot ---- */
 function show(id) { document.getElementById(id).classList.remove("hidden"); }
 function hide(id) { document.getElementById(id).classList.add("hidden"); }
@@ -613,5 +686,6 @@ applyTeam(state.selected_team);
 saveState(state);
 renderQuizIntro();
 CurveSlider.init();
+DataCheck.init();
 tickCountdown(); setInterval(tickCountdown, 1000);
 renderRaceWeek(); setInterval(renderRaceWeek, 60000); // refresh past/next state each minute

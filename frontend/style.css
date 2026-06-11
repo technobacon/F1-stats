@@ -278,6 +278,43 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 
 .foot { text-align:center; color:var(--muted); font-size:.72rem; padding:1.6rem; border-top:1px solid var(--line); }
 
+/* ===================== DEV DATA CHECK ===================== */
+.data-check-btn { display:block; margin:.7rem auto 0; background:transparent; color:var(--muted);
+                  border:1px dashed var(--line); border-radius:8px; padding:.35rem .8rem;
+                  font-size:.72rem; cursor:pointer; font-family:inherit; transition:.15s; }
+.data-check-btn:hover { color:var(--color-primary); border-color:var(--color-primary); }
+.data-overlay { position:fixed; inset:0; z-index:70; background:rgba(5,7,10,.78);
+                backdrop-filter:blur(6px); display:flex; align-items:stretch; justify-content:center;
+                padding:clamp(.6rem,3vw,2rem); }
+.data-panel { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+              box-shadow:var(--shadow); width:100%; max-width:1100px; display:flex;
+              flex-direction:column; overflow:hidden; }
+.data-head { display:flex; align-items:center; gap:.7rem; flex-wrap:wrap;
+             padding:1rem 1.2rem .4rem; }
+.data-head h2 { margin:0; font-size:1.15rem; flex:1 0 auto; }
+.data-head input[type="search"] { flex:1 1 220px; background:var(--bg2); color:var(--text);
+             border:1px solid var(--line); border-radius:8px; padding:.5rem .7rem; font-family:inherit; }
+.data-head input[type="search"]:focus { outline:none; border-color:var(--color-primary); }
+.data-head select { background:var(--bg2); color:var(--text); border:1px solid var(--line);
+             border-radius:8px; padding:.5rem; font-family:inherit; }
+.data-close { width:auto; margin:0; padding:.5rem .9rem; font-size:.82rem; }
+.data-note { margin:.1rem 1.2rem .6rem; }
+.data-table-wrap { overflow:auto; flex:1; border-top:1px solid var(--line); }
+.data-table { width:100%; border-collapse:collapse; font-size:.82rem; }
+.data-table th { position:sticky; top:0; background:var(--surface2); text-align:left;
+                 padding:.55rem .8rem; cursor:pointer; user-select:none; white-space:nowrap;
+                 border-bottom:1px solid var(--line); color:var(--muted);
+                 text-transform:uppercase; letter-spacing:.06em; font-size:.66rem; }
+.data-table th:hover { color:var(--text); }
+.data-table th.sorted { color:var(--color-primary); }
+.data-table th.sorted::after { content:" ▲"; font-size:.6rem; }
+.data-table th.sorted.desc::after { content:" ▼"; }
+.data-table td { padding:.45rem .8rem; border-bottom:1px solid var(--line); vertical-align:top; }
+.data-table tr:hover td { background:rgba(255,255,255,.03); }
+.data-table .num { text-align:right; font-variant-numeric:tabular-nums; }
+.data-table .dt-a { font-weight:800; color:var(--color-primary); white-space:nowrap; }
+.data-table .dt-q { min-width:280px; }
+
 .cap-note { background:rgba(63,185,80,.12); border:1px solid #2e6b3a; color:#9fe0ab;
             border-radius:10px; padding:.7rem .9rem; margin-bottom:1rem; font-size:.9rem; }
 .accuracy-row { color:var(--muted); margin:.5rem 0 1rem; font-size:.9rem; text-align:center; }

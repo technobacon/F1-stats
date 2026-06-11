@@ -32,7 +32,7 @@ def test_daily_quiz_hides_answer(client):
     r = client.get("/api/v1/quiz/daily")
     assert r.status_code == 200
     body = r.json()
-    assert len(body["questions"]) == 10
+    assert len(body["questions"]) == 6
     for q in body["questions"]:
         assert "tracking_token" in q
         # The trust boundary: no answer field in any client-facing question.
@@ -70,7 +70,7 @@ def test_unknown_token_404(client):
     assert r.status_code == 404
 
 
-@pytest.mark.parametrize("mode,count", [("daily", 10), ("race_week", 10), ("one_shot", 3)])
+@pytest.mark.parametrize("mode,count", [("daily", 6), ("race_week", 6), ("one_shot", 3)])
 def test_all_modes_serve_and_hide_answers(client, mode, count):
     r = client.get(f"/api/v1/quiz/{mode}")
     assert r.status_code == 200
@@ -89,6 +89,20 @@ def test_daily_set_is_deterministic_within_period(client):
     a = [q["question_text"] for q in client.get("/api/v1/quiz/daily").json()["questions"]]
     b = [q["question_text"] for q in client.get("/api/v1/quiz/daily").json()["questions"]]
     assert a == b  # stable provisioning for the same UTC day
+
+
+def test_dev_questions_exposes_answers_for_proofreading(client):
+    r = client.get("/api/v1/dev/questions")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["count"] == len(body["questions"]) > 0
+    for q in body["questions"][:5]:
+        assert q["question_string"] and "verified_answer" in q
+
+
+def test_dev_questions_can_be_disabled(client, monkeypatch):
+    monkeypatch.setenv("F1_DEV_TOOLS", "0")
+    assert client.get("/api/v1/dev/questions").status_code == 404
 
 
 def test_arcade_pair_shape(client):

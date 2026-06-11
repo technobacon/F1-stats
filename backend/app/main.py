@@ -1,9 +1,11 @@
 """FastAPI application (Architecture §1).
 
 Endpoints:
-    GET  /api/v1/quiz/daily          -> 10 questions, NO answers, tracking tokens
+    GET  /api/v1/quiz/daily          -> 6 questions, NO answers, tracking tokens
     POST /api/v1/quiz/daily/verify   -> server-side score for one guess
     GET  /api/v1/arcade/pair         -> over/under matchup (non-competitive v1)
+    GET  /api/v1/dev/questions       -> full question bank WITH answers (proofreading
+                                        tool; disable with F1_DEV_TOOLS=0)
     GET  /api/v1/health              -> liveness + question count
     GET  /                           -> static prototype frontend
 
@@ -99,6 +101,27 @@ def quiz_verify(req: VerifyRequest):
 @app.post("/api/v1/quiz/daily/verify", response_model=VerifyResponse)
 def daily_verify(req: VerifyRequest):
     return quiz_verify(req)
+
+
+@app.get("/api/v1/dev/questions")
+def dev_questions():
+    """Development proofreading tool: the full active question bank INCLUDING the
+    verified answers, so the stats can be eyeballed against the record books.
+    This intentionally crosses the no-answers-to-the-client trust boundary —
+    set F1_DEV_TOOLS=0 in production to switch it off."""
+    if os.environ.get("F1_DEV_TOOLS", "1").lower() in ("0", "false", "off"):
+        raise HTTPException(404, "Dev tools are disabled (F1_DEV_TOOLS=0).")
+    conn = get_conn()
+    try:
+        rows = conn.execute(
+            "SELECT question_string, verified_answer, answer_kind, category, "
+            "       game_mode, era_year, difficulty_weight "
+            "FROM production_trivia_questions WHERE is_active = 1 "
+            "ORDER BY category, question_string"
+        ).fetchall()
+    finally:
+        conn.close()
+    return {"count": len(rows), "questions": [dict(r) for r in rows]}
 
 
 @app.get("/api/v1/arcade/pair", response_model=ArcadePairResponse)

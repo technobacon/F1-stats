@@ -10,6 +10,24 @@ The bank is era-biased toward the modern era with a lean on the
 Senna/Prost/Mansell/Piquet (1984–93) and Schumacher (1994–2006) eras, and spans
 three entity kinds: **drivers, teams (constructors), and circuits (venues)**.
 
+## Driver significance gate
+
+A driver may only *feature* in a question when they matter for the era the
+question is scoped to (the mid-point of its season span). The further back the
+question reaches, the bigger the name has to be:
+
+| Question era | Featured driver must have… |
+|---|---|
+| 2020s | ≥ 50 career points |
+| 2010s | at least one race win |
+| 2000s | multiple race wins (3+) |
+| pre-2000 | a World Championship |
+
+Head-to-head questions apply the gate to **both** drivers. Team and venue
+questions are unaffected (they don't feature a driver by name). Champions are
+matched by full name (`seed.WORLD_CHAMPIONS`), so the gate works for both the
+synthetic seed and the real ETL ids.
+
 ## Driver questions
 1. **Career wins / podiums / poles / fastest laps / points** — the staples.
 2. **Runner-up (P2) / third-place (P3) finishes** — the "nearly" stats.
@@ -28,16 +46,27 @@ three entity kinds: **drivers, teams (constructors), and circuits (venues)**.
 15. **Head-to-head difference** — "how many more X does A have than B?", only
     generated when the two tallies are close (within ~20–30%) and substantial,
     so it can't be eyeballed.
+16. **Hat-trick weekends** — pole, the win *and* the fastest lap in one Grand Prix.
+17. **Wins from off pole** — career wins that didn't start from P1.
+18. **Deepest winning grid slot** — the furthest back they started a race they won.
+19. **Longest top-10 / podium streaks** — consecutive-finish runs, in race order.
+20. **Team-mate count** — how many different drivers shared their car.
+21. **Most recent win year** — the latest season with a victory.
+22. **Average grid position** — the qualifying counterpart to average finish.
 
 ## Team (constructor) questions
-16. **Team wins / podiums / poles / points per era window** (1980–93, 94–06,
+23. **Team wins / podiums / poles / points per era window** (1980–93, 94–06,
     07–13, 14–26) — so each lands in a real period.
-17. **Team 1-2 finishes** — races where a team locked out P1 **and** P2.
-18. **Team best season / which season** — peak win haul and the year it happened.
+24. **Team 1-2 finishes** — races where a team locked out P1 **and** P2.
+25. **Front-row lockouts** — both cars on row one of the grid, per era window.
+26. **Team best season / which season** — peak win haul and the year it happened.
+27. **Distinct winning drivers** — how many different drivers have won for the team.
 
 ## Circuit (venue) questions
-19. **Different winners at a circuit** — how many distinct drivers have won there.
-20. **Races a circuit has hosted** — venue longevity.
+28. **Different winners at a circuit** — how many distinct drivers have won there.
+29. **Races a circuit has hosted** — venue longevity.
+30. **Wins from pole at a venue** — how often the polesitter converted there.
+31. **Venue win record** — the most wins any single driver has taken there.
 
 ## Building the bank
 ```bash
