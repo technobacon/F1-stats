@@ -14,6 +14,7 @@ all reduce to deterministic SQL:
       best_season          max of the metric over any single season
       which_year           the season in which the metric peaked (returns a year)
       first_season         earliest season the metric was non-zero (returns a year)
+      last_season          latest season the metric was non-zero (returns a year)
       percentage_of_races  100 * metric / races-entered, rounded
       difference           entity_id minus entity_id_b (head-to-head)
 
@@ -64,6 +65,20 @@ _RACE_METRICS = {
     # Poles / front rows from the Grand Prix starting grid (see module docstring).
     "poles":                "SUM(CASE WHEN grid = 1 THEN 1 ELSE 0 END)",
     "front_rows":           "SUM(CASE WHEN grid IN (1, 2) THEN 1 ELSE 0 END)",
+    # Hat-trick weekends: pole, the win AND the fastest lap in one Grand Prix.
+    "hat_tricks":           "SUM(CASE WHEN grid = 1 AND position = 1 AND fastest_lap = 1 "
+                            "THEN 1 ELSE 0 END)",
+    # Wins started from pole / from anywhere else (circuit-keyed this answers
+    # "how often has the race here been won from pole?").
+    "pole_wins":            "SUM(CASE WHEN grid = 1 AND position = 1 THEN 1 ELSE 0 END)",
+    "wins_off_pole":        "SUM(CASE WHEN position = 1 AND grid > 1 THEN 1 ELSE 0 END)",
+    # Deepest grid slot a win was taken from (max grid among wins).
+    "deepest_win_grid":     "COALESCE(MAX(CASE WHEN position = 1 THEN grid END), 0)",
+    # Mean starting slot across the scope, rounded.
+    "avg_grid":             "COALESCE(CAST(ROUND(AVG(grid)) AS INTEGER), 0)",
+    # How many different drivers have won in this scope (constructor-keyed:
+    # distinct race winners the team has fielded).
+    "distinct_winning_drivers": "COUNT(DISTINCT CASE WHEN position = 1 THEN driver_id END)",
 }
 # All metrics are now sourced from staging_race_results; the qualifying table is
 # retained in staging but no longer drives any production metric.
@@ -71,15 +86,19 @@ _QUALI_METRICS: dict[str, str] = {}
 
 # Special metrics computed by dedicated joins/group-bys rather than a single
 # scoped aggregate expression (entity_id meaning varies — see each function).
-_SPECIAL_METRICS = {"poles_converted", "one_two_finishes", "distinct_winners", "races_held"}
+_SPECIAL_METRICS = {
+    "poles_converted", "one_two_finishes", "distinct_winners", "races_held",
+    "longest_points_streak", "longest_podium_streak", "teammate_count",
+    "front_row_lockouts", "most_wins_one_driver",
+}
 
 _AGGREGATIONS = {
-    "total", "best_season", "which_year", "first_season",
+    "total", "best_season", "which_year", "first_season", "last_season",
     "percentage_of_races", "difference", "per_season_avg", "best_circuit",
 }
 
-# Which entity column a question is keyed on (driver questions vs team questions).
-_ENTITY_COL = {"driver": "driver_id", "constructor": "constructor_id"}
+# Which entity column a question is keyed on (driver / team / venue questions).
+_ENTITY_COL = {"driver": "driver_id", "constructor": "constructor_id", "circuit": "circuit_id"}
 
 # Metrics whose result is a count of races (used to pick slider/answer hints).
 SUPPORTED_METRICS = set(_RACE_METRICS) | set(_QUALI_METRICS) | _SPECIAL_METRICS
@@ -195,6 +214,63 @@ def _poles_converted(conn, entity_id, params) -> int:
     return conn.execute(sql, args).fetchone()["v"] or 0
 
 
+def _longest_streak(conn, entity_id, params, max_position: int) -> int:
+    """Longest run of consecutive classified finishes at or above `max_position`
+    (10 -> top-10 streak, 3 -> podium streak), in chronological race order."""
+    ecol = _entity_col(params)
+    where = [f"{ecol} = ?", "year BETWEEN ? AND ?"]
+    args: list[Any] = [entity_id, params["start_year"], params["end_year"]]
+    if params.get("filter_constructor_id") and ecol != "constructor_id":
+        where.append("constructor_id = ?"); args.append(params["filter_constructor_id"])
+    rows = conn.execute(
+        f"SELECT position FROM staging_race_results WHERE {' AND '.join(where)} "
+        "ORDER BY year, round", args,
+    ).fetchall()
+    best = run = 0
+    for r in rows:
+        if r["position"] is not None and r["position"] <= max_position:
+            run += 1
+            best = max(best, run)
+        else:
+            run = 0
+    return best
+
+
+def _teammate_count(conn, driver_id, params) -> int:
+    """How many different drivers shared the entity's car (same constructor in
+    the same race) across the scope."""
+    sql = ("SELECT COUNT(DISTINCT b.driver_id) AS v FROM staging_race_results a "
+           "JOIN staging_race_results b ON b.year = a.year AND b.round = a.round "
+           "AND b.constructor_id = a.constructor_id AND b.driver_id != a.driver_id "
+           "WHERE a.driver_id = ? AND a.constructor_id IS NOT NULL "
+           "AND a.year BETWEEN ? AND ?")
+    args = [driver_id, params["start_year"], params["end_year"]]
+    return conn.execute(sql, args).fetchone()["v"] or 0
+
+
+def _front_row_lockouts(conn, constructor_id, params) -> int:
+    """Races where one constructor started from BOTH front-row slots (P1 and P2)."""
+    sql = ("SELECT COUNT(*) AS v FROM ("
+           "SELECT year, round FROM staging_race_results "
+           "WHERE constructor_id = ? AND year BETWEEN ? AND ? GROUP BY year, round "
+           "HAVING SUM(CASE WHEN grid = 1 THEN 1 ELSE 0 END) >= 1 "
+           "AND SUM(CASE WHEN grid = 2 THEN 1 ELSE 0 END) >= 1)")
+    args = [constructor_id, params["start_year"], params["end_year"]]
+    return conn.execute(sql, args).fetchone()["v"] or 0
+
+
+def _most_wins_one_driver(conn, entity_id, params) -> int:
+    """The win record held by a single driver within the scope (circuit-keyed:
+    the most wins anyone has taken at that venue)."""
+    ecol = _entity_col(params)
+    sql = (f"SELECT COALESCE(MAX(w), 0) AS v FROM ("
+           f"SELECT COUNT(*) AS w FROM staging_race_results "
+           f"WHERE {ecol} = ? AND position = 1 AND year BETWEEN ? AND ? "
+           f"GROUP BY driver_id)")
+    args = [entity_id, params["start_year"], params["end_year"]]
+    return conn.execute(sql, args).fetchone()["v"] or 0
+
+
 def compute_metric(conn: sqlite3.Connection, params: dict) -> Decimal:
     """Independently compute the trusted value for a question. Never reads
     `proposed_answer`."""
@@ -213,6 +289,16 @@ def compute_metric(conn: sqlite3.Connection, params: dict) -> Decimal:
             return Decimal(str(_poles_converted(conn, entity, params)))
         if metric == "one_two_finishes":
             return Decimal(str(_one_two_finishes(conn, entity, params)))
+        if metric == "longest_points_streak":
+            return Decimal(str(_longest_streak(conn, entity, params, max_position=10)))
+        if metric == "longest_podium_streak":
+            return Decimal(str(_longest_streak(conn, entity, params, max_position=3)))
+        if metric == "teammate_count":
+            return Decimal(str(_teammate_count(conn, entity, params)))
+        if metric == "front_row_lockouts":
+            return Decimal(str(_front_row_lockouts(conn, entity, params)))
+        if metric == "most_wins_one_driver":
+            return Decimal(str(_most_wins_one_driver(conn, entity, params)))
         return Decimal(str(_circuit_fact(conn, metric, entity, params)))  # distinct_winners | races_held
 
     if metric not in SUPPORTED_METRICS:
@@ -235,6 +321,9 @@ def compute_metric(conn: sqlite3.Connection, params: dict) -> Decimal:
     elif aggregation == "first_season":
         years = _scope_years(conn, metric, entity, params)
         value = next((y for y in years if _scalar(conn, metric, entity, params, y) > 0), 0)
+    elif aggregation == "last_season":
+        years = _scope_years(conn, metric, entity, params)
+        value = next((y for y in reversed(years) if _scalar(conn, metric, entity, params, y) > 0), 0)
     elif aggregation == "percentage_of_races":
         starts = _scalar(conn, "starts", entity, params)
         metric_total = _scalar(conn, metric, entity, params)

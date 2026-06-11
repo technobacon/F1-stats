@@ -21,8 +21,8 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
 ## Current state (shipped)
 
 ### Game
-- **Daily General Challenge** — 10 questions across all of F1 history.
-- **Daily Race Challenge** — 10 questions on teams, circuits and race-day feats.
+- **Daily General Challenge** — 6 questions across all of F1 history.
+- **Daily Race Challenge** — 6 questions on teams, circuits and race-day feats.
 - **Hardcore** — 3 brutal questions, no slider (type-only).
 - **Arcade Over/Under** — endless "who has more?" head-to-heads, streak-based.
 - Server-authoritative scoring: the answer never reaches the client; guesses are

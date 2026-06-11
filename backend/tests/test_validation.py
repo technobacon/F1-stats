@@ -226,6 +226,127 @@ def test_per_circuit_filter(conn):
     assert summed == total
 
 
+# ---- Creative metrics -------------------------------------------------------
+
+def test_hat_tricks_bounded_by_pole_wins_and_fastest_laps(conn):
+    hat = compute_metric(conn, _params(metric_target="hat_tricks"))
+    pole_wins = compute_metric(conn, _params(metric_target="pole_wins"))
+    fl = compute_metric(conn, _params(metric_target="fastest_laps"))
+    assert 0 <= hat <= min(pole_wins, fl)
+
+
+def test_pole_wins_plus_off_pole_wins_equals_wins(conn):
+    wins = compute_metric(conn, _params())
+    from_pole = compute_metric(conn, _params(metric_target="pole_wins"))
+    off_pole = compute_metric(conn, _params(metric_target="wins_off_pole"))
+    assert from_pole + off_pole == wins
+
+
+def test_pole_wins_matches_poles_converted(conn):
+    assert (compute_metric(conn, _params(metric_target="pole_wins"))
+            == compute_metric(conn, _params(metric_target="poles_converted")))
+
+
+def test_deepest_win_grid_positive_when_wins_exist(conn):
+    deepest = compute_metric(conn, _params(metric_target="deepest_win_grid"))
+    assert deepest >= 1  # Schumacher/Benetton has wins, so a deepest slot exists
+
+
+def test_avg_grid_in_range(conn):
+    avg = compute_metric(conn, _params(metric_target="avg_grid"))
+    assert 1 <= avg <= 24
+
+
+def test_streaks_bounded_by_finishes(conn):
+    top10 = compute_metric(conn, _params(metric_target="points_finishes"))
+    pod = compute_metric(conn, _params(metric_target="podiums"))
+    s10 = compute_metric(conn, _params(metric_target="longest_points_streak"))
+    s3 = compute_metric(conn, _params(metric_target="longest_podium_streak"))
+    assert 0 <= s3 <= s10 <= top10
+    assert s3 <= pod
+
+
+def test_teammate_count_finds_shared_cars(conn):
+    # Button and Hamilton overlap at McLaren (2010-2012) in the synthetic log.
+    n = compute_metric(conn, {
+        "target_entity": "driver", "entity_id": "hamilton",
+        "start_year": 2007, "end_year": 2024, "metric_target": "teammate_count",
+    })
+    assert n >= 1
+
+
+def test_last_season_at_least_first_season(conn):
+    first = compute_metric(conn, _params(aggregation="first_season"))
+    last = compute_metric(conn, _params(aggregation="last_season"))
+    assert first <= last <= 1995
+
+
+def test_front_row_lockouts_zero_for_single_car_team(conn):
+    val = compute_metric(conn, {
+        "target_entity": "constructor", "entity_id": "benetton",
+        "start_year": 1991, "end_year": 1995, "metric_target": "front_row_lockouts",
+    })
+    assert val == 0
+
+
+def test_distinct_winning_drivers_for_team(conn):
+    # McLaren's synthetic winners: Senna, Prost, Hamilton, Raikkonen, Button.
+    val = compute_metric(conn, {
+        "target_entity": "constructor", "entity_id": "mclaren",
+        "start_year": 1984, "end_year": 2016, "metric_target": "distinct_winning_drivers",
+    })
+    assert val == 5
+
+
+def test_circuit_keyed_metrics(conn):
+    cid = conn.execute(
+        "SELECT circuit_id FROM staging_race_results WHERE position = 1 LIMIT 1"
+    ).fetchone()["circuit_id"]
+    p = {"target_entity": "circuit", "entity_id": cid, "start_year": 1980, "end_year": 2026}
+    pole_wins = compute_metric(conn, {**p, "metric_target": "pole_wins"})
+    record = compute_metric(conn, {**p, "metric_target": "most_wins_one_driver"})
+    wins_there = compute_metric(conn, {**p, "metric_target": "wins"})
+    assert 0 <= pole_wins <= wins_there
+    assert 1 <= record <= wins_there
+
+
+# ---- Driver significance gate -------------------------------------------------
+
+def test_significance_tiers():
+    from app.seed import _is_significant
+    # 2020s: 50+ career points is enough, no win needed.
+    assert _is_significant(2022, 0, 120.0, False) is True
+    assert _is_significant(2022, 0, 12.0, False) is False
+    # 2010s: must be a race winner.
+    assert _is_significant(2015, 1, 900.0, False) is True
+    assert _is_significant(2015, 0, 900.0, False) is False
+    # 2000s: multiple (3+) wins.
+    assert _is_significant(2004, 3, 0.0, False) is True
+    assert _is_significant(2004, 2, 500.0, False) is False
+    # Pre-2000: world champions only.
+    assert _is_significant(1991, 40, 500.0, False) is False
+    assert _is_significant(1991, 40, 500.0, True) is True
+
+
+def test_generated_pool_respects_significance_gate(conn):
+    from app.seed import (DRIVERS, _champion_ids, _driver_career_stats,
+                          generate_questions)
+    champions = _champion_ids(conn)
+    stats = _driver_career_stats(conn)
+    # Synthetic Webber is a winner but no champion: his pre-2010 stint questions
+    # (2002+ era) survive only via the 2000s multiple-winner rule.
+    assert "webber" not in champions and stats["webber"][0] >= 3
+    questions = generate_questions(conn, DRIVERS)
+    # No question featuring a non-champion may be scoped pre-2000.
+    for q in questions:
+        p = q["validation_parameters"]
+        if p.get("target_entity") != "driver":
+            continue
+        era = round((p["start_year"] + p["end_year"]) / 2)
+        if era < 2000:
+            assert p["entity_id"] in champions
+
+
 # ---- Validation gate --------------------------------------------------------
 
 def test_unsupported_metric_rejected(conn):

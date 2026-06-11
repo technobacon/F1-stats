@@ -38,7 +38,7 @@ ARCADE_METRICS = {
 }
 
 # Per-mode session size (PRD §4.1). One-Shots is the short, hardcore set.
-MODE_QUESTION_COUNT = {"daily": 10, "race_week": 10, "one_shot": 3}
+MODE_QUESTION_COUNT = {"daily": 6, "race_week": 6, "one_shot": 3}
 
 # Era-biased serving: the quiz mix focuses on the modern era, dips into history
 # only occasionally, and leans a little extra on the two golden eras. Weights are

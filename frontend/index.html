@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=3" />
+  <link rel="stylesheet" href="/static/style.css?v=4" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -90,7 +90,7 @@
         <button class="mode-card" data-view="quiz" data-mode="daily">
           <span class="mc-icon">🏁</span>
           <h3>Daily General Challenge</h3>
-          <p>Ten questions spanning all of F1 history — wins, poles, points, comebacks and more.
+          <p>Six questions spanning all of F1 history — wins, poles, points, comebacks and more.
              One run a day. How close can you get?</p>
           <span class="mc-cta">Play now →</span>
         </button>
@@ -98,7 +98,7 @@
         <button class="mode-card" data-view="quiz" data-mode="race_week">
           <span class="mc-icon">🏎️</span>
           <h3>Daily Race Challenge</h3>
-          <p>Ten questions themed around teams, circuits and race-day feats. Sharpen up
+          <p>Six questions themed around teams, circuits and race-day feats. Sharpen up
              before lights out.</p>
           <span class="mc-cta">Play now →</span>
         </button>
@@ -138,7 +138,7 @@
 
       <div id="quiz-intro" class="card">
         <h2 id="quiz-title">Daily General Challenge</h2>
-        <p id="quiz-desc">Ten questions. Guess the stat — the closer you are, the more
+        <p id="quiz-desc">Six questions. Guess the stat — the closer you are, the more
            of the 5,000 points you keep.</p>
         <div id="quiz-cap" class="cap-note hidden"></div>
         <button class="btn-primary" id="start-quiz">Start Session</button>
@@ -147,7 +147,7 @@
       </div>
 
       <div id="quiz-play" class="card hidden">
-        <div class="q-progress"><span id="q-index">1</span> / <span id="q-total">10</span>
+        <div class="q-progress"><span id="q-index">1</span> / <span id="q-total">6</span>
           · <span id="q-mode-badge" class="badge">daily</span>
           <span id="q-cat" class="chip"></span></div>
         <h3 id="q-text">…</h3>
@@ -253,9 +253,43 @@
 
   <footer class="foot">
     F1 Stat Guesser · a fan-made Formula 1 trivia game · not affiliated with Formula 1
+    <button class="data-check-btn" id="data-check" title="Development tool: browse every question and its verified answer">📋 Check the data</button>
   </footer>
 
+  <!-- Dev-only proofreading overlay: the full question bank WITH answers,
+       served by /api/v1/dev/questions (disable with F1_DEV_TOOLS=0). -->
+  <div id="data-overlay" class="data-overlay hidden">
+    <div class="data-panel">
+      <div class="data-head">
+        <h2>Question bank <span class="badge" id="data-count">…</span></h2>
+        <input type="search" id="data-search" placeholder="Filter questions…" />
+        <select id="data-mode-filter">
+          <option value="">All modes</option>
+          <option value="daily">daily</option>
+          <option value="race_week">race-week</option>
+          <option value="one_shot">hardcore</option>
+        </select>
+        <button class="btn-ghost data-close" id="data-close">✕ Close</button>
+      </div>
+      <p class="muted data-note">Development tool — every active question with its verified answer,
+         recomputed from the staging data. Click a column header to sort.</p>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th data-sort="question_string">Question</th>
+            <th data-sort="verified_answer" class="num">Answer</th>
+            <th data-sort="answer_kind">Kind</th>
+            <th data-sort="category">Category</th>
+            <th data-sort="game_mode">Mode</th>
+            <th data-sort="era_year" class="num">Era</th>
+          </tr></thead>
+          <tbody id="data-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/app.js?v=3"></script>
+  <script src="/static/app.js?v=4"></script>
 </body>
 </html>
