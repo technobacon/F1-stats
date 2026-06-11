@@ -660,6 +660,7 @@ const DataCheck = (() => {
 
   function init() {
     document.getElementById("data-check").addEventListener("click", open);
+    document.getElementById("data-check-reveal").addEventListener("click", open);
     document.getElementById("data-close").addEventListener("click", close);
     document.getElementById("data-overlay").addEventListener("click", (e) => {
       if (e.target.id === "data-overlay") close();
