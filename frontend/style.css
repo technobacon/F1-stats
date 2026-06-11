@@ -1,17 +1,28 @@
 /* F1 Stat Guesser — theme. Constructor colours via CSS variables (data-team). */
 :root { --bg:#0a0d12; --bg2:#0e131a; --surface:#151b24; --surface2:#10151c;
         --line:#252d38; --text:#eef2f7; --muted:#8b95a5;
-        --color-primary:#FF8700; --color-accent:#1B2425;
+        --color-primary:#FF8700; --color-secondary:#FF8700; --color-accent:#1B2425;
+        --btn-text:#000;
         --radius:14px; --shadow:0 12px 34px rgba(0,0,0,.45); }
-:root[data-team="ferrari"]  { --color-primary:#EF3829; --color-accent:#F9C900; }
-:root[data-team="mercedes"] { --color-primary:#6CD3BF; --color-accent:#111111; }
-:root[data-team="mclaren"]  { --color-primary:#FF8700; --color-accent:#1B2425; }
-:root[data-team="red_bull"] { --color-primary:#3671C6; --color-accent:#FFC906; }
+
+/* 2026 F1 grid — single-colour teams */
+:root[data-team="mclaren"]      { --color-primary:#FF8700; --color-secondary:#FF8700; --color-accent:#1B2425;  --btn-text:#000; }
+:root[data-team="mercedes"]     { --color-primary:#6CD3BF; --color-secondary:#6CD3BF; --color-accent:#111111;  --btn-text:#000; }
+:root[data-team="williams"]     { --color-primary:#37BEDD; --color-secondary:#37BEDD; --color-accent:#041E42;  --btn-text:#000; }
+:root[data-team="rb"]           { --color-primary:#2A52C9; --color-secondary:#2A52C9; --color-accent:#FFFFFF;  --btn-text:#fff; }
+:root[data-team="haas"]         { --color-primary:#E8002D; --color-secondary:#E8002D; --color-accent:#B6BABD;  --btn-text:#fff; }
+:root[data-team="audi"]         { --color-primary:#52E252; --color-secondary:#52E252; --color-accent:#000000;  --btn-text:#000; }
+
+/* 2026 F1 grid — two-primary-colour teams (buttons render as gradient) */
+:root[data-team="ferrari"]      { --color-primary:#EF3829; --color-secondary:#F9C900; --color-accent:#F9C900;  --btn-text:#000; }
+:root[data-team="red_bull"]     { --color-primary:#3671C6; --color-secondary:#FFC906; --color-accent:#FFC906;  --btn-text:#fff; }
+:root[data-team="aston_martin"] { --color-primary:#006D5B; --color-secondary:#CEDC00; --color-accent:#CEDC00;  --btn-text:#000; }
+:root[data-team="alpine"]       { --color-primary:#0090FF; --color-secondary:#FF87BC; --color-accent:#FF87BC;  --btn-text:#fff; }
 
 * { box-sizing:border-box; }
 body { margin:0; font-family:'Titillium Web','Segoe UI',system-ui,sans-serif;
        background:
-         radial-gradient(1100px 600px at 80% -10%, rgba(255,135,0,.07), transparent 60%),
+         radial-gradient(1100px 600px at 80% -10%, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 60%),
          var(--bg);
        color:var(--text); min-height:100vh; display:flex; flex-direction:column;
        -webkit-font-smoothing:antialiased; }
@@ -25,7 +36,7 @@ a { color:inherit; text-decoration:none; }
        border-bottom:1px solid var(--line); position:sticky; top:0; z-index:30; }
 .hud-brand { display:flex; align-items:center; gap:.45rem; font-weight:900; font-style:italic;
              letter-spacing:.02em; cursor:pointer; }
-.brand-mark { background:var(--color-primary); color:#000; padding:.05rem .4rem; border-radius:5px;
+.brand-mark { background:var(--color-primary); color:var(--btn-text); padding:.05rem .4rem; border-radius:5px;
               font-size:1.05rem; }
 .brand-word { font-size:1rem; letter-spacing:.06em; }
 
@@ -36,15 +47,20 @@ a { color:inherit; text-decoration:none; }
             border-radius:99px; padding:.45rem .95rem; cursor:pointer; font-weight:700;
             font-size:.9rem; white-space:nowrap; font-family:inherit; transition:.15s; }
 .mode-tab:hover { color:var(--text); }
-.mode-tab.active { color:#000; background:var(--color-primary); }
+.mode-tab.active { color:var(--btn-text); background:var(--color-primary); }
 
 .hud-profile { display:flex; align-items:center; gap:.8rem; }
 .hud-countdown { text-align:right; display:flex; flex-direction:column; line-height:1.1; }
 .hud-label { font-size:.58rem; color:var(--muted); letter-spacing:1.5px; }
 .hud-timer { font-variant-numeric:tabular-nums; font-weight:700; font-size:.95rem; }
 .hud-points { font-weight:800; color:var(--color-primary); white-space:nowrap; }
-#team-select { background:var(--bg2); color:var(--text); border:1px solid var(--line);
-               border-radius:8px; padding:.35rem .5rem; font-family:inherit; }
+/* Team picker trigger button (replaces old <select>) */
+.team-select-btn { display:flex; align-items:center; gap:.45rem; background:var(--bg2);
+                   color:var(--text); border:1px solid var(--line); border-radius:8px;
+                   padding:.35rem .7rem; font-family:inherit; cursor:pointer;
+                   font-size:.85rem; font-weight:700; transition:border-color .15s; white-space:nowrap; }
+.team-select-btn:hover { border-color:var(--color-primary); }
+.team-btn-swatch { width:10px; height:10px; border-radius:50%; flex-shrink:0; display:inline-block; }
 
 main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem 3rem; }
 .view { display:none; } .view.active { display:block; animation:fade .35s ease; }
@@ -59,7 +75,7 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
   content:""; position:absolute; inset:0; z-index:0; opacity:.9;
   background:
     linear-gradient(180deg, rgba(8,11,16,.62), rgba(8,11,16,.92)),
-    radial-gradient(120% 90% at 50% -10%, rgba(255,135,0,.22), transparent 55%),
+    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 55%),
     url('/static/hero.jpg') center/cover no-repeat; }
 .hero::after { /* motion / speed streaks */
   content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
@@ -148,13 +164,14 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
         padding:1.6rem; box-shadow:var(--shadow); }
 .card h2 { margin-top:0; }
 .muted { color:var(--muted); font-size:.85rem; }
-.badge { font-size:.62rem; background:var(--color-primary); color:#000; padding:.15rem .55rem;
+.badge { font-size:.62rem; background:var(--color-primary); color:var(--btn-text); padding:.15rem .55rem;
          border-radius:99px; vertical-align:middle; font-weight:800; }
 .chip { font-size:.62rem; background:var(--line); color:var(--text); padding:.15rem .55rem;
         border-radius:99px; text-transform:capitalize; letter-spacing:.3px; }
 .q-hint { color:var(--muted); font-size:.78rem; margin:.1rem 0 0; }
 
-.btn-primary { background:var(--color-primary); color:#000; border:none; border-radius:10px;
+.btn-primary { background:linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+               color:var(--btn-text); border:none; border-radius:10px;
                padding:.8rem 1.5rem; font-weight:800; cursor:pointer; font-size:1rem;
                font-family:inherit; transition:filter .15s, transform .1s; }
 .btn-primary:hover { filter:brightness(1.08); } .btn-primary:active { transform:translateY(1px); }
@@ -326,6 +343,29 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
          transform:translateX(-50%); background:#000; color:#fff; border:1px solid var(--color-primary);
          padding:.7rem 1.1rem; border-radius:10px; font-size:.9rem; z-index:50; max-width:90%;
          text-align:center; box-shadow:0 6px 24px rgba(0,0,0,.5); }
+
+/* ===================== TEAM PICKER MODAL ===================== */
+.team-overlay { position:fixed; inset:0; z-index:70; background:rgba(5,7,10,.82);
+                backdrop-filter:blur(8px); display:flex; align-items:center;
+                justify-content:center; padding:1rem; }
+.team-panel { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+              box-shadow:var(--shadow); width:100%; max-width:580px; overflow:hidden; }
+.team-panel-head { display:flex; align-items:center; justify-content:space-between;
+                   padding:1rem 1.2rem; border-bottom:1px solid var(--line); }
+.team-panel-head h2 { margin:0; font-size:1.05rem; font-style:italic; text-transform:uppercase;
+                      letter-spacing:.04em; }
+.team-picker-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));
+                    gap:.75rem; padding:1.25rem; }
+.team-card { border:2px solid var(--line); border-radius:10px; overflow:hidden; cursor:pointer;
+             background:var(--bg2); transition:transform .12s, box-shadow .12s;
+             font-family:inherit; padding:0; text-align:left; }
+.team-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.4); }
+.team-card.selected { box-shadow:0 0 0 1px var(--color-primary), 0 6px 20px rgba(0,0,0,.3); }
+.team-card-swatch { height:44px; width:100%; display:block; }
+.team-card-name { padding:.4rem .6rem .5rem; font-size:.8rem; font-weight:700;
+                  color:var(--text); display:flex; align-items:center; justify-content:space-between; }
+.team-card-check { color:var(--color-primary); font-size:.85rem; opacity:0; transition:opacity .12s; }
+.team-card.selected .team-card-check { opacity:1; }
 
 /* ===================== MOBILE ===================== */
 @media (max-width: 760px) {

@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=5" />
+  <link rel="stylesheet" href="/static/style.css?v=6" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -42,12 +42,10 @@
         <span class="hud-label" id="countdown-label">NEXT SESSION</span>
         <span class="hud-timer" id="countdown-timer">--:--:--:--</span>
       </div>
-      <select id="team-select" title="Team theme">
-        <option value="ferrari">Ferrari</option>
-        <option value="mercedes">Mercedes</option>
-        <option value="mclaren" selected>McLaren</option>
-        <option value="red_bull">Red Bull</option>
-      </select>
+      <button id="team-select-btn" class="team-select-btn" title="Change team colour theme" aria-haspopup="dialog">
+        <span class="team-btn-swatch" id="team-btn-swatch"></span>
+        <span id="team-btn-label">McLaren</span>
+      </button>
       <span class="hud-points" id="hud-points">0 pts</span>
     </div>
   </header>
@@ -290,7 +288,18 @@
     </div>
   </div>
 
+  <!-- Team picker modal -->
+  <div id="team-overlay" class="team-overlay hidden" role="dialog" aria-modal="true" aria-label="Choose your team">
+    <div class="team-panel">
+      <div class="team-panel-head">
+        <h2>Choose Your Team</h2>
+        <button class="game-exit" id="team-panel-close">✕ Close</button>
+      </div>
+      <div class="team-picker-grid" id="team-picker-grid"></div>
+    </div>
+  </div>
+
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/app.js?v=5"></script>
+  <script src="/static/app.js?v=6"></script>
 </body>
 </html>

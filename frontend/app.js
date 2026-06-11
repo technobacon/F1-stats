@@ -56,12 +56,39 @@ function isoWeek() {
   return `${d.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
+/* ---- All 2026 F1 constructor colour schemes ---- */
+const TEAMS = {
+  mclaren:      { name: "McLaren",      primary: "#FF8700", secondary: "#FF8700", text: "#000" },
+  ferrari:      { name: "Ferrari",      primary: "#EF3829", secondary: "#F9C900", text: "#000" },
+  mercedes:     { name: "Mercedes",     primary: "#6CD3BF", secondary: "#6CD3BF", text: "#000" },
+  red_bull:     { name: "Red Bull",     primary: "#3671C6", secondary: "#FFC906", text: "#fff" },
+  aston_martin: { name: "Aston Martin", primary: "#006D5B", secondary: "#CEDC00", text: "#000" },
+  alpine:       { name: "Alpine",       primary: "#0090FF", secondary: "#FF87BC", text: "#fff" },
+  williams:     { name: "Williams",     primary: "#37BEDD", secondary: "#37BEDD", text: "#000" },
+  rb:           { name: "RB",           primary: "#2A52C9", secondary: "#2A52C9", text: "#fff" },
+  haas:         { name: "Haas",         primary: "#E8002D", secondary: "#E8002D", text: "#fff" },
+  audi:         { name: "Audi",         primary: "#52E252", secondary: "#52E252", text: "#000" },
+};
+
 /* ---- Theming (Architecture §3.1) ---- */
 function applyTeam(team) {
-  document.documentElement.setAttribute("data-team", team);
-  document.getElementById("team-select").value = team;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute(
-    "content", getComputedStyle(document.documentElement).getPropertyValue("--color-primary").trim());
+  const t = TEAMS[team] || TEAMS.mclaren;
+  const root = document.documentElement;
+  root.setAttribute("data-team", team);
+  /* Override inline so new teams not in CSS still work */
+  root.style.setProperty("--color-primary", t.primary);
+  root.style.setProperty("--color-secondary", t.secondary);
+  root.style.setProperty("--btn-text", t.text);
+  /* Update header button */
+  const swatch = document.getElementById("team-btn-swatch");
+  const label  = document.getElementById("team-btn-label");
+  if (swatch) {
+    swatch.style.background = t.secondary !== t.primary
+      ? `linear-gradient(135deg, ${t.primary}, ${t.secondary})`
+      : t.primary;
+  }
+  if (label) label.textContent = t.name;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", t.primary);
   state.selected_team = team;
 }
 
@@ -581,7 +608,7 @@ document.getElementById("arcade-b").addEventListener("click", () => pick("b"));
 
 /* ===================== PROFILE ===================== */
 function renderProfile() {
-  document.getElementById("p-team").textContent = state.selected_team;
+  document.getElementById("p-team").textContent = (TEAMS[state.selected_team] || TEAMS.mclaren).name;
   document.getElementById("p-points").textContent = state.lifetime_points.toLocaleString();
   document.getElementById("p-games").textContent = state.games_played;
   document.getElementById("p-accuracy").textContent =
@@ -604,7 +631,46 @@ document.getElementById("reset-btn").addEventListener("click", () => {
   toast("Local progress reset.");
 });
 
-document.getElementById("team-select").addEventListener("change", (e) => { applyTeam(e.target.value); saveState(state); });
+/* ===================== TEAM PICKER ===================== */
+const TeamPicker = (() => {
+  function buildSwatch(t) {
+    return t.secondary !== t.primary
+      ? `linear-gradient(135deg, ${t.primary}, ${t.secondary})`
+      : t.primary;
+  }
+
+  function open() {
+    const grid = document.getElementById("team-picker-grid");
+    grid.innerHTML = Object.entries(TEAMS).map(([key, t]) => {
+      const sel = key === state.selected_team;
+      return `<button class="team-card${sel ? " selected" : ""}" data-team="${key}"
+                      aria-pressed="${sel}" style="${sel ? `border-color:${t.primary}` : ""}">
+                <span class="team-card-swatch" style="background:${buildSwatch(t)}"></span>
+                <span class="team-card-name">${t.name}<span class="team-card-check">✓</span></span>
+              </button>`;
+    }).join("");
+    grid.querySelectorAll(".team-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        applyTeam(card.dataset.team);
+        saveState(state);
+        close();
+      });
+    });
+    show("team-overlay");
+  }
+
+  function close() { hide("team-overlay"); }
+
+  function init() {
+    document.getElementById("team-select-btn").addEventListener("click", open);
+    document.getElementById("team-panel-close").addEventListener("click", close);
+    document.getElementById("team-overlay").addEventListener("click", (e) => {
+      if (e.target.id === "team-overlay") close();
+    });
+  }
+
+  return { init };
+})();
 
 /* ===================== DEV DATA CHECK (proofreading) ===================== */
 /* Renders the full question bank WITH verified answers in a filterable, sortable
@@ -688,5 +754,6 @@ saveState(state);
 renderQuizIntro();
 CurveSlider.init();
 DataCheck.init();
+TeamPicker.init();
 tickCountdown(); setInterval(tickCountdown, 1000);
 renderRaceWeek(); setInterval(renderRaceWeek, 60000); // refresh past/next state each minute
