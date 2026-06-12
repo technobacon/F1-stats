@@ -58,17 +58,17 @@ function isoWeek() {
 
 /* ---- All 2026 F1 constructor colour schemes ---- */
 const TEAMS = {
-  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#FF8000", text: "#000" },  // solid — user-specified
-  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#DC0000", text: "#fff" },  // solid — user-specified
-  mercedes:     { name: "Mercedes",     primary: "#00D2BE", secondary: "#00D2BE", text: "#000" },  // Petronas teal, solid
-  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#FFC906", text: "#fff" },  // midnight navy → gold
-  aston_martin: { name: "Aston Martin", primary: "#006F62", secondary: "#CEDC00", text: "#fff" },  // BRG → lime
-  alpine:       { name: "Alpine",       primary: "#FF87BC", secondary: "#0090FF", text: "#000" },  // pink → blue
-  williams:     { name: "Williams",     primary: "#0064FF", secondary: "#0064FF", text: "#fff" },  // vivid blue, solid
-  rb:           { name: "Racing Bulls", primary: "#1E1464", secondary: "#1E1464", text: "#fff" },  // deep indigo, solid
-  haas:         { name: "Haas",         primary: "#B6BABD", secondary: "#B6BABD", text: "#000" },  // silver, solid
-  audi:         { name: "Audi",         primary: "#282828", secondary: "#282828", text: "#fff" },  // charcoal, solid
-  cadillac:     { name: "Cadillac",     primary: "#FFFFFF", secondary: "#FFFFFF", text: "#000" },  // white, solid
+  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#FF8000", text: "#000" },
+  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#DC0000", text: "#fff" },
+  mercedes:     { name: "Mercedes",     primary: "#00D2BE", secondary: "#00D2BE", text: "#000" },
+  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#FFC906", tertiary: "#DC0000", text: "#fff" },
+  aston_martin: { name: "Aston Martin", primary: "#00B140", secondary: "#00B140", text: "#000" },
+  alpine:       { name: "Alpine",       primary: "#FF87BC", secondary: "#0090FF", text: "#000" },
+  williams:     { name: "Williams",     primary: "#0064FF", secondary: "#0064FF", text: "#fff" },
+  rb:           { name: "Racing Bulls", primary: "#FFFFFF", secondary: "#5BA4CF", text: "#000" },
+  haas:         { name: "Haas",         primary: "#1A1A1A", secondary: "#E8002D", text: "#fff" },
+  audi:         { name: "Audi",         primary: "#8E8E8E", secondary: "#CC0000", text: "#000" },
+  cadillac:     { name: "Cadillac",     primary: "#FFFFFF", secondary: "#0D0D0D", text: "#000" },
 };
 
 /* ---- Theming (Architecture §3.1) ---- */
@@ -76,21 +76,28 @@ function applyTeam(team) {
   const t = TEAMS[team] || TEAMS.mclaren;
   const root = document.documentElement;
   root.setAttribute("data-team", team);
-  /* Override inline so new teams not in CSS still work */
   root.style.setProperty("--color-primary", t.primary);
   root.style.setProperty("--color-secondary", t.secondary);
   root.style.setProperty("--btn-text", t.text);
-  /* Update header button */
+  /* Three-colour teams get an explicit gradient override; others fall back to CSS default */
+  if (t.tertiary) {
+    root.style.setProperty("--btn-gradient", `linear-gradient(135deg, ${t.primary}, ${t.secondary}, ${t.tertiary})`);
+  } else {
+    root.style.removeProperty("--btn-gradient");
+  }
+  /* Update header button swatch */
   const swatch = document.getElementById("team-btn-swatch");
   const label  = document.getElementById("team-btn-label");
-  if (swatch) {
-    swatch.style.background = t.secondary !== t.primary
-      ? `linear-gradient(135deg, ${t.primary}, ${t.secondary})`
-      : t.primary;
-  }
-  if (label) label.textContent = t.name;
+  if (swatch) swatch.style.background = buildTeamSwatch(t);
+  if (label)  label.textContent = t.name;
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", t.primary);
   state.selected_team = team;
+}
+
+function buildTeamSwatch(t) {
+  if (t.tertiary) return `linear-gradient(135deg, ${t.primary}, ${t.secondary}, ${t.tertiary})`;
+  if (t.secondary !== t.primary) return `linear-gradient(135deg, ${t.primary}, ${t.secondary})`;
+  return t.primary;
 }
 
 /* ---- Toast ---- */
@@ -634,19 +641,13 @@ document.getElementById("reset-btn").addEventListener("click", () => {
 
 /* ===================== TEAM PICKER ===================== */
 const TeamPicker = (() => {
-  function buildSwatch(t) {
-    return t.secondary !== t.primary
-      ? `linear-gradient(135deg, ${t.primary}, ${t.secondary})`
-      : t.primary;
-  }
-
   function open() {
     const grid = document.getElementById("team-picker-grid");
     grid.innerHTML = Object.entries(TEAMS).map(([key, t]) => {
       const sel = key === state.selected_team;
       return `<button class="team-card${sel ? " selected" : ""}" data-team="${key}"
                       aria-pressed="${sel}" style="${sel ? `border-color:${t.primary}` : ""}">
-                <span class="team-card-swatch" style="background:${buildSwatch(t)}"></span>
+                <span class="team-card-swatch" style="background:${buildTeamSwatch(t)}"></span>
                 <span class="team-card-name">${t.name}<span class="team-card-check">✓</span></span>
               </button>`;
     }).join("");

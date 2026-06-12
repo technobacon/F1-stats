@@ -1,24 +1,26 @@
 /* F1 Stat Guesser — theme. Constructor colours via CSS variables (data-team). */
 :root { --bg:#0a0d12; --bg2:#0e131a; --surface:#151b24; --surface2:#10151c;
         --line:#252d38; --text:#eef2f7; --muted:#8b95a5;
-        --color-primary:#FF8700; --color-secondary:#FF8700; --color-accent:#1B2425;
+        --color-primary:#FF8000; --color-secondary:#FF8000; --color-accent:#1B2425;
         --btn-text:#000;
+        --btn-gradient:linear-gradient(135deg, var(--color-primary), var(--color-secondary));
         --radius:14px; --shadow:0 12px 34px rgba(0,0,0,.45); }
 
-/* 2026 F1 grid — single-colour teams */
+/* 2026 F1 grid — solid teams */
 :root[data-team="mclaren"]      { --color-primary:#FF8000; --color-secondary:#FF8000; --color-accent:#1B2425;  --btn-text:#000; }
 :root[data-team="ferrari"]      { --color-primary:#DC0000; --color-secondary:#DC0000; --color-accent:#F9C900;  --btn-text:#fff; }
 :root[data-team="mercedes"]     { --color-primary:#00D2BE; --color-secondary:#00D2BE; --color-accent:#111111;  --btn-text:#000; }
+:root[data-team="aston_martin"] { --color-primary:#00B140; --color-secondary:#00B140; --color-accent:#004D1C;  --btn-text:#000; }
 :root[data-team="williams"]     { --color-primary:#0064FF; --color-secondary:#0064FF; --color-accent:#FFFFFF;  --btn-text:#fff; }
-:root[data-team="rb"]           { --color-primary:#1E1464; --color-secondary:#1E1464; --color-accent:#FFFFFF;  --btn-text:#fff; }
-:root[data-team="haas"]         { --color-primary:#B6BABD; --color-secondary:#B6BABD; --color-accent:#E8002D;  --btn-text:#000; }
-:root[data-team="audi"]         { --color-primary:#282828; --color-secondary:#282828; --color-accent:#999999;  --btn-text:#fff; }
-:root[data-team="cadillac"]     { --color-primary:#FFFFFF; --color-secondary:#FFFFFF; --color-accent:#00175B;  --btn-text:#000; }
 
-/* 2026 F1 grid — two-primary-colour teams (buttons render as gradient) */
-:root[data-team="red_bull"]     { --color-primary:#1E1B4B; --color-secondary:#FFC906; --color-accent:#FFC906;  --btn-text:#fff; }
-:root[data-team="aston_martin"] { --color-primary:#006F62; --color-secondary:#CEDC00; --color-accent:#CEDC00;  --btn-text:#fff; }
+/* 2026 F1 grid — gradient teams */
+:root[data-team="red_bull"]     { --color-primary:#1E1B4B; --color-secondary:#FFC906; --color-accent:#DC0000;
+                                   --btn-gradient:linear-gradient(135deg,#1E1B4B,#FFC906,#DC0000); --btn-text:#fff; }
 :root[data-team="alpine"]       { --color-primary:#FF87BC; --color-secondary:#0090FF; --color-accent:#0090FF;  --btn-text:#000; }
+:root[data-team="rb"]           { --color-primary:#FFFFFF; --color-secondary:#5BA4CF; --color-accent:#1E1464;  --btn-text:#000; }
+:root[data-team="haas"]         { --color-primary:#1A1A1A; --color-secondary:#E8002D; --color-accent:#E8002D;  --btn-text:#fff; }
+:root[data-team="audi"]         { --color-primary:#8E8E8E; --color-secondary:#CC0000; --color-accent:#CC0000;  --btn-text:#000; }
+:root[data-team="cadillac"]     { --color-primary:#FFFFFF; --color-secondary:#0D0D0D; --color-accent:#0D0D0D;  --btn-text:#000; }
 
 * { box-sizing:border-box; }
 body { margin:0; font-family:'Titillium Web','Segoe UI',system-ui,sans-serif;
@@ -171,7 +173,7 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
         border-radius:99px; text-transform:capitalize; letter-spacing:.3px; }
 .q-hint { color:var(--muted); font-size:.78rem; margin:.1rem 0 0; }
 
-.btn-primary { background:linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+.btn-primary { background:var(--btn-gradient);
                color:var(--btn-text); border:none; border-radius:10px;
                padding:.8rem 1.5rem; font-weight:800; cursor:pointer; font-size:1rem;
                font-family:inherit; transition:filter .15s, transform .1s; }
