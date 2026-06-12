@@ -56,16 +56,18 @@ function isoWeek() {
   return `${d.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
-/* ---- All 2026 F1 constructor colour schemes ---- */
+/* ---- All 2026 F1 constructor colour schemes ----
+ * Each team has a main (primary) colour and a secondary accent. Main buttons render
+ * solid in the primary with a thin secondary stripe along the bottom edge. */
 const TEAMS = {
-  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#FF8000", text: "#000" },
-  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#DC0000", text: "#fff" },
-  mercedes:     { name: "Mercedes",     primary: "#00D2BE", secondary: "#00D2BE", text: "#000" },
-  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#FFC906", tertiary: "#DC0000", text: "#fff" },
-  aston_martin: { name: "Aston Martin", primary: "#00B140", secondary: "#00B140", text: "#000" },
+  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#1B2425", text: "#000" },
+  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#FFEB00", text: "#fff" },
+  mercedes:     { name: "Mercedes",     primary: "#00D2BE", secondary: "#0A0A0A", text: "#000" },
+  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#DC0000", text: "#fff" },
+  aston_martin: { name: "Aston Martin", primary: "#006F62", secondary: "#CEDC00", text: "#fff" },
   alpine:       { name: "Alpine",       primary: "#FF87BC", secondary: "#0090FF", text: "#000" },
-  williams:     { name: "Williams",     primary: "#0064FF", secondary: "#0064FF", text: "#fff" },
-  rb:           { name: "Racing Bulls", primary: "#FFFFFF", secondary: "#5BA4CF", text: "#000" },
+  williams:     { name: "Williams",     primary: "#0064FF", secondary: "#FFFFFF", text: "#fff" },
+  rb:           { name: "Racing Bulls", primary: "#1634CE", secondary: "#FFFFFF", text: "#fff" },
   haas:         { name: "Haas",         primary: "#1A1A1A", secondary: "#E8002D", text: "#fff" },
   audi:         { name: "Audi",         primary: "#8E8E8E", secondary: "#CC0000", text: "#000" },
   cadillac:     { name: "Cadillac",     primary: "#FFFFFF", secondary: "#0D0D0D", text: "#000" },
@@ -79,25 +81,13 @@ function applyTeam(team) {
   root.style.setProperty("--color-primary", t.primary);
   root.style.setProperty("--color-secondary", t.secondary);
   root.style.setProperty("--btn-text", t.text);
-  /* Three-colour teams get an explicit gradient override; others fall back to CSS default */
-  if (t.tertiary) {
-    root.style.setProperty("--btn-gradient", `linear-gradient(135deg, ${t.primary}, ${t.secondary}, ${t.tertiary})`);
-  } else {
-    root.style.removeProperty("--btn-gradient");
-  }
-  /* Update header button swatch */
+  /* Header dot: solid main colour with a secondary accent ring */
   const swatch = document.getElementById("team-btn-swatch");
   const label  = document.getElementById("team-btn-label");
-  if (swatch) swatch.style.background = buildTeamSwatch(t);
+  if (swatch) { swatch.style.background = t.primary; swatch.style.boxShadow = `inset 0 0 0 2px ${t.secondary}`; }
   if (label)  label.textContent = t.name;
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", t.primary);
   state.selected_team = team;
-}
-
-function buildTeamSwatch(t) {
-  if (t.tertiary) return `linear-gradient(135deg, ${t.primary}, ${t.secondary}, ${t.tertiary})`;
-  if (t.secondary !== t.primary) return `linear-gradient(135deg, ${t.primary}, ${t.secondary})`;
-  return t.primary;
 }
 
 /* ---- Toast ---- */
@@ -647,7 +637,8 @@ const TeamPicker = (() => {
       const sel = key === state.selected_team;
       return `<button class="team-card${sel ? " selected" : ""}" data-team="${key}"
                       aria-pressed="${sel}" style="${sel ? `border-color:${t.primary}` : ""}">
-                <span class="team-card-swatch" style="background:${buildTeamSwatch(t)}"></span>
+                <span class="team-card-swatch"
+                      style="background:${t.primary}; box-shadow:inset 0 -8px 0 ${t.secondary}"></span>
                 <span class="team-card-name">${t.name}<span class="team-card-check">✓</span></span>
               </button>`;
     }).join("");
