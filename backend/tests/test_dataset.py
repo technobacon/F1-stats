@@ -63,3 +63,36 @@ def test_committed_bank_loads_and_serves():
     pair = service.build_arcade_pair(conn, random.Random(0))
     assert pair["entity_a"]["full_name"] and pair["entity_b"]["full_name"]
     conn.close()
+
+
+def test_race_week_circuit_filtering():
+    """Race-week questions tagged with a circuit are served when (and only when)
+    that circuit is requested, with a full daily session's worth per circuit."""
+    if not seed.DATASET_PATH.exists():
+        pytest.skip("committed dataset not present")
+    conn = db.connect(":memory:")
+    seed.load_dataset(conn)
+
+    circuits = [
+        r["circuit_id"]
+        for r in conn.execute(
+            "SELECT DISTINCT circuit_id FROM production_trivia_questions "
+            "WHERE circuit_id IS NOT NULL"
+        )
+    ]
+    assert circuits, "expected circuit-specific race-week questions in the bank"
+
+    need = service.MODE_QUESTION_COUNT["race_week"]
+    for cid in circuits:
+        served = service.build_quiz(conn, "race_week", circuit_id=cid)["questions"]
+        assert len(served) == need
+        # A circuit-filtered session draws only from that circuit's bank.
+        rows = {
+            q["question_string"]
+            for q in conn.execute(
+                "SELECT question_string FROM production_trivia_questions WHERE circuit_id = ?",
+                (cid,),
+            )
+        }
+        assert all(q["question_text"] in rows for q in served)
+    conn.close()

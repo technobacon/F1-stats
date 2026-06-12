@@ -159,6 +159,43 @@ const SESSIONS = SESSIONS_2026
   .map(([iso, name, kind]) => ({ when: new Date(iso), name, kind, text: `${name} · ${kind}` }))
   .sort((a, b) => a.when - b.when);
 
+/* Race-week questions are circuit-specific: each Grand Prix maps to the circuit
+ * whose 42-strong question bank (6/day across the week) is served that week.
+ * `null` = a venue with no championship history yet (e.g. Madrid's 2026 debut),
+ * which falls back to the general race-week pool. */
+const CIRCUIT_BY_GP = {
+  "Australian GP": "albert_park", "Chinese GP": "shanghai", "Japanese GP": "suzuka",
+  "Bahrain GP": "bahrain", "Saudi Arabian GP": "jeddah", "Miami GP": "miami",
+  "Canadian GP": "villeneuve", "Monaco GP": "monaco", "Spanish GP": "catalunya",
+  "Austrian GP": "red_bull_ring", "British GP": "silverstone", "Belgian GP": "spa",
+  "Hungarian GP": "hungaroring", "Dutch GP": "zandvoort", "Italian GP": "monza",
+  "Madrid GP": null, "Azerbaijan GP": "baku", "Singapore GP": "marina_bay",
+  "United States GP": "americas", "Mexico City GP": "rodriguez", "São Paulo GP": "interlagos",
+  "Las Vegas GP": "vegas", "Qatar GP": "losail", "Abu Dhabi GP": "yas_marina",
+};
+const CIRCUIT_NAME = {
+  albert_park: "Albert Park", shanghai: "Shanghai International Circuit", suzuka: "Suzuka Circuit",
+  bahrain: "Bahrain International Circuit", jeddah: "Jeddah Corniche Circuit",
+  miami: "Miami International Autodrome", villeneuve: "Circuit Gilles Villeneuve",
+  monaco: "Circuit de Monaco", catalunya: "Barcelona-Catalunya", red_bull_ring: "Red Bull Ring",
+  silverstone: "Silverstone Circuit", spa: "Spa-Francorchamps", hungaroring: "Hungaroring",
+  zandvoort: "Zandvoort", monza: "Monza", baku: "Baku City Circuit", marina_bay: "Marina Bay",
+  americas: "Circuit of the Americas", rodriguez: "Autódromo Hermanos Rodríguez",
+  interlagos: "Interlagos", vegas: "Las Vegas Strip Circuit", losail: "Losail International Circuit",
+  yas_marina: "Yas Marina Circuit",
+};
+
+/* The circuit whose question bank should be served for the current race week:
+ * the venue of the next upcoming session's Grand Prix. Returns null off-season or
+ * for a venue with no history (caller then falls back to the general pool). */
+function currentRaceCircuit() {
+  const now = new Date();
+  const next = SESSIONS.find((s) => s.when > now);
+  if (!next) return null;
+  const id = CIRCUIT_BY_GP[next.name];
+  return id ? { id, gp: next.name, name: CIRCUIT_NAME[id] || next.name } : null;
+}
+
 function tickCountdown() {
   const now = new Date();
   let target = SESSIONS.find((s) => s.when > now);
@@ -256,6 +293,13 @@ function renderQuizIntro() {
   const cfg = MODES[currentMode];
   document.getElementById("quiz-title").textContent = cfg.title;
   document.getElementById("quiz-desc").textContent = cfg.desc;
+  // Race-week is circuit-specific: tell the player which venue this week covers.
+  if (currentMode === "race_week") {
+    const rc = currentRaceCircuit();
+    if (rc) document.getElementById("quiz-desc").textContent =
+      `Six questions all about ${rc.name}, host of this week's ${rc.gp}. ` +
+      `Forty-two circuit stats run across the race week — the closer your guess, the bigger the score.`;
+  }
   document.body.classList.remove("in-game"); // intro is not part of the immersive run
   show("quiz-intro"); hide("quiz-play"); hide("quiz-reveal"); hide("quiz-summary");
   document.getElementById("quiz-status").textContent = "";
@@ -283,7 +327,13 @@ async function startQuiz() {
   const status = document.getElementById("quiz-status");
   status.textContent = "Loading questions…";
   try {
-    const res = await fetch(`${API}/quiz/${currentMode}`);
+    let url = `${API}/quiz/${currentMode}`;
+    // Race-week serves the current Grand Prix's circuit-specific bank.
+    if (currentMode === "race_week") {
+      const rc = currentRaceCircuit();
+      if (rc) url += `?circuit=${encodeURIComponent(rc.id)}`;
+    }
+    const res = await fetch(url);
     if (!res.ok) throw new Error(await res.text());
     quiz = await res.json();
     qPos = 0; sessionScore = 0; sessionCloseness = 0;

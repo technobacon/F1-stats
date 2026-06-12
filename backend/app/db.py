@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS production_trivia_questions (
     difficulty_weight REAL DEFAULT 1.0,
     game_mode         TEXT NOT NULL,               -- 'daily','race_week','one_shot'
     era_year          INTEGER,                     -- representative year (mid-span) for era-biased serving
+    circuit_id        TEXT,                        -- non-null for circuit-specific race_week questions
     is_active         INTEGER DEFAULT 1,
     scheduled_date    TEXT,                        -- ISO date for cron rotations
     created_at        TEXT DEFAULT CURRENT_TIMESTAMP
@@ -122,6 +123,8 @@ def _migrate(conn: sqlite3.Connection) -> None:
     existing = {r[1] for r in conn.execute("PRAGMA table_info(production_trivia_questions)")}
     if existing and "era_year" not in existing:
         conn.execute("ALTER TABLE production_trivia_questions ADD COLUMN era_year INTEGER")
+    if existing and "circuit_id" not in existing:
+        conn.execute("ALTER TABLE production_trivia_questions ADD COLUMN circuit_id TEXT")
 
 
 def init_db(conn: sqlite3.Connection) -> None:

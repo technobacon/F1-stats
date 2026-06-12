@@ -19,7 +19,7 @@ import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -76,12 +76,12 @@ def health():
 
 
 @app.get("/api/v1/quiz/{mode}", response_model=DailyQuizResponse)
-def quiz(mode: str):
+def quiz(mode: str, circuit: str | None = Query(default=None)):
     if mode not in service.MODE_QUESTION_COUNT:
         raise HTTPException(404, f"Unknown game mode '{mode}'.")
     conn = get_conn()
     try:
-        payload = service.build_quiz(conn, game_mode=mode)
+        payload = service.build_quiz(conn, game_mode=mode, circuit_id=circuit)
     finally:
         conn.close()
     if not payload["questions"]:

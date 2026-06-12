@@ -105,7 +105,8 @@ def _slider_bounds(answer: float) -> tuple[float, float]:
     return 0.0, round(upper)
 
 
-def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str | None = None) -> dict:
+def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str | None = None,
+               circuit_id: str | None = None) -> dict:
     """Provision a quiz session: deterministically pick verified questions for the
     given mode + period, mint tracking tokens.
 
@@ -113,17 +114,29 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     seeded by (mode, period) so it is stable for everyone within the period and
     rotates to a fresh set the next period. The verified answer is stashed in the
     token store, NOT returned to the client.
+
+    For race_week mode, pass `circuit_id` to serve questions specific to that
+    circuit. Without it, all race_week questions (including generic ones) are served.
     """
     count = MODE_QUESTION_COUNT.get(game_mode, 5)
     period = period or _utc_today()
 
-    pool = conn.execute(
-        "SELECT id, question_string, verified_answer, answer_kind, category, "
-        "       display_min, display_max, difficulty_weight, era_year "
-        "FROM production_trivia_questions "
-        "WHERE is_active = 1 AND game_mode = ? ORDER BY id",
-        (game_mode,),
-    ).fetchall()
+    if circuit_id and game_mode == "race_week":
+        pool = conn.execute(
+            "SELECT id, question_string, verified_answer, answer_kind, category, "
+            "       display_min, display_max, difficulty_weight, era_year "
+            "FROM production_trivia_questions "
+            "WHERE is_active = 1 AND game_mode = ? AND circuit_id = ? ORDER BY id",
+            (game_mode, circuit_id),
+        ).fetchall()
+    else:
+        pool = conn.execute(
+            "SELECT id, question_string, verified_answer, answer_kind, category, "
+            "       display_min, display_max, difficulty_weight, era_year "
+            "FROM production_trivia_questions "
+            "WHERE is_active = 1 AND game_mode = ? ORDER BY id",
+            (game_mode,),
+        ).fetchall()
 
     rng = _deterministic_rng(game_mode, period)
     # Bias the per-period selection toward the modern era (with a lean on the

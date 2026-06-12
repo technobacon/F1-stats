@@ -815,7 +815,8 @@ _ARCADE_STAT_KEYS = ["wins", "podiums", "poles", "fastest_laps",
                      "points_finishes", "front_rows", "dnfs"]
 
 _DATASET_COLS = ("question_string", "verified_answer", "answer_kind", "category",
-                 "display_min", "display_max", "difficulty_weight", "game_mode", "era_year")
+                 "display_min", "display_max", "difficulty_weight", "game_mode", "era_year",
+                 "circuit_id")
 
 
 def _era_weighted_sample(rng: random.Random, rows: list, k: int) -> list:
@@ -912,11 +913,12 @@ def load_dataset(conn: sqlite3.Connection, path=None) -> dict:
         conn.execute(
             "INSERT OR IGNORE INTO production_trivia_questions "
             "(id, question_string, verified_answer, answer_kind, category, display_min, "
-            " display_max, difficulty_weight, game_mode, era_year, is_active, scheduled_date) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NULL)",
+            " display_max, difficulty_weight, game_mode, era_year, circuit_id, is_active, scheduled_date) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NULL)",
             (str(uuid.uuid4()), q["question_string"], float(q["verified_answer"]),
              q.get("answer_kind", "count"), q.get("category", ""), q.get("display_min"),
-             q.get("display_max"), q.get("difficulty_weight", 1.0), q["game_mode"], q.get("era_year")),
+             q.get("display_max"), q.get("difficulty_weight", 1.0), q["game_mode"], q.get("era_year"),
+             q.get("circuit_id")),
         )
     conn.commit()
     return {"committed": len(data), "rejected": 0, "rejections": []}
