@@ -18,6 +18,7 @@
 :root[data-team="red_bull"]     { --color-primary:#3671C6; --color-secondary:#FFC906; --color-accent:#FFC906;  --btn-text:#fff; }
 :root[data-team="aston_martin"] { --color-primary:#006D5B; --color-secondary:#CEDC00; --color-accent:#CEDC00;  --btn-text:#000; }
 :root[data-team="alpine"]       { --color-primary:#0090FF; --color-secondary:#FF87BC; --color-accent:#FF87BC;  --btn-text:#fff; }
+:root[data-team="cadillac"]     { --color-primary:#003087; --color-secondary:#BF0A30; --color-accent:#BF0A30;  --btn-text:#fff; }
 
 * { box-sizing:border-box; }
 body { margin:0; font-family:'Titillium Web','Segoe UI',system-ui,sans-serif;
@@ -349,13 +350,14 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
                 backdrop-filter:blur(8px); display:flex; align-items:center;
                 justify-content:center; padding:1rem; }
 .team-panel { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-              box-shadow:var(--shadow); width:100%; max-width:580px; overflow:hidden; }
+              box-shadow:var(--shadow); width:100%; max-width:580px;
+              display:flex; flex-direction:column; max-height:85vh; overflow:hidden; }
 .team-panel-head { display:flex; align-items:center; justify-content:space-between;
-                   padding:1rem 1.2rem; border-bottom:1px solid var(--line); }
+                   padding:1rem 1.2rem; border-bottom:1px solid var(--line); flex-shrink:0; }
 .team-panel-head h2 { margin:0; font-size:1.05rem; font-style:italic; text-transform:uppercase;
                       letter-spacing:.04em; }
 .team-picker-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));
-                    gap:.75rem; padding:1.25rem; }
+                    gap:.75rem; padding:1.25rem; overflow-y:auto; }
 .team-card { border:2px solid var(--line); border-radius:10px; overflow:hidden; cursor:pointer;
              background:var(--bg2); transition:transform .12s, box-shadow .12s;
              font-family:inherit; padding:0; text-align:left; }

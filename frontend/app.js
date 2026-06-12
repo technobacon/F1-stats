@@ -68,6 +68,7 @@ const TEAMS = {
   rb:           { name: "RB",           primary: "#2A52C9", secondary: "#2A52C9", text: "#fff" },
   haas:         { name: "Haas",         primary: "#E8002D", secondary: "#E8002D", text: "#fff" },
   audi:         { name: "Audi",         primary: "#52E252", secondary: "#52E252", text: "#000" },
+  cadillac:     { name: "Cadillac",     primary: "#003087", secondary: "#BF0A30", text: "#fff" },
 };
 
 /* ---- Theming (Architecture §3.1) ---- */
