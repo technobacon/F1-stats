@@ -58,17 +58,17 @@ function isoWeek() {
 
 /* ---- All 2026 F1 constructor colour schemes ---- */
 const TEAMS = {
-  mclaren:      { name: "McLaren",      primary: "#FF8700", secondary: "#FF8700", text: "#000" },
-  ferrari:      { name: "Ferrari",      primary: "#EF3829", secondary: "#F9C900", text: "#000" },
-  mercedes:     { name: "Mercedes",     primary: "#6CD3BF", secondary: "#6CD3BF", text: "#000" },
-  red_bull:     { name: "Red Bull",     primary: "#3671C6", secondary: "#FFC906", text: "#fff" },
-  aston_martin: { name: "Aston Martin", primary: "#006D5B", secondary: "#CEDC00", text: "#000" },
-  alpine:       { name: "Alpine",       primary: "#0090FF", secondary: "#FF87BC", text: "#fff" },
-  williams:     { name: "Williams",     primary: "#37BEDD", secondary: "#37BEDD", text: "#000" },
-  rb:           { name: "RB",           primary: "#2A52C9", secondary: "#2A52C9", text: "#fff" },
+  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#FF8000", text: "#000" },
+  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#FDEE21", text: "#000" },
+  mercedes:     { name: "Mercedes",     primary: "#00A19C", secondary: "#00A19C", text: "#000" },
+  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#FFC906", text: "#fff" },
+  aston_martin: { name: "Aston Martin", primary: "#006F62", secondary: "#CEDC00", text: "#fff" },
+  alpine:       { name: "Alpine",       primary: "#FF87BC", secondary: "#0090FF", text: "#000" },
+  williams:     { name: "Williams",     primary: "#041E42", secondary: "#041E42", text: "#fff" },
+  rb:           { name: "Racing Bulls", primary: "#1E1464", secondary: "#1E1464", text: "#fff" },
   haas:         { name: "Haas",         primary: "#E8002D", secondary: "#E8002D", text: "#fff" },
-  audi:         { name: "Audi",         primary: "#52E252", secondary: "#52E252", text: "#000" },
-  cadillac:     { name: "Cadillac",     primary: "#003087", secondary: "#BF0A30", text: "#fff" },
+  audi:         { name: "Audi",         primary: "#282828", secondary: "#282828", text: "#fff" },
+  cadillac:     { name: "Cadillac",     primary: "#00175B", secondary: "#BF0A30", text: "#fff" },
 };
 
 /* ---- Theming (Architecture §3.1) ---- */
