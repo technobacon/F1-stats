@@ -315,7 +315,12 @@ def compute_metric(conn: sqlite3.Connection, params: dict) -> Decimal:
         years = _scope_years(conn, metric, entity, params)
         value = max((_scalar(conn, metric, entity, params, y) for y in years), default=0)
     elif aggregation == "which_year":
-        years = _scope_years(conn, metric, entity, params)
+        # Only seasons where the metric actually occurred are candidates: "which
+        # season did they win the most" is meaningless for a driver who never won,
+        # so an all-zero scope returns 0 (and the emit gate drops the question)
+        # rather than reporting their debut year as a phantom peak.
+        years = [y for y in _scope_years(conn, metric, entity, params)
+                 if _scalar(conn, metric, entity, params, y) > 0]
         # Earliest season achieving the peak value (deterministic tie-break).
         value = max(years, key=lambda y: (_scalar(conn, metric, entity, params, y), -y)) if years else 0
     elif aggregation == "first_season":

@@ -119,6 +119,17 @@ def test_which_year_returns_year_in_range(conn):
     assert 1991 <= yr <= 1995
 
 
+def test_which_year_is_zero_when_metric_never_achieved(conn):
+    # Rosberg took zero wins at Williams (2006-2009) — like Liam Lawson, who has
+    # never won a Grand Prix. "Which season did they win the most" is meaningless
+    # for a winless scope, so it must return 0 (and be dropped) rather than
+    # reporting the debut season as a phantom peak.
+    params = {"target_entity": "driver", "entity_id": "rosberg",
+              "filter_constructor_id": "williams", "start_year": 2006,
+              "end_year": 2009, "metric_target": "wins", "aggregation": "which_year"}
+    assert compute_metric(conn, params) == 0
+
+
 def test_first_season_returns_year_in_range(conn):
     yr = compute_metric(conn, _params(aggregation="first_season"))
     assert 1991 <= yr <= 1995
