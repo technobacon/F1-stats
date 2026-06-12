@@ -4653,17 +4653,6 @@
   "era_year": 1996
  },
  {
-  "question_string": "In which season did Isack Hadjar take the most wins of their career?",
-  "verified_answer": 2025.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2025.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2026
- },
- {
   "question_string": "What is Lance Stroll's longest run of consecutive podium finishes?",
   "verified_answer": 1.0,
   "answer_kind": "count",
@@ -4796,17 +4785,6 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which season did Liam Lawson win the most races for RB F1 Team?",
-  "verified_answer": 2024.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2024.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2025
- },
- {
   "question_string": "How many times in their career did Alexander Albon climb 10+ places from the grid in a race?",
   "verified_answer": 4.0,
   "answer_kind": "count",
@@ -4816,17 +4794,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "one_shot",
   "era_year": 2022
- },
- {
-  "question_string": "In which season did Johnny Herbert win the most races for Jaguar?",
-  "verified_answer": 2000.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2000.0,
-  "display_max": 2000.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2000
  },
  {
   "question_string": "At their single most successful circuit, how many times has Valtteri Bottas won there?",
@@ -4904,17 +4871,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "one_shot",
   "era_year": 2023
- },
- {
-  "question_string": "In which season did Michael Schumacher win the most races for Mercedes?",
-  "verified_answer": 2010.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2010.0,
-  "display_max": 2012.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2011
  },
  {
   "question_string": "Across their whole career, in what percentage of races did Felipe Massa finish on the podium?",
@@ -5137,17 +5093,6 @@
   "era_year": 2022
  },
  {
-  "question_string": "In which season did Michael Schumacher win the most races for Jordan?",
-  "verified_answer": 1991.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 1991.0,
-  "display_max": 1991.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 1991
- },
- {
   "question_string": "What is the most race wins Lando Norris scored in a single season for McLaren?",
   "verified_answer": 7.0,
   "answer_kind": "count",
@@ -5225,17 +5170,6 @@
   "era_year": 1982
  },
  {
-  "question_string": "In which season did Jarno Trulli win the most races for Lotus?",
-  "verified_answer": 2010.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2010.0,
-  "display_max": 2011.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2010
- },
- {
   "question_string": "Driving for Toleman (1984-1984), how many times did Ayrton Senna climb 10+ places from the grid?",
   "verified_answer": 2.0,
   "answer_kind": "count",
@@ -5302,17 +5236,6 @@
   "era_year": 2020
  },
  {
-  "question_string": "In which season did Lance Stroll win the most races for Racing Point?",
-  "verified_answer": 2019.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2019.0,
-  "display_max": 2020.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2020
- },
- {
   "question_string": "Driving for Toleman, in what percentage of races did Ayrton Senna finish on the podium?",
   "verified_answer": 21.0,
   "answer_kind": "percentage",
@@ -5366,17 +5289,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "one_shot",
   "era_year": 2021
- },
- {
-  "question_string": "In which season did Nigel Mansell win the most races for McLaren?",
-  "verified_answer": 1995.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 1995.0,
-  "display_max": 1995.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 1995
  },
  {
   "question_string": "Net across every start, how many positions did Kimi Räikkönen gain from the grid for Alfa Romeo (2019-2021)?",
@@ -5500,17 +5412,6 @@
   "era_year": 2006
  },
  {
-  "question_string": "In which season did Heikki Kovalainen win the most races for Lotus?",
-  "verified_answer": 2010.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2010.0,
-  "display_max": 2011.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2010
- },
- {
   "question_string": "How many times did Mark Webber fail to finish (DNF) for Minardi (2002-2002)?",
   "verified_answer": 7.0,
   "answer_kind": "count",
@@ -5619,17 +5520,6 @@
   "difficulty_weight": 3.0,
   "game_mode": "one_shot",
   "era_year": 2020
- },
- {
-  "question_string": "In which season did Lance Stroll win the most races for Aston Martin?",
-  "verified_answer": 2021.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2021.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2024
  },
  {
   "question_string": "What is the furthest back on the grid Esteban Ocon started a race they went on to win?",
@@ -5762,17 +5652,6 @@
   "difficulty_weight": 3.0,
   "game_mode": "one_shot",
   "era_year": 1984
- },
- {
-  "question_string": "In which season did Liam Lawson take the most wins of their career?",
-  "verified_answer": 2023.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2023.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2024
  },
  {
   "question_string": "Driving for McLaren, in what percentage of races did Lando Norris finish on the podium?",
@@ -5929,17 +5808,6 @@
   "era_year": 2002
  },
  {
-  "question_string": "In which season did Daniel Ricciardo win the most races for AlphaTauri?",
-  "verified_answer": 2023.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2023.0,
-  "display_max": 2023.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2023
- },
- {
   "question_string": "At their single most successful circuit, how many times has Daniel Ricciardo won there?",
   "verified_answer": 1.0,
   "answer_kind": "count",
@@ -5973,17 +5841,6 @@
   "era_year": 2008
  },
  {
-  "question_string": "In which season did Esteban Ocon win the most races for Force India?",
-  "verified_answer": 2017.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2017.0,
-  "display_max": 2018.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2018
- },
- {
   "question_string": "Across every race they started, what is Fernando Alonso's average grid position?",
   "verified_answer": 9.0,
   "answer_kind": "count",
@@ -5993,17 +5850,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "one_shot",
   "era_year": 2014
- },
- {
-  "question_string": "In which season did Mario Andretti win the most races for Williams?",
-  "verified_answer": 1982.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 1982.0,
-  "display_max": 1982.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 1982
  },
  {
   "question_string": "Across classified finishes, what is Robert Kubica's average finishing position?",
@@ -6479,17 +6325,6 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which season did Daniel Ricciardo win the most races for Renault?",
-  "verified_answer": 2019.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2019.0,
-  "display_max": 2020.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2020
- },
- {
   "question_string": "Net across every start, how many positions did Daniel Ricciardo gain from the grid for Red Bull (2014-2018)?",
   "verified_answer": 141.0,
   "answer_kind": "count",
@@ -6699,17 +6534,6 @@
   "era_year": 2026
  },
  {
-  "question_string": "In which season did Esteban Ocon win the most races for Manor Marussia?",
-  "verified_answer": 2016.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2016.0,
-  "display_max": 2016.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2016
- },
- {
   "question_string": "How many times did Lance Stroll fail to finish (DNF) for Aston Martin (2021-2026)?",
   "verified_answer": 17.0,
   "answer_kind": "count",
@@ -6717,17 +6541,6 @@
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 3.0,
-  "game_mode": "one_shot",
-  "era_year": 2024
- },
- {
-  "question_string": "In which season did Nico Hülkenberg win the most races for Haas F1 Team?",
-  "verified_answer": 2023.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2023.0,
-  "display_max": 2024.0,
-  "difficulty_weight": 3.5,
   "game_mode": "one_shot",
   "era_year": 2024
  },
@@ -6875,17 +6688,6 @@
   "era_year": 2022
  },
  {
-  "question_string": "In which season did Damon Hill win the most races for Arrows?",
-  "verified_answer": 1997.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 1997.0,
-  "display_max": 1997.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 1997
- },
- {
   "question_string": "In which year did Pierre Gasly score their first win for AlphaTauri?",
   "verified_answer": 2020.0,
   "answer_kind": "year",
@@ -6906,17 +6708,6 @@
   "difficulty_weight": 3.5,
   "game_mode": "one_shot",
   "era_year": 1997
- },
- {
-  "question_string": "In which season did Liam Lawson win the most races for AlphaTauri?",
-  "verified_answer": 2023.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2023.0,
-  "display_max": 2023.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2023
  },
  {
   "question_string": "Driving for Williams, in what percentage of races did George Russell finish on the podium?",
@@ -7051,17 +6842,6 @@
   "era_year": 2007
  },
  {
-  "question_string": "In which season did Giancarlo Fisichella win the most races for Sauber?",
-  "verified_answer": 2004.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2004.0,
-  "display_max": 2004.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2004
- },
- {
   "question_string": "Net across every start, how many positions did Sergio Pérez gain from the grid for Racing Point (2019-2020)?",
   "verified_answer": 47.0,
   "answer_kind": "count",
@@ -7126,17 +6906,6 @@
   "difficulty_weight": 3.5,
   "game_mode": "one_shot",
   "era_year": 2022
- },
- {
-  "question_string": "In which season did Alexander Albon win the most races for Williams?",
-  "verified_answer": 2022.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2022.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2024
  },
  {
   "question_string": "What is Sergio Pérez's longest run of consecutive podium finishes?",
@@ -7225,17 +6994,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "one_shot",
   "era_year": 2022
- },
- {
-  "question_string": "In which season did Valtteri Bottas win the most races for Sauber?",
-  "verified_answer": 2024.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2024.0,
-  "display_max": 2024.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2024
  },
  {
   "question_string": "Net across every start, how many positions did Esteban Ocon gain from the grid for Manor Marussia (2016-2016)?",
@@ -7445,17 +7203,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "one_shot",
   "era_year": 2022
- },
- {
-  "question_string": "In which season did Felipe Massa win the most races for Williams?",
-  "verified_answer": 2014.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2014.0,
-  "display_max": 2017.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2016
  },
  {
   "question_string": "Driving for Williams, in what percentage of races did Nigel Mansell finish on the podium?",
@@ -7841,17 +7588,6 @@
   "difficulty_weight": 3.5,
   "game_mode": "one_shot",
   "era_year": 2022
- },
- {
-  "question_string": "In which season did David Coulthard win the most races for Red Bull?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2005.0,
-  "display_max": 2008.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2006
  },
  {
   "question_string": "What is the most places Mario Andretti ever made up from grid to finish in a single race?",
@@ -8294,17 +8030,6 @@
   "era_year": 2025
  },
  {
-  "question_string": "In which season did Jenson Button win the most races for Benetton?",
-  "verified_answer": 2001.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2001.0,
-  "display_max": 2001.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2001
- },
- {
   "question_string": "How many times did Heikki Kovalainen fail to finish (DNF) for Lotus (2010-2011)?",
   "verified_answer": 11.0,
   "answer_kind": "count",
@@ -8347,17 +8072,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "one_shot",
   "era_year": 2024
- },
- {
-  "question_string": "In which season did Lance Stroll take the most wins of their career?",
-  "verified_answer": 2017.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2017.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2022
  },
  {
   "question_string": "How many times did Kevin Magnussen fail to finish (DNF) for Haas F1 Team (2017-2024)?",
@@ -8481,17 +8195,6 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which season did Nico Hülkenberg win the most races for Audi?",
-  "verified_answer": 2026.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2026.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2026
- },
- {
   "question_string": "How many times did Keke Rosberg fail to finish (DNF) for McLaren (1986-1986)?",
   "verified_answer": 8.0,
   "answer_kind": "count",
@@ -8536,17 +8239,6 @@
   "era_year": 2020
  },
  {
-  "question_string": "In which season did Rubens Barrichello win the most races for Honda?",
-  "verified_answer": 2006.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2006.0,
-  "display_max": 2008.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2007
- },
- {
   "question_string": "Net across every start, how many positions did Giancarlo Fisichella gain from the grid for Ferrari (2009-2009)?",
   "verified_answer": 23.0,
   "answer_kind": "count",
@@ -8567,17 +8259,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "one_shot",
   "era_year": 1989
- },
- {
-  "question_string": "In which season did Max Verstappen win the most races for Toro Rosso?",
-  "verified_answer": 2015.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2015.0,
-  "display_max": 2016.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2016
  },
  {
   "question_string": "Driving for McLaren (1996-2004), how many times did David Coulthard climb 10+ places from the grid?",
@@ -8657,17 +8338,6 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which season did Sebastian Vettel win the most races for Aston Martin?",
-  "verified_answer": 2021.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2021.0,
-  "display_max": 2022.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2022
- },
- {
   "question_string": "What is the furthest back on the grid Felipe Massa started a race they went on to win?",
   "verified_answer": 2.0,
   "answer_kind": "count",
@@ -8688,17 +8358,6 @@
   "difficulty_weight": 3.0,
   "game_mode": "one_shot",
   "era_year": 2004
- },
- {
-  "question_string": "In which season did Heikki Kovalainen win the most races for Caterham?",
-  "verified_answer": 2012.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2012.0,
-  "display_max": 2012.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2012
  },
  {
   "question_string": "Net across every start, how many positions did Heinz-Harald Frentzen gain from the grid for Prost (2001-2001)?",
@@ -8943,17 +8602,6 @@
   "era_year": 1984
  },
  {
-  "question_string": "In which season did Yuki Tsunoda take the most wins of their career?",
-  "verified_answer": 2021.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2021.0,
-  "display_max": 2025.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2023
- },
- {
   "question_string": "In which season did Pastor Maldonado win the most races for Williams?",
   "verified_answer": 2012.0,
   "answer_kind": "year",
@@ -8974,17 +8622,6 @@
   "difficulty_weight": 3.5,
   "game_mode": "one_shot",
   "era_year": 2010
- },
- {
-  "question_string": "In which season did Valtteri Bottas win the most races for Cadillac F1 Team?",
-  "verified_answer": 2026.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2026.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2026
  },
  {
   "question_string": "Across every race they started, what is Jacques Villeneuve's average grid position?",
@@ -9040,17 +8677,6 @@
   "difficulty_weight": 3.5,
   "game_mode": "one_shot",
   "era_year": 1997
- },
- {
-  "question_string": "In which season did Yuki Tsunoda win the most races for RB F1 Team?",
-  "verified_answer": 2024.0,
-  "answer_kind": "year",
-  "category": "milestone",
-  "display_min": 2024.0,
-  "display_max": 2025.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "one_shot",
-  "era_year": 2024
  },
  {
   "question_string": "Driving for Jordan, in what percentage of races did Heinz-Harald Frentzen finish on the podium?",
