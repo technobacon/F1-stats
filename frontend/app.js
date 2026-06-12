@@ -58,17 +58,17 @@ function isoWeek() {
 
 /* ---- All 2026 F1 constructor colour schemes ---- */
 const TEAMS = {
-  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#FF8000", text: "#000" },
-  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#FDEE21", text: "#000" },
-  mercedes:     { name: "Mercedes",     primary: "#00A19C", secondary: "#00A19C", text: "#000" },
-  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#FFC906", text: "#fff" },
-  aston_martin: { name: "Aston Martin", primary: "#006F62", secondary: "#CEDC00", text: "#fff" },
-  alpine:       { name: "Alpine",       primary: "#FF87BC", secondary: "#0090FF", text: "#000" },
-  williams:     { name: "Williams",     primary: "#041E42", secondary: "#041E42", text: "#fff" },
-  rb:           { name: "Racing Bulls", primary: "#1E1464", secondary: "#1E1464", text: "#fff" },
-  haas:         { name: "Haas",         primary: "#E8002D", secondary: "#E8002D", text: "#fff" },
-  audi:         { name: "Audi",         primary: "#282828", secondary: "#282828", text: "#fff" },
-  cadillac:     { name: "Cadillac",     primary: "#00175B", secondary: "#BF0A30", text: "#fff" },
+  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#FF8000", text: "#000" },  // solid — user-specified
+  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#DC0000", text: "#fff" },  // solid — user-specified
+  mercedes:     { name: "Mercedes",     primary: "#00D2BE", secondary: "#00D2BE", text: "#000" },  // Petronas teal, solid
+  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#FFC906", text: "#fff" },  // midnight navy → gold
+  aston_martin: { name: "Aston Martin", primary: "#006F62", secondary: "#CEDC00", text: "#fff" },  // BRG → lime
+  alpine:       { name: "Alpine",       primary: "#FF87BC", secondary: "#0090FF", text: "#000" },  // pink → blue
+  williams:     { name: "Williams",     primary: "#0064FF", secondary: "#0064FF", text: "#fff" },  // vivid blue, solid
+  rb:           { name: "Racing Bulls", primary: "#1E1464", secondary: "#1E1464", text: "#fff" },  // deep indigo, solid
+  haas:         { name: "Haas",         primary: "#B6BABD", secondary: "#B6BABD", text: "#000" },  // silver, solid
+  audi:         { name: "Audi",         primary: "#282828", secondary: "#282828", text: "#fff" },  // charcoal, solid
+  cadillac:     { name: "Cadillac",     primary: "#FFFFFF", secondary: "#FFFFFF", text: "#000" },  // white, solid
 };
 
 /* ---- Theming (Architecture §3.1) ---- */

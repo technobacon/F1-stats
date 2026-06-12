@@ -7,18 +7,18 @@
 
 /* 2026 F1 grid — single-colour teams */
 :root[data-team="mclaren"]      { --color-primary:#FF8000; --color-secondary:#FF8000; --color-accent:#1B2425;  --btn-text:#000; }
-:root[data-team="mercedes"]     { --color-primary:#00A19C; --color-secondary:#00A19C; --color-accent:#111111;  --btn-text:#000; }
-:root[data-team="williams"]     { --color-primary:#041E42; --color-secondary:#041E42; --color-accent:#37BEDD;  --btn-text:#fff; }
+:root[data-team="ferrari"]      { --color-primary:#DC0000; --color-secondary:#DC0000; --color-accent:#F9C900;  --btn-text:#fff; }
+:root[data-team="mercedes"]     { --color-primary:#00D2BE; --color-secondary:#00D2BE; --color-accent:#111111;  --btn-text:#000; }
+:root[data-team="williams"]     { --color-primary:#0064FF; --color-secondary:#0064FF; --color-accent:#FFFFFF;  --btn-text:#fff; }
 :root[data-team="rb"]           { --color-primary:#1E1464; --color-secondary:#1E1464; --color-accent:#FFFFFF;  --btn-text:#fff; }
-:root[data-team="haas"]         { --color-primary:#E8002D; --color-secondary:#E8002D; --color-accent:#B6BABD;  --btn-text:#fff; }
+:root[data-team="haas"]         { --color-primary:#B6BABD; --color-secondary:#B6BABD; --color-accent:#E8002D;  --btn-text:#000; }
 :root[data-team="audi"]         { --color-primary:#282828; --color-secondary:#282828; --color-accent:#999999;  --btn-text:#fff; }
+:root[data-team="cadillac"]     { --color-primary:#FFFFFF; --color-secondary:#FFFFFF; --color-accent:#00175B;  --btn-text:#000; }
 
 /* 2026 F1 grid — two-primary-colour teams (buttons render as gradient) */
-:root[data-team="ferrari"]      { --color-primary:#DC0000; --color-secondary:#FDEE21; --color-accent:#FDEE21;  --btn-text:#000; }
 :root[data-team="red_bull"]     { --color-primary:#1E1B4B; --color-secondary:#FFC906; --color-accent:#FFC906;  --btn-text:#fff; }
 :root[data-team="aston_martin"] { --color-primary:#006F62; --color-secondary:#CEDC00; --color-accent:#CEDC00;  --btn-text:#fff; }
 :root[data-team="alpine"]       { --color-primary:#FF87BC; --color-secondary:#0090FF; --color-accent:#0090FF;  --btn-text:#000; }
-:root[data-team="cadillac"]     { --color-primary:#00175B; --color-secondary:#BF0A30; --color-accent:#BF0A30;  --btn-text:#fff; }
 
 * { box-sizing:border-box; }
 body { margin:0; font-family:'Titillium Web','Segoe UI',system-ui,sans-serif;
