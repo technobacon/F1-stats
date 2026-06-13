@@ -136,8 +136,10 @@ docs/               # original design documents
 | `POST` | `/api/v1/auth/logout` | revokes the bearer token (`Authorization: Bearer …`) |
 | `GET`  | `/api/v1/auth/me` | current user + server-derived stats (requires bearer token) |
 | `POST` | `/api/v1/sync/claim` | `{anon_id}` → merge a guest device's verified events into the account |
-| `GET`  | `/api/v1/leaderboard` | top players by **server-verified** points |
-| `GET`  | `/api/v1/dev/questions` | full bank **with answers** for proofreading ("Check the data" button); disable with `F1_DEV_TOOLS=0` |
+| `POST` | `/api/v1/profile/team` | `{selected_team}` → persist the player's constructor faction (server-side; counts in the Constructors' Championship) |
+| `GET`  | `/api/v1/leaderboard` | top players by **server-verified** points; `?period=all\|weekly\|daily` for resetting windows |
+| `GET`  | `/api/v1/leaderboard/teams` | **Constructors' Championship** — verified points bucketed by team faction; `?period=` as above |
+| `GET`  | `/api/v1/dev/questions` | full bank **with answers** for proofreading ("Check the data" button); **disabled in production** (`F1_DEV_TOOLS=0`, set in `render.yaml`) |
 
 The daily/race-week/one-shot selection is **deterministic per period** (seeded by
 mode + UTC date), so everyone gets the same set within a period and it rotates —
@@ -180,6 +182,14 @@ swap SQLite for the managed Postgres the blueprint specifies (Architecture §0).
 - **User accounts** (username + PBKDF2-hashed password, server sessions) with
   server-side saving, guest→account merge, and a server-verified Global
   Leaderboard — see *Accounts, saving & the trust boundary* below
+- **Daily / weekly / all-time leaderboards** (resetting windows give newcomers a
+  fresh race to win) and a **Constructors' Championship** that buckets every
+  player's verified points by the team faction they pledge to (PRD §5.3)
+- **Server-side daily streaks** recomputed from play history, and a
+  **replay-proof leaderboard**: the deterministic daily set can't be re-run to
+  inflate a total — one scored row per player per question per day
+- **Spoiler-free shareable result** — a Wordle-style coloured-square grid with
+  the day's puzzle number, copied/shared without leaking any answers
 
 ### Question variety
 

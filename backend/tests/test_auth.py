@@ -192,6 +192,138 @@ def test_leaderboard_uses_server_scores_not_client_claims(client):
     assert board[0]["lifetime_points"] == 5000
 
 
+def test_replaying_the_daily_does_not_inflate_the_total(client):
+    """Leaderboard integrity: the daily set is deterministic, so re-running it must
+    not stack the same questions onto a player's total a second time."""
+    token = client.post("/api/v1/auth/register",
+                        json={"username": "grinder", "password": "password1"}).json()["token"]
+    hdr = {"Authorization": f"Bearer {token}"}
+
+    quiz = client.get("/api/v1/quiz/daily").json()
+    first = quiz["questions"][0]["tracking_token"]
+    actual = _answer(client, first)  # anonymous reveal (orphan, not the account's)
+    client.post("/api/v1/quiz/verify",
+                json={"tracking_token": first, "guess": actual}, headers=hdr)
+    after_one = client.get("/api/v1/auth/me", headers=hdr).json()["stats"]
+    assert after_one["questions_answered"] == 1
+    assert after_one["lifetime_points"] == 5000
+
+    # Replay: same UTC day -> same question id behind a fresh token. The score is
+    # still returned to the player, but it must NOT be recorded again.
+    replay = client.get("/api/v1/quiz/daily").json()["questions"][0]["tracking_token"]
+    r = client.post("/api/v1/quiz/verify",
+                    json={"tracking_token": replay, "guess": actual}, headers=hdr)
+    assert r.json()["score"] == 5000          # the player still sees their score
+    after_two = client.get("/api/v1/auth/me", headers=hdr).json()["stats"]
+    assert after_two["questions_answered"] == 1   # but the total is unchanged
+    assert after_two["lifetime_points"] == 5000
+
+
+def test_daily_streak_is_server_derived(client):
+    import datetime as _dt
+    from app import db
+
+    token = client.post("/api/v1/auth/register",
+                        json={"username": "streaky", "password": "password1"}).json()["token"]
+    hdr = {"Authorization": f"Bearer {token}"}
+    me = client.get("/api/v1/auth/me", headers=hdr).json()
+    assert me["stats"]["daily_streak"] == 0  # nothing played yet
+
+    # Play today, then backfill the two prior days directly in the store (the
+    # streak must be reconstructed from rows, never taken from the client).
+    quiz = client.get("/api/v1/quiz/daily").json()
+    qid_token = quiz["questions"][0]["tracking_token"]
+    actual = _answer(client, qid_token)
+    client.post("/api/v1/quiz/verify",
+                json={"tracking_token": qid_token, "guess": actual}, headers=hdr)
+
+    conn = db.connect()
+    try:
+        uid = conn.execute("SELECT id FROM users WHERE username='streaky'").fetchone()["id"]
+        today = _dt.datetime.now(_dt.timezone.utc).date()
+        for offset in (1, 2):  # yesterday and the day before
+            d = today - _dt.timedelta(days=offset)
+            conn.execute(
+                "INSERT INTO play_events (user_id, question_id, game_mode, score, "
+                "identity_key, period, created_at) VALUES (?, ?, 'daily', 4000, ?, ?, ?)",
+                (uid, f"backfill-{offset}", uid, d.isoformat(), f"{d.isoformat()} 12:00:00"),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+
+    streak = client.get("/api/v1/auth/me", headers=hdr).json()["stats"]["daily_streak"]
+    assert streak == 3  # today + yesterday + day before, consecutive
+
+
+def test_daily_and_weekly_leaderboards_filter_by_window(client):
+    import datetime as _dt
+    from app import db
+
+    token = client.post("/api/v1/auth/register",
+                        json={"username": "windowed", "password": "password1"}).json()["token"]
+    hdr = {"Authorization": f"Bearer {token}"}
+    quiz = client.get("/api/v1/quiz/daily").json()
+    t = quiz["questions"][0]["tracking_token"]
+    actual = _answer(client, t)
+    client.post("/api/v1/quiz/verify",
+                json={"tracking_token": t, "guess": actual}, headers=hdr)  # 5000 today
+
+    # An old event (40 days ago) counts all-time but not in the daily/weekly window.
+    conn = db.connect()
+    try:
+        uid = conn.execute("SELECT id FROM users WHERE username='windowed'").fetchone()["id"]
+        old = _dt.datetime.now(_dt.timezone.utc) - _dt.timedelta(days=40)
+        conn.execute(
+            "INSERT INTO play_events (user_id, question_id, game_mode, score, "
+            "identity_key, period, created_at) VALUES (?, 'old-q', 'daily', 3000, ?, ?, ?)",
+            (uid, uid, old.date().isoformat(), old.strftime("%Y-%m-%d %H:%M:%S")),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    all_pts = client.get("/api/v1/leaderboard").json()["entries"][0]["lifetime_points"]
+    day_pts = client.get("/api/v1/leaderboard?period=daily").json()["entries"][0]["lifetime_points"]
+    assert all_pts == 8000   # 5000 today + 3000 old
+    assert day_pts == 5000   # only today's
+
+
+def test_constructors_championship_buckets_points_by_team(client):
+    # Two Ferrari fans and one McLaren fan; the team board sums each faction.
+    for name, team in [("tifosi1", "ferrari"), ("tifosi2", "ferrari"), ("papaya1", "mclaren")]:
+        tok = client.post("/api/v1/auth/register",
+                          json={"username": name, "password": "password1",
+                                "selected_team": team}).json()["token"]
+        hdr = {"Authorization": f"Bearer {tok}"}
+        quiz = client.get("/api/v1/quiz/daily").json()
+        t = quiz["questions"][0]["tracking_token"]
+        actual = _answer(client, t)
+        client.post("/api/v1/quiz/verify",
+                    json={"tracking_token": t, "guess": actual}, headers=hdr)
+
+    board = client.get("/api/v1/leaderboard/teams").json()["entries"]
+    by_team = {e["team"]: e for e in board}
+    assert by_team["ferrari"]["points"] == 10000   # two members * 5000
+    assert by_team["ferrari"]["members"] == 2
+    assert by_team["mclaren"]["points"] == 5000
+    assert board[0]["team"] == "ferrari"           # ranked by total points
+
+
+def test_set_team_persists_server_side(client):
+    tok = client.post("/api/v1/auth/register",
+                      json={"username": "switcher", "password": "password1"}).json()["token"]
+    hdr = {"Authorization": f"Bearer {tok}"}
+    r = client.post("/api/v1/profile/team", json={"selected_team": "williams"}, headers=hdr)
+    assert r.status_code == 200
+    assert r.json()["selected_team"] == "williams"
+    # Survives a fresh fetch (it's in the DB, not just the response).
+    assert client.get("/api/v1/auth/me", headers=hdr).json()["selected_team"] == "williams"
+    # An unknown team is normalized to the default rather than rejected.
+    r2 = client.post("/api/v1/profile/team", json={"selected_team": "lego"}, headers=hdr)
+    assert r2.json()["selected_team"] == "mclaren"
+
+
 def test_accounts_survive_question_bank_reseed(client, tmp_path):
     """Re-running the dataset seed (what happens on every boot) must not wipe
     accounts or their play history."""

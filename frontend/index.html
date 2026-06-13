@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=8" />
+  <link rel="stylesheet" href="/static/style.css?v=9" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -205,6 +205,7 @@
         <h2>Session Complete</h2>
         <div class="summary-score" id="summary-score">0</div>
         <p>points this session</p>
+        <div class="summary-grid" id="summary-grid" aria-label="Your result grid"></div>
         <div class="accuracy-row" id="accuracy-row"></div>
         <div class="ad-slot ad-summary" data-ad="summary-display">ad · summary display</div>
         <button class="btn-primary" id="share-result">Share Result</button>
@@ -256,14 +257,31 @@
         <button class="btn-secondary danger" id="reset-btn">Reset local progress</button>
       </div>
 
-      <!-- Global Leaderboard: ranks players by SERVER-verified points only
-           (Architecture §2.2 trust boundary). -->
+      <!-- Leaderboards: ranked by SERVER-verified points only (Architecture §2.2
+           trust boundary). The period tabs switch both boards between all-time and
+           the resetting daily / weekly windows. -->
+      <div class="lb-period" role="tablist" aria-label="Leaderboard window">
+        <button class="lb-period-tab active" data-period="all">All-time</button>
+        <button class="lb-period-tab" data-period="weekly">This week</button>
+        <button class="lb-period-tab" data-period="daily">Today</button>
+      </div>
+
       <div class="card">
         <h2>Global Leaderboard</h2>
         <ol class="leaderboard" id="leaderboard-list">
           <li class="muted">Loading…</li>
         </ol>
         <p class="muted">Ranked by points the server scored — local totals can't be posted directly.</p>
+      </div>
+
+      <!-- Constructors' Championship (PRD §5.3): every player's verified points
+           bucketed by the team faction they pledged to. -->
+      <div class="card">
+        <h2>Constructors' Championship</h2>
+        <ol class="leaderboard ctc" id="team-leaderboard-list">
+          <li class="muted">Loading…</li>
+        </ol>
+        <p class="muted">Which fanbase is the smartest? Pick your team to add your points to its tally.</p>
       </div>
     </section>
   </main>
@@ -342,6 +360,6 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/app.js?v=8"></script>
+  <script src="/static/app.js?v=9"></script>
 </body>
 </html>

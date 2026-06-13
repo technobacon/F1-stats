@@ -270,6 +270,8 @@ document.querySelectorAll("[data-view]").forEach((el) => {
 
 /* ===================== QUIZ (Daily / Race-Week / One-Shots) ===================== */
 let quiz = null, qPos = 0, sessionScore = 0, sessionCloseness = 0;
+// Per-question scores for this run, used to build the spoiler-free share grid.
+let sessionResults = [];
 
 function playedKey(mode) { return `played_${mode}`; }
 function isCapped(mode) {
@@ -312,7 +314,7 @@ async function startQuiz() {
     const res = await fetch(`${API}/quiz/${currentMode}`);
     if (!res.ok) throw new Error(await res.text());
     quiz = await res.json();
-    qPos = 0; sessionScore = 0; sessionCloseness = 0;
+    qPos = 0; sessionScore = 0; sessionCloseness = 0; sessionResults = [];
     document.getElementById("q-total").textContent = quiz.questions.length;
     document.getElementById("q-mode-badge").textContent = currentMode.replace("_", "-");
     hide("quiz-intro"); show("quiz-play"); hide("quiz-summary"); hide("quiz-reveal");
@@ -469,6 +471,7 @@ async function submitGuess() {
     const result = await res.json();
     sessionScore += result.score;
     sessionCloseness += result.score / result.max_score;
+    sessionResults.push(result.score / result.max_score);  // 0..1 per question
     revealScore(q, result);
   } catch (e) {
     toast("Couldn't score that — try again.");
@@ -546,6 +549,9 @@ function finishSession() {
   document.getElementById("summary-score").textContent = sessionScore.toLocaleString();
   const acc = Math.round((sessionCloseness / quiz.questions.length) * 100);
   document.getElementById("accuracy-row").textContent = `Accuracy: ${acc}% · ${sessionScore.toLocaleString()} / ${maxPossible.toLocaleString()}`;
+  // Spoiler-free result grid (same squares the Share button copies).
+  const gridEl = document.getElementById("summary-grid");
+  if (gridEl) gridEl.textContent = sessionResults.map(closenessSquare).join("");
 
   // Mark the period as played (cap), then update guest-first local stats.
   const cfg = MODES[currentMode];
@@ -579,14 +585,44 @@ function awardAchievements(acc) {
 
 document.getElementById("summary-back").addEventListener("click", () => navigate("home"));
 
+/* Map a per-question closeness (0..1) to a coloured square — the spoiler-free
+ * Wordle-style result. No numbers that reveal the answer, just how close. */
+function closenessSquare(c) {
+  if (c >= 0.999) return "🟦";  // bullseye
+  if (c >= 0.80) return "🟩";   // very close
+  if (c >= 0.50) return "🟨";   // in the ballpark
+  if (c >= 0.20) return "🟧";   // miles off
+  return "⬛";                   // way off
+}
+
+/* A stable daily puzzle number: whole UTC days since the game's launch epoch.
+ * Gives every shared result the same "#NNN" for the day, like Wordle. */
+function dailyNumber() {
+  const epoch = Date.UTC(2026, 0, 1);             // 2026-01-01
+  return Math.floor((Date.now() - epoch) / 864e5) + 1;
+}
+
+function buildShareText() {
+  const grid = sessionResults.map(closenessSquare).join("");
+  const max = quiz.questions.length * 5000;
+  const tag = currentMode === "daily" ? `Daily #${dailyNumber()}`
+            : currentMode === "race_week" ? `Race Challenge #${dailyNumber()}`
+            : "Hardcore";
+  // Spoiler-free: shares the closeness pattern and total, never the answers.
+  return `🏁 F1 Stat Guesser — ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts\n${location.origin}`;
+}
+
 document.getElementById("share-result").addEventListener("click", async () => {
-  const text = `🏁 F1 StatGuesser — I scored ${sessionScore.toLocaleString()} / ` +
-    `${quiz.questions.length * 5000} on the ${MODES[currentMode].title}!`;
+  const text = buildShareText();
   if (navigator.share) {
-    try { await navigator.share({ title: "F1 StatGuesser", text }); return; } catch { /* cancelled */ }
+    try { await navigator.share({ title: "F1 Stat Guesser", text }); return; } catch { /* cancelled */ }
   }
-  try { await navigator.clipboard.writeText(text); document.getElementById("share-status").textContent = "Copied to clipboard!"; }
-  catch { document.getElementById("share-status").textContent = text; }
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById("share-status").textContent = "Result copied — paste it to share!";
+  } catch {
+    document.getElementById("share-status").textContent = text;
+  }
 });
 
 /* ===================== ARCADE OVER/UNDER ===================== */
@@ -652,8 +688,11 @@ function renderProfile() {
       ? (serverStats.questions_answered ? `${Math.round(serverStats.average_accuracy * 100)}%` : "—")
       : (state._q_count ? `${Math.round(state.average_closeness * 100)}%` : "—");
 
-  // Cosmetic stats stay local.
-  document.getElementById("p-streak").textContent = state.daily_streak;
+  // Streak: server-derived when signed in (authoritative across devices),
+  // local otherwise.
+  document.getElementById("p-streak").textContent =
+    signedIn && serverStats && serverStats.daily_streak != null
+      ? serverStats.daily_streak : state.daily_streak;
   document.getElementById("p-achievements").textContent =
     state.unlocked_achievements.length ? state.unlocked_achievements.map((a) => a.replace(/_/g, " ")).join(", ") : "none yet";
 
@@ -665,6 +704,7 @@ function renderProfile() {
       (serverStats && serverStats.username) || localStorage.getItem("f1statguesser_username") || "you";
   }
   loadLeaderboard();
+  loadTeamLeaderboard();
 }
 
 async function refreshMe() {
@@ -679,23 +719,60 @@ async function refreshMe() {
   } catch { /* offline — keep whatever we have */ }
 }
 
+/* Leaderboard window shared by the global board and the Constructors'
+ * Championship: 'all' | 'weekly' | 'daily'. Daily/weekly reset, so there's
+ * always a fresh race to win — the reason to come back tomorrow. */
+let lbPeriod = "all";
+
 async function loadLeaderboard() {
   const list = document.getElementById("leaderboard-list");
   if (!list) return;
   try {
-    const res = await fetch(`${API}/leaderboard`);
+    const res = await fetch(`${API}/leaderboard?period=${lbPeriod}`);
     const entries = (await res.json()).entries || [];
     const myName = localStorage.getItem("f1statguesser_username");
     list.innerHTML = entries.length
       ? entries.map((e) => `<li class="${e.username === myName ? "me" : ""}">
             <span class="lb-rank">${e.rank}</span>
-            <span class="lb-name">${escapeHtml(e.username)}</span>
+            <span class="lb-name">${escapeHtml(e.username)} <em class="lb-team">${(TEAMS[e.selected_team] || {}).name || ""}</em></span>
             <span class="lb-points">${e.lifetime_points.toLocaleString()}</span>
           </li>`).join("")
-      : `<li class="muted">No scores yet — be the first to post one.</li>`;
+      : `<li class="muted">No scores ${lbPeriod === "all" ? "yet" : "in this window"} — be the first to post one.</li>`;
   } catch {
     list.innerHTML = `<li class="muted">Leaderboard unavailable right now.</li>`;
   }
+}
+
+async function loadTeamLeaderboard() {
+  const list = document.getElementById("team-leaderboard-list");
+  if (!list) return;
+  try {
+    const res = await fetch(`${API}/leaderboard/teams?period=${lbPeriod}`);
+    const entries = (await res.json()).entries || [];
+    const mine = state.selected_team;
+    list.innerHTML = entries.length
+      ? entries.map((e) => {
+          const t = TEAMS[e.team] || { name: e.team, primary: "#888" };
+          return `<li class="${e.team === mine ? "me" : ""}">
+            <span class="lb-rank">${e.rank}</span>
+            <span class="ctc-swatch" style="background:${t.primary}"></span>
+            <span class="lb-name">${escapeHtml(t.name)}
+              <em class="lb-team">${e.members} fan${e.members === 1 ? "" : "s"} · ${e.avg_per_member.toLocaleString()} avg</em></span>
+            <span class="lb-points">${e.points.toLocaleString()}</span>
+          </li>`;
+        }).join("")
+      : `<li class="muted">No team has scored ${lbPeriod === "all" ? "yet" : "in this window"}.</li>`;
+  } catch {
+    list.innerHTML = `<li class="muted">Standings unavailable right now.</li>`;
+  }
+}
+
+function setLeaderboardPeriod(period) {
+  lbPeriod = period;
+  document.querySelectorAll(".lb-period-tab").forEach((t) =>
+    t.classList.toggle("active", t.dataset.period === period));
+  loadLeaderboard();
+  loadTeamLeaderboard();
 }
 
 function escapeHtml(s) {
@@ -751,7 +828,9 @@ const Auth = (() => {
     try {
       const res = await fetch(`${API}/auth/${mode}`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, anon_id: anonId() }),
+        // Pledge the locally-chosen team on sign-up so the new account joins that
+        // faction in the Constructors' Championship from its first point.
+        body: JSON.stringify({ username, password, anon_id: anonId(), selected_team: state.selected_team }),
       });
       if (!res.ok) {
         const detail = await res.json().catch(() => ({}));
@@ -762,6 +841,9 @@ const Auth = (() => {
       setAuthToken(body.token);
       localStorage.setItem("f1statguesser_username", body.username);
       serverStats = { ...body.stats, username: body.username };
+      // Adopt the team the server has on file for this account (it persists the
+      // faction across devices, unlike the local-only guest choice).
+      if (body.selected_team) applyTeam(body.selected_team);
       state.is_guest = false; saveState(state);
       close();
       toast(body.claimed_events
@@ -800,6 +882,21 @@ const Auth = (() => {
   return { init };
 })();
 
+/* Persist the chosen team to the account so it counts in the Constructors'
+ * Championship and follows the player across devices. No-op for guests (their
+ * choice stays local until they sign in, which pledges it then). */
+async function syncTeam(team) {
+  if (!isSignedIn()) return;
+  try {
+    await fetch(`${API}/profile/team`, {
+      method: "POST",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ selected_team: team }),
+    });
+    loadTeamLeaderboard();  // reflect the switch in the standings
+  } catch { /* best effort — local choice already applied */ }
+}
+
 /* ===================== TEAM PICKER ===================== */
 const TeamPicker = (() => {
   function open() {
@@ -817,6 +914,7 @@ const TeamPicker = (() => {
       card.addEventListener("click", () => {
         applyTeam(card.dataset.team);
         saveState(state);
+        syncTeam(card.dataset.team);  // persist server-side when signed in
         close();
       });
     });
@@ -920,6 +1018,8 @@ CurveSlider.init();
 DataCheck.init();
 TeamPicker.init();
 Auth.init();
+document.querySelectorAll(".lb-period-tab").forEach((t) =>
+  t.addEventListener("click", () => setLeaderboardPeriod(t.dataset.period)));
 // If a session token is present, pull the authoritative server stats, then
 // repaint the profile so it shows the signed-in totals.
 refreshMe().then(renderProfile);

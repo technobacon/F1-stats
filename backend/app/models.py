@@ -48,6 +48,9 @@ class RegisterRequest(BaseModel):
     password: str
     # Guest device id to merge into the new account (verified events only).
     anon_id: str | None = None
+    # The constructor faction the player pledges to (PRD §5.3). Optional; an
+    # unknown value is normalized to the default rather than rejected.
+    selected_team: str | None = None
 
 
 class LoginRequest(BaseModel):
@@ -61,6 +64,7 @@ class UserStats(BaseModel):
     questions_answered: int
     average_accuracy: float   # mean proximity in [0, 1]
     best_answer: int
+    daily_streak: int = 0     # consecutive days completing a daily challenge
 
 
 class AuthResponse(BaseModel):
@@ -84,6 +88,10 @@ class ClaimRequest(BaseModel):
     anon_id: str
 
 
+class SetTeamRequest(BaseModel):
+    selected_team: str
+
+
 class LeaderboardEntry(BaseModel):
     rank: int
     username: str
@@ -94,6 +102,21 @@ class LeaderboardEntry(BaseModel):
 
 class LeaderboardResponse(BaseModel):
     entries: list[LeaderboardEntry]
+    period: str = "all"
+
+
+class TeamLeaderboardEntry(BaseModel):
+    rank: int
+    team: str
+    points: int
+    members: int
+    questions_answered: int
+    avg_per_member: int
+
+
+class TeamLeaderboardResponse(BaseModel):
+    entries: list[TeamLeaderboardEntry]
+    period: str = "all"
 
 
 class ArcadeEntity(BaseModel):

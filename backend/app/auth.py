@@ -33,6 +33,22 @@ _PBKDF2_ROUNDS = 200_000
 _SALT_BYTES = 16
 _SESSION_TTL = timedelta(days=30)
 
+# The constructor factions a player can pledge to (mirrors the frontend TEAMS map
+# and PRD §5.3). Used to validate the cosmetic team choice and to bucket the
+# Constructors' Championship leaderboard. 'mclaren' is the default.
+TEAMS = (
+    "mclaren", "ferrari", "mercedes", "red_bull", "aston_martin", "alpine",
+    "williams", "rb", "haas", "audi", "cadillac",
+)
+DEFAULT_TEAM = "mclaren"
+
+
+def normalize_team(team: str | None) -> str:
+    """Return a known team key, falling back to the default for anything unknown."""
+    t = (team or "").strip().lower()
+    return t if t in TEAMS else DEFAULT_TEAM
+
+
 # Conservative username rules: keep it simple, predictable and URL/display-safe.
 _USERNAME_RE = re.compile(r"^[A-Za-z0-9_.-]{3,32}$")
 _MIN_PASSWORD_LEN = 8
@@ -143,9 +159,12 @@ def _user_public(row: sqlite3.Row) -> dict:
     }
 
 
-def create_user(conn: sqlite3.Connection, username: str, password: str) -> dict:
+def create_user(
+    conn: sqlite3.Connection, username: str, password: str, selected_team: str | None = None
+) -> dict:
     """Create an account, returning its public view. Raises AuthError on invalid
-    input or a taken username."""
+    input or a taken username. The team is the cosmetic faction the player pledges
+    to (PRD §5.3); an unknown value falls back to the default rather than erroring."""
     username = (username or "").strip()
     if not _USERNAME_RE.match(username):
         raise AuthError(
@@ -159,8 +178,8 @@ def create_user(conn: sqlite3.Connection, username: str, password: str) -> dict:
     user_id = str(uuid.uuid4())
     try:
         conn.execute(
-            "INSERT INTO users (id, username, password_hash) VALUES (?, ?, ?)",
-            (user_id, username, hash_password(password)),
+            "INSERT INTO users (id, username, password_hash, selected_team) VALUES (?, ?, ?, ?)",
+            (user_id, username, hash_password(password), normalize_team(selected_team)),
         )
     except sqlite3.IntegrityError as exc:  # UNIQUE(username) — case-insensitive
         raise AuthError("That username is already taken.") from exc
@@ -225,10 +244,13 @@ def delete_session(conn: sqlite3.Connection, token: str | None) -> None:
     conn.commit()
 
 
-def set_selected_team(conn: sqlite3.Connection, user_id: str, team: str) -> None:
-    """Persist the cosmetic team choice (Architecture §2.2 cosmetic carry-over)."""
+def set_selected_team(conn: sqlite3.Connection, user_id: str, team: str) -> str:
+    """Persist the cosmetic team choice (Architecture §2.2 cosmetic carry-over,
+    PRD §5.3). The value is normalized to a known team; returns what was stored."""
+    team = normalize_team(team)
     conn.execute("UPDATE users SET selected_team = ? WHERE id = ?", (team, user_id))
     conn.commit()
+    return team
 
 
 # ── Play history (the trust-boundary foundation) ─────────────────────────────
@@ -242,15 +264,28 @@ def record_event(
     game_mode: str | None = None,
     guess: float | None = None,
     actual: float | None = None,
-) -> None:
+    period: str | None = None,
+) -> bool:
     """Persist one server-scored guess. Called from the verify endpoint with the
-    score the server just computed — the client never supplies the score."""
-    conn.execute(
-        "INSERT INTO play_events (user_id, anon_id, question_id, game_mode, score, guess, actual) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (user_id, anon_id, question_id, game_mode, int(score), guess, actual),
+    score the server just computed — the client never supplies the score.
+
+    Returns True if a new scored row was written, False if it was a deduped
+    replay. The daily set is deterministic, so a player could otherwise re-run it
+    and stack the same questions onto their total; the (identity, question, day)
+    UNIQUE index plus INSERT OR IGNORE pin each question to one scored row per
+    player per day. Reveals with no identity (no account and no anon id) are
+    always written as orphans — they belong to nobody and never count."""
+    identity_key = user_id or anon_id or ""
+    period = period or _now().strftime("%Y-%m-%d")
+    cur = conn.execute(
+        "INSERT OR IGNORE INTO play_events "
+        "(user_id, anon_id, question_id, game_mode, score, guess, actual, identity_key, period) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (user_id, anon_id, question_id, game_mode, int(score), guess, actual,
+         identity_key or None, period),
     )
     conn.commit()
+    return cur.rowcount > 0
 
 
 def claim_anon_events(conn: sqlite3.Connection, anon_id: str | None, user_id: str) -> int:
@@ -260,13 +295,46 @@ def claim_anon_events(conn: sqlite3.Connection, anon_id: str | None, user_id: st
     untouched by the ``user_id IS NULL`` guard."""
     if not anon_id:
         return 0
+    # Re-key the rows to the user (identity_key too), so the dedup guard now treats
+    # them as the account's: replaying the same day's question after signing in is
+    # rejected instead of double-counted.
     cur = conn.execute(
-        "UPDATE play_events SET user_id = ?, anon_id = NULL "
+        "UPDATE OR IGNORE play_events SET user_id = ?, anon_id = NULL, identity_key = ? "
         "WHERE anon_id = ? AND user_id IS NULL",
-        (user_id, anon_id),
+        (user_id, user_id, anon_id),
     )
     conn.commit()
     return cur.rowcount
+
+
+def daily_streak(conn: sqlite3.Connection, user_id: str) -> int:
+    """Consecutive-day streak of completing a daily-mode challenge, recomputed
+    server-side from play_events (Architecture §2.2 — never trusts the client).
+
+    A day counts if the user logged any 'daily' play that UTC date. The streak is
+    the run of consecutive days ending today or yesterday; if the most recent
+    daily play is older than yesterday the streak has lapsed and is 0."""
+    rows = conn.execute(
+        "SELECT DISTINCT date(created_at) AS d FROM play_events "
+        "WHERE user_id = ? AND game_mode = 'daily' ORDER BY d DESC",
+        (user_id,),
+    ).fetchall()
+    days = [r["d"] for r in rows if r["d"]]
+    if not days:
+        return 0
+    today = _now().date()
+    most_recent = datetime.strptime(days[0], "%Y-%m-%d").date()
+    if (today - most_recent).days > 1:
+        return 0  # lapsed: nothing today or yesterday
+    streak, prev = 1, most_recent
+    for d in days[1:]:
+        cur = datetime.strptime(d, "%Y-%m-%d").date()
+        if (prev - cur).days == 1:
+            streak += 1
+            prev = cur
+        else:
+            break
+    return streak
 
 
 def user_stats(conn: sqlite3.Connection, user_id: str) -> dict:
@@ -285,20 +353,46 @@ def user_stats(conn: sqlite3.Connection, user_id: str) -> dict:
         # accuracy = average proximity, i.e. mean(score)/max_score, in [0, 1]
         "average_accuracy": round((row["avg_score"] or 0) / 5000.0, 3) if answered else 0.0,
         "best_answer": int(row["best"] or 0),
+        "daily_streak": daily_streak(conn, user_id),
     }
 
 
-def leaderboard(conn: sqlite3.Connection, limit: int = 20) -> list[dict]:
-    """Top players by server-verified lifetime points. The whole point of the
-    trust boundary: these numbers come only from play_events, so they can't be
-    forged by editing localStorage."""
+def _period_cutoff(period: str) -> str | None:
+    """UTC lower bound (as a 'YYYY-MM-DD HH:MM:SS' string comparable to
+    play_events.created_at) for a leaderboard window, or None for all-time.
+
+      * 'daily'  -> since 00:00 UTC today
+      * 'weekly' -> since 00:00 UTC Monday (ISO week start)
+      * anything else -> None (all-time)
+
+    Daily and weekly boards reset, so newcomers always have a fresh race to win —
+    that is the daily-return hook an all-time-only board can't give."""
+    now = _now()
+    if period == "daily":
+        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif period == "weekly":
+        midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        start = midnight - timedelta(days=now.weekday())  # Monday
+    else:
+        return None
+    return start.strftime("%Y-%m-%d %H:%M:%S")
+
+
+def leaderboard(conn: sqlite3.Connection, limit: int = 20, period: str = "all") -> list[dict]:
+    """Top players by server-verified points over a window ('all'|'daily'|'weekly').
+    The whole point of the trust boundary: these numbers come only from
+    play_events, so they can't be forged by editing localStorage."""
+    cutoff = _period_cutoff(period)
+    where = "e.created_at >= ?" if cutoff else "1=1"
+    params: tuple = (cutoff, limit) if cutoff else (limit,)
     rows = conn.execute(
         "SELECT u.username AS username, u.selected_team AS selected_team, "
         "       COALESCE(SUM(e.score), 0) AS points, COUNT(e.id) AS answered "
         "FROM users u JOIN play_events e ON e.user_id = u.id "
+        f"WHERE {where} "
         "GROUP BY u.id HAVING answered > 0 "
         "ORDER BY points DESC, answered ASC LIMIT ?",
-        (limit,),
+        params,
     ).fetchall()
     return [
         {
@@ -307,6 +401,39 @@ def leaderboard(conn: sqlite3.Connection, limit: int = 20) -> list[dict]:
             "selected_team": r["selected_team"],
             "lifetime_points": int(r["points"] or 0),
             "questions_answered": r["answered"],
+        }
+        for i, r in enumerate(rows)
+    ]
+
+
+def team_leaderboard(conn: sqlite3.Connection, period: str = "all") -> list[dict]:
+    """The Constructors' Championship (PRD §5.3): every player's server-verified
+    points bucketed by the constructor faction they pledged to, ranked to show
+    'which fanbase is statistically the smartest'. Points come only from
+    play_events, so a faction's standing can't be inflated from the client.
+
+    Average points per member is reported alongside the total so a small, sharp
+    fanbase isn't buried purely by a larger one's headcount."""
+    cutoff = _period_cutoff(period)
+    where = "e.created_at >= ?" if cutoff else "1=1"
+    params: tuple = (cutoff,) if cutoff else ()
+    rows = conn.execute(
+        "SELECT u.selected_team AS team, COALESCE(SUM(e.score), 0) AS points, "
+        "       COUNT(e.id) AS answered, COUNT(DISTINCT u.id) AS members "
+        "FROM users u JOIN play_events e ON e.user_id = u.id "
+        f"WHERE {where} "
+        "GROUP BY u.selected_team HAVING answered > 0 "
+        "ORDER BY points DESC",
+        params,
+    ).fetchall()
+    return [
+        {
+            "rank": i + 1,
+            "team": r["team"] or DEFAULT_TEAM,
+            "points": int(r["points"] or 0),
+            "members": r["members"],
+            "questions_answered": r["answered"],
+            "avg_per_member": int(round((r["points"] or 0) / r["members"])) if r["members"] else 0,
         }
         for i, r in enumerate(rows)
     ]

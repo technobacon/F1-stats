@@ -29,6 +29,17 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
   scored server-side (`backend/app/scoring.py`).
 - Per-period caps (one run per day per daily mode), with a testing replay.
 
+### Accounts, leaderboards & retention
+- **Accounts** (PBKDF2 + server sessions), guest→account merge, server-side
+  saving — totals are rebuilt from server-scored `play_events`, never the client.
+- **Replay-proof leaderboard**: a `(player, question, day)` unique guard means the
+  deterministic daily set can't be re-run to inflate a total.
+- **Daily / weekly / all-time** leaderboards (resetting windows) and a
+  **Constructors' Championship** bucketing verified points by team faction.
+- **Server-side daily streaks**, recomputed from play history.
+- **Spoiler-free Wordle-style share grid** with the day's puzzle number.
+- `/api/v1/dev/questions` (answer key) is **off in production** (`F1_DEV_TOOLS=0`).
+
 ### Questions & data
 - **1,000-question curated bank** committed at `backend/app/data/questions.json`,
   served with no network (`F1_DATA_SOURCE=dataset`). Companion
@@ -123,8 +134,10 @@ Key env vars: `F1_DATA_SOURCE` (`dataset` | `jolpica` | `synthetic`),
 ## Known gaps / caveats
 - **No hero photo bundled** — copyright. Add a licensed image at
   `frontend/hero.jpg` to use one (the CSS scene shows until then).
-- **Accounts / sync / Global Leaderboard are stubs** — progress is local-only
-  (`localStorage`); the "Sync" button is a placeholder.
+- **Account durability on the free host** — accounts, sessions and verified play
+  history live in the SQLite file at `F1_DB_PATH`. On Render's free plan that's
+  ephemeral (`/tmp`), so they're wiped on every redeploy. Attach a persistent
+  disk (paid) or move to Postgres for durable accounts — see `render.yaml`.
 - **No real LLM** in the loop yet — questions come from the deterministic
   generator behind the validation gate (the gate is the point; the LLM is a
   drop-in).

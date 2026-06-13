@@ -150,18 +150,32 @@ CREATE INDEX IF NOT EXISTS idx_auth_sessions_user ON auth_sessions (user_id);
 -- table is trustworthy (Architecture §2.2 trust boundary). Guest play is logged
 -- against a client-generated anon_id and reassigned to a user on sign-in (claim).
 CREATE TABLE IF NOT EXISTS play_events (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id     TEXT REFERENCES users(id) ON DELETE CASCADE,   -- NULL while anonymous
-    anon_id     TEXT,                                          -- guest device id (pre-account)
-    question_id TEXT NOT NULL,
-    game_mode   TEXT,
-    score       INTEGER NOT NULL,
-    guess       REAL,
-    actual      REAL,
-    created_at  TEXT DEFAULT CURRENT_TIMESTAMP
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id      TEXT REFERENCES users(id) ON DELETE CASCADE,  -- NULL while anonymous
+    anon_id      TEXT,                                         -- guest device id (pre-account)
+    question_id  TEXT NOT NULL,
+    game_mode    TEXT,
+    score        INTEGER NOT NULL,
+    guess        REAL,
+    actual       REAL,
+    -- Leaderboard integrity (trust boundary): the daily set is deterministic, so
+    -- without a guard a player could replay it and stack the same questions onto
+    -- their total over and over. identity_key (the user id, or the guest anon id)
+    -- plus period (UTC play date) let a partial UNIQUE index keep at most one
+    -- scored row per identity per question per day — see record_event's INSERT OR
+    -- IGNORE. Orphan reveals (no identity) are exempt and never counted.
+    identity_key TEXT,
+    period       TEXT,
+    created_at   TEXT DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_play_events_user ON play_events (user_id);
 CREATE INDEX IF NOT EXISTS idx_play_events_anon ON play_events (anon_id);
+CREATE INDEX IF NOT EXISTS idx_play_events_created ON play_events (created_at);
+-- One scored row per (identity, question, day). Partial so the throwaway
+-- anonymous reveals (identity_key NULL/'') are never deduped against each other.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_play_events_dedup
+    ON play_events (identity_key, question_id, period)
+    WHERE identity_key IS NOT NULL AND identity_key != '';
 """
 
 
@@ -174,6 +188,16 @@ def _migrate(conn: sqlite3.Connection) -> None:
     existing = {r[1] for r in conn.execute("PRAGMA table_info(production_trivia_questions)")}
     if existing and "era_year" not in existing:
         conn.execute("ALTER TABLE production_trivia_questions ADD COLUMN era_year INTEGER")
+
+    # play_events gained dedup columns (identity_key, period) after launch. Add
+    # them before SCHEMA's CREATE UNIQUE INDEX runs, or that index would fail on a
+    # pre-existing table. PRAGMA returns no rows when the table is absent (fresh
+    # DB), so this is a safe no-op there.
+    pe_cols = {r[1] for r in conn.execute("PRAGMA table_info(play_events)")}
+    if pe_cols and "identity_key" not in pe_cols:
+        conn.execute("ALTER TABLE play_events ADD COLUMN identity_key TEXT")
+    if pe_cols and "period" not in pe_cols:
+        conn.execute("ALTER TABLE play_events ADD COLUMN period TEXT")
 
 
 def init_db(conn: sqlite3.Connection) -> None:

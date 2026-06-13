@@ -9,8 +9,23 @@ services:
     branch: main
     buildCommand: pip install -r backend/requirements.txt
     startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    # ── Account & leaderboard durability ────────────────────────────────────
+    # The question bank is rebuilt from the committed snapshot on every boot, but
+    # accounts, sessions and verified play history live ONLY in the SQLite file. On
+    # the free plan the filesystem is ephemeral (F1_DB_PATH below points at /tmp),
+    # so those tables are wiped on every redeploy — fine for a demo, NOT for a game
+    # people are meant to return to daily. To make them durable, move to a paid
+    # plan and attach a persistent disk by uncommenting the block below (then point
+    # F1_DB_PATH at the mount), or swap SQLite for managed Postgres (Architecture
+    # §0). Until then, treat accounts as disposable across deploys.
+    # disk:
+    #   name: f1-data
+    #   mountPath: /data
+    #   sizeGB: 1
     envVars:
-      # Render's filesystem is ephemeral; the app self-seeds on boot.
+      # Render's free filesystem is ephemeral; the app self-seeds on boot. Point
+      # this at the persistent disk's mountPath (e.g. /data/f1stats.db) once the
+      # disk above is enabled, so accounts and the leaderboard survive redeploys.
       - key: F1_DB_PATH
         value: /tmp/f1stats.db
       # Serve the curated, validated 1000-question bank committed in the repo
@@ -19,3 +34,9 @@ services:
       #   F1_DATA_SOURCE=jolpica F1_ETL_START_YEAR=1980 python3 -m app.seed --export
       - key: F1_DATA_SOURCE
         value: dataset
+      # Turn OFF the proofreading endpoint in production. /api/v1/dev/questions
+      # returns every question WITH its verified answer (a deliberate dev-only
+      # crossing of the no-answers trust boundary); leaving it on lets anyone fetch
+      # the answer key and defeat the leaderboard. Defaults ON for local dev.
+      - key: F1_DEV_TOOLS
+        value: "0"

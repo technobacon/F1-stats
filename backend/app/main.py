@@ -33,6 +33,8 @@ from .models import (
     LoginRequest,
     MeResponse,
     RegisterRequest,
+    SetTeamRequest,
+    TeamLeaderboardResponse,
     VerifyRequest,
     VerifyResponse,
 )
@@ -163,7 +165,7 @@ def auth_register(req: RegisterRequest):
     conn = get_conn()
     try:
         try:
-            user = auth.create_user(conn, req.username, req.password)
+            user = auth.create_user(conn, req.username, req.password, req.selected_team)
         except auth.AuthError as exc:
             raise HTTPException(400, str(exc))
         claimed = auth.claim_anon_events(conn, req.anon_id, user["id"])
@@ -240,13 +242,40 @@ def sync_claim(req: ClaimRequest, user: dict = Depends(require_user)):
 
 
 @app.get("/api/v1/leaderboard", response_model=LeaderboardResponse)
-def leaderboard(limit: int = 20):
+def leaderboard(limit: int = 20, period: str = "all"):
+    period = period if period in ("all", "daily", "weekly") else "all"
     conn = get_conn()
     try:
-        entries = auth.leaderboard(conn, limit=max(1, min(limit, 100)))
+        entries = auth.leaderboard(conn, limit=max(1, min(limit, 100)), period=period)
     finally:
         conn.close()
-    return {"entries": entries}
+    return {"entries": entries, "period": period}
+
+
+@app.get("/api/v1/leaderboard/teams", response_model=TeamLeaderboardResponse)
+def team_leaderboard(period: str = "all"):
+    """Constructors' Championship — server-verified points by team faction (PRD §5.3)."""
+    period = period if period in ("all", "daily", "weekly") else "all"
+    conn = get_conn()
+    try:
+        entries = auth.team_leaderboard(conn, period=period)
+    finally:
+        conn.close()
+    return {"entries": entries, "period": period}
+
+
+@app.post("/api/v1/profile/team", response_model=MeResponse)
+def set_team(req: SetTeamRequest, user: dict = Depends(require_user)):
+    """Persist the signed-in player's constructor faction (PRD §5.3). Cosmetic for
+    the player, but it also assigns their points to a team in the Constructors'
+    Championship, so it lives server-side rather than only in localStorage."""
+    conn = get_conn()
+    try:
+        team = auth.set_selected_team(conn, user["id"], req.selected_team)
+        stats = auth.user_stats(conn, user["id"])
+    finally:
+        conn.close()
+    return {"username": user["username"], "selected_team": team, "stats": stats}
 
 
 @app.get("/api/v1/dev/questions")
