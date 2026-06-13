@@ -177,7 +177,8 @@ swap SQLite for the managed Postgres the blueprint specifies (Architecture §0).
   significance-gated pool
 - 30+ question types across drivers, teams and circuits; era-biased serving with
   an era-tiered driver significance gate (2020s: 50+ points · 2010s: race winners
-  · 2000s: 3+ wins · pre-2000: world champions only)
+  · 2000s: 3+ wins · pre-2000: world champions only). The same gate filters the
+  Arcade Over/Under roster, so it never pits insignificant also-rans
 - Guest-first localStorage: lifetime points, accuracy, streaks, achievements
 - **User accounts** (username + PBKDF2-hashed password, server sessions) with
   server-side saving, guest→account merge, and a server-verified Global

@@ -287,6 +287,15 @@ def build_arcade_pair(conn: sqlite3.Connection, rng: random.Random | None = None
     if not drivers:
         return _arcade_from_dataset(rng)
 
+    # Apply the same era-tiered significance gate the question generator uses, so
+    # Over/Under only pits drivers who actually matter — no insignificant also-rans.
+    # Guarded: if a (e.g. tiny synthetic) dataset leaves too few, keep the full set.
+    from .seed import significant_driver_ids  # lazy import: avoids a load-time cycle
+    keep = significant_driver_ids(conn)
+    significant = [d for d in drivers if d["driver_id"] in keep]
+    if len(significant) >= 2:
+        drivers = significant
+
     # Find all driver pairs whose careers overlap (shared era).
     overlapping = [
         (a, b)
