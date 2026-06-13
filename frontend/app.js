@@ -4,6 +4,32 @@
 
 const API = "/api/v1";
 const STORAGE_KEY = "f1statguesser_user_state";
+const TOKEN_KEY = "f1statguesser_auth_token";
+const ANON_KEY = "f1statguesser_anon_id";
+
+/* ---- Auth/session helpers ----
+ * The session token is an opaque bearer credential from the server. The anon id
+ * is a stable per-device id so guesses made while logged out are recorded
+ * server-side and can be claimed on sign-in (Architecture §2.2). */
+function authToken() { return localStorage.getItem(TOKEN_KEY); }
+function setAuthToken(t) {
+  if (t) localStorage.setItem(TOKEN_KEY, t);
+  else localStorage.removeItem(TOKEN_KEY);
+}
+function anonId() {
+  let id = localStorage.getItem(ANON_KEY);
+  if (!id) {
+    id = (crypto.randomUUID && crypto.randomUUID()) ||
+         `anon-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem(ANON_KEY, id);
+  }
+  return id;
+}
+function authHeaders(extra = {}) {
+  const t = authToken();
+  return t ? { ...extra, Authorization: `Bearer ${t}` } : { ...extra };
+}
+function isSignedIn() { return !!authToken(); }
 
 /* ---- Mode metadata ---- */
 const MODES = {
@@ -435,8 +461,9 @@ async function submitGuess() {
   submitBtn.disabled = true; submitBtn.textContent = "Scoring…";
   try {
     const res = await fetch(`${API}/quiz/verify`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tracking_token: q.tracking_token, guess }),
+      method: "POST",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ tracking_token: q.tracking_token, guess, anon_id: anonId() }),
     });
     if (!res.ok) throw new Error(await res.text());
     const result = await res.json();
@@ -605,29 +632,173 @@ document.getElementById("arcade-a").addEventListener("click", () => pick("a"));
 document.getElementById("arcade-b").addEventListener("click", () => pick("b"));
 
 /* ===================== PROFILE ===================== */
+/* Server-derived stats for the signed-in user (null when a guest). Points and
+ * accuracy shown in the profile come from here when present — the authoritative,
+ * server-scored totals (Architecture §2.2) — falling back to local stats for a
+ * guest. Streak / achievements / team stay local (cosmetic). */
+let serverStats = null;
+
 function renderProfile() {
+  const signedIn = isSignedIn();
   document.getElementById("p-team").textContent = (TEAMS[state.selected_team] || TEAMS.mclaren).name;
-  document.getElementById("p-points").textContent = state.lifetime_points.toLocaleString();
-  document.getElementById("p-games").textContent = state.games_played;
+
+  // Competitive numbers: server values when signed in, local otherwise.
+  const points = signedIn && serverStats ? serverStats.lifetime_points : state.lifetime_points;
+  document.getElementById("p-points").textContent = points.toLocaleString();
+  document.getElementById("p-games").textContent =
+    signedIn && serverStats ? serverStats.questions_answered : state.games_played;
   document.getElementById("p-accuracy").textContent =
-    state._q_count ? `${Math.round(state.average_closeness * 100)}%` : "—";
+    signedIn && serverStats
+      ? (serverStats.questions_answered ? `${Math.round(serverStats.average_accuracy * 100)}%` : "—")
+      : (state._q_count ? `${Math.round(state.average_closeness * 100)}%` : "—");
+
+  // Cosmetic stats stay local.
   document.getElementById("p-streak").textContent = state.daily_streak;
   document.getElementById("p-achievements").textContent =
     state.unlocked_achievements.length ? state.unlocked_achievements.map((a) => a.replace(/_/g, " ")).join(", ") : "none yet";
-  document.getElementById("guest-badge").textContent = state.is_guest ? "guest" : "member";
+
+  document.getElementById("guest-badge").textContent = signedIn ? "member" : "guest";
+  document.getElementById("account-guest").classList.toggle("hidden", signedIn);
+  document.getElementById("account-member").classList.toggle("hidden", !signedIn);
+  if (signedIn) {
+    document.getElementById("account-username").textContent =
+      (serverStats && serverStats.username) || localStorage.getItem("f1statguesser_username") || "you";
+  }
+  loadLeaderboard();
 }
 
-document.getElementById("sync-btn").addEventListener("click", () => {
-  alert("Account Wall: signing in lets you post to the Global Leaderboard.\n\n" +
-        "Per the trust boundary (Architecture §2.2), the server would re-derive your " +
-        "leaderboard total from server-verified round events — never from this local blob.");
-});
+async function refreshMe() {
+  if (!isSignedIn()) { serverStats = null; return; }
+  try {
+    const res = await fetch(`${API}/auth/me`, { headers: authHeaders() });
+    if (res.status === 401) { setAuthToken(null); serverStats = null; return; }
+    if (!res.ok) return;
+    const me = await res.json();
+    serverStats = { ...me.stats, username: me.username };
+    localStorage.setItem("f1statguesser_username", me.username);
+  } catch { /* offline — keep whatever we have */ }
+}
+
+async function loadLeaderboard() {
+  const list = document.getElementById("leaderboard-list");
+  if (!list) return;
+  try {
+    const res = await fetch(`${API}/leaderboard`);
+    const entries = (await res.json()).entries || [];
+    const myName = localStorage.getItem("f1statguesser_username");
+    list.innerHTML = entries.length
+      ? entries.map((e) => `<li class="${e.username === myName ? "me" : ""}">
+            <span class="lb-rank">${e.rank}</span>
+            <span class="lb-name">${escapeHtml(e.username)}</span>
+            <span class="lb-points">${e.lifetime_points.toLocaleString()}</span>
+          </li>`).join("")
+      : `<li class="muted">No scores yet — be the first to post one.</li>`;
+  } catch {
+    list.innerHTML = `<li class="muted">Leaderboard unavailable right now.</li>`;
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
 document.getElementById("reset-btn").addEventListener("click", () => {
   localStorage.removeItem(STORAGE_KEY);
   ["arcade_streak", "arcade_best", "played_daily", "played_race_week"].forEach((k) => localStorage.removeItem(k));
   state = defaultState(); applyTeam(state.selected_team); saveState(state);
   toast("Local progress reset.");
 });
+
+/* ===================== ACCOUNTS ===================== */
+const Auth = (() => {
+  let mode = "register";  // 'register' | 'login'
+
+  function open() {
+    setMode("register");
+    document.getElementById("auth-error").classList.add("hidden");
+    document.getElementById("auth-form").reset();
+    show("auth-overlay");
+    document.getElementById("auth-username").focus();
+  }
+  function close() { hide("auth-overlay"); }
+
+  function setMode(m) {
+    mode = m;
+    const register = m === "register";
+    document.getElementById("auth-title").textContent = register ? "Create your account" : "Sign in";
+    document.getElementById("auth-submit").textContent = register ? "Create account" : "Sign in";
+    document.getElementById("auth-switch-text").textContent =
+      register ? "Already have an account?" : "Need an account?";
+    document.getElementById("auth-switch-btn").textContent =
+      register ? "Sign in instead" : "Create one instead";
+    document.getElementById("auth-password").setAttribute(
+      "autocomplete", register ? "new-password" : "current-password");
+  }
+
+  function showError(msg) {
+    const el = document.getElementById("auth-error");
+    el.textContent = msg;
+    el.classList.remove("hidden");
+  }
+
+  async function submit(e) {
+    e.preventDefault();
+    const username = document.getElementById("auth-username").value.trim();
+    const password = document.getElementById("auth-password").value;
+    const btn = document.getElementById("auth-submit");
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${API}/auth/${mode}`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, anon_id: anonId() }),
+      });
+      if (!res.ok) {
+        const detail = await res.json().catch(() => ({}));
+        showError(detail.detail || "Something went wrong. Please try again.");
+        return;
+      }
+      const body = await res.json();
+      setAuthToken(body.token);
+      localStorage.setItem("f1statguesser_username", body.username);
+      serverStats = { ...body.stats, username: body.username };
+      state.is_guest = false; saveState(state);
+      close();
+      toast(body.claimed_events
+        ? `Welcome, ${body.username}! ${body.claimed_events} guest result${body.claimed_events === 1 ? "" : "s"} saved to your account.`
+        : `Welcome, ${body.username}!`);
+      renderProfile();
+    } catch {
+      showError("Network error — is the server awake?");
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function logout() {
+    try { await fetch(`${API}/auth/logout`, { method: "POST", headers: authHeaders() }); }
+    catch { /* best effort */ }
+    setAuthToken(null);
+    localStorage.removeItem("f1statguesser_username");
+    serverStats = null;
+    state.is_guest = true; saveState(state);
+    toast("Logged out.");
+    renderProfile();
+  }
+
+  function init() {
+    document.getElementById("open-auth-btn").addEventListener("click", open);
+    document.getElementById("auth-close").addEventListener("click", close);
+    document.getElementById("logout-btn").addEventListener("click", logout);
+    document.getElementById("auth-form").addEventListener("submit", submit);
+    document.getElementById("auth-switch-btn").addEventListener("click", () =>
+      setMode(mode === "register" ? "login" : "register"));
+    document.getElementById("auth-overlay").addEventListener("click", (e) => {
+      if (e.target.id === "auth-overlay") close();
+    });
+  }
+  return { init };
+})();
 
 /* ===================== TEAM PICKER ===================== */
 const TeamPicker = (() => {
@@ -748,5 +919,9 @@ renderQuizIntro();
 CurveSlider.init();
 DataCheck.init();
 TeamPicker.init();
+Auth.init();
+// If a session token is present, pull the authoritative server stats, then
+// repaint the profile so it shows the signed-in totals.
+refreshMe().then(renderProfile);
 tickCountdown(); setInterval(tickCountdown, 1000);
 renderRaceWeek(); setInterval(renderRaceWeek, 60000); // refresh past/next state each minute

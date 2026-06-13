@@ -383,3 +383,30 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
   .btn-primary, .btn-secondary, .btn-ghost { padding:.8rem 1.2rem; }
   #q-input { font-size:16px; }                /* >=16px stops iOS Safari auto-zoom */
 }
+
+/* ===================== ACCOUNTS / AUTH MODAL ===================== */
+.auth-panel { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+              box-shadow:var(--shadow); width:100%; max-width:420px;
+              display:flex; flex-direction:column; overflow:hidden; }
+.auth-form { display:flex; flex-direction:column; gap:.35rem; padding:1.25rem; }
+.auth-form label { font-size:.72rem; text-transform:uppercase; letter-spacing:.05em;
+                   color:var(--muted); margin-top:.5rem; }
+.auth-form input { background:var(--bg2); color:var(--text); border:1px solid var(--line);
+                   border-radius:9px; padding:.7rem .8rem; font-size:16px; /* >=16px: no iOS zoom */ }
+.auth-form input:focus { outline:none; border-color:var(--color-primary); }
+.auth-form .btn-primary { margin-top:1rem; width:100%; justify-content:center; }
+.auth-error { color:#ff6b6b; font-size:.82rem; margin:.6rem 0 0; }
+.auth-switch { padding:0 1.25rem 1.25rem; margin:0; text-align:center; }
+.link-btn { background:none; border:none; color:var(--color-primary); cursor:pointer;
+            font:inherit; font-size:.85rem; text-decoration:underline; padding:0; }
+
+/* ===================== GLOBAL LEADERBOARD ===================== */
+.leaderboard { list-style:none; margin:.5rem 0 1rem; padding:0; display:flex;
+               flex-direction:column; gap:.3rem; }
+.leaderboard li { display:flex; align-items:center; gap:.7rem; padding:.55rem .7rem;
+                  background:var(--bg2); border:1px solid var(--line); border-radius:9px; }
+.leaderboard li.muted { background:none; border:none; justify-content:center; }
+.leaderboard li.me { border-color:var(--color-primary); }
+.lb-rank { font-weight:700; color:var(--muted); min-width:1.5rem; text-align:center; }
+.lb-name { flex:1; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lb-points { font-variant-numeric:tabular-nums; font-weight:700; color:var(--color-primary); }

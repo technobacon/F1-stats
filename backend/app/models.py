@@ -31,6 +31,9 @@ class DailyQuizResponse(BaseModel):
 class VerifyRequest(BaseModel):
     tracking_token: str
     guess: float
+    # Optional client-generated guest device id, so a guess made while logged out
+    # is recorded server-side and can be claimed on sign-in (Architecture §2.2).
+    anon_id: str | None = None
 
 
 class VerifyResponse(BaseModel):
@@ -38,6 +41,59 @@ class VerifyResponse(BaseModel):
     actual: float = Field(..., description="True value, revealed only AFTER the guess")
     guess: float
     max_score: int = 5000
+
+
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+    # Guest device id to merge into the new account (verified events only).
+    anon_id: str | None = None
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+    anon_id: str | None = None
+
+
+class UserStats(BaseModel):
+    lifetime_points: int
+    questions_answered: int
+    average_accuracy: float   # mean proximity in [0, 1]
+    best_answer: int
+
+
+class AuthResponse(BaseModel):
+    """Returned by register/login: the session token plus the server-derived
+    profile. The token is an opaque bearer credential — store it and send it as
+    'Authorization: Bearer <token>'."""
+    token: str
+    username: str
+    selected_team: str
+    stats: UserStats
+    claimed_events: int = 0
+
+
+class MeResponse(BaseModel):
+    username: str
+    selected_team: str
+    stats: UserStats
+
+
+class ClaimRequest(BaseModel):
+    anon_id: str
+
+
+class LeaderboardEntry(BaseModel):
+    rank: int
+    username: str
+    selected_team: str
+    lifetime_points: int
+    questions_answered: int
+
+
+class LeaderboardResponse(BaseModel):
+    entries: list[LeaderboardEntry]
 
 
 class ArcadeEntity(BaseModel):

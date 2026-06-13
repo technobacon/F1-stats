@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=7" />
+  <link rel="stylesheet" href="/static/style.css?v=8" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -242,10 +242,28 @@
           <dt>Daily streak</dt><dd id="p-streak">0</dd>
           <dt>Achievements</dt><dd id="p-achievements">none yet</dd>
         </dl>
-        <p class="muted">All progress is stored locally in your browser. We only ask you to
-           sign in when you post to the Global Leaderboard.</p>
-        <button class="btn-secondary" id="sync-btn">Sync Progress Across Devices →</button>
+        <!-- Account block: swaps between guest and signed-in states (app.js). -->
+        <div id="account-guest">
+          <p class="muted">Your progress is saved on this device. Create a free account to
+             save it to the cloud, play across devices, and join the Global Leaderboard.</p>
+          <button class="btn-secondary" id="open-auth-btn">Create account / Sign in →</button>
+        </div>
+        <div id="account-member" class="hidden">
+          <p class="muted">Signed in as <strong id="account-username">—</strong>.
+             Your points are saved to your account and counted on the leaderboard.</p>
+          <button class="btn-secondary" id="logout-btn">Log out</button>
+        </div>
         <button class="btn-secondary danger" id="reset-btn">Reset local progress</button>
+      </div>
+
+      <!-- Global Leaderboard: ranks players by SERVER-verified points only
+           (Architecture §2.2 trust boundary). -->
+      <div class="card">
+        <h2>Global Leaderboard</h2>
+        <ol class="leaderboard" id="leaderboard-list">
+          <li class="muted">Loading…</li>
+        </ol>
+        <p class="muted">Ranked by points the server scored — local totals can't be posted directly.</p>
       </div>
     </section>
   </main>
@@ -299,7 +317,31 @@
     </div>
   </div>
 
+  <!-- Account modal: create account / sign in -->
+  <div id="auth-overlay" class="team-overlay hidden" role="dialog" aria-modal="true" aria-label="Account">
+    <div class="auth-panel">
+      <div class="team-panel-head">
+        <h2 id="auth-title">Create your account</h2>
+        <button class="game-exit" id="auth-close">✕ Close</button>
+      </div>
+      <form id="auth-form" class="auth-form" autocomplete="on">
+        <label for="auth-username">Username</label>
+        <input type="text" id="auth-username" name="username" autocomplete="username"
+               placeholder="3-32 letters, numbers, . _ -" required />
+        <label for="auth-password">Password</label>
+        <input type="password" id="auth-password" name="password" autocomplete="current-password"
+               placeholder="at least 8 characters" required minlength="8" />
+        <p class="auth-error hidden" id="auth-error"></p>
+        <button type="submit" class="btn-primary" id="auth-submit">Create account</button>
+      </form>
+      <p class="muted auth-switch">
+        <span id="auth-switch-text">Already have an account?</span>
+        <button type="button" class="link-btn" id="auth-switch-btn">Sign in instead</button>
+      </p>
+    </div>
+  </div>
+
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/app.js?v=7"></script>
+  <script src="/static/app.js?v=8"></script>
 </body>
 </html>

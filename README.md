@@ -129,13 +129,41 @@ docs/               # original design documents
 |---|---|---|
 | `GET`  | `/api/v1/health` | liveness + active question count |
 | `GET`  | `/api/v1/quiz/{mode}` | `daily` (6) / `race_week` (6) / `one_shot` (3); tracking tokens, **no answers** |
-| `POST` | `/api/v1/quiz/verify` | `{tracking_token, guess}` → server-side score |
+| `POST` | `/api/v1/quiz/verify` | `{tracking_token, guess, anon_id?}` → server-side score; also **records** the scored result (to the signed-in user, or to `anon_id` for a guest) |
 | `GET`  | `/api/v1/arcade/pair` | over/under matchup (non-competitive v1) |
+| `POST` | `/api/v1/auth/register` | `{username, password, anon_id?}` → session token + server stats; claims guest events |
+| `POST` | `/api/v1/auth/login` | `{username, password, anon_id?}` → session token + server stats; claims guest events |
+| `POST` | `/api/v1/auth/logout` | revokes the bearer token (`Authorization: Bearer …`) |
+| `GET`  | `/api/v1/auth/me` | current user + server-derived stats (requires bearer token) |
+| `POST` | `/api/v1/sync/claim` | `{anon_id}` → merge a guest device's verified events into the account |
+| `GET`  | `/api/v1/leaderboard` | top players by **server-verified** points |
 | `GET`  | `/api/v1/dev/questions` | full bank **with answers** for proofreading ("Check the data" button); disable with `F1_DEV_TOOLS=0` |
 
 The daily/race-week/one-shot selection is **deterministic per period** (seeded by
 mode + UTC date), so everyone gets the same set within a period and it rotates —
 the prototype's stand-in for the 00:00 UTC cron provisioning (Architecture §1.1).
+
+### Accounts, saving & the trust boundary
+
+Accounts are built directly into the FastAPI backend — no third-party auth
+service, no OAuth, no extra dependencies. Passwords are hashed with PBKDF2 (from
+the standard library) and never stored in plaintext; a session is an opaque
+bearer token the browser keeps in `localStorage`.
+
+Saving respects the trust boundary (Architecture §2.2): the server **never**
+trusts client-supplied totals. Every guess is scored server-side and that score
+is written to `play_events`; the leaderboard and your profile totals are
+recomputed from those rows, so a total can't be forged by editing `localStorage`.
+Play while logged out is recorded against a per-device `anon_id` and claimed into
+your account when you sign in, so nothing is lost.
+
+**Persistence caveat (hosting):** accounts live in the SQLite file at
+`F1_DB_PATH`. The question bank is wiped and reloaded on every boot, but the
+account tables (`users`, `auth_sessions`, `play_events`) are deliberately
+preserved across that reseed. They only survive as long as the **file** does, so
+on an ephemeral host (e.g. a container with no persistent disk) accounts vanish
+on redeploy. For durable accounts, point `F1_DB_PATH` at a persistent volume, or
+swap SQLite for the managed Postgres the blueprint specifies (Architecture §0).
 
 ## Implemented systems
 
@@ -149,6 +177,9 @@ the prototype's stand-in for the 00:00 UTC cron provisioning (Architecture §1.1
   an era-tiered driver significance gate (2020s: 50+ points · 2010s: race winners
   · 2000s: 3+ wins · pre-2000: world champions only)
 - Guest-first localStorage: lifetime points, accuracy, streaks, achievements
+- **User accounts** (username + PBKDF2-hashed password, server sessions) with
+  server-side saving, guest→account merge, and a server-verified Global
+  Leaderboard — see *Accounts, saving & the trust boundary* below
 
 ### Question variety
 

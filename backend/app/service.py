@@ -23,9 +23,9 @@ from pathlib import Path
 from . import scoring
 from .validation import compute_metric
 
-# tracking_token -> (question_id, verified_answer). Server-side only; the answer
-# is never serialized to the client. Redis in production.
-_TOKEN_STORE: dict[str, tuple[str, float]] = {}
+# tracking_token -> (question_id, verified_answer, game_mode). Server-side only;
+# the answer is never serialized to the client. Redis in production.
+_TOKEN_STORE: dict[str, tuple[str, float, str]] = {}
 
 ARCADE_METRICS = {
     "wins": "Race Wins",
@@ -134,7 +134,7 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     questions = []
     for row in rows:
         token = secrets.token_urlsafe(16)
-        _TOKEN_STORE[token] = (row["id"], row["verified_answer"])
+        _TOKEN_STORE[token] = (row["id"], row["verified_answer"], game_mode)
         # Prefer explicit display bounds (year/percentage); else a non-revealing band.
         if row["display_min"] is not None and row["display_max"] is not None:
             smin, smax = row["display_min"], row["display_max"]
@@ -157,9 +157,19 @@ def verify_guess(token: str, guess: float) -> dict | None:
     entry = _TOKEN_STORE.get(token)
     if entry is None:
         return None
-    _question_id, actual = entry
+    _question_id, actual, _game_mode = entry
     score = scoring.score_guess(guess, actual)
     return {"score": score, "actual": actual, "guess": guess, "max_score": scoring.MAX_SCORE}
+
+
+def token_meta(token: str) -> tuple[str, str] | None:
+    """(question_id, game_mode) for a tracking token, or None if unknown. Lets the
+    API persist a server-scored play_event without re-exposing the answer."""
+    entry = _TOKEN_STORE.get(token)
+    if entry is None:
+        return None
+    question_id, _actual, game_mode = entry
+    return question_id, game_mode
 
 
 def _career_total(conn: sqlite3.Connection, driver_id: str, metric: str) -> float:

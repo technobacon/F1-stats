@@ -19,12 +19,23 @@ import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import db, seed, service
-from .models import ArcadePairResponse, DailyQuizResponse, VerifyRequest, VerifyResponse
+from . import auth, db, seed, service
+from .models import (
+    ArcadePairResponse,
+    AuthResponse,
+    ClaimRequest,
+    DailyQuizResponse,
+    LeaderboardResponse,
+    LoginRequest,
+    MeResponse,
+    RegisterRequest,
+    VerifyRequest,
+    VerifyResponse,
+)
 
 FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
 
@@ -63,6 +74,26 @@ def get_conn():
     return conn
 
 
+def _bearer(authorization: str | None) -> str | None:
+    """Pull the token out of an 'Authorization: Bearer <token>' header."""
+    if not authorization:
+        return None
+    scheme, _, token = authorization.partition(" ")
+    return token.strip() if scheme.lower() == "bearer" and token else None
+
+
+def require_user(authorization: str | None = Header(default=None)) -> dict:
+    """FastAPI dependency: resolve the bearer token to a user or 401."""
+    conn = get_conn()
+    try:
+        user = auth.session_user(conn, _bearer(authorization))
+    finally:
+        conn.close()
+    if user is None:
+        raise HTTPException(401, "Not signed in (missing or expired session).")
+    return user
+
+
 @app.get("/api/v1/health")
 def health():
     conn = get_conn()
@@ -90,17 +121,123 @@ def quiz(mode: str):
 
 
 @app.post("/api/v1/quiz/verify", response_model=VerifyResponse)
-def quiz_verify(req: VerifyRequest):
+def quiz_verify(req: VerifyRequest, authorization: str | None = Header(default=None)):
     result = service.verify_guess(req.tracking_token, req.guess)
     if result is None:
         raise HTTPException(404, "Unknown or expired tracking token.")
+    # Persist the server-computed score (never a client number) so totals can be
+    # rebuilt trustworthily (Architecture §2.2). Logged in -> attach to the user;
+    # logged out -> attach to the guest device id for later claim. Recording is
+    # best-effort: a storage hiccup must not break scoring the guess.
+    meta = service.token_meta(req.tracking_token)
+    if meta is not None:
+        question_id, game_mode = meta
+        conn = get_conn()
+        try:
+            user = auth.session_user(conn, _bearer(authorization))
+            auth.record_event(
+                conn,
+                question_id=question_id,
+                score=result["score"],
+                user_id=user["id"] if user else None,
+                anon_id=None if user else req.anon_id,
+                game_mode=game_mode,
+                guess=req.guess,
+                actual=result["actual"],
+            )
+        except Exception:  # noqa: BLE001 — scoring already succeeded; don't fail the response
+            pass
+        finally:
+            conn.close()
     return result
 
 
 # Back-compat aliases for the original daily-only endpoints.
 @app.post("/api/v1/quiz/daily/verify", response_model=VerifyResponse)
-def daily_verify(req: VerifyRequest):
-    return quiz_verify(req)
+def daily_verify(req: VerifyRequest, authorization: str | None = Header(default=None)):
+    return quiz_verify(req, authorization)
+
+
+@app.post("/api/v1/auth/register", response_model=AuthResponse)
+def auth_register(req: RegisterRequest):
+    conn = get_conn()
+    try:
+        try:
+            user = auth.create_user(conn, req.username, req.password)
+        except auth.AuthError as exc:
+            raise HTTPException(400, str(exc))
+        claimed = auth.claim_anon_events(conn, req.anon_id, user["id"])
+        token = auth.create_session(conn, user["id"])
+        stats = auth.user_stats(conn, user["id"])
+    finally:
+        conn.close()
+    return {
+        "token": token, "username": user["username"],
+        "selected_team": user["selected_team"], "stats": stats,
+        "claimed_events": claimed,
+    }
+
+
+@app.post("/api/v1/auth/login", response_model=AuthResponse)
+def auth_login(req: LoginRequest):
+    conn = get_conn()
+    try:
+        user = auth.authenticate(conn, req.username, req.password)
+        if user is None:
+            raise HTTPException(401, "Incorrect username or password.")
+        claimed = auth.claim_anon_events(conn, req.anon_id, user["id"])
+        token = auth.create_session(conn, user["id"])
+        stats = auth.user_stats(conn, user["id"])
+    finally:
+        conn.close()
+    return {
+        "token": token, "username": user["username"],
+        "selected_team": user["selected_team"], "stats": stats,
+        "claimed_events": claimed,
+    }
+
+
+@app.post("/api/v1/auth/logout")
+def auth_logout(authorization: str | None = Header(default=None)):
+    conn = get_conn()
+    try:
+        auth.delete_session(conn, _bearer(authorization))
+    finally:
+        conn.close()
+    return {"status": "ok"}
+
+
+@app.get("/api/v1/auth/me", response_model=MeResponse)
+def auth_me(user: dict = Depends(require_user)):
+    conn = get_conn()
+    try:
+        stats = auth.user_stats(conn, user["id"])
+    finally:
+        conn.close()
+    return {"username": user["username"], "selected_team": user["selected_team"], "stats": stats}
+
+
+@app.post("/api/v1/sync/claim", response_model=MeResponse)
+def sync_claim(req: ClaimRequest, user: dict = Depends(require_user)):
+    """Merge a guest device's verified events into the signed-in account, then
+    return the refreshed server-derived profile (Architecture §2.2)."""
+    conn = get_conn()
+    try:
+        auth.claim_anon_events(conn, req.anon_id, user["id"])
+        stats = auth.user_stats(conn, user["id"])
+    finally:
+        conn.close()
+    return {"username": user["username"], "selected_team": user["selected_team"], "stats": stats}
+
+
+@app.get("/api/v1/leaderboard", response_model=LeaderboardResponse)
+def leaderboard(limit: int = 20):
+    conn = get_conn()
+    try:
+        entries = auth.leaderboard(conn, limit=max(1, min(limit, 100)))
+    finally:
+        conn.close()
+    return {"entries": entries}
 
 
 @app.get("/api/v1/dev/questions")

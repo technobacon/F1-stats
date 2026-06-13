@@ -110,6 +110,47 @@ CREATE TABLE IF NOT EXISTS etl_metadata (
     key   TEXT PRIMARY KEY,
     value TEXT
 );
+
+-- ── User accounts & server-authoritative play history ───────────────────────
+-- IMPORTANT: these tables are deliberately OUTSIDE reset_db()'s drop list. The
+-- question bank is wiped and reloaded on every boot (load_dataset -> reset_db),
+-- but accounts and their verified play history must survive that. They persist
+-- for as long as the SQLite file does, so on an ephemeral host point F1_DB_PATH
+-- at a persistent volume or the accounts vanish on redeploy (see README).
+CREATE TABLE IF NOT EXISTS users (
+    id            TEXT PRIMARY KEY,                  -- UUID
+    username      TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    password_hash TEXT NOT NULL,                     -- pbkdf2_sha256$rounds$salt$hash
+    selected_team TEXT DEFAULT 'mclaren',            -- cosmetic carry-over (Architecture §2.2)
+    created_at    TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Opaque bearer tokens, validated server-side. Logout / expiry = delete the row.
+CREATE TABLE IF NOT EXISTS auth_sessions (
+    token      TEXT PRIMARY KEY,
+    user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    expires_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_auth_sessions_user ON auth_sessions (user_id);
+
+-- Every server-scored guess. The score is computed server-side (scoring.py) and
+-- NEVER accepted from the client, so any leaderboard/total derived from this
+-- table is trustworthy (Architecture §2.2 trust boundary). Guest play is logged
+-- against a client-generated anon_id and reassigned to a user on sign-in (claim).
+CREATE TABLE IF NOT EXISTS play_events (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     TEXT REFERENCES users(id) ON DELETE CASCADE,   -- NULL while anonymous
+    anon_id     TEXT,                                          -- guest device id (pre-account)
+    question_id TEXT NOT NULL,
+    game_mode   TEXT,
+    score       INTEGER NOT NULL,
+    guess       REAL,
+    actual      REAL,
+    created_at  TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_play_events_user ON play_events (user_id);
+CREATE INDEX IF NOT EXISTS idx_play_events_anon ON play_events (anon_id);
 """
 
 
@@ -131,7 +172,13 @@ def init_db(conn: sqlite3.Connection) -> None:
 
 
 def reset_db(conn: sqlite3.Connection) -> None:
-    """Drop and recreate all tables. Used by the seed script and tests."""
+    """Drop and recreate the DATA tables (staging + question bank). Used by the
+    seed script and tests, and on every boot via load_dataset.
+
+    The user/account tables (users, auth_sessions, play_events) are intentionally
+    NOT dropped here: re-seeding the question bank must never wipe accounts or
+    their verified play history. init_db (re)creates them if absent and otherwise
+    leaves their data untouched."""
     for table in (
         "staging_race_results",
         "staging_qualifying_results",
