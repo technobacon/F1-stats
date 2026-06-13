@@ -70,6 +70,12 @@ ARCADE_METRICS = {
 # Per-mode session size (PRD §4.1). One-Shots is the short, hardcore set.
 MODE_QUESTION_COUNT = {"daily": 6, "race_week": 6, "one_shot": 3}
 
+# Free Practice: an unlimited, non-competitive training mode. Questions are drawn
+# one at a time at random and the score is NEVER recorded — verify() looks for
+# this game_mode on the token and skips persistence so nothing reaches a user's
+# totals or the leaderboard.
+FREE_PRACTICE_MODE = "free_practice"
+
 # Era-biased serving: the quiz mix focuses on the modern era, dips into history
 # only occasionally, and leans a little extra on the two golden eras. Weights are
 # relative (only their ratios matter) and are applied per question by mid-span
@@ -181,6 +187,50 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
             "slider_max": smax,
         })
     return {"game_mode": game_mode, "questions": questions}
+
+
+def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None = None) -> dict | None:
+    """Provision a single random Free Practice question, or None if the bank is empty.
+
+    Unlike the daily/race/hardcore sets, Free Practice is unlimited and personal:
+    questions are pulled one at a time, truly at random, from the WHOLE active bank
+    (any game_mode). The mix keeps the same era bias as the rest of the game so
+    practice resembles real play. The verified answer is stashed in the token store
+    (tagged free_practice) and never returned to the client; because the token
+    carries that mode, verify() records nothing for it.
+    """
+    rng = rng or random.Random()
+    _prune_tokens()  # keep the in-memory token store bounded
+
+    pool = conn.execute(
+        "SELECT id, question_string, verified_answer, answer_kind, category, "
+        "       display_min, display_max, difficulty_weight, era_year "
+        "FROM production_trivia_questions WHERE is_active = 1 ORDER BY id"
+    ).fetchall()
+    if not pool:
+        return None
+
+    weights = [_era_weight(row["era_year"]) for row in pool]
+    row = _weighted_sample(rng, pool, weights, 1)[0]
+
+    token = secrets.token_urlsafe(16)
+    _TOKEN_STORE[token] = (row["id"], row["verified_answer"], FREE_PRACTICE_MODE, time.monotonic())
+    if row["display_min"] is not None and row["display_max"] is not None:
+        smin, smax = row["display_min"], row["display_max"]
+    else:
+        smin, smax = _slider_bounds(row["verified_answer"])
+    return {
+        "game_mode": FREE_PRACTICE_MODE,
+        "question": {
+            "tracking_token": token,
+            "question_text": row["question_string"],
+            "difficulty_weight": row["difficulty_weight"],
+            "answer_kind": row["answer_kind"],
+            "category": row["category"] or "",
+            "slider_min": smin,
+            "slider_max": smax,
+        },
+    }
 
 
 def verify_guess(token: str, guess: float) -> dict | None:

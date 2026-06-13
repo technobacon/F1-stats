@@ -338,6 +338,13 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .cap-note { background:rgba(63,185,80,.12); border:1px solid #2e6b3a; color:#9fe0ab;
             border-radius:10px; padding:.7rem .9rem; margin-bottom:1rem; font-size:.9rem; }
 .accuracy-row { color:var(--muted); margin:.5rem 0 1rem; font-size:.9rem; text-align:center; }
+
+/* Free Practice anti-scouting penalty notice (shown on the reveal card). */
+.penalty-note { background:rgba(210,153,34,.12); border:1px solid #7a5a1e; color:#e6c373;
+                border-radius:10px; padding:.7rem .9rem; margin:.4rem 0 1rem; font-size:.85rem;
+                line-height:1.45; text-align:left; }
+.penalty-note strong { color:#ffd479; }
+.penalty-note em { font-style:italic; color:#f0d6a0; }
 #replay-quiz { margin-top:.6rem; }
 .toast { position:fixed; left:50%; bottom:calc(1.25rem + env(safe-area-inset-bottom));
          transform:translateX(-50%); background:#000; color:#fff; border:1px solid var(--color-primary);

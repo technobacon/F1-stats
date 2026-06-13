@@ -105,6 +105,45 @@ def test_dev_questions_can_be_disabled(client, monkeypatch):
     assert client.get("/api/v1/dev/questions").status_code == 404
 
 
+def test_practice_question_hides_answer(client):
+    r = client.get("/api/v1/practice/question")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["game_mode"] == "free_practice"
+    q = body["question"]
+    assert "tracking_token" in q
+    # Same trust boundary as the daily set: no answer reaches the client.
+    assert "answer" not in q and "verified_answer" not in q and "actual" not in q
+
+
+def test_practice_questions_are_random(client):
+    # Unlimited + non-deterministic: repeated draws should not be locked to one
+    # question the way the per-period daily set is. Allow for the small chance of
+    # repeats by sampling several times and asking for more than one distinct text.
+    seen = {client.get("/api/v1/practice/question").json()["question"]["question_text"]
+            for _ in range(12)}
+    assert len(seen) > 1
+
+
+def test_practice_scores_server_side_but_is_not_recorded(client):
+    # A Free Practice guess is scored like any other...
+    q = client.get("/api/v1/practice/question").json()["question"]
+    r = client.post("/api/v1/quiz/verify",
+                    json={"tracking_token": q["tracking_token"], "guess": 1,
+                          "anon_id": "practice-device"})
+    assert r.status_code == 200
+    assert 0 <= r.json()["score"] <= 5000
+
+    # ...but it must NEVER reach a user's totals. Claiming this device's events into
+    # a fresh account should pull in nothing, proving the score was not persisted.
+    acct = client.post("/api/v1/auth/register",
+                       json={"username": "practicer", "password": "supersecret",
+                             "anon_id": "practice-device"}).json()
+    assert acct["claimed_events"] == 0
+    assert acct["stats"]["lifetime_points"] == 0
+    assert acct["stats"]["questions_answered"] == 0
+
+
 def test_arcade_pair_shape(client):
     r = client.get("/api/v1/arcade/pair")
     assert r.status_code == 200

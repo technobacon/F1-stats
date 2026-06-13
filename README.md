@@ -129,7 +129,8 @@ docs/               # original design documents
 |---|---|---|
 | `GET`  | `/api/v1/health` | liveness + active question count |
 | `GET`  | `/api/v1/quiz/{mode}` | `daily` (6) / `race_week` (6) / `one_shot` (3); tracking tokens, **no answers** |
-| `POST` | `/api/v1/quiz/verify` | `{tracking_token, guess, anon_id?}` → server-side score; also **records** the scored result (to the signed-in user, or to `anon_id` for a guest) |
+| `GET`  | `/api/v1/practice/question` | one **random** Free Practice question; unlimited, non-competitive, **no answers** |
+| `POST` | `/api/v1/quiz/verify` | `{tracking_token, guess, anon_id?}` → server-side score; also **records** the scored result (to the signed-in user, or to `anon_id` for a guest) — **except Free Practice**, which is never recorded |
 | `GET`  | `/api/v1/arcade/pair` | over/under matchup (non-competitive v1) |
 | `POST` | `/api/v1/auth/register` | `{username, password, anon_id?}` → session token + server stats; claims guest events |
 | `POST` | `/api/v1/auth/login` | `{username, password, anon_id?}` → session token + server stats; claims guest events |
@@ -168,7 +169,8 @@ swap SQLite for the managed Postgres the blueprint specifies (Architecture §0).
 ## Implemented systems
 
 - Polished landing page + three exact-numerical modes (Daily General / Daily Race
-  / Hardcore) + Arcade Over/Under
+  / Hardcore) + unlimited **Free Practice** (non-competitive, never recorded, with a
+  5-second anti-scouting penalty on low scores) + Arcade Over/Under
 - Server-authoritative exp-decay scoring; answers never leave the server
 - Deterministic anti-hallucination validation; a **committed 1,000-question bank**
   (`backend/app/data/questions.json`) drawn from a ~3,100-question validated,

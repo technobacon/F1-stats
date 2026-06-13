@@ -48,7 +48,21 @@ const MODES = {
     desc: "Three brutal questions. No slider, no safety net — type your answer and commit.",
     capKey: null, capLabel: "", slider: false,
   },
+  free_practice: {
+    title: "Free Practice",
+    desc: "Unlimited random questions to sharpen your instincts. Your score is shown here " +
+      "but never saved or ranked — it's pure practice. To keep it fair, scoring under " +
+      "1,000 points on a question adds a 5-second wait before the next one (an anti-scouting " +
+      "measure, explained when it happens).",
+    capKey: null, capLabel: "", slider: true, free: true,
+  },
 };
+
+/* Free Practice anti-scouting rule: a question scored under the threshold blocks
+ * the Next button for a few seconds. This deters "quiz-scouting" — burning through
+ * questions with throwaway guesses just to reveal and memorise the answers. */
+const PRACTICE_PENALTY_THRESHOLD = 1000; // out of 5,000 per question
+const PRACTICE_PENALTY_SECONDS = 5;
 
 /* ---- Guest-first local state (Architecture §2.1 schema) ---- */
 const defaultState = () => ({
@@ -247,8 +261,9 @@ function renderRaceWeek() {
  * the hero buttons and the landing-page mode cards. */
 let currentMode = "daily";
 function navigate(view, mode) {
-  // Leaving the quiz (or re-entering its intro) always exits immersive mode.
-  if (view !== "quiz") document.body.classList.remove("in-game");
+  // Leaving the quiz (or re-entering its intro) always exits immersive mode and
+  // cancels any in-flight Free Practice penalty countdown.
+  if (view !== "quiz") { document.body.classList.remove("in-game"); clearInterval(practiceTimer); }
   document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
   document.getElementById("view-" + view).classList.add("active");
   // Sync the top-nav highlight (tabs only; cards/buttons aren't tabs).
@@ -270,6 +285,7 @@ document.querySelectorAll("[data-view]").forEach((el) => {
 
 /* ===================== QUIZ (Daily / Race-Week / One-Shots) ===================== */
 let quiz = null, qPos = 0, sessionScore = 0, sessionCloseness = 0;
+let practiceCount = 0, practiceTimer = null; // Free Practice: questions answered + penalty countdown
 
 function playedKey(mode) { return `played_${mode}`; }
 function isCapped(mode) {
@@ -306,6 +322,7 @@ document.getElementById("start-quiz").addEventListener("click", () => startQuiz(
 document.getElementById("replay-quiz").addEventListener("click", () => startQuiz());
 
 async function startQuiz() {
+  if (MODES[currentMode].free) return startFreePractice();
   const status = document.getElementById("quiz-status");
   status.textContent = "Loading questions…";
   try {
@@ -323,6 +340,90 @@ async function startQuiz() {
     status.textContent = "Could not load quiz. Tap to retry.";
     toast("Network error — is the server awake?");
   }
+}
+
+/* ===================== FREE PRACTICE (unlimited, non-competitive) ===================== *
+ * Pulls one random question at a time from /practice/question. The score is shown
+ * for feedback but is NEVER recorded (the server skips persistence for this mode),
+ * so there is no summary, cap or leaderboard write — just a rolling session tally. */
+async function fetchPracticeQuestion() {
+  const res = await fetch(`${API}/practice/question`);
+  if (!res.ok) throw new Error(await res.text());
+  return (await res.json()).question;
+}
+
+async function startFreePractice() {
+  const status = document.getElementById("quiz-status");
+  status.textContent = "Loading question…";
+  clearInterval(practiceTimer);
+  practiceCount = 0; sessionScore = 0; sessionCloseness = 0;
+  try {
+    const q = await fetchPracticeQuestion();
+    quiz = { questions: [q], free: true };
+    qPos = 0;
+    document.getElementById("q-total").textContent = "∞";
+    document.getElementById("q-mode-badge").textContent = "practice";
+    hide("quiz-intro"); show("quiz-play"); hide("quiz-summary"); hide("quiz-reveal");
+    document.body.classList.add("in-game");
+    window.scrollTo({ top: 0 });
+    renderQuestion();
+  } catch (e) {
+    status.textContent = "Could not load a question. Tap to retry.";
+    toast("Network error — is the server awake?");
+  }
+}
+
+async function nextPracticeQuestion() {
+  const btn = document.getElementById("next-question");
+  btn.disabled = true; btn.textContent = "Loading…";
+  try {
+    const q = await fetchPracticeQuestion();
+    quiz.questions = [q]; qPos = 0;
+    practiceCount += 1;
+  } catch {
+    toast("Couldn't load the next question — tap to retry.");
+    btn.disabled = false; btn.textContent = "Next question";
+    return;
+  }
+  hide("quiz-reveal"); show("quiz-play");
+  renderQuestion();
+}
+
+/* After a Free Practice reveal, gate the Next button: scores at or above the
+ * threshold proceed freely; lower scores trigger a short, explained countdown. */
+function startPracticePenalty(score) {
+  const btn = document.getElementById("next-question");
+  const note = document.getElementById("practice-penalty");
+  clearInterval(practiceTimer);
+
+  if (score >= PRACTICE_PENALTY_THRESHOLD) {
+    note.classList.add("hidden");
+    btn.disabled = false; btn.textContent = "Next question";
+    return;
+  }
+
+  let remaining = PRACTICE_PENALTY_SECONDS;
+  btn.disabled = true;
+  note.classList.remove("hidden");
+  const paint = () => {
+    note.innerHTML =
+      `🐢 <strong>${remaining}s penalty.</strong> Scoring under ` +
+      `${PRACTICE_PENALTY_THRESHOLD.toLocaleString()} points triggers a short wait. ` +
+      `This discourages <em>quiz-scouting</em> — guessing wildly just to reveal and ` +
+      `memorise answers. Take a breath and read the result.`;
+    btn.textContent = `Next question in ${remaining}s`;
+  };
+  paint();
+  practiceTimer = setInterval(() => {
+    remaining -= 1;
+    if (remaining <= 0) {
+      clearInterval(practiceTimer);
+      note.classList.add("hidden");
+      btn.disabled = false; btn.textContent = "Next question";
+    } else {
+      paint();
+    }
+  }, 1000);
 }
 
 /* ===================== CURVED RACE-LINE SLIDER ===================== *
@@ -424,7 +525,7 @@ const KIND_HINT = {
 function renderQuestion() {
   const q = quiz.questions[qPos];
   const kind = q.answer_kind || "count";
-  document.getElementById("q-index").textContent = qPos + 1;
+  document.getElementById("q-index").textContent = quiz.free ? practiceCount + 1 : qPos + 1;
   document.getElementById("q-text").textContent = q.question_text;
   document.getElementById("q-cat").textContent = (q.category || "").replace(/_/g, " ");
   document.getElementById("q-hint").textContent = KIND_HINT[kind] || "";
@@ -442,9 +543,10 @@ function renderQuestion() {
   });
   input.oninput = () => { if (useSlider) CurveSlider.setValue(parseFloat(input.value) || q.slider_min); };
 
-  // Advance the immersive progress bar to reflect questions completed.
+  // Advance the immersive progress bar to reflect questions completed. Free
+  // Practice is endless, so the bar simply stays full rather than tracking an end.
   const fill = document.getElementById("game-progress-fill");
-  if (fill) fill.style.width = `${(qPos / quiz.questions.length) * 100}%`;
+  if (fill) fill.style.width = quiz.free ? "100%" : `${(qPos / quiz.questions.length) * 100}%`;
   const gp = document.getElementById("game-points");
   if (gp) gp.textContent = `${sessionScore.toLocaleString()} pts`;
 
@@ -503,6 +605,16 @@ function revealScore(q, result) {
     guessNode.style.left = clampPct(result.guess) + "%";
     setTimeout(() => slideToAnswer(actualNode, actualText, clampPct(result.actual), result), 500);
   });
+
+  // Free Practice gates the Next button (anti-scouting penalty); every other mode
+  // keeps the plain, always-available "Next".
+  if (quiz && quiz.free) {
+    startPracticePenalty(result.score);
+  } else {
+    const nextBtn = document.getElementById("next-question");
+    nextBtn.disabled = false; nextBtn.textContent = "Next";
+    document.getElementById("practice-penalty").classList.add("hidden");
+  }
 }
 
 function slideToAnswer(node, textEl, targetPct, result) {
@@ -535,6 +647,7 @@ function tickOdometer(target) {
 }
 
 document.getElementById("next-question").addEventListener("click", () => {
+  if (quiz && quiz.free) { nextPracticeQuestion(); return; }
   qPos++;
   if (qPos < quiz.questions.length) { hide("quiz-reveal"); show("quiz-play"); renderQuestion(); }
   else finishSession();
