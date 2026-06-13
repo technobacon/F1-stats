@@ -180,11 +180,20 @@ def auth_register(req: RegisterRequest):
 
 @app.post("/api/v1/auth/login", response_model=AuthResponse)
 def auth_login(req: LoginRequest):
+    # Brute-force guard: too many recent failures for this username -> 429.
+    try:
+        auth.check_login_allowed(req.username)
+    except auth.RateLimitError as exc:
+        raise HTTPException(
+            429, str(exc), headers={"Retry-After": str(exc.retry_after)}
+        )
     conn = get_conn()
     try:
         user = auth.authenticate(conn, req.username, req.password)
         if user is None:
+            auth.note_failed_login(req.username)
             raise HTTPException(401, "Incorrect username or password.")
+        auth.clear_failed_logins(req.username)
         claimed = auth.claim_anon_events(conn, req.anon_id, user["id"])
         token = auth.create_session(conn, user["id"])
         stats = auth.user_stats(conn, user["id"])

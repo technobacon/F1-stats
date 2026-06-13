@@ -32,6 +32,17 @@ def connect(db_path: Path | str | None = None) -> sqlite3.Connection:
     conn = sqlite3.connect(str(db_path if db_path is not None else DB_PATH))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    # Robustness: one connection-per-request means score writes (verify) can
+    # overlap reads. WAL lets readers and a writer run concurrently, and a busy
+    # timeout makes a brief lock wait-and-retry instead of throwing "database is
+    # locked". Both are no-ops on an in-memory DB and safe to set every connect.
+    try:
+        conn.execute("PRAGMA journal_mode = WAL")
+        conn.execute("PRAGMA busy_timeout = 5000")  # ms
+    except sqlite3.OperationalError:
+        # Some filesystems (e.g. certain network mounts) reject WAL; the default
+        # rollback journal still works, just with coarser locking.
+        pass
     return conn
 
 

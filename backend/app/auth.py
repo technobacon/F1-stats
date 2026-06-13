@@ -25,6 +25,7 @@ import hmac
 import re
 import secrets
 import sqlite3
+import time
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -35,10 +36,23 @@ _SESSION_TTL = timedelta(days=30)
 # Conservative username rules: keep it simple, predictable and URL/display-safe.
 _USERNAME_RE = re.compile(r"^[A-Za-z0-9_.-]{3,32}$")
 _MIN_PASSWORD_LEN = 8
+# Cap the password length BEFORE hashing: PBKDF2 hashes the whole input, so an
+# unbounded password is a cheap denial-of-service (hash a multi-MB string). 1024
+# is far above any real password and well within OWASP guidance.
+_MAX_PASSWORD_LEN = 1024
 
 
 class AuthError(ValueError):
     """Raised for bad input or auth failures the API turns into 4xx responses."""
+
+
+class RateLimitError(Exception):
+    """Raised when an account is temporarily locked after too many failed logins.
+    The API turns this into a 429."""
+
+    def __init__(self, retry_after: int):
+        self.retry_after = retry_after
+        super().__init__("Too many attempts. Please wait and try again.")
 
 
 def _now() -> datetime:
@@ -65,11 +79,57 @@ def verify_password(password: str, stored: str) -> bool:
             return False
         expected = bytes.fromhex(hash_hex)
         candidate = hashlib.pbkdf2_hmac(
-            "sha256", password.encode(), bytes.fromhex(salt_hex), int(rounds_s)
+            "sha256", (password or "").encode()[:_MAX_PASSWORD_LEN],
+            bytes.fromhex(salt_hex), int(rounds_s),
         )
     except (ValueError, AttributeError):
         return False
     return hmac.compare_digest(candidate, expected)
+
+
+# A throwaway hash of a random value. authenticate() verifies against this when a
+# username doesn't exist so a missing user costs the same time as a wrong
+# password — closing the timing side-channel that would otherwise reveal which
+# usernames are registered.
+_DUMMY_HASH = hash_password(secrets.token_hex(16))
+
+
+# ── Login rate limiting (brute-force protection) ─────────────────────────────
+# In-memory sliding window keyed by username. Adequate for the single-process
+# prototype; production would back this with Redis (Architecture §0). Successful
+# logins clear the counter, so a legitimate user is never locked out by their own
+# eventual success.
+_MAX_FAILED_LOGINS = 8
+_LOCKOUT_WINDOW_SECONDS = 900  # 15 minutes
+_failed_logins: dict[str, list[float]] = {}
+
+
+def _norm_key(username: str) -> str:
+    return (username or "").strip().lower()
+
+
+def check_login_allowed(username: str) -> None:
+    """Raise RateLimitError if this username has too many recent failures."""
+    key = _norm_key(username)
+    now = time.monotonic()
+    hits = [t for t in _failed_logins.get(key, []) if now - t < _LOCKOUT_WINDOW_SECONDS]
+    _failed_logins[key] = hits
+    if len(hits) >= _MAX_FAILED_LOGINS:
+        retry_after = int(_LOCKOUT_WINDOW_SECONDS - (now - hits[0])) + 1
+        raise RateLimitError(retry_after)
+
+
+def note_failed_login(username: str) -> None:
+    _failed_logins.setdefault(_norm_key(username), []).append(time.monotonic())
+
+
+def clear_failed_logins(username: str) -> None:
+    _failed_logins.pop(_norm_key(username), None)
+
+
+def reset_rate_limits() -> None:
+    """Clear all rate-limit state (used by tests)."""
+    _failed_logins.clear()
 
 
 # ── Users & sessions ─────────────────────────────────────────────────────────
@@ -93,6 +153,8 @@ def create_user(conn: sqlite3.Connection, username: str, password: str) -> dict:
         )
     if len(password or "") < _MIN_PASSWORD_LEN:
         raise AuthError(f"Password must be at least {_MIN_PASSWORD_LEN} characters.")
+    if len(password) > _MAX_PASSWORD_LEN:
+        raise AuthError(f"Password must be at most {_MAX_PASSWORD_LEN} characters.")
 
     user_id = str(uuid.uuid4())
     try:
@@ -108,11 +170,17 @@ def create_user(conn: sqlite3.Connection, username: str, password: str) -> dict:
 
 
 def authenticate(conn: sqlite3.Connection, username: str, password: str) -> dict | None:
-    """Return the user's public view if the credentials are valid, else None."""
+    """Return the user's public view if the credentials are valid, else None.
+
+    Runs a password verification even when the username is unknown (against a
+    dummy hash) so the response time doesn't reveal whether a username exists."""
     row = conn.execute(
         "SELECT * FROM users WHERE username = ?", ((username or "").strip(),)
     ).fetchone()
-    if row is None or not verify_password(password or "", row["password_hash"]):
+    if row is None:
+        verify_password(password or "", _DUMMY_HASH)  # equalize timing; result ignored
+        return None
+    if not verify_password(password or "", row["password_hash"]):
         return None
     return _user_public(row)
 

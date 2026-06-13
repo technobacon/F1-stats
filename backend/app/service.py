@@ -17,15 +17,45 @@ import json
 import random
 import secrets
 import sqlite3
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
 from . import scoring
 from .validation import compute_metric
 
-# tracking_token -> (question_id, verified_answer, game_mode). Server-side only;
-# the answer is never serialized to the client. Redis in production.
-_TOKEN_STORE: dict[str, tuple[str, float, str]] = {}
+# tracking_token -> (question_id, verified_answer, game_mode, issued_at). Server-
+# side only; the answer is never serialized to the client. Redis in production.
+_TOKEN_STORE: dict[str, tuple[str, float, str, float]] = {}
+# Robustness: this in-memory store would otherwise grow without bound (a new
+# token per question served, forever). Tokens expire after a generous play window
+# and the store is capped, evicting the oldest. Redis TTLs replace this in prod.
+_TOKEN_TTL_SECONDS = 6 * 3600
+_TOKEN_STORE_MAX = 100_000
+
+
+def _prune_tokens() -> None:
+    """Drop expired tokens, then enforce the size cap by evicting the oldest."""
+    now = time.monotonic()
+    expired = [t for t, v in _TOKEN_STORE.items() if now - v[3] > _TOKEN_TTL_SECONDS]
+    for t in expired:
+        del _TOKEN_STORE[t]
+    overflow = len(_TOKEN_STORE) - _TOKEN_STORE_MAX
+    if overflow > 0:
+        for t in sorted(_TOKEN_STORE, key=lambda k: _TOKEN_STORE[k][3])[:overflow]:
+            del _TOKEN_STORE[t]
+
+
+def _live_token(token: str) -> tuple[str, float, str, float] | None:
+    """Return a token's entry if present and not expired, else None (expired
+    tokens are dropped, so the caller sees them as unknown)."""
+    entry = _TOKEN_STORE.get(token)
+    if entry is None:
+        return None
+    if time.monotonic() - entry[3] > _TOKEN_TTL_SECONDS:
+        del _TOKEN_STORE[token]
+        return None
+    return entry
 
 ARCADE_METRICS = {
     "wins": "Race Wins",
@@ -116,6 +146,7 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     """
     count = MODE_QUESTION_COUNT.get(game_mode, 5)
     period = period or _utc_today()
+    _prune_tokens()  # keep the in-memory token store bounded
 
     pool = conn.execute(
         "SELECT id, question_string, verified_answer, answer_kind, category, "
@@ -134,7 +165,7 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     questions = []
     for row in rows:
         token = secrets.token_urlsafe(16)
-        _TOKEN_STORE[token] = (row["id"], row["verified_answer"], game_mode)
+        _TOKEN_STORE[token] = (row["id"], row["verified_answer"], game_mode, time.monotonic())
         # Prefer explicit display bounds (year/percentage); else a non-revealing band.
         if row["display_min"] is not None and row["display_max"] is not None:
             smin, smax = row["display_min"], row["display_max"]
@@ -154,10 +185,10 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
 
 def verify_guess(token: str, guess: float) -> dict | None:
     """Score a guess server-side. Returns None if the token is unknown/expired."""
-    entry = _TOKEN_STORE.get(token)
+    entry = _live_token(token)
     if entry is None:
         return None
-    _question_id, actual, _game_mode = entry
+    _question_id, actual, _game_mode, _issued = entry
     score = scoring.score_guess(guess, actual)
     return {"score": score, "actual": actual, "guess": guess, "max_score": scoring.MAX_SCORE}
 
@@ -165,10 +196,10 @@ def verify_guess(token: str, guess: float) -> dict | None:
 def token_meta(token: str) -> tuple[str, str] | None:
     """(question_id, game_mode) for a tracking token, or None if unknown. Lets the
     API persist a server-scored play_event without re-exposing the answer."""
-    entry = _TOKEN_STORE.get(token)
+    entry = _live_token(token)
     if entry is None:
         return None
-    question_id, _actual, game_mode = entry
+    question_id, _actual, game_mode, _issued = entry
     return question_id, game_mode
 
 

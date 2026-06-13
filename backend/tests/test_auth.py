@@ -17,6 +17,15 @@ def seeded_db(tmp_path, monkeypatch):
     yield
 
 
+@pytest.fixture(autouse=True)
+def _reset_rate_limits():
+    # The login limiter is process-global in-memory; clear it around each test so
+    # accumulated failures from one test never leak into another.
+    auth.reset_rate_limits()
+    yield
+    auth.reset_rate_limits()
+
+
 @pytest.fixture
 def client():
     return TestClient(app)
@@ -70,6 +79,51 @@ def test_login_wrong_password_401(client):
     client.post("/api/v1/auth/register", json={"username": "checo", "password": "perez1234"})
     r = client.post("/api/v1/auth/login", json={"username": "checo", "password": "nope"})
     assert r.status_code == 401
+
+
+def test_login_unknown_username_401(client):
+    # Unknown user must look exactly like a wrong password (no enumeration).
+    r = client.post("/api/v1/auth/login", json={"username": "ghost", "password": "whatever1"})
+    assert r.status_code == 401
+
+
+def test_overlong_password_rejected(client):
+    r = client.post("/api/v1/auth/register",
+                    json={"username": "longpass", "password": "x" * 2000})
+    assert r.status_code == 400
+
+
+def test_login_lockout_after_repeated_failures(client):
+    client.post("/api/v1/auth/register", json={"username": "norris", "password": "correctpass1"})
+    # 8 wrong attempts are rejected as 401...
+    for _ in range(8):
+        assert client.post("/api/v1/auth/login",
+                           json={"username": "norris", "password": "wrong"}).status_code == 401
+    # ...the next attempt is rate-limited (429), even with the correct password.
+    r = client.post("/api/v1/auth/login", json={"username": "norris", "password": "correctpass1"})
+    assert r.status_code == 429
+    assert "Retry-After" in r.headers
+
+
+def test_successful_login_resets_the_failure_counter(client):
+    client.post("/api/v1/auth/register", json={"username": "piastri", "password": "correctpass1"})
+    for _ in range(5):
+        client.post("/api/v1/auth/login", json={"username": "piastri", "password": "wrong"})
+    # A correct login clears the counter, so the user isn't locked out afterwards.
+    assert client.post("/api/v1/auth/login",
+                       json={"username": "piastri", "password": "correctpass1"}).status_code == 200
+    for _ in range(8):
+        assert client.post("/api/v1/auth/login",
+                           json={"username": "piastri", "password": "wrong"}).status_code == 401
+
+
+def test_connection_uses_wal_and_busy_timeout():
+    conn = db.connect()
+    try:
+        assert conn.execute("PRAGMA journal_mode").fetchone()[0].lower() == "wal"
+        assert conn.execute("PRAGMA busy_timeout").fetchone()[0] >= 5000
+    finally:
+        conn.close()
 
 
 def test_me_requires_auth(client):
