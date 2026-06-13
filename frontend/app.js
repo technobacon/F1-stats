@@ -31,6 +31,44 @@ function authHeaders(extra = {}) {
 }
 function isSignedIn() { return !!authToken(); }
 
+/* ---- First-party analytics ----
+ * Pseudonymous, self-contained: events are keyed by the existing guest anon_id
+ * plus a per-tab session id, queued client-side and flushed in small batches
+ * (via sendBeacon on page hide so nothing is lost on exit). No third-party tag,
+ * no extra cookies. Scoring/leaderboard never depend on this — it's telemetry. */
+const ANALYTICS_SESSION_KEY = "f1sg_session_id";
+function sessionId() {
+  let id = sessionStorage.getItem(ANALYTICS_SESSION_KEY);
+  if (!id) {
+    id = (crypto.randomUUID && crypto.randomUUID()) || `s-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    sessionStorage.setItem(ANALYTICS_SESSION_KEY, id);
+  }
+  return id;
+}
+let _evQueue = [];
+function track(event, props) {
+  _evQueue.push({ event, props: props || {}, t: Date.now() });
+  if (_evQueue.length >= 20) flushAnalytics(false);
+}
+function flushAnalytics(useBeacon) {
+  if (!_evQueue.length) return;
+  const body = JSON.stringify({ anon_id: anonId(), session_id: sessionId(), events: _evQueue.splice(0) });
+  const url = `${API}/analytics/collect`;
+  try {
+    if (useBeacon && navigator.sendBeacon) {
+      navigator.sendBeacon(url, new Blob([body], { type: "application/json" }));
+    } else {
+      fetch(url, { method: "POST", headers: authHeaders({ "Content-Type": "application/json" }), body, keepalive: true })
+        .catch(() => {});
+    }
+  } catch { /* telemetry must never throw into the app */ }
+}
+setInterval(() => flushAnalytics(false), 15000);
+addEventListener("pagehide", () => flushAnalytics(true));
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") flushAnalytics(true);
+});
+
 /* ---- Mode metadata ---- */
 const MODES = {
   daily: {
@@ -261,6 +299,7 @@ function renderRaceWeek() {
  * the hero buttons and the landing-page mode cards. */
 let currentMode = "daily";
 function navigate(view, mode) {
+  track("view", { view, mode: mode || null });
   // Leaving the quiz (or re-entering its intro) always exits immersive mode and
   // cancels any in-flight Free Practice penalty countdown.
   if (view !== "quiz") { document.body.classList.remove("in-game"); clearInterval(practiceTimer); }
@@ -331,6 +370,7 @@ async function startQuiz() {
     const res = await fetch(`${API}/quiz/${currentMode}`);
     if (!res.ok) throw new Error(await res.text());
     quiz = await res.json();
+    track("quiz_start", { mode: currentMode });
     qPos = 0; sessionScore = 0; sessionCloseness = 0; sessionResults = [];
     document.getElementById("q-total").textContent = quiz.questions.length;
     document.getElementById("q-mode-badge").textContent = currentMode.replace("_", "-");
@@ -361,6 +401,7 @@ async function startFreePractice() {
   practiceCount = 0; sessionScore = 0; sessionCloseness = 0;
   try {
     const q = await fetchPracticeQuestion();
+    track("practice_start");
     quiz = { questions: [q], free: true };
     qPos = 0;
     document.getElementById("q-total").textContent = "∞";
@@ -661,6 +702,7 @@ function finishSession() {
   const maxPossible = quiz.questions.length * 5000;
   document.getElementById("summary-score").textContent = sessionScore.toLocaleString();
   const acc = Math.round((sessionCloseness / quiz.questions.length) * 100);
+  track("quiz_complete", { mode: currentMode, score: sessionScore, accuracy: acc });
   document.getElementById("accuracy-row").textContent = `Accuracy: ${acc}% · ${sessionScore.toLocaleString()} / ${maxPossible.toLocaleString()}`;
   // Spoiler-free result grid (same squares the Share button copies).
   const gridEl = document.getElementById("summary-grid");
@@ -726,6 +768,7 @@ function buildShareText() {
 }
 
 document.getElementById("share-result").addEventListener("click", async () => {
+  track("share", { mode: currentMode });
   const text = buildShareText();
   if (navigator.share) {
     try { await navigator.share({ title: "F1 Stat Guesser", text }); return; } catch { /* cancelled */ }
@@ -760,6 +803,7 @@ async function loadArcade() {
 function pick(which) {
   if (locked || !arcade) return;
   locked = true;
+  track("arcade_play");
   const a = arcade.entity_a, b = arcade.entity_b;
   document.querySelector("#arcade-a .val").textContent = a.value;
   document.querySelector("#arcade-b .val").textContent = b.value;
@@ -905,6 +949,7 @@ const Auth = (() => {
   let mode = "register";  // 'register' | 'login'
 
   function open() {
+    track("signup_open");
     setMode("register");
     document.getElementById("auth-error").classList.add("hidden");
     document.getElementById("auth-form").reset();
@@ -951,6 +996,7 @@ const Auth = (() => {
         return;
       }
       const body = await res.json();
+      track(mode === "register" ? "signup_success" : "login_success");
       setAuthToken(body.token);
       localStorage.setItem("f1statguesser_username", body.username);
       serverStats = { ...body.stats, username: body.username };
@@ -1025,6 +1071,7 @@ const TeamPicker = (() => {
     }).join("");
     grid.querySelectorAll(".team-card").forEach((card) => {
       card.addEventListener("click", () => {
+        track("team_select", { team: card.dataset.team });
         applyTeam(card.dataset.team);
         saveState(state);
         syncTeam(card.dataset.team);  // persist server-side when signed in
@@ -1133,6 +1180,7 @@ TeamPicker.init();
 Auth.init();
 document.querySelectorAll(".lb-period-tab").forEach((t) =>
   t.addEventListener("click", () => setLeaderboardPeriod(t.dataset.period)));
+track("app_open", { signed_in: isSignedIn() });  // open the analytics session
 // If a session token is present, pull the authoritative server stats, then
 // repaint the profile so it shows the signed-in totals.
 refreshMe().then(renderProfile);

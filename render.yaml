@@ -34,6 +34,12 @@ services:
       # the answer key and defeat the leaderboard. Defaults ON for local dev.
       - key: F1_DEV_TOOLS
         value: "0"
+      # First-party analytics. Event collection is always on (pseudonymous, no
+      # third party); the /analytics dashboard + summary API are gated by this
+      # token. Leave it unset to keep the dashboard disabled (collection still
+      # runs); set any strong secret to view metrics at /analytics.
+      - key: F1_ANALYTICS_TOKEN
+        sync: false
 
       # ── Free durable accounts (Litestream → S3-compatible object storage) ────
       # The question bank is rebuilt from the committed snapshot on every boot, but

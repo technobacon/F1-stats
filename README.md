@@ -140,6 +140,9 @@ docs/               # original design documents
 | `POST` | `/api/v1/profile/team` | `{selected_team}` → persist the player's constructor faction (server-side; counts in the Constructors' Championship) |
 | `GET`  | `/api/v1/leaderboard` | top players by **server-verified** points; `?period=all\|weekly\|daily` for resetting windows |
 | `GET`  | `/api/v1/leaderboard/teams` | **Constructors' Championship** — verified points bucketed by team faction; `?period=` as above |
+| `POST` | `/api/v1/analytics/collect` | ingest a batch of pseudonymous client events (sendBeacon-friendly); public, bounded, best-effort |
+| `GET`  | `/api/v1/analytics/summary` | DAU/WAU/MAU, the play funnel, D1/D7 retention, mode mix, account growth; **token-gated** (`F1_ANALYTICS_TOKEN`); `?days=` window |
+| `GET`  | `/analytics` | the analytics dashboard page (reads the gated summary; harmless without the token) |
 | `GET`  | `/api/v1/dev/questions` | full bank **with answers** for proofreading ("Check the data" button); **disabled in production** (`F1_DEV_TOOLS=0`, set in `render.yaml`) |
 
 The daily/race-week/one-shot selection is **deterministic per period** (seeded by
@@ -202,6 +205,26 @@ To turn it on (free, ~5 minutes):
    under Litestream replication`; thereafter every write is mirrored within ~1 s
    and a final snapshot is flushed on graceful shutdown.
 
+### Analytics
+
+Engagement is measured **first-party** — no Google Analytics, no third-party tag,
+no cross-site cookies — in keeping with the rest of the project. The frontend
+batches a small set of allow-listed, pseudonymous events (keyed by the existing
+guest `anon_id` + a per-tab session id) and flushes them via `navigator.sendBeacon`;
+the server validates and bounds them into `analytics_events`
+(`backend/app/analytics.py`). This is **aggregate telemetry only** — it never
+feeds scoring or the leaderboard, which stay on `play_events` behind the trust
+boundary.
+
+- **Collection is always on** and privacy-respecting (no PII).
+- **The dashboard is gated** by `F1_ANALYTICS_TOKEN`: leave it unset and
+  `/analytics` + the summary API are disabled (collection still runs); set a
+  strong secret and open `/analytics`, paste the token, and you get **DAU / WAU /
+  MAU**, the **landing → start → complete → share → sign-up funnel** with
+  conversion rates, **D1 / D7 retention**, **mode popularity**, and **account
+  growth** over a 7/14/30-day window.
+- Rows older than 180 days are pruned on boot to bound growth.
+
 ## Implemented systems
 
 - Polished landing page + three exact-numerical modes (Daily General / Daily Race
@@ -227,6 +250,10 @@ To turn it on (free, ~5 minutes):
   inflate a total — one scored row per player per question per day
 - **Spoiler-free shareable result** — a Wordle-style coloured-square grid with
   the day's puzzle number, copied/shared without leaking any answers
+- **First-party analytics** — a self-contained, pseudonymous event pipeline
+  (`backend/app/analytics.py`) with a token-gated dashboard at `/analytics`
+  reporting DAU/WAU/MAU, the play funnel, D1/D7 retention and mode mix; see
+  *Analytics* below
 
 ### Question variety
 

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>F1 Stat Guesser — Analytics</title>
+  <style>
+    :root { --bg:#0a0d12; --surface:#151b24; --line:#252d38; --text:#eef2f7;
+            --muted:#8b95a5; --accent:#FF8000; --green:#2ecc71; --amber:#f1c40f; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:'Titillium Web','Segoe UI',system-ui,sans-serif;
+           background:var(--bg); color:var(--text); padding:1.5rem; }
+    h1 { font-style:italic; text-transform:uppercase; letter-spacing:.02em; margin:0 0 .2rem; }
+    h2 { font-size:1rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);
+         margin:1.8rem 0 .7rem; }
+    .wrap { max-width:1000px; margin:0 auto; }
+    .bar-top { display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; margin:1rem 0; }
+    input, select, button { font-family:inherit; font-size:.9rem; padding:.5rem .7rem;
+           background:var(--surface); color:var(--text); border:1px solid var(--line);
+           border-radius:8px; }
+    button { cursor:pointer; font-weight:700; }
+    button.primary { background:var(--accent); color:#000; border-color:var(--accent); }
+    .muted { color:var(--muted); }
+    .grid { display:grid; gap:.7rem; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
+    .kpi { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem; }
+    .kpi .v { font-size:2rem; font-weight:900; font-style:italic; color:var(--accent); }
+    .kpi .l { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; }
+    .kpi .sub { color:var(--muted); font-size:.78rem; margin-top:.2rem; }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem 1.2rem; }
+    table { width:100%; border-collapse:collapse; }
+    td, th { text-align:left; padding:.35rem .2rem; border-bottom:1px solid var(--line); font-size:.9rem; }
+    th { color:var(--muted); font-weight:600; }
+    td.n, th.n { text-align:right; font-variant-numeric:tabular-nums; }
+    .meter { background:#0e131a; border-radius:6px; height:10px; overflow:hidden; }
+    .meter > span { display:block; height:100%; background:var(--accent); }
+    .cols { display:grid; gap:1rem; grid-template-columns:1fr 1fr; }
+    @media (max-width:760px){ .cols { grid-template-columns:1fr; } }
+    .chart { display:flex; align-items:flex-end; gap:3px; height:120px; }
+    .chart .col { flex:1; display:flex; flex-direction:column; justify-content:flex-end; gap:2px; }
+    .chart .col .b { background:var(--accent); border-radius:2px 2px 0 0; min-height:1px; }
+    .chart .col .b.players { background:#3a7bd5; }
+    .chart .lbl { text-align:center; color:var(--muted); font-size:.6rem; margin-top:.3rem;
+                  white-space:nowrap; overflow:hidden; }
+    .legend { display:flex; gap:1rem; font-size:.78rem; color:var(--muted); margin-top:.4rem; }
+    .legend i { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:.3rem; }
+    .err { background:#2a1416; border:1px solid #5a2730; color:#ffb4b4; padding:.8rem 1rem;
+           border-radius:10px; margin:1rem 0; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>F1 Stat Guesser — Analytics</h1>
+    <p class="muted">First-party, pseudonymous engagement metrics. Combines client
+       events with server-verified play. Data is token-gated.</p>
+
+    <div class="bar-top">
+      <input type="password" id="token" placeholder="Analytics token (F1_ANALYTICS_TOKEN)" style="flex:1;min-width:220px" />
+      <select id="days">
+        <option value="7">Last 7 days</option>
+        <option value="14" selected>Last 14 days</option>
+        <option value="30">Last 30 days</option>
+      </select>
+      <button class="primary" id="load">Load</button>
+    </div>
+
+    <div id="error" class="err hidden"></div>
+    <div id="report" class="hidden">
+      <div class="grid" id="kpis"></div>
+
+      <h2>Active users — visitors vs players</h2>
+      <div class="card">
+        <div class="chart" id="active-chart"></div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Visitors</span>
+          <span><i style="background:#3a7bd5"></i>Players</span></div>
+      </div>
+
+      <div class="cols">
+        <div>
+          <h2>Play funnel</h2>
+          <div class="card"><table id="funnel"></table></div>
+        </div>
+        <div>
+          <h2>Mode popularity</h2>
+          <div class="card"><table id="modes"></table></div>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div>
+          <h2>Retention</h2>
+          <div class="card grid" id="retention"></div>
+        </div>
+        <div>
+          <h2>New accounts / day</h2>
+          <div class="card"><div class="chart" id="signups-chart"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "/api/v1";
+    const $ = (id) => document.getElementById(id);
+    const TOKEN_KEY = "f1sg_analytics_token";
+    const fmt = (n) => (n == null ? "—" : Number(n).toLocaleString());
+    const pct = (r) => (r == null ? "—" : Math.round(r * 100) + "%");
+
+    $("token").value = localStorage.getItem(TOKEN_KEY) || "";
+    $("load").addEventListener("click", load);
+    $("token").addEventListener("keydown", (e) => { if (e.key === "Enter") load(); });
+    if ($("token").value) load();
+
+    async function load() {
+      const token = $("token").value.trim();
+      const days = $("days").value;
+      localStorage.setItem(TOKEN_KEY, token);
+      showError("");
+      try {
+        const res = await fetch(`${API}/analytics/summary?days=${days}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.status === 404) return showError("Analytics is disabled on this server (set F1_ANALYTICS_TOKEN).");
+        if (res.status === 401) return showError("Invalid token.");
+        if (!res.ok) return showError("Could not load report (" + res.status + ").");
+        render(await res.json());
+      } catch (e) {
+        showError("Network error loading the report.");
+      }
+    }
+
+    function showError(msg) {
+      const el = $("error");
+      el.textContent = msg;
+      el.classList.toggle("hidden", !msg);
+      if (msg) $("report").classList.add("hidden");
+    }
+
+    function kpi(value, label, sub) {
+      return `<div class="kpi"><div class="v">${value}</div><div class="l">${label}</div>${
+        sub ? `<div class="sub">${sub}</div>` : ""}</div>`;
+    }
+
+    function render(d) {
+      $("report").classList.remove("hidden");
+      $("kpis").innerHTML =
+        kpi(fmt(d.dau), "DAU", "active today") +
+        kpi(fmt(d.wau), "WAU", "last 7 days") +
+        kpi(fmt(d.mau), "MAU", "last 30 days") +
+        kpi(fmt(d.totals.accounts), "Accounts", fmt(d.totals.visitors_all_time) + " visitors all-time") +
+        kpi(fmt(d.totals.scored_answers), "Scored answers", "server-verified");
+
+      // Active-by-day grouped bars (visitors + players), scaled to the max.
+      const max = Math.max(1, ...d.active_by_day.flatMap((x) => [x.visitors, x.players]));
+      $("active-chart").innerHTML = d.active_by_day.map((x) => `
+        <div class="col" title="${x.date}: ${x.visitors} visitors, ${x.players} players">
+          <div class="b" style="height:${(x.visitors / max) * 100}%"></div>
+          <div class="b players" style="height:${(x.players / max) * 100}%"></div>
+          <div class="lbl">${x.date.slice(5)}</div>
+        </div>`).join("");
+
+      // Funnel with conversion rates.
+      const f = d.funnel;
+      $("funnel").innerHTML = `
+        <tr><th>Step</th><th class="n">Count</th><th class="n">Conversion</th></tr>
+        ${row("App opens", f.app_open, "")}
+        ${row("Quiz starts", f.quiz_start, pct(f.start_rate) + " of opens")}
+        ${row("Quiz completes", f.quiz_complete, pct(f.completion_rate) + " of starts")}
+        ${row("Shares", f.share, pct(f.share_rate) + " of completes")}
+        ${row("Sign-ups", f.signup_success, pct(f.signup_rate) + " of opens")}`;
+
+      // Modes, sorted desc with a proportional meter.
+      const modes = Object.entries(d.modes).sort((a, b) => b[1] - a[1]);
+      const mmax = Math.max(1, ...modes.map((m) => m[1]));
+      $("modes").innerHTML = `<tr><th>Mode</th><th class="n">Plays</th><th></th></tr>` +
+        modes.map(([k, v]) => `<tr><td>${k.replace(/_/g, " ")}</td><td class="n">${fmt(v)}</td>
+          <td style="width:40%"><div class="meter"><span style="width:${(v / mmax) * 100}%"></span></div></td></tr>`).join("");
+
+      const r = d.retention;
+      $("retention").innerHTML =
+        kpi(pct(r.d1), "Day 1", `cohort ${fmt(r.d1_cohort)}`) +
+        kpi(pct(r.d7), "Day 7", `cohort ${fmt(r.d7_cohort)}`);
+
+      const smax = Math.max(1, ...d.signups_by_day.map((x) => x.count));
+      $("signups-chart").innerHTML = d.signups_by_day.map((x) => `
+        <div class="col" title="${x.date}: ${x.count}">
+          <div class="b" style="height:${(x.count / smax) * 100}%"></div>
+          <div class="lbl">${x.date.slice(5)}</div>
+        </div>`).join("");
+    }
+
+    function row(label, count, conv) {
+      return `<tr><td>${label}</td><td class="n">${fmt(count)}</td><td class="n muted">${conv}</td></tr>`;
+    }
+  </script>
+</body>
+</html>

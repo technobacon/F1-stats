@@ -176,6 +176,26 @@ CREATE INDEX IF NOT EXISTS idx_play_events_created ON play_events (created_at);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_play_events_dedup
     ON play_events (identity_key, question_id, period)
     WHERE identity_key IS NOT NULL AND identity_key != '';
+
+-- First-party product analytics. Pseudonymous, self-contained (no third-party
+-- tag, no cross-site cookies): events are keyed by the same client-generated
+-- anon_id used for guest play, plus a per-tab session id. This is UNTRUSTED
+-- client data used only for AGGREGATE metrics — it never feeds scoring or the
+-- leaderboard (those stay on play_events behind the trust boundary). Kept OUTSIDE
+-- reset_db()'s drop list so history survives the boot-time question reseed; the
+-- boot path prunes rows older than the retention window to bound growth.
+CREATE TABLE IF NOT EXISTS analytics_events (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    event      TEXT NOT NULL,        -- allow-listed name (analytics.EVENT_NAMES)
+    anon_id    TEXT,                 -- stable per-device visitor id (pseudonymous)
+    user_id    TEXT,                 -- set when signed in; no FK (best-effort insert)
+    session_id TEXT,                 -- per-tab visit id
+    props      TEXT,                 -- small sanitized JSON blob (e.g. {"mode":"daily"})
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_analytics_created ON analytics_events (created_at);
+CREATE INDEX IF NOT EXISTS idx_analytics_event   ON analytics_events (event);
+CREATE INDEX IF NOT EXISTS idx_analytics_anon    ON analytics_events (anon_id);
 """
 
 

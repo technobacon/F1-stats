@@ -25,8 +25,10 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import auth, db, seed, service
+from . import analytics, auth, db, seed, service
 from .models import (
+    AnalyticsBatch,
+    AnalyticsCollectResponse,
     ArcadePairResponse,
     AuthResponse,
     ClaimRequest,
@@ -65,6 +67,15 @@ async def lifespan(_app: FastAPI):
         # boot is safe and only hits the network when the data is stale; the
         # dataset source just reloads the committed bank (cheap, offline).
         seed.refresh(source=source)
+    # Bound the analytics log so it can't grow without limit on a long-lived DB.
+    conn = db.connect()
+    try:
+        db.init_db(conn)
+        analytics.prune(conn)
+    except Exception:  # noqa: BLE001 — analytics housekeeping must never block boot
+        pass
+    finally:
+        conn.close()
     yield
 
 
@@ -326,6 +337,62 @@ def arcade_pair():
         return service.build_arcade_pair(conn)
     finally:
         conn.close()
+
+
+# ── Analytics ────────────────────────────────────────────────────────────────
+@app.post("/api/v1/analytics/collect", response_model=AnalyticsCollectResponse)
+def analytics_collect(batch: AnalyticsBatch, authorization: str | None = Header(default=None)):
+    """Ingest a batch of pseudonymous client events (sendBeacon-friendly). Public
+    and best-effort: malformed/unknown events are dropped, the batch is bounded,
+    and any failure is swallowed so analytics can never break gameplay. Events are
+    attributed to the signed-in user when a bearer token is present, else to the
+    guest anon_id only — this is AGGREGATE telemetry, never scoring input."""
+    conn = get_conn()
+    try:
+        user = auth.session_user(conn, _bearer(authorization))
+        stored = analytics.record_events(
+            conn,
+            events=[e.model_dump() for e in batch.events],
+            anon_id=batch.anon_id,
+            session_id=batch.session_id,
+            user_id=user["id"] if user else None,
+        )
+    except Exception:  # noqa: BLE001 — telemetry must never surface an error to the client
+        stored = 0
+    finally:
+        conn.close()
+    return {"stored": stored}
+
+
+def require_analytics(authorization: str | None = Header(default=None)) -> None:
+    """Gate the analytics reporting on F1_ANALYTICS_TOKEN. Unset -> the dashboard
+    is disabled (404, like dev tools); set -> require a matching bearer token."""
+    if not analytics.token_configured():
+        raise HTTPException(404, "Analytics dashboard is disabled (set F1_ANALYTICS_TOKEN).")
+    if not analytics.token_matches(_bearer(authorization)):
+        raise HTTPException(401, "Invalid analytics token.")
+
+
+@app.get("/api/v1/analytics/summary")
+def analytics_summary(days: int = 14, _: None = Depends(require_analytics)):
+    """Engagement report: DAU/WAU/MAU, the play funnel, D1/D7 retention, mode mix
+    and account growth. Token-gated; combines client events with server-verified
+    play_events. Returns a plain dict (rich nested shape) by design."""
+    conn = get_conn()
+    try:
+        return analytics.summary(conn, days=days)
+    finally:
+        conn.close()
+
+
+@app.get("/analytics")
+def analytics_dashboard():
+    """The dashboard viewer page. Harmless without a token — the data behind it is
+    fetched from the token-gated summary endpoint."""
+    page = FRONTEND_DIR / "analytics.html"
+    if not page.exists():
+        raise HTTPException(404, "Dashboard page not found.")
+    return FileResponse(page)
 
 
 @app.get("/")

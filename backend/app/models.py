@@ -7,6 +7,8 @@ leaves the server (PRD §2, Architecture §1.1).
 
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -124,6 +126,26 @@ class TeamLeaderboardEntry(BaseModel):
 class TeamLeaderboardResponse(BaseModel):
     entries: list[TeamLeaderboardEntry]
     period: str = "all"
+
+
+class AnalyticsEvent(BaseModel):
+    event: str
+    # Accept anything for props so one malformed field can't 422 a whole batch;
+    # analytics._clean_props sanitizes it (non-dicts / oversized blobs are dropped).
+    props: Any = None
+    t: int | None = None   # client timestamp (ms); informational, server time is authoritative
+
+
+class AnalyticsBatch(BaseModel):
+    """A best-effort batch of pseudonymous client events (see analytics.py). Keyed
+    by the guest anon_id and a per-tab session id — no PII, no third party."""
+    anon_id: str | None = None
+    session_id: str | None = None
+    events: list[AnalyticsEvent] = []
+
+
+class AnalyticsCollectResponse(BaseModel):
+    stored: int
 
 
 class ArcadeEntity(BaseModel):

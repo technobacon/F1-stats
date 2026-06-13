@@ -38,6 +38,9 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
   **Constructors' Championship** bucketing verified points by team faction.
 - **Server-side daily streaks**, recomputed from play history.
 - **Spoiler-free Wordle-style share grid** with the day's puzzle number.
+- **First-party analytics** (`analytics.py`): pseudonymous, self-contained event
+  pipeline + token-gated `/analytics` dashboard (DAU/WAU/MAU, play funnel, D1/D7
+  retention, mode mix). Aggregate-only; never feeds scoring/leaderboard.
 - `/api/v1/dev/questions` (answer key) is **off in production** (`F1_DEV_TOOLS=0`).
 
 ### Questions & data
@@ -169,7 +172,8 @@ Key env vars: `F1_DATA_SOURCE` (`dataset` | `jolpica` | `synthetic`),
 - Real LLM question synthesizer behind the existing validation gate.
 
 **Product**
-- Analytics + the ad slots already stubbed in the reveal/summary views.
+- Wire the ad slots already stubbed in the reveal/summary views (analytics is
+  now shipped — see *Analytics* above).
 - Next.js + Tailwind frontend (NextAuth guest-first, Framer Motion reveal).
 - Accessibility pass, i18n, social share cards.
 - A persistent disk or paid Render tier to avoid cold-start rebuilds (minor,
