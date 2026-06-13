@@ -7,25 +7,19 @@ services:
     runtime: python
     plan: free
     branch: main
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
-    # ── Account & leaderboard durability ────────────────────────────────────
-    # The question bank is rebuilt from the committed snapshot on every boot, but
-    # accounts, sessions and verified play history live ONLY in the SQLite file. On
-    # the free plan the filesystem is ephemeral (F1_DB_PATH below points at /tmp),
-    # so those tables are wiped on every redeploy — fine for a demo, NOT for a game
-    # people are meant to return to daily. To make them durable, move to a paid
-    # plan and attach a persistent disk by uncommenting the block below (then point
-    # F1_DB_PATH at the mount), or swap SQLite for managed Postgres (Architecture
-    # §0). Until then, treat accounts as disposable across deploys.
-    # disk:
-    #   name: f1-data
-    #   mountPath: /data
-    #   sizeGB: 1
+    # Install deps, then fetch the Litestream binary into backend/bin so the
+    # start command can stream the SQLite DB to object storage. The download is
+    # best-effort (|| true): if it fails the app still boots, just without
+    # durability (start.sh logs a warning).
+    buildCommand: |
+      pip install -r backend/requirements.txt
+      mkdir -p backend/bin
+      curl -fsSL https://github.com/benbjohnson/litestream/releases/download/v0.3.13/litestream-v0.3.13-linux-amd64.tar.gz \
+        | tar -xz -C backend/bin litestream || echo "litestream download failed; continuing without durability"
+    startCommand: cd backend && ./start.sh
     envVars:
-      # Render's free filesystem is ephemeral; the app self-seeds on boot. Point
-      # this at the persistent disk's mountPath (e.g. /data/f1stats.db) once the
-      # disk above is enabled, so accounts and the leaderboard survive redeploys.
+      # SQLite path. Render's free filesystem is ephemeral, so this lives in /tmp
+      # and is made durable by Litestream replication (below) rather than a disk.
       - key: F1_DB_PATH
         value: /tmp/f1stats.db
       # Serve the curated, validated 1000-question bank committed in the repo
@@ -40,3 +34,27 @@ services:
       # the answer key and defeat the leaderboard. Defaults ON for local dev.
       - key: F1_DEV_TOOLS
         value: "0"
+
+      # ── Free durable accounts (Litestream → S3-compatible object storage) ────
+      # The question bank is rebuilt from the committed snapshot on every boot, but
+      # accounts, sessions and verified play history live ONLY in the SQLite file —
+      # which the ephemeral free host wipes on every redeploy AND cold start. Rather
+      # than a paid disk or Postgres, Litestream continuously replicates the DB to a
+      # free object-storage bucket and restores it on boot (see start.sh).
+      #
+      # To enable (free, ~5 min — see README → "Free durable accounts"): create a
+      # Backblaze B2 bucket (10 GB free, no card) or Cloudflare R2 bucket, then set
+      # the five values below. Leaving REPLICA_BUCKET blank keeps the ephemeral
+      # behaviour, so the service still deploys as-is.
+      - key: LITESTREAM_REPLICA_BUCKET
+        sync: false            # e.g. f1-statguesser-db
+      - key: LITESTREAM_REPLICA_PATH
+        value: f1stats
+      - key: LITESTREAM_REPLICA_ENDPOINT
+        sync: false            # e.g. s3.us-west-002.backblazeb2.com
+      - key: LITESTREAM_REPLICA_REGION
+        sync: false            # e.g. us-west-002
+      - key: LITESTREAM_ACCESS_KEY_ID
+        sync: false            # B2 keyID / R2 access key (secret)
+      - key: LITESTREAM_SECRET_ACCESS_KEY
+        sync: false            # B2 applicationKey / R2 secret (secret)

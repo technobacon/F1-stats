@@ -135,9 +135,10 @@ Key env vars: `F1_DATA_SOURCE` (`dataset` | `jolpica` | `synthetic`),
 - **No hero photo bundled** — copyright. Add a licensed image at
   `frontend/hero.jpg` to use one (the CSS scene shows until then).
 - **Account durability on the free host** — accounts, sessions and verified play
-  history live in the SQLite file at `F1_DB_PATH`. On Render's free plan that's
-  ephemeral (`/tmp`), so they're wiped on every redeploy. Attach a persistent
-  disk (paid) or move to Postgres for durable accounts — see `render.yaml`.
+  history live in the SQLite file at `F1_DB_PATH`, which the free host wipes on
+  redeploy/cold start. Fixed for free with **Litestream**: it replicates the DB
+  to an S3-compatible bucket and restores on boot (opt-in via env; see README →
+  *Free durable accounts*). A persistent disk or Postgres remain heavier options.
 - **No real LLM** in the loop yet — questions come from the deterministic
   generator behind the validation gate (the gate is the point; the LLM is a
   drop-in).

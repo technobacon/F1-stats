@@ -159,13 +159,47 @@ recomputed from those rows, so a total can't be forged by editing `localStorage`
 Play while logged out is recorded against a per-device `anon_id` and claimed into
 your account when you sign in, so nothing is lost.
 
-**Persistence caveat (hosting):** accounts live in the SQLite file at
-`F1_DB_PATH`. The question bank is wiped and reloaded on every boot, but the
-account tables (`users`, `auth_sessions`, `play_events`) are deliberately
-preserved across that reseed. They only survive as long as the **file** does, so
-on an ephemeral host (e.g. a container with no persistent disk) accounts vanish
-on redeploy. For durable accounts, point `F1_DB_PATH` at a persistent volume, or
-swap SQLite for the managed Postgres the blueprint specifies (Architecture §0).
+**Persistence (hosting):** accounts live in the SQLite file at `F1_DB_PATH`. The
+question bank is wiped and reloaded on every boot, but the account tables
+(`users`, `auth_sessions`, `play_events`) are deliberately preserved across that
+reseed. They only survive as long as the **file** does — and on an ephemeral
+free host the filesystem is wiped on every redeploy *and* cold start. The free
+fix is **Litestream** (below); the heavier options remain a persistent disk or
+managed Postgres (Architecture §0).
+
+### Free durable accounts (Litestream → object storage)
+
+[Litestream](https://litestream.io) continuously streams the SQLite DB to an
+S3-compatible bucket and restores it on boot, so accounts survive the ephemeral
+host with **no paid disk and no Postgres migration**. The wiring is already in
+place — `backend/start.sh` wraps uvicorn, `backend/litestream.yml` is the config,
+`render.yaml` fetches the binary at build time and the `Dockerfile` bakes it in.
+It's **opt-in**: with no bucket configured the app just runs with an ephemeral DB
+(local dev, tests and CI are untouched).
+
+To turn it on (free, ~5 minutes):
+
+1. Create a bucket on a free S3-compatible store — **Backblaze B2** (10 GB free,
+   no credit card) or **Cloudflare R2** are both fine.
+2. Make an application key with read/write access and note the **keyID** and
+   **applicationKey**, plus your bucket's **endpoint** and **region** (B2 shows
+   these as e.g. `s3.us-west-002.backblazeb2.com` / `us-west-002`).
+3. In the Render dashboard (or your host's env), set the values `render.yaml`
+   marks `sync: false`:
+
+   | Env var | Example |
+   |---|---|
+   | `LITESTREAM_REPLICA_BUCKET` | `f1-statguesser-db` |
+   | `LITESTREAM_REPLICA_ENDPOINT` | `s3.us-west-002.backblazeb2.com` |
+   | `LITESTREAM_REPLICA_REGION` | `us-west-002` |
+   | `LITESTREAM_ACCESS_KEY_ID` | *(your keyID)* |
+   | `LITESTREAM_SECRET_ACCESS_KEY` | *(your applicationKey)* |
+
+   (`LITESTREAM_REPLICA_PATH` defaults to `f1stats`.)
+
+4. Redeploy. On boot you'll see `Restoring … from replica` / `Starting uvicorn
+   under Litestream replication`; thereafter every write is mirrored within ~1 s
+   and a final snapshot is flushed on graceful shutdown.
 
 ## Implemented systems
 

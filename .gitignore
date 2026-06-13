@@ -15,6 +15,9 @@ backend/*.db-shm
 # Raw Jolpica API response cache (etl.py); regenerated weekly
 backend/.http_cache/
 
+# Litestream binary, fetched at build time (render.yaml) — never committed
+backend/bin/
+
 # OS / editor
 .DS_Store
 *.swp

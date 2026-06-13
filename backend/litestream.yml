@@ -1,0 +1,20 @@
+# Litestream replication config (used by start.sh in production only).
+#
+# Streams the SQLite database to S3-compatible object storage so accounts,
+# sessions and verified play history survive the ephemeral free host. All values
+# come from the environment so no secrets live in the repo; credentials are read
+# by Litestream from LITESTREAM_ACCESS_KEY_ID / LITESTREAM_SECRET_ACCESS_KEY.
+#
+# Works with any S3-compatible store. Backblaze B2 is the suggested free target
+# (10 GB free, no credit card): set
+#   LITESTREAM_REPLICA_ENDPOINT = s3.us-west-002.backblazeb2.com   (your region)
+#   LITESTREAM_REPLICA_REGION   = us-west-002
+# Cloudflare R2 and AWS S3 work the same way with their own endpoint/region.
+dbs:
+  - path: ${F1_DB_PATH}
+    replicas:
+      - type: s3
+        bucket: ${LITESTREAM_REPLICA_BUCKET}
+        path: ${LITESTREAM_REPLICA_PATH}
+        endpoint: ${LITESTREAM_REPLICA_ENDPOINT}
+        region: ${LITESTREAM_REPLICA_REGION}
