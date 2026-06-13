@@ -27,7 +27,7 @@ from datetime import datetime, timedelta, timezone
 EVENT_NAMES = frozenset({
     "app_open",        # a visit starts (per tab/session)
     "view",            # navigated to a section (props.view, props.mode)
-    "quiz_start",      # began a Daily / Race / Hardcore session (props.mode)
+    "quiz_start",      # began a Daily / Race session (props.mode)
     "quiz_complete",   # finished a session (props.mode, props.score)
     "share",           # tapped Share on the result (props.mode)
     "arcade_play",     # made an Over/Under pick

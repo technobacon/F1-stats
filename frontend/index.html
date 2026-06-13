@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>F1 Stat Guesser</title>
+  <title>GridMaster</title>
 
   <!-- PWA / iOS add-to-home-screen -->
   <link rel="manifest" href="/static/manifest.json" />
   <meta name="theme-color" content="#FF8700" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Stat Guesser" />
+  <meta name="apple-mobile-web-app-title" content="GridMaster" />
   <link rel="apple-touch-icon" href="/static/icon-180.png" />
   <link rel="icon" href="/static/icon-180.png" />
 
@@ -19,21 +19,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=11" />
+  <link rel="stylesheet" href="/static/style.css?v=12" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
   <header class="hud">
     <a class="hud-brand" data-view="home" href="#home">
-      <span class="brand-mark">F1</span><span class="brand-word">STAT&nbsp;GUESSER</span>
+      <!-- Logo: an empty grid spot — a square viewed from a slightly angled top-down
+           perspective with its near (bottom) side left open, like an unfilled box on
+           the F1 starting grid waiting to be claimed. -->
+      <span class="brand-mark" aria-hidden="true">
+        <svg class="brand-logo" viewBox="0 0 100 100">
+          <path d="M16 82 L31 25 L69 25 L84 82" fill="none" stroke="currentColor"
+                stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span><span class="brand-word">GRIDMASTER</span>
     </a>
 
     <nav class="modes" id="modes">
       <button class="mode-tab active" data-view="home">Home</button>
       <button class="mode-tab" data-view="quiz" data-mode="daily">Daily</button>
       <button class="mode-tab" data-view="quiz" data-mode="race_week">Race</button>
-      <button class="mode-tab" data-view="quiz" data-mode="one_shot">Hardcore</button>
-      <button class="mode-tab" data-view="quiz" data-mode="free_practice">Practice</button>
+      <button class="mode-tab" data-view="quiz" data-mode="free_practice">Free Practice</button>
       <button class="mode-tab" data-view="arcade">Arcade</button>
       <button class="mode-tab" data-view="profile">Profile</button>
     </nav>
@@ -57,7 +64,7 @@
       <div class="hero">
         <div class="hero-inner">
           <p class="hero-eyebrow">Welcome to</p>
-          <h1 class="hero-title">F1 <span class="accent">Stat</span> Guesser</h1>
+          <h1 class="hero-title">GRID<span class="accent">MASTER</span></h1>
           <p class="hero-sub">Test your Formula 1 knowledge across every era — from Senna and
              Prost to the modern grid. Guess the stat, get scored on how close you are.</p>
           <div class="hero-cta">
@@ -102,14 +109,6 @@
           <span class="mc-cta">Play now →</span>
         </button>
 
-        <button class="mode-card" data-view="quiz" data-mode="one_shot">
-          <span class="mc-icon">🔥</span>
-          <h3>Hardcore</h3>
-          <p>Three brutal questions. No slider, no safety net — type your answer and commit.
-             For the truly obsessed.</p>
-          <span class="mc-cta">Play now →</span>
-        </button>
-
         <button class="mode-card" data-view="quiz" data-mode="free_practice">
           <span class="mc-icon">🛞</span>
           <h3>Free Practice</h3>
@@ -134,7 +133,7 @@
       </div>
     </section>
 
-    <!-- ===================== QUIZ (Daily / Race / Hardcore) ===================== -->
+    <!-- ===================== QUIZ (Daily / Race / Free Practice) ===================== -->
     <section id="view-quiz" class="view">
       <!-- Immersive top bar — only visible once a session is in progress -->
       <div class="game-bar">
@@ -170,17 +169,26 @@
             </svg>
             <div class="car-thumb" id="car-thumb" role="slider" tabindex="0"
                  aria-label="Your guess" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-              <svg class="car-sprite" viewBox="0 0 90 40" aria-hidden="true">
-                <rect x="2" y="9" width="7" height="22" rx="3" class="car-dark" />
-                <rect x="16" y="1"  width="15" height="8" rx="4" class="car-tyre" />
-                <rect x="16" y="31" width="15" height="8" rx="4" class="car-tyre" />
-                <rect x="58" y="3"  width="12" height="7" rx="3.5" class="car-tyre" />
-                <rect x="58" y="30" width="12" height="7" rx="3.5" class="car-tyre" />
-                <path class="car-body"
-                  d="M9 20 C14 14 22 13 34 13 L58 12 C74 13 86 16 88 20 C86 24 74 27 58 28 L34 27 C22 27 14 26 9 20 Z" />
-                <ellipse cx="44" cy="20" rx="6" ry="4" class="car-dark" />
-                <circle cx="44" cy="20" r="1.6" class="car-cockpit" />
-                <rect x="82" y="12" width="6" height="16" rx="2" class="car-dark" />
+              <!-- Simplistic side-view F1 car (nose to the right). Body + wings take
+                   the selected team's primary colour; the visor its secondary. See
+                   .car-* in style.css and F1_CAR_SHAPES in app.js (same shape, reused
+                   for the reveal markers). -->
+              <svg class="car-sprite" viewBox="0 0 128 52" aria-hidden="true">
+                <rect class="car-body" x="8"  y="9"  width="19" height="4" rx="1.5" />
+                <rect class="car-body" x="17" y="11" width="5"  height="18" rx="1.5" />
+                <rect class="car-body" x="104" y="39" width="22" height="4" rx="1.5" />
+                <rect class="car-body" x="116" y="36" width="3" height="5" />
+                <path class="car-body" d="M12 41 L15 28 C19 24 29 24 38 25 L52 25
+                  C55 17 65 16 70 20 L76 23 L100 27 L123 36 C125 37 125 40 122 41
+                  L40 43 C20 43 12 43 12 41 Z" />
+                <path class="car-dark" d="M55 24 C57 17 66 16 70 21 L65 24 Z" />
+                <rect class="car-dark" x="60" y="13" width="3" height="11" rx="1.5" />
+                <circle class="car-cockpit" cx="63" cy="20" r="3.2" />
+                <rect class="car-wing" x="64" y="18" width="3.4" height="3" rx="1" />
+                <circle class="car-tyre" cx="34"  cy="40" r="12" />
+                <circle class="car-hub"  cx="34"  cy="40" r="5" />
+                <circle class="car-tyre" cx="100" cy="40" r="12" />
+                <circle class="car-hub"  cx="100" cy="40" r="5" />
               </svg>
             </div>
             <span class="curve-end curve-min" id="curve-min">0</span>
@@ -297,7 +305,7 @@
   </main>
 
   <footer class="foot">
-    F1 Stat Guesser · a fan-made Formula 1 trivia game · not affiliated with Formula 1
+    GridMaster · a fan-made Formula 1 trivia game · not affiliated with Formula 1
     <button class="data-check-btn" id="data-check" title="Development tool: browse every question and its verified answer">📋 Check the data</button>
   </footer>
 
@@ -312,7 +320,6 @@
           <option value="">All modes</option>
           <option value="daily">daily</option>
           <option value="race_week">race-week</option>
-          <option value="one_shot">hardcore</option>
         </select>
         <button class="btn-ghost data-close" id="data-close">✕ Close</button>
       </div>
@@ -370,6 +377,6 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/app.js?v=11"></script>
+  <script src="/static/app.js?v=12"></script>
 </body>
 </html>

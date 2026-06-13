@@ -1,4 +1,4 @@
-/* F1 StatGuesser — prototype frontend.
+/* GridMaster — prototype frontend.
  * Guest-first: all progress lives in localStorage (PRD §5.2, Architecture §2.1).
  * Scoring is NEVER computed here — guesses go to the server, which returns the score. */
 
@@ -81,26 +81,22 @@ const MODES = {
     desc: "Six questions on teams, circuits and race-day feats from across the eras. The closer your guess, the bigger the score.",
     capKey: () => utcDate(), capLabel: "today's Daily Race Challenge", slider: true,
   },
-  one_shot: {
-    title: "Hardcore",
-    desc: "Three brutal questions. No slider, no safety net — type your answer and commit.",
-    capKey: null, capLabel: "", slider: false,
-  },
   free_practice: {
     title: "Free Practice",
     desc: "Unlimited random questions to sharpen your instincts. Your score is shown here " +
       "but never saved or ranked — it's pure practice. To keep it fair, scoring under " +
-      "1,000 points on a question adds a 5-second wait before the next one (an anti-scouting " +
-      "measure, explained when it happens).",
+      "1,000 points on a question hands your team a 10-second penalty before the next one " +
+      "(an anti-scouting measure, explained when it happens).",
     capKey: null, capLabel: "", slider: true, free: true,
   },
 };
 
 /* Free Practice anti-scouting rule: a question scored under the threshold blocks
  * the Next button for a few seconds. This deters "quiz-scouting" — burning through
- * questions with throwaway guesses just to reveal and memorise the answers. */
+ * questions with throwaway guesses just to reveal and memorise the answers. The
+ * wait is framed as a stewards' time penalty handed to the player's chosen team. */
 const PRACTICE_PENALTY_THRESHOLD = 1000; // out of 5,000 per question
-const PRACTICE_PENALTY_SECONDS = 5;
+const PRACTICE_PENALTY_SECONDS = 10;
 
 /* ---- Guest-first local state (Architecture §2.1 schema) ---- */
 const defaultState = () => ({
@@ -446,14 +442,17 @@ function startPracticePenalty(score) {
   }
 
   let remaining = PRACTICE_PENALTY_SECONDS;
+  const teamName = (TEAMS[state.selected_team] || TEAMS.mclaren).name;
   btn.disabled = true;
   note.classList.remove("hidden");
   const paint = () => {
     note.innerHTML =
-      `🐢 <strong>${remaining}s penalty.</strong> Scoring under ` +
-      `${PRACTICE_PENALTY_THRESHOLD.toLocaleString()} points triggers a short wait. ` +
-      `This discourages <em>quiz-scouting</em> — guessing wildly just to reveal and ` +
-      `memorise answers. Take a breath and read the result.`;
+      `🏴 <strong>${PRACTICE_PENALTY_SECONDS} SECONDS PENALTY TO ${escapeHtml(teamName.toUpperCase())}.</strong> ` +
+      `You scored under ${PRACTICE_PENALTY_THRESHOLD.toLocaleString()} points, so the stewards ` +
+      `hold you on the grid for ${remaining}s. This is necessary to discourage ` +
+      `<em>quiz-scouting</em> — guessing wildly just to reveal and memorise answers — ` +
+      `which would let players farm the bank and spoil the challenge for everyone. ` +
+      `Take a breath and read the result.`;
     btn.textContent = `Next question in ${remaining}s`;
   };
   paint();
@@ -575,7 +574,7 @@ function renderQuestion() {
 
   const input = document.getElementById("q-input");
   // Year answers always use the curved slider (the scope is in the question anyway);
-  // One-Shots otherwise hides it for a hardcore, type-it-in feel.
+  // other modes fall back to whatever the mode config specifies.
   const useSlider = kind === "year" || MODES[currentMode].slider;
   input.step = "1"; input.min = q.slider_min;
   input.max = kind === "percentage" ? 100 : q.slider_max;
@@ -621,6 +620,30 @@ async function submitGuess() {
     submitBtn.disabled = false; submitBtn.textContent = "Lock In Guess";
   }
 }
+
+/* Simplistic side-view F1 car, reused for the slider thumb (inline in index.html)
+ * and the two reveal markers. Body + wings are the team's primary colour, the
+ * visor its secondary; pass "car-ghost" for the translucent grey actual marker.
+ * Keep this in sync with the inline #car-thumb SVG in index.html. */
+const F1_CAR_SHAPES =
+  '<rect class="car-body" x="8" y="9" width="19" height="4" rx="1.5"/>' +
+  '<rect class="car-body" x="17" y="11" width="5" height="18" rx="1.5"/>' +
+  '<rect class="car-body" x="104" y="39" width="22" height="4" rx="1.5"/>' +
+  '<rect class="car-body" x="116" y="36" width="3" height="5"/>' +
+  '<path class="car-body" d="M12 41 L15 28 C19 24 29 24 38 25 L52 25 ' +
+    'C55 17 65 16 70 20 L76 23 L100 27 L123 36 C125 37 125 40 122 41 L40 43 C20 43 12 43 12 41 Z"/>' +
+  '<path class="car-dark" d="M55 24 C57 17 66 16 70 21 L65 24 Z"/>' +
+  '<rect class="car-dark" x="60" y="13" width="3" height="11" rx="1.5"/>' +
+  '<circle class="car-cockpit" cx="63" cy="20" r="3.2"/>' +
+  '<rect class="car-wing" x="64" y="18" width="3.4" height="3" rx="1"/>' +
+  '<circle class="car-tyre" cx="34" cy="40" r="12"/><circle class="car-hub" cx="34" cy="40" r="5"/>' +
+  '<circle class="car-tyre" cx="100" cy="40" r="12"/><circle class="car-hub" cx="100" cy="40" r="5"/>';
+function f1CarSVG(extraClass = "") {
+  return `<svg class="car-sprite ${extraClass}" viewBox="0 0 128 52" aria-hidden="true">${F1_CAR_SHAPES}</svg>`;
+}
+// Drop a full (locked-in guess) and a ghost (actual answer) car into the reveal markers.
+document.getElementById("node-guess").insertAdjacentHTML("afterbegin", f1CarSVG());
+document.getElementById("node-actual").insertAdjacentHTML("afterbegin", f1CarSVG("car-ghost"));
 
 /* Odometer Score Reveal (Architecture §3.2) */
 function revealScore(q, result) {
@@ -762,16 +785,16 @@ function buildShareText() {
   const max = quiz.questions.length * 5000;
   const tag = currentMode === "daily" ? `Daily #${dailyNumber()}`
             : currentMode === "race_week" ? `Race Challenge #${dailyNumber()}`
-            : "Hardcore";
+            : "Free Practice";
   // Spoiler-free: shares the closeness pattern and total, never the answers.
-  return `🏁 F1 Stat Guesser — ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts\n${location.origin}`;
+  return `🏁 GridMaster — ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts\n${location.origin}`;
 }
 
 document.getElementById("share-result").addEventListener("click", async () => {
   track("share", { mode: currentMode });
   const text = buildShareText();
   if (navigator.share) {
-    try { await navigator.share({ title: "F1 Stat Guesser", text }); return; } catch { /* cancelled */ }
+    try { await navigator.share({ title: "GridMaster", text }); return; } catch { /* cancelled */ }
   }
   try {
     await navigator.clipboard.writeText(text);

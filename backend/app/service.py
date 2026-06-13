@@ -67,8 +67,8 @@ ARCADE_METRICS = {
     "dnfs": "DNFs",
 }
 
-# Per-mode session size (PRD §4.1). One-Shots is the short, hardcore set.
-MODE_QUESTION_COUNT = {"daily": 6, "race_week": 6, "one_shot": 3}
+# Per-mode session size (PRD §4.1). The competitive daily sets are six questions each.
+MODE_QUESTION_COUNT = {"daily": 6, "race_week": 6}
 
 # Free Practice: an unlimited, non-competitive training mode. Questions are drawn
 # one at a time at random and the score is NEVER recorded — verify() looks for
@@ -192,7 +192,7 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
 def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None = None) -> dict | None:
     """Provision a single random Free Practice question, or None if the bank is empty.
 
-    Unlike the daily/race/hardcore sets, Free Practice is unlimited and personal:
+    Unlike the daily/race sets, Free Practice is unlimited and personal:
     questions are pulled one at a time, truly at random, from the WHOLE active bank
     (any game_mode). The mix keeps the same era bias as the rest of the game so
     practice resembles real play. The verified answer is stashed in the token store
@@ -269,13 +269,61 @@ def _career_total(conn: sqlite3.Connection, driver_id: str, metric: str) -> floa
     return float(compute_metric(conn, params))
 
 
+# Over/Under should be a genuine close call, not a blowout: the two drivers'
+# totals must land within this fraction of each other (the smaller is at least
+# 70% of the larger). Pairs further apart than this are rejected.
+ARCADE_MAX_GAP = 0.30
+
+
+def _within_gap(va: float, vb: float, max_gap: float = ARCADE_MAX_GAP) -> bool:
+    """True when two values are within max_gap of each other (relative to the
+    larger). Two zeros count as identical, hence close."""
+    hi = max(abs(va), abs(vb))
+    if hi == 0:
+        return True
+    return abs(va - vb) / hi <= max_gap
+
+
+def _pick_close_pair(pairs, metrics, rng, value_fn, attempts: int = 80):
+    """Sample (driver pair, metric) combos until the two totals are within
+    ARCADE_MAX_GAP, so the matchup is a real toss-up rather than a runaway.
+
+    value_fn(entity, metric) -> float is memoised per (driver_id, metric) so the
+    same total is never recomputed. Falls back to the closest combo seen if no
+    sample clears the gap within `attempts` (guarantees a result on any dataset).
+    Returns (a, b, metric, value_a, value_b).
+    """
+    cache: dict = {}
+
+    def val(entity, metric):
+        key = (entity["driver_id"], metric)
+        if key not in cache:
+            cache[key] = value_fn(entity, metric)
+        return cache[key]
+
+    best = None  # (gap, a, b, metric, va, vb)
+    for _ in range(attempts):
+        a, b = rng.choice(pairs)
+        metric = rng.choice(metrics)
+        va, vb = val(a, metric), val(b, metric)
+        if _within_gap(va, vb):
+            return a, b, metric, va, vb
+        hi = max(abs(va), abs(vb))
+        gap = 0.0 if hi == 0 else abs(va - vb) / hi
+        if best is None or gap < best[0]:
+            best = (gap, a, b, metric, va, vb)
+    _, a, b, metric, va, vb = best
+    return a, b, metric, va, vb
+
+
 def build_arcade_pair(conn: sqlite3.Connection, rng: random.Random | None = None) -> dict:
     """Generate a 'Who Has More?' matchup (PRD §4.2).
 
     Picks two drivers from an overlapping era and a shared metric, computing
     career totals via index-friendly lookups (no ORDER BY RANDOM(); Architecture
-    §1.2). v1 is non-competitive, so both values are returned for client-side
-    evaluation.
+    §1.2). The pairing is biased toward close totals (within ARCADE_MAX_GAP) so
+    the call is hard. v1 is non-competitive, so both values are returned for
+    client-side evaluation.
     """
     rng = rng or random.Random()
     drivers = conn.execute(
@@ -303,19 +351,19 @@ def build_arcade_pair(conn: sqlite3.Connection, rng: random.Random | None = None
         for b in drivers[i + 1:]
         if a["active_from"] <= b["active_to"] and b["active_from"] <= a["active_to"]
     ]
-    a, b = rng.choice(overlapping)
-    metric = rng.choice(list(ARCADE_METRICS))
+    a, b, metric, va, vb = _pick_close_pair(
+        overlapping, list(ARCADE_METRICS), rng,
+        lambda d, m: _career_total(conn, d["driver_id"], m),
+    )
 
     return {
         "metric": metric,
         "metric_label": ARCADE_METRICS[metric],
         "entity_a": {
-            "driver_id": a["driver_id"], "full_name": a["full_name"],
-            "value": _career_total(conn, a["driver_id"], metric),
+            "driver_id": a["driver_id"], "full_name": a["full_name"], "value": va,
         },
         "entity_b": {
-            "driver_id": b["driver_id"], "full_name": b["full_name"],
-            "value": _career_total(conn, b["driver_id"], metric),
+            "driver_id": b["driver_id"], "full_name": b["full_name"], "value": vb,
         },
     }
 
@@ -337,13 +385,13 @@ def _arcade_from_dataset(rng: random.Random) -> dict:
         for b in ds[i + 1:]
         if a["active_from"] <= b["active_to"] and b["active_from"] <= a["active_to"]
     ]
-    a, b = rng.choice(overlapping)
-    metric = rng.choice(list(ARCADE_METRICS))
+    a, b, metric, va, vb = _pick_close_pair(
+        overlapping, list(ARCADE_METRICS), rng,
+        lambda d, m: float(d["stats"][m]),
+    )
     return {
         "metric": metric,
         "metric_label": ARCADE_METRICS[metric],
-        "entity_a": {"driver_id": a["driver_id"], "full_name": a["full_name"],
-                     "value": float(a["stats"][metric])},
-        "entity_b": {"driver_id": b["driver_id"], "full_name": b["full_name"],
-                     "value": float(b["stats"][metric])},
+        "entity_a": {"driver_id": a["driver_id"], "full_name": a["full_name"], "value": va},
+        "entity_b": {"driver_id": b["driver_id"], "full_name": b["full_name"], "value": vb},
     }
