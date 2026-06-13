@@ -107,3 +107,25 @@ def test_committed_bank_loads_and_serves():
     pair = service.build_arcade_pair(conn, random.Random(0))
     assert pair["entity_a"]["full_name"] and pair["entity_b"]["full_name"]
     conn.close()
+
+
+def test_arcade_pairs_are_close_calls():
+    """Over/Under should be a genuine toss-up: across many draws the two totals
+    almost always land within ARCADE_MAX_GAP of each other."""
+    if not seed.DATASET_PATH.exists():
+        pytest.skip("committed dataset not present")
+    import random
+    service._ARCADE_DATASET = None
+    conn = db.connect(":memory:")
+    seed.load_dataset(conn)
+    rng = random.Random(1)
+    close = 0
+    trials = 60
+    for _ in range(trials):
+        p = service.build_arcade_pair(conn, rng)
+        if service._within_gap(p["entity_a"]["value"], p["entity_b"]["value"]):
+            close += 1
+    conn.close()
+    # The sampler falls back to the closest pair it found, so the vast majority
+    # (here, all) of matchups should clear the gap on the real snapshot.
+    assert close >= trials * 0.9

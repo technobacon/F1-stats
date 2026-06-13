@@ -79,7 +79,7 @@ async def lifespan(_app: FastAPI):
     yield
 
 
-app = FastAPI(title="F1 StatGuesser API", version="0.1.0-prototype", lifespan=lifespan)
+app = FastAPI(title="GridMaster API", version="0.1.0-prototype", lifespan=lifespan)
 
 
 def get_conn():

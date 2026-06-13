@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>F1 Stat Guesser</title>
+  <title>GridMaster</title>
 
   <!-- PWA / iOS add-to-home-screen -->
   <link rel="manifest" href="/static/manifest.json" />
   <meta name="theme-color" content="#FF8700" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Stat Guesser" />
+  <meta name="apple-mobile-web-app-title" content="GridMaster" />
   <link rel="apple-touch-icon" href="/static/icon-180.png" />
   <link rel="icon" href="/static/icon-180.png" />
 
@@ -25,15 +25,22 @@
   <!-- ===================== TOP BAR ===================== -->
   <header class="hud">
     <a class="hud-brand" data-view="home" href="#home">
-      <span class="brand-mark">F1</span><span class="brand-word">STAT&nbsp;GUESSER</span>
+      <!-- Logo: an empty grid spot — a square viewed from a slightly angled top-down
+           perspective with its near (bottom) side left open, like an unfilled box on
+           the F1 starting grid waiting to be claimed. -->
+      <span class="brand-mark" aria-hidden="true">
+        <svg class="brand-logo" viewBox="0 0 100 100">
+          <path d="M16 82 L31 25 L69 25 L84 82" fill="none" stroke="currentColor"
+                stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span><span class="brand-word">GRIDMASTER</span>
     </a>
 
     <nav class="modes" id="modes">
       <button class="mode-tab active" data-view="home">Home</button>
       <button class="mode-tab" data-view="quiz" data-mode="daily">Daily</button>
       <button class="mode-tab" data-view="quiz" data-mode="race_week">Race</button>
-      <button class="mode-tab" data-view="quiz" data-mode="one_shot">Hardcore</button>
-      <button class="mode-tab" data-view="quiz" data-mode="free_practice">Practice</button>
+      <button class="mode-tab" data-view="quiz" data-mode="free_practice">Free Practice</button>
       <button class="mode-tab" data-view="arcade">Arcade</button>
       <button class="mode-tab" data-view="profile">Profile</button>
     </nav>
@@ -57,7 +64,7 @@
       <div class="hero">
         <div class="hero-inner">
           <p class="hero-eyebrow">Welcome to</p>
-          <h1 class="hero-title">F1 <span class="accent">Stat</span> Guesser</h1>
+          <h1 class="hero-title">GRID<span class="accent">MASTER</span></h1>
           <p class="hero-sub">Test your Formula 1 knowledge across every era — from Senna and
              Prost to the modern grid. Guess the stat, get scored on how close you are.</p>
           <div class="hero-cta">
@@ -102,14 +109,6 @@
           <span class="mc-cta">Play now →</span>
         </button>
 
-        <button class="mode-card" data-view="quiz" data-mode="one_shot">
-          <span class="mc-icon">🔥</span>
-          <h3>Hardcore</h3>
-          <p>Three brutal questions. No slider, no safety net — type your answer and commit.
-             For the truly obsessed.</p>
-          <span class="mc-cta">Play now →</span>
-        </button>
-
         <button class="mode-card" data-view="quiz" data-mode="free_practice">
           <span class="mc-icon">🛞</span>
           <h3>Free Practice</h3>
@@ -134,7 +133,7 @@
       </div>
     </section>
 
-    <!-- ===================== QUIZ (Daily / Race / Hardcore) ===================== -->
+    <!-- ===================== QUIZ (Daily / Race / Free Practice) ===================== -->
     <section id="view-quiz" class="view">
       <!-- Immersive top bar — only visible once a session is in progress -->
       <div class="game-bar">
@@ -297,7 +296,7 @@
   </main>
 
   <footer class="foot">
-    F1 Stat Guesser · a fan-made Formula 1 trivia game · not affiliated with Formula 1
+    GridMaster · a fan-made Formula 1 trivia game · not affiliated with Formula 1
     <button class="data-check-btn" id="data-check" title="Development tool: browse every question and its verified answer">📋 Check the data</button>
   </footer>
 
@@ -312,7 +311,6 @@
           <option value="">All modes</option>
           <option value="daily">daily</option>
           <option value="race_week">race-week</option>
-          <option value="one_shot">hardcore</option>
         </select>
         <button class="btn-ghost data-close" id="data-close">✕ Close</button>
       </div>

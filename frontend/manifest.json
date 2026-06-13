@@ -1,6 +1,6 @@
 {
-  "name": "F1 StatGuesser",
-  "short_name": "StatGuesser",
+  "name": "GridMaster",
+  "short_name": "GridMaster",
   "description": "Gamified Formula 1 statistics guessing game.",
   "start_url": "/",
   "scope": "/",

@@ -1,4 +1,4 @@
-/* F1 StatGuesser — prototype frontend.
+/* GridMaster — prototype frontend.
  * Guest-first: all progress lives in localStorage (PRD §5.2, Architecture §2.1).
  * Scoring is NEVER computed here — guesses go to the server, which returns the score. */
 
@@ -81,26 +81,22 @@ const MODES = {
     desc: "Six questions on teams, circuits and race-day feats from across the eras. The closer your guess, the bigger the score.",
     capKey: () => utcDate(), capLabel: "today's Daily Race Challenge", slider: true,
   },
-  one_shot: {
-    title: "Hardcore",
-    desc: "Three brutal questions. No slider, no safety net — type your answer and commit.",
-    capKey: null, capLabel: "", slider: false,
-  },
   free_practice: {
     title: "Free Practice",
     desc: "Unlimited random questions to sharpen your instincts. Your score is shown here " +
       "but never saved or ranked — it's pure practice. To keep it fair, scoring under " +
-      "1,000 points on a question adds a 5-second wait before the next one (an anti-scouting " +
-      "measure, explained when it happens).",
+      "1,000 points on a question hands your team a 10-second penalty before the next one " +
+      "(an anti-scouting measure, explained when it happens).",
     capKey: null, capLabel: "", slider: true, free: true,
   },
 };
 
 /* Free Practice anti-scouting rule: a question scored under the threshold blocks
  * the Next button for a few seconds. This deters "quiz-scouting" — burning through
- * questions with throwaway guesses just to reveal and memorise the answers. */
+ * questions with throwaway guesses just to reveal and memorise the answers. The
+ * wait is framed as a stewards' time penalty handed to the player's chosen team. */
 const PRACTICE_PENALTY_THRESHOLD = 1000; // out of 5,000 per question
-const PRACTICE_PENALTY_SECONDS = 5;
+const PRACTICE_PENALTY_SECONDS = 10;
 
 /* ---- Guest-first local state (Architecture §2.1 schema) ---- */
 const defaultState = () => ({
@@ -446,14 +442,17 @@ function startPracticePenalty(score) {
   }
 
   let remaining = PRACTICE_PENALTY_SECONDS;
+  const teamName = (TEAMS[state.selected_team] || TEAMS.mclaren).name;
   btn.disabled = true;
   note.classList.remove("hidden");
   const paint = () => {
     note.innerHTML =
-      `🐢 <strong>${remaining}s penalty.</strong> Scoring under ` +
-      `${PRACTICE_PENALTY_THRESHOLD.toLocaleString()} points triggers a short wait. ` +
-      `This discourages <em>quiz-scouting</em> — guessing wildly just to reveal and ` +
-      `memorise answers. Take a breath and read the result.`;
+      `🏴 <strong>${PRACTICE_PENALTY_SECONDS} SECONDS PENALTY TO ${escapeHtml(teamName.toUpperCase())}.</strong> ` +
+      `You scored under ${PRACTICE_PENALTY_THRESHOLD.toLocaleString()} points, so the stewards ` +
+      `hold you on the grid for ${remaining}s. This is necessary to discourage ` +
+      `<em>quiz-scouting</em> — guessing wildly just to reveal and memorise answers — ` +
+      `which would let players farm the bank and spoil the challenge for everyone. ` +
+      `Take a breath and read the result.`;
     btn.textContent = `Next question in ${remaining}s`;
   };
   paint();
@@ -575,7 +574,7 @@ function renderQuestion() {
 
   const input = document.getElementById("q-input");
   // Year answers always use the curved slider (the scope is in the question anyway);
-  // One-Shots otherwise hides it for a hardcore, type-it-in feel.
+  // other modes fall back to whatever the mode config specifies.
   const useSlider = kind === "year" || MODES[currentMode].slider;
   input.step = "1"; input.min = q.slider_min;
   input.max = kind === "percentage" ? 100 : q.slider_max;
@@ -762,16 +761,16 @@ function buildShareText() {
   const max = quiz.questions.length * 5000;
   const tag = currentMode === "daily" ? `Daily #${dailyNumber()}`
             : currentMode === "race_week" ? `Race Challenge #${dailyNumber()}`
-            : "Hardcore";
+            : "Free Practice";
   // Spoiler-free: shares the closeness pattern and total, never the answers.
-  return `🏁 F1 Stat Guesser — ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts\n${location.origin}`;
+  return `🏁 GridMaster — ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts\n${location.origin}`;
 }
 
 document.getElementById("share-result").addEventListener("click", async () => {
   track("share", { mode: currentMode });
   const text = buildShareText();
   if (navigator.share) {
-    try { await navigator.share({ title: "F1 Stat Guesser", text }); return; } catch { /* cancelled */ }
+    try { await navigator.share({ title: "GridMaster", text }); return; } catch { /* cancelled */ }
   }
   try {
     await navigator.clipboard.writeText(text);

@@ -4,7 +4,7 @@ daily payload never carries the answer, and scoring happens server-side."""
 import pytest
 from fastapi.testclient import TestClient
 
-from app import db, seed
+from app import db, seed, service
 from app.main import app
 
 
@@ -70,7 +70,7 @@ def test_unknown_token_404(client):
     assert r.status_code == 404
 
 
-@pytest.mark.parametrize("mode,count", [("daily", 6), ("race_week", 6), ("one_shot", 3)])
+@pytest.mark.parametrize("mode,count", [("daily", 6), ("race_week", 6)])
 def test_all_modes_serve_and_hide_answers(client, mode, count):
     r = client.get(f"/api/v1/quiz/{mode}")
     assert r.status_code == 200
@@ -83,6 +83,12 @@ def test_all_modes_serve_and_hide_answers(client, mode, count):
 
 def test_unknown_mode_404(client):
     assert client.get("/api/v1/quiz/bogus").status_code == 404
+
+
+def test_hardcore_mode_removed(client):
+    # The hardcore (one_shot) game mode was retired; it must no longer be served.
+    assert "one_shot" not in service.MODE_QUESTION_COUNT
+    assert client.get("/api/v1/quiz/one_shot").status_code == 404
 
 
 def test_daily_set_is_deterministic_within_period(client):
