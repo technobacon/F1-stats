@@ -184,18 +184,34 @@ class JolpicaClient:
             raise NetworkError(f"httpx not available: {exc}") from exc
 
         attempts = 0
+        transient = 0
+        backoff = 2.0
         while True:
             self.limiter.acquire()
             try:
                 resp = httpx.get(url, timeout=30.0, headers={"User-Agent": "F1-StatGuesser-ETL"})
             except httpx.HTTPError as exc:
-                raise NetworkError(f"request failed for {url}: {exc}") from exc
+                # Network hiccup: retry a few times with exponential backoff before
+                # giving up, so a single dropped connection doesn't kill a long run.
+                transient += 1
+                if transient > 8:
+                    raise NetworkError(f"request failed for {url}: {exc}") from exc
+                time.sleep(backoff); backoff = min(backoff * 2, 60)
+                continue
             if resp.status_code == 429:
                 # Sliding-window violation: halt this many seconds, then retry.
                 attempts += 1
                 if attempts > 5:
                     raise NetworkError(f"persistent 429 from {url}")
                 time.sleep(RETRY_AFTER_429)
+                continue
+            if resp.status_code == 403 or resp.status_code >= 500:
+                # Transient WAF/edge blips (403) and server errors: back off and
+                # retry rather than aborting the whole extract.
+                transient += 1
+                if transient > 8:
+                    raise NetworkError(f"persistent HTTP {resp.status_code} from {url}")
+                time.sleep(backoff); backoff = min(backoff * 2, 60)
                 continue
             if resp.status_code >= 400:
                 raise NetworkError(f"HTTP {resp.status_code} for {url}")

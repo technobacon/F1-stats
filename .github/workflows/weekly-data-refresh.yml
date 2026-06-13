@@ -1,0 +1,62 @@
+name: Weekly data refresh
+
+# Rebuilds the committed question bank from the live Jolpica F1 API once a week,
+# covering the complete World Championship record (1950 -> current year). A
+# sanity gate (scripts/verify_bank.py) blocks the commit if the extract looks
+# truncated, partial, or fell back to the synthetic seed, so the curated bank is
+# never overwritten with bad numbers. Also runnable on demand from the Actions
+# tab.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      F1_DATA_SOURCE: jolpica
+      F1_ETL_START_YEAR: "1950"   # full history; END_YEAR defaults to the current year
+      F1_DB_PATH: ${{ github.workspace }}/backend/f1stats.db
+      F1_ETL_CACHE_DIR: ${{ github.workspace }}/backend/.http_cache
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: python -m pip install -q -r requirements.txt
+
+      - name: Rebuild bank from the live Jolpica ETL
+        run: python -m app.seed --export --source jolpica --count 1000
+
+      - name: Sanity gate (block bad data)
+        run: python -m scripts.verify_bank
+
+      - name: Run test suite
+        run: python -m pytest -q
+
+      - name: Commit refreshed bank if it changed
+        run: |
+          if git diff --quiet -- app/data/questions.json app/data/arcade.json; then
+            echo "No data changes this week."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/data/questions.json app/data/arcade.json
+          git commit -m "Weekly data refresh from Jolpica F1 ($(date -u +%Y-%m-%d))"
+          git push
