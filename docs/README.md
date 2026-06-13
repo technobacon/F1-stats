@@ -4,19 +4,29 @@ This folder contains the design and engineering documentation for **F1 StatGuess
 
 ## Documents
 
-| # | Document | Audience | Summary |
-|---|----------|----------|---------|
-| 1 | [Product Requirements Document](./PRD.md) | Product, Frontend, Backend, UI/UX, QA | Executive summary, scoring engine, data pipeline overview, gameplay modes, gamification & monetization. |
-| 2 | [Technical Pipeline Specs](./TECHNICAL_PIPELINE_SPECS.md) | Backend / Data Engineers | ETL ingestion engine, LLM context chunking, deterministic anti-hallucination validation layer, production SQL schema. |
-| 3 | [Full Architecture Blueprint](./ARCHITECTURE_BLUEPRINT.md) | Full-Stack / DevOps | Game logic & API state, guest-first frontend state, constructor theming, score-reveal animation, ad-network integration. |
-| 4 | [Implementation Notes (as built)](./IMPLEMENTATION_NOTES.md) | Anyone reading the code | How the running prototype maps to the specs: synthetic race-log generator, the metric+aggregation validation engine, the question taxonomy, and the serving path. |
+| Document | Audience | Summary |
+|----------|----------|---------|
+| ⭐ [Engineering Handoff](./HANDOFF.md) | **Start here** — anyone picking up the project | Current state, go-live checklist, architecture, env vars, run/test/deploy, durability & analytics, roadmap, gotchas. |
+| [Status & Roadmap](./STATUS.md) | Everyone | Living snapshot of what's shipped and what's next. |
+| [Product Requirements Document](./PRD.md) | Product, Frontend, Backend, UI/UX, QA | Executive summary, scoring engine, data pipeline overview, gameplay modes, gamification & monetization. |
+| [Technical Pipeline Specs](./TECHNICAL_PIPELINE_SPECS.md) | Backend / Data Engineers | ETL ingestion engine, LLM context chunking, deterministic anti-hallucination validation layer, production SQL schema. |
+| [Full Architecture Blueprint](./ARCHITECTURE_BLUEPRINT.md) | Full-Stack / DevOps | Game logic & API state, guest-first frontend state, constructor theming, score-reveal animation, ad-network integration. |
+| [Implementation Notes (as built)](./IMPLEMENTATION_NOTES.md) | Anyone reading the code | How the running service maps to the specs: the generator + validation engine, accounts/leaderboards, analytics, durability, and the serving path. |
+| [Question Types](./question-types.md) | Content / Backend | The question taxonomy and design. |
+
+> **Note on the spec docs (PRD, Pipeline, Blueprint):** these describe the original
+> *design target* (Next.js + Postgres + Redis + Celery + NextAuth + an LLM
+> pipeline). The shipped service intentionally realizes that design as a single,
+> dependency-light FastAPI + SQLite app — see **HANDOFF** / **Implementation
+> Notes** for what is actually built.
 
 ## Reading Order
 
-1. Start with the **PRD** for product scope and the scoring formula.
-2. Read the **Technical Pipeline Specs** to understand how trivia questions are sourced, generated, and validated.
-3. Read the **Architecture Blueprint** for runtime serving, client state, theming, and monetization.
-4. Read the **Implementation Notes** to see how the running prototype realizes all of the above.
+1. **Engineering Handoff** — orient on current state and how to run it.
+2. **PRD** — product scope and the scoring formula.
+3. **Technical Pipeline Specs** — how questions are sourced, generated, validated.
+4. **Architecture Blueprint** — the target runtime/theming/monetization design.
+5. **Implementation Notes** — how the running service realizes all of the above.
 
 ## Key Cross-Cutting Invariants
 

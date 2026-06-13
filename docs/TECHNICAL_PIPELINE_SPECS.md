@@ -3,6 +3,10 @@
 **Module:** Data Engineering Core
 **Target Audience:** Backend Developers / Data Engineers
 
+> **Design target, not as-built.** This is the original spec. For what's actually
+> shipped (the Jolpica ETL, the metric/aggregation validation engine, the committed
+> bank) see [HANDOFF](./HANDOFF.md) and [Implementation Notes](./IMPLEMENTATION_NOTES.md).
+
 ### 1. The Raw ETL Ingestion Engine
 The ingestion pipeline acts as an isolated, asynchronous system responsible for transforming highly nested external API entities into relational database matrices. To safeguard production systems against downtime, direct runtime execution loops during user client sessions are strictly prohibited.
 

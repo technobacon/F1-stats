@@ -3,6 +3,11 @@
 **Document Version:** 1.0
 **Target Audience:** Frontend Developers, Backend/Data Engineers, UI/UX Designers, QA Engineers
 
+> **Product spec, not as-built.** This captures the original product requirements.
+> Most of it is shipped (see [HANDOFF](./HANDOFF.md) and [STATUS](./STATUS.md));
+> notable deltas: the in-code generator stands in for the LLM synthesizer behind
+> the same validation gate, and ad-network integration is still stubbed.
+
 ## 1. Executive Summary
 F1 StatGuesser is a web-based, gamified sports trivia platform built for Formula 1 fans. The application leverages high-accuracy historical data to present users with numerical guessing challenges, scoring them based on their proximity to the true statistic. The platform utilizes a "hybrid-scarcity" retention model, blending capped daily challenges with an unlimited, highly bingeable arcade mode to maximize user engagement and ad-impression inventory.
 

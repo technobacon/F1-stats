@@ -5,13 +5,18 @@ to the spec docs (PRD / Pipeline / Architecture), and the concrete shape of the
 question-generation and validation systems. Where the spec describes intent,
 this describes the code as it actually runs.
 
-> **Status:** runnable prototype with two data sources. By default the staging
-> data is **synthetic and illustrative** (a self-consistent, offline stand-in),
-> but a **real Jolpica ETL** (`etl.py`, `F1_DATA_SOURCE=jolpica`) can populate
-> staging from live F1 history — rate-limited, disk-cached, and refreshed weekly.
-> Either way the guarantee the prototype enforces is *internal*: every
-> client-facing answer is recomputed from the staging tables, so questions can
-> never disagree with the data they were generated from.
+> **Status:** launch-ready service. The default data source is **`dataset`** — the
+> committed, validated **1,000-question bank** (`data/questions.json`, spanning
+> 1950–2026), served with no network. A **real Jolpica ETL** (`etl.py`,
+> `F1_DATA_SOURCE=jolpica`) rebuilds that bank from live F1 history (rate-limited,
+> disk-cached, weekly), and an in-code **synthetic** seed is the offline fallback.
+> Every client-facing answer is recomputed from staging before it ships, so
+> questions can never disagree with the data they were generated from.
+>
+> Beyond the question pipeline the service now also has real **accounts**,
+> server-verified **leaderboards** (all-time/weekly/daily) + a **Constructors'
+> Championship**, server-side **streaks**, free **durable storage** (Litestream),
+> and first-party **analytics** — see §9–§11. **116 tests pass.**
 
 ---
 
@@ -19,15 +24,18 @@ this describes the code as it actually runs.
 
 | File | Responsibility |
 |------|----------------|
-| `backend/app/db.py` | SQLite schema (staging + production + `etl_metadata`), connect/init/reset. |
+| `backend/app/db.py` | SQLite schema (staging + production + `etl_metadata`; plus the **durable** account & analytics tables) + migrations; connect/init/reset. |
 | `backend/app/etl.py` | **Real Jolpica ETL** (Pipeline §1): rate-limited (token bucket), disk-cached, weekly-gated ingestion of drivers/constructors/circuits/results/qualifying into staging. |
-| `backend/app/seed.py` | Pipeline orchestrator: synthetic race-log generator (offline fallback) **and** `load_entities_from_staging` for real data → data-driven question generator → validation → production. `refresh()` selects the source. |
+| `backend/app/seed.py` | Pipeline orchestrator: synthetic race-log generator (offline fallback), `load_entities_from_staging` for real data, **and** `load_dataset` for the committed bank → data-driven generator → validation → production. `refresh()` selects the source. |
 | `backend/app/validation.py` | The deterministic anti-hallucination engine (metric + aggregation registry). |
-| `backend/app/service.py` | Quiz provisioning (deterministic question sampling), tracking tokens, arcade. |
+| `backend/app/service.py` | Quiz / Free Practice / arcade provisioning (deterministic, era-weighted sampling), tracking tokens. |
 | `backend/app/scoring.py` | Server-authoritative exponential-decay scoring. |
+| `backend/app/auth.py` | Accounts (PBKDF2 + sessions), `play_events`, guest→account merge, leaderboards (period-windowed), Constructors' Championship, daily streaks (§9). |
+| `backend/app/analytics.py` | First-party event ingest (allow-listed, bounded) + aggregate reporting (DAU/funnel/retention) (§10). |
 | `backend/app/models.py` | Pydantic request/response models. |
-| `backend/app/main.py` | FastAPI routes + static frontend mount. |
-| `frontend/*` | Guest-first PWA: modes, odometer reveal, localStorage stats. |
+| `backend/app/main.py` | FastAPI routes + lifespan (self-seed, analytics prune) + static frontend mount. |
+| `backend/start.sh`, `litestream.yml` | Prod entrypoint wrapping uvicorn with Litestream replication for durable accounts (§11). |
+| `frontend/*` | Guest-first PWA: modes, odometer reveal, leaderboards, share grid, analytics tracker, `analytics.html` dashboard. |
 
 The pipeline has two interchangeable front-ends into the same staging→validation
 →production path, selected by `seed.refresh(source=...)` (env `F1_DATA_SOURCE`):
@@ -188,7 +196,9 @@ still routes every one through the validator before committing — so the
 *mechanism* is exercised on all questions, and the rejection path is proven by a
 deliberately planted wrong answer (§5).
 
-Current run commits **~560 questions** across **10 categories**:
+The default `dataset` source serves the committed, validated **1,000-question
+bank** (`data/questions.json`); the synthetic in-code run commits **~560
+questions**. Both span the same **10 categories**:
 
 | Category | Examples |
 |----------|----------|
@@ -205,8 +215,8 @@ Current run commits **~560 questions** across **10 categories**:
 
 `answer_kind` drives the client input (count / points / **year** / **percentage**);
 `display_min`/`display_max` carry sensible slider bounds for year and percentage
-questions. Questions are spread across the three exact-numerical game modes, with
-the more lateral metrics weighted into **One-Shots**.
+questions. Questions are spread across the exact-numerical game modes, with the
+more lateral metrics weighted into **Hardcore** (internally `one_shot`).
 
 ---
 
@@ -215,7 +225,8 @@ the more lateral metrics weighted into **One-Shots**.
 `mock_llm_questions()` appends exactly one question whose `proposed_answer` is
 **wrong** (Schumacher/Ferrari career wins: staging says 72, the mock "remembers"
 80). The real Schumacher/Ferrari wins total is intentionally excluded from normal
-generation so this is the only question with that wording. Running the pipeline:
+generation so this is the only question with that wording. Running the synthetic
+pipeline (`F1_DATA_SOURCE=synthetic python -m app.seed`):
 
 ```
 Seed complete. Committed 560 questions, rejected 1.
@@ -235,6 +246,9 @@ concrete proof of the anti-hallucination invariant.
 - Deterministically samples N questions for `(mode, period)` so the set is stable
   for everyone within a period and rotates the next period (mirrors the 00:00 UTC
   cron provisioning, Architecture §1.1).
+- Sampling is **era-weighted** (`ERA_WEIGHT_BANDS`): the mix leans modern (2014+)
+  with a lean on the golden eras, older seasons appearing occasionally — so the
+  1950–2026 bank still feels current.
 - Mints an opaque `tracking_token` per question; the verified answer is stashed
   **server-side** in the token store and never serialized to the client.
 - Slider bounds: uses `display_min/max` when present (year/percentage), otherwise
@@ -243,7 +257,13 @@ concrete proof of the anti-hallucination invariant.
 Scoring (`scoring.py`) is server-authoritative: the client submits a guess + token,
 the server looks up the trusted answer and applies the percentage-error
 exponential-decay formula (PRD §2). The answer is only revealed *after* a guess is
-scored.
+scored. The verify endpoint also records a server-scored `play_event` (§9) —
+**except Free Practice** (`service.FREE_PRACTICE_MODE`), which is a non-competitive
+training mode and is never recorded.
+
+**Free Practice** (`service.build_practice_question`) serves one random verified
+question at a time, unlimited and non-competitive, behind the same era-tiered
+significance gate the generator uses.
 
 **Arcade Over/Under** compares two drivers on a career metric
 (`service.ARCADE_METRICS`: wins, podiums, poles, fastest laps, points finishes,
@@ -256,9 +276,15 @@ front rows, DNFs), again computed through the same validation engine.
 - Each question shows a **category chip** and an **answer-kind hint** (“Enter a
   year”, “Enter a percentage 0–100”, etc.).
 - **Year** questions always render a labelled slider bounded by the season range;
-  One-Shots otherwise hides the slider for a harder feel.
-- Stats (lifetime points, accuracy, streaks, achievements) live in `localStorage`
-  — guest-first, no account required.
+  Hardcore otherwise hides the slider for a harder feel.
+- Guest-first: stats live in `localStorage` with no account required. Once signed
+  in, the **competitive** numbers (points, accuracy, streak) come from the server
+  instead; cosmetic state (team, achievements) stays local.
+- Profile shows the **leaderboards** (all-time/weekly/daily tabs) and the
+  **Constructors' Championship**; the summary screen shows a spoiler-free
+  **Wordle-style result grid** that Share copies.
+- A small pseudonymous **analytics tracker** batches funnel events and flushes via
+  `sendBeacon` (§10).
 
 ---
 
@@ -266,18 +292,73 @@ front rows, DNFs), again computed through the same validation engine.
 
 ```bash
 cd backend
-python -m app.seed         # rebuild + seed + run the validation pipeline
-python -m pytest -q        # 52 tests (incl. ETL ingestion, offline)
-python -m uvicorn app.main:app --reload
+F1_DATA_SOURCE=dataset ./run.sh   # install, load the committed bank, serve :8000
+python -m pytest -q               # 116 tests (offline)
 ```
 
-Test coverage of note (`tests/test_validation.py`):
+Test coverage of note:
 
-- **Exact** assertions for placed metrics (wins, podiums, poles).
-- **Consistency** assertions for emergent metrics (points/DNFs/positions-gained
-  equal an independent direct query).
-- Every aggregation (`best_season`, `which_year`, `first_season`,
-  `percentage_of_races`, `difference`), per-circuit filtering, and the
-  poles-converted join.
-- The pipeline commits all valid questions and rejects exactly the one planted
-  hallucination, which is verified absent from production.
+- `tests/test_validation.py` — **exact** assertions for placed metrics; consistency
+  assertions for emergent metrics; every aggregation, per-circuit filtering, the
+  poles-converted join; and the planted-hallucination rejection.
+- `tests/test_api.py` — the trust boundary (no answer in any payload), all modes,
+  deterministic daily, dev-tools toggle.
+- `tests/test_auth.py` — accounts, sessions, guest→account merge, the replay-proof
+  dedup, server-derived streaks, period & team leaderboards, reseed survival.
+- `tests/test_analytics.py` — bounded ingest, the allow-list, the token gate, and
+  funnel/mode aggregation.
+
+---
+
+## 9. Accounts, leaderboards & the trust boundary (`auth.py`)
+
+The account layer is **first-party and dependency-free** — no OAuth, no third-party
+auth. Passwords are PBKDF2-HMAC-SHA256 (stdlib `hashlib`, per-user salt); sessions
+are opaque server-stored bearer tokens (logout/expiry = a row delete).
+
+The trust boundary (Architecture §2.2) is enforced by construction: every guess is
+scored server-side and written to **`play_events`** with the server's score —
+never a client number. Leaderboard and profile totals are **recomputed** from
+those rows, so they can't be forged from `localStorage`. Guest play is logged
+against the client `anon_id` and re-keyed to the account on sign-in
+(`claim_anon_events`).
+
+- **Replay-proof:** the daily set is deterministic, so without a guard a player
+  could re-run it and stack points. A partial `UNIQUE(identity_key, question_id,
+  period)` index plus `INSERT OR IGNORE` pins each question to **one scored row per
+  player per day** (orphan reveals with no identity are exempt).
+- **Leaderboards:** `leaderboard(period=all|weekly|daily)` filters on
+  `created_at`; the resetting windows give newcomers a fresh race to win.
+- **Constructors' Championship:** `team_leaderboard` buckets verified points by the
+  player's pledged team (persisted via `POST /api/v1/profile/team`).
+- **Streaks:** `daily_streak` recomputes the consecutive-day run from `play_events`
+  (never trusts the client).
+
+---
+
+## 10. Analytics (`analytics.py`)
+
+First-party, pseudonymous, self-contained — no third-party tag, no cross-site
+cookie. The frontend batches an allow-listed set of events keyed by the guest
+`anon_id` + a per-tab session id and flushes them via `sendBeacon`; the server
+validates/bounds them into the persistent `analytics_events` table (pruned to 180
+days on boot). This is **aggregate telemetry only** — it never feeds scoring or the
+leaderboard.
+
+- `POST /api/v1/analytics/collect` — public, best-effort batch ingest (unknown
+  events dropped, batch capped, props sanitized).
+- `GET /api/v1/analytics/summary` — DAU/WAU/MAU, the open→start→complete→share→
+  signup funnel with conversion rates, D1/D7 retention, mode mix, account growth.
+  **Token-gated** by `F1_ANALYTICS_TOKEN` (unset ⇒ disabled). `/analytics` serves
+  the dashboard page (`frontend/analytics.html`, no dependencies).
+
+---
+
+## 11. Durability (Litestream)
+
+Accounts/sessions/play-history/analytics live only in the SQLite file, which an
+ephemeral free host wipes on redeploy/cold start. `backend/start.sh` makes it
+durable for free: on boot it restores the latest snapshot from S3-compatible object
+storage, then runs uvicorn under `litestream replicate`. It's **opt-in** (engaged
+only when `LITESTREAM_REPLICA_BUCKET` is set) and **graceful** (final snapshot on
+SIGTERM), with zero changes to application code or SQL. Setup is in HANDOFF §7.

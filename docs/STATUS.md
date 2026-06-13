@@ -1,10 +1,10 @@
 # Project status & roadmap
 
-_Last updated: 2026-06-10_
+_Last updated: 2026-06-13_
 
 A snapshot of where **F1 Stat Guesser** is, how it fits together, and what could
-come next. For the question design specifically, see
-[`question-types.md`](./question-types.md).
+come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
+engineering handoff. For question design see [`question-types.md`](./question-types.md).
 
 ---
 
@@ -12,7 +12,8 @@ come next. For the question design specifically, see
 
 A guest-first Formula 1 trivia game. You guess a numeric stat (e.g. "How many
 career wins does Lewis Hamilton have?") and are scored on how close you get, with
-an exponential-decay curve. Three timed quiz modes plus an endless arcade.
+an exponential-decay curve. Three daily quiz modes, an endless Free Practice mode,
+and an endless arcade.
 
 Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
 
@@ -24,6 +25,8 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
 - **Daily General Challenge** — 6 questions across all of F1 history.
 - **Daily Race Challenge** — 6 questions on teams, circuits and race-day feats.
 - **Hardcore** — 3 brutal questions, no slider (type-only).
+- **Free Practice** — endless single questions with an anti-scouting penalty;
+  non-competitive, **never recorded** (no totals/leaderboard write).
 - **Arcade Over/Under** — endless "who has more?" head-to-heads, streak-based.
 - Server-authoritative scoring: the answer never reaches the client; guesses are
   scored server-side (`backend/app/scoring.py`).
@@ -57,9 +60,9 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
   Senna/Prost/Mansell/Piquet (1984–93) and Schumacher (1994–2006) eras; older
   eras appear occasionally (`service.ERA_WEIGHT_BANDS`).
 - **Real data source**: a rate-limited, disk-cached, weekly-gated Jolpica
-  (Ergast) ETL (`backend/app/etl.py`) covering 1980→present can rebuild the bank
-  (`python -m app.seed --export`). The synthetic in-code seed is the offline
-  fallback.
+  (Ergast) ETL (`backend/app/etl.py`) covering the full **1950→present** World
+  Championship can rebuild the bank (`python -m app.seed --export`); the committed
+  bank spans 1950–2026. The synthetic in-code seed is the offline fallback.
 
 ### Frontend
 - Polished **landing page**: hero ("Welcome to F1 Stat Guesser") in Titillium
@@ -69,9 +72,11 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
   theming, live countdown HUD, share, PWA / add-to-home-screen.
 
 ### Quality
-- **64 tests passing** (`cd backend && python3 -m pytest -q`): scoring,
-  validation (incl. every new metric/aggregation), API trust boundary, all
-  modes, ETL ingestion, and the dataset export→load→serve round-trip.
+- **116 tests passing** (`cd backend && python3 -m pytest -q`): scoring,
+  validation (incl. every metric/aggregation), API trust boundary, all modes,
+  accounts/leaderboards/streaks, the replay-proof dedup, analytics ingest +
+  reporting + token gate, ETL ingestion, and the dataset export→load→serve
+  round-trip.
 
 ---
 
@@ -83,13 +88,17 @@ backend/app/
                  entity × years × constructor/circuit -> recomputed answer
   seed.py        question generator + dataset export/load + data-source router
   etl.py         Jolpica ETL: token-bucket rate limit, disk cache, weekly gate
-  service.py     quiz provisioning (era-weighted), token store, scoring, arcade
+  service.py     quiz/practice/arcade provisioning (era-weighted), token store
   scoring.py     exponential-decay percentage-error scoring
+  auth.py        accounts, sessions, play_events, leaderboards, streaks, teams
+  analytics.py   first-party event ingest (allow-listed) + aggregate reporting
   db.py          SQLite schema + lightweight migrations
   main.py        FastAPI app; self-seeds on boot; serves the static frontend
   data/          questions.json (the bank) + arcade.json (offline arcade)
-frontend/        index.html, style.css, app.js (guest-first, localStorage)
-docs/            design docs, question-types.md, this file
+backend/start.sh   prod entrypoint: Litestream restore+replicate around uvicorn
+frontend/        index.html, style.css, app.js (guest-first, localStorage),
+                 analytics.html (token-gated dashboard)
+docs/            HANDOFF, design docs, question-types.md, this file
 ```
 
 Data flow: **Jolpica API → staging tables → generator → validation → production
@@ -120,17 +129,24 @@ cd backend && python3 -m pytest -q
 ```
 
 Key env vars: `F1_DATA_SOURCE` (`dataset` | `jolpica` | `synthetic`),
-`F1_DB_PATH`, `F1_ETL_START_YEAR` / `F1_ETL_END_YEAR`.
+`F1_DB_PATH`, `F1_ETL_START_YEAR` / `F1_ETL_END_YEAR`, `F1_DEV_TOOLS` (`0` in
+prod), `F1_ANALYTICS_TOKEN`, and the `LITESTREAM_*` replica vars. Full table in
+[`HANDOFF.md`](./HANDOFF.md) §6.
 
 ---
 
 ## Deployment
 
 - `render.yaml` deploys **`main`**, `F1_DATA_SOURCE=dataset` (instant boot, no
-  network), DB on `/tmp` (ephemeral — rebuilt from the committed bank each boot).
-- Workflow: branch → PR into `main` → merge → Render auto-deploys.
-- **Manual step**: confirm the service's **Branch = `main`** in the Render
-  dashboard (Render stores it there too, not only in `render.yaml`).
+  network), `F1_DEV_TOOLS=0` (answer-key endpoint off). The build fetches the
+  Litestream binary; `backend/start.sh` is the entrypoint.
+- DB lives at `/tmp/f1stats.db`; **set the `LITESTREAM_*` vars** to make accounts
+  durable across the free host's redeploys/cold starts (see HANDOFF §7), else
+  they're rebuilt empty each boot.
+- Workflow: branch → merge to `main` → Render auto-deploys.
+- **Manual steps** (dashboard, not in repo): confirm **Branch = `main`**; set
+  `F1_ANALYTICS_TOKEN` to view `/analytics`; set the `LITESTREAM_*` vars for
+  durable accounts.
 
 ---
 
@@ -163,18 +179,17 @@ Key env vars: `F1_DATA_SOURCE` (`dataset` | `jolpica` | `synthetic`),
 - Difficulty calibration / adaptive difficulty from answer telemetry.
 - Expand achievements; daily-streak rewards; weekly themed rounds.
 
-**Platform**
-- Global Leaderboard + accounts with **server-reconstructed** totals (never
-  trust the client blob), per the trust-boundary design.
-- Migrate SQLite → Postgres and the in-memory token store → Redis.
+**Platform** (accounts, the server-verified leaderboards, the Constructors'
+Championship, durable storage and analytics are all **done** — see *Current
+state*)
+- Migrate SQLite → Postgres and the in-memory token store → Redis (needed only to
+  scale past one instance).
 - Run the weekly ETL on a real scheduler (cron / Celery beat) instead of the
   boot-time gate; keep `questions.json` refreshed automatically.
 - Real LLM question synthesizer behind the existing validation gate.
 
 **Product**
-- Wire the ad slots already stubbed in the reveal/summary views (analytics is
-  now shipped — see *Analytics* above).
+- Post-race recap quizzes; PWA push reminders (streak/new-daily nudges).
+- Wire the ad slots already stubbed in the reveal/summary views.
 - Next.js + Tailwind frontend (NextAuth guest-first, Framer Motion reveal).
 - Accessibility pass, i18n, social share cards.
-- A persistent disk or paid Render tier to avoid cold-start rebuilds (minor,
-  since the bank load is fast).

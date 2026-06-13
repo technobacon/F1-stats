@@ -89,7 +89,7 @@ Seed complete. Committed 6 questions, rejected 1.
 
 ```bash
 cd backend
-python3 -m pytest -q     # 52 tests: scoring, validation, API trust boundary, all modes, ETL ingestion
+python3 -m pytest -q     # 116 tests: scoring, validation, trust boundary, all modes, accounts, leaderboards, analytics, ETL
 ```
 
 ### Install on your phone (PWA)

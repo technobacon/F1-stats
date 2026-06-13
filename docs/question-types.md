@@ -72,7 +72,7 @@ synthetic seed and the real ETL ids.
 ```bash
 cd backend
 # Rebuild questions.json (+ arcade.json) from live data, era-weighted to ~1000:
-F1_DATA_SOURCE=jolpica F1_ETL_START_YEAR=1980 python3 -m app.seed --export
+F1_DATA_SOURCE=jolpica F1_ETL_START_YEAR=1950 python3 -m app.seed --export
 ```
 The site serves this committed bank with `F1_DATA_SOURCE=dataset` (instant boot,
 no network).

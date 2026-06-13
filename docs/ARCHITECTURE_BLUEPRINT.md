@@ -3,6 +3,13 @@
 **Module:** Full-Stack Deployment
 **Target Audience:** Full-Stack Developers / DevOps Engineers
 
+> **Design target, not as-built.** The stack below (Next.js / Postgres / Redis /
+> Celery / NextAuth) is the original vision. The shipped service realizes the same
+> *invariants* — server-authoritative scoring, the trust boundary, constructor
+> theming, the odometer reveal — as a single FastAPI + SQLite app with first-party
+> auth and (free) Litestream durability. See [HANDOFF](./HANDOFF.md) and
+> [Implementation Notes](./IMPLEMENTATION_NOTES.md) for current state.
+
 ### 0. Adopted Technology Stack
 
 | Layer | Technology | Rationale |
