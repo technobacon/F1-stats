@@ -381,6 +381,34 @@ def _is_significant(era_year: int | None, wins: int, points: float, champion: bo
     return champion
 
 
+def _driver_era_year(active_from: int | None, active_to: int | None) -> int | None:
+    """A driver's representative era for the significance gate: the midpoint of
+    their career span, mirroring how a question is gated by its scope's mid-span
+    year."""
+    if active_from is None or active_to is None:
+        return None
+    return (int(active_from) + int(active_to)) // 2
+
+
+def significant_driver_ids(conn: sqlite3.Connection) -> set[str]:
+    """Driver ids that clear the era-tiered significance gate, scored by each
+    driver's career-midpoint era. This is the SAME gate the question generator
+    applies to featured drivers, so Arcade surfaces the same calibre of driver
+    instead of insignificant also-rans."""
+    career = _driver_career_stats(conn)
+    champions = _champion_ids(conn)
+    keep: set[str] = set()
+    for r in conn.execute(
+        "SELECT driver_id, MIN(year) AS lo, MAX(year) AS hi "
+        "FROM staging_race_results GROUP BY driver_id"
+    ):
+        wins, points = career.get(r["driver_id"], (0, 0.0))
+        era = _driver_era_year(r["lo"], r["hi"])
+        if _is_significant(era, wins, points, r["driver_id"] in champions):
+            keep.add(r["driver_id"])
+    return keep
+
+
 # F1 dropped a driver's worst results from the championship through 1990 (various
 # "best N of M" schemes). Ergast/Jolpica reports the points scored in each race,
 # so summing race points OVERCOUNTS the official championship total for any window
@@ -883,7 +911,12 @@ def export_dataset(conn: sqlite3.Connection, n: int = 1000, out_path=None) -> di
 
 def export_arcade(conn: sqlite3.Connection, out_path=None, min_starts: int = 40) -> dict:
     """Snapshot per-driver career totals for the arcade metrics so Over/Under
-    runs from the committed bank with no staging tables present."""
+    runs from the committed bank with no staging tables present.
+
+    Only drivers that clear the era-tiered significance gate are included — the
+    same filter the question generator applies — so the committed snapshot (and
+    therefore the dataset-served Over/Under) carries no insignificant also-rans."""
+    significant = significant_driver_ids(conn)
     rows = conn.execute(
         "SELECT r.driver_id AS did, d.full_name AS nm, MIN(r.year) AS af, MAX(r.year) AS at, "
         "COUNT(*) AS starts FROM staging_race_results r "
@@ -892,6 +925,8 @@ def export_arcade(conn: sqlite3.Connection, out_path=None, min_starts: int = 40)
     ).fetchall()
     drivers = []
     for r in rows:
+        if r["did"] not in significant:
+            continue
         base = {"target_entity": "driver", "entity_id": r["did"],
                 "start_year": r["af"], "end_year": r["at"]}
         stats = {k: int(compute_metric(conn, {**base, "metric_target": k})) for k in _ARCADE_STAT_KEYS}

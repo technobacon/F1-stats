@@ -3,6 +3,8 @@
 Endpoints:
     GET  /api/v1/quiz/daily          -> 6 questions, NO answers, tracking tokens
     POST /api/v1/quiz/daily/verify   -> server-side score for one guess
+    GET  /api/v1/practice/question   -> one random Free Practice question (unlimited,
+                                        non-competitive; score is never recorded)
     GET  /api/v1/arcade/pair         -> over/under matchup (non-competitive v1)
     GET  /api/v1/dev/questions       -> full question bank WITH answers (proofreading
                                         tool; disable with F1_DEV_TOOLS=0)
@@ -32,6 +34,7 @@ from .models import (
     LeaderboardResponse,
     LoginRequest,
     MeResponse,
+    PracticeQuestionResponse,
     RegisterRequest,
     SetTeamRequest,
     TeamLeaderboardResponse,
@@ -122,6 +125,21 @@ def quiz(mode: str):
     return payload
 
 
+@app.get("/api/v1/practice/question", response_model=PracticeQuestionResponse)
+def practice_question():
+    """Serve one random Free Practice question. The mode is unlimited and its
+    scores are never recorded (see quiz_verify), so there is no daily cap and no
+    deterministic per-period seeding — every request is a fresh random draw."""
+    conn = get_conn()
+    try:
+        payload = service.build_practice_question(conn)
+    finally:
+        conn.close()
+    if payload is None:
+        raise HTTPException(503, "No questions provisioned. Run the seed pipeline.")
+    return payload
+
+
 @app.post("/api/v1/quiz/verify", response_model=VerifyResponse)
 def quiz_verify(req: VerifyRequest, authorization: str | None = Header(default=None)):
     result = service.verify_guess(req.tracking_token, req.guess)
@@ -131,8 +149,10 @@ def quiz_verify(req: VerifyRequest, authorization: str | None = Header(default=N
     # rebuilt trustworthily (Architecture §2.2). Logged in -> attach to the user;
     # logged out -> attach to the guest device id for later claim. Recording is
     # best-effort: a storage hiccup must not break scoring the guess.
+    # Free Practice is deliberately excluded: it is a non-competitive training mode
+    # whose scores must never touch a user's totals or the leaderboard.
     meta = service.token_meta(req.tracking_token)
-    if meta is not None:
+    if meta is not None and meta[1] != service.FREE_PRACTICE_MODE:
         question_id, game_mode = meta
         conn = get_conn()
         try:

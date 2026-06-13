@@ -48,6 +48,50 @@ def test_exported_questions_have_no_subjective_wording(staged, tmp_path):
         assert "in our database" not in text and "roughly" not in text
 
 
+def test_significance_gate_filters_arcade_drivers(staged):
+    """Arcade must apply the same era-tiered significance gate as the question
+    generator: an insignificant modern also-ran (no wins, < 50 career points) is
+    excluded, while a multiple champion is kept."""
+    # A nobody: races in the 2020s, never wins, scores under the 50-point floor.
+    staged.execute(
+        "INSERT INTO staging_drivers (driver_id, full_name, active_from, active_to) "
+        "VALUES ('nobody', 'Nobody McAlsoran', 2021, 2023)"
+    )
+    for rnd in range(1, 4):
+        staged.execute(
+            "INSERT INTO staging_race_results "
+            "(driver_id, constructor_id, year, round, position, grid, points) "
+            "VALUES ('nobody', 'haas', 2022, ?, 15, 18, 0)", (rnd,)
+        )
+    staged.commit()
+
+    keep = seed.significant_driver_ids(staged)
+    assert "nobody" not in keep
+    assert "schumacher" in keep  # 7-time champion, always significant
+
+    # And the export honours it — the also-ran never reaches the snapshot.
+    import tempfile
+    from pathlib import Path
+    out = Path(tempfile.mkdtemp()) / "arcade.json"
+    seed.export_arcade(staged, out_path=out, min_starts=1)
+    ids = {d["driver_id"] for d in json.loads(out.read_text())["drivers"]}
+    assert "nobody" not in ids and "schumacher" in ids
+
+
+def test_committed_arcade_snapshot_is_significant_only():
+    """The shipped arcade snapshot carries no insignificant drivers: every modern
+    (2010s+) entry is a race winner and every pre-2000 entry is a champion."""
+    if not seed.ARCADE_PATH.exists():
+        pytest.skip("committed arcade snapshot not present")
+    drivers = json.loads(seed.ARCADE_PATH.read_text())["drivers"]
+    for d in drivers:
+        era = (d["active_from"] + d["active_to"]) // 2
+        if 2010 <= era < 2020:
+            assert d["stats"]["wins"] >= 1, f"{d['driver_id']} is a 2010s non-winner"
+        if era < 2000:
+            assert d["full_name"] in seed.WORLD_CHAMPIONS, f"{d['driver_id']} is a pre-2000 non-champion"
+
+
 def test_committed_bank_loads_and_serves():
     """The shipped questions.json / arcade.json power quiz + arcade with no staging."""
     if not seed.DATASET_PATH.exists():

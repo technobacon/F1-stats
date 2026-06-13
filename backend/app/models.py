@@ -28,6 +28,13 @@ class DailyQuizResponse(BaseModel):
     questions: list[DailyQuestion]
 
 
+class PracticeQuestionResponse(BaseModel):
+    """A single Free Practice question. Same trust boundary as the daily set — no
+    answer field — but served one at a time and never recorded server-side."""
+    game_mode: str
+    question: DailyQuestion
+
+
 class VerifyRequest(BaseModel):
     tracking_token: str
     guess: float
