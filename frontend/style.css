@@ -210,9 +210,17 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 .car-thumb.dragging { cursor:grabbing; filter:drop-shadow(0 10px 18px rgba(0,0,0,.6)); }
 .car-sprite { display:block; width:100%; height:auto; }
 .car-body { fill:var(--color-primary); }
+.car-wing { fill:var(--color-secondary); }
 .car-dark { fill:#0b0e13; }
 .car-tyre { fill:#15181f; }
+.car-hub  { fill:#3a3f49; }
 .car-cockpit { fill:#fff; opacity:.85; }
+/* Ghost car: the revealed actual-answer marker — flat grey at 70% opacity. */
+.car-ghost { opacity:.7; }
+.car-ghost .car-body, .car-ghost .car-wing, .car-ghost .car-dark { fill:#8b95a5; }
+.car-ghost .car-tyre { fill:#5b626e; }
+.car-ghost .car-hub { fill:#3a3f49; }
+.car-ghost .car-cockpit { fill:#d3d9e2; }
 .curve-end { position:absolute; bottom:-.2rem; font-size:.72rem; font-weight:700; color:var(--muted);
              font-variant-numeric:tabular-nums; }
 .curve-min { left:0; } .curve-max { right:0; }
@@ -254,14 +262,15 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .reveal .timeline { position:relative; height:80px; margin:2rem 0 1rem; }
 .timeline-track { position:absolute; top:50%; left:0; right:0; height:8px;
                   transform:translateY(-50%); background:var(--line); border-radius:4px; }
-.timeline-node { position:absolute; top:50%; transform:translate(-50%,-50%); }
-.timeline-node span { position:absolute; top:-24px; left:50%; transform:translateX(-50%);
+.timeline-node { position:absolute; top:50%; transform:translate(-50%,-50%);
+                 width:clamp(46px,12vw,62px); }
+.timeline-node .car-sprite { width:100%; filter:drop-shadow(0 4px 8px rgba(0,0,0,.45)); }
+.timeline-node span { position:absolute; top:-22px; left:50%; transform:translateX(-50%);
                       font-size:.65rem; white-space:nowrap; color:var(--muted); }
-.timeline-node.guess { width:18px; height:18px; border-radius:50%;
-                       background:var(--color-primary); transition:left .5s cubic-bezier(.2,.8,.2,1); }
-.timeline-node.actual { width:6px; height:42px; border-radius:3px; background:#fff;
-                        box-shadow:0 0 0 2px rgba(0,0,0,.18), 0 0 14px 3px var(--color-primary); }
-.timeline-node.actual span { color:#fff; }
+/* The locked-in guess (full team car) rides above the ghost when they overlap. */
+.timeline-node.guess { z-index:2; transition:left .5s cubic-bezier(.2,.8,.2,1); }
+.timeline-node.actual { z-index:1; }
+.timeline-node.actual span { color:var(--text); }
 .reveal-numbers { display:flex; justify-content:space-between; font-size:.9rem; color:var(--muted); }
 #reveal-actual { transition:opacity .25s, transform .25s; }
 #reveal-actual.pending { opacity:.35; }
