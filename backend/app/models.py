@@ -45,11 +45,24 @@ class VerifyRequest(BaseModel):
     anon_id: str | None = None
 
 
+class QuestionInsight(BaseModel):
+    """Social proof for the question just answered (auth.question_insight): how
+    many players have answered it, the average score, and the percentage of them
+    this guess beat. Built from server-scored events, so it can't be gamed."""
+    players_answered: int
+    average_score: int
+    beat_percent: int = Field(..., ge=0, le=100)
+
+
 class VerifyResponse(BaseModel):
     score: int = Field(..., ge=0, le=5000)
     actual: float = Field(..., description="True value, revealed only AFTER the guess")
     guess: float
     max_score: int = 5000
+    # Aggregate comparison vs. other players. Present only for recorded competitive
+    # modes once enough players have answered; None for Free Practice and new
+    # questions (it is never derivable into the answer).
+    insight: QuestionInsight | None = None
 
 
 class RegisterRequest(BaseModel):
@@ -60,6 +73,9 @@ class RegisterRequest(BaseModel):
     # The constructor faction the player pledges to (PRD §5.3). Optional; an
     # unknown value is normalized to the default rather than rejected.
     selected_team: str | None = None
+    # OPTIONAL email for future opt-in streak/daily reminders. Blank/None is fine;
+    # a malformed non-empty value is rejected with a 400.
+    email: str | None = None
 
 
 class LoginRequest(BaseModel):

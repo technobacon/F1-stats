@@ -4,6 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>GridMaster</title>
+  <meta name="description" content="Guess the Formula 1 stat, get scored on how close you are. A new daily F1 challenge every day — drivers, teams and circuits across every era." />
+
+  <!-- Rich link previews for shared results (Open Graph + Twitter Card), so a
+       pasted GridMaster link unfurls into a card instead of a bare URL. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="GridMaster" />
+  <meta property="og:title" content="GridMaster — the daily Formula 1 stats challenge" />
+  <meta property="og:description" content="Guess the F1 stat, get scored on how close you are. New daily challenge — can you beat your friends?" />
+  <meta property="og:image" content="/static/icon-180.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="GridMaster — the daily Formula 1 stats challenge" />
+  <meta name="twitter:description" content="Guess the F1 stat, get scored on how close you are. New daily challenge — can you beat your friends?" />
+  <meta name="twitter:image" content="/static/icon-180.png" />
 
   <!-- PWA / iOS add-to-home-screen -->
   <link rel="manifest" href="/static/manifest.json" />
@@ -19,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=12" />
+  <link rel="stylesheet" href="/static/style.css?v=14" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -71,6 +84,9 @@
             <button class="btn-primary" data-view="quiz" data-mode="daily">Play the Daily Challenge</button>
             <button class="btn-ghost" data-view="arcade">Try Arcade</button>
           </div>
+          <!-- Streak hook: loud, loss-averse reminder to keep the run alive.
+               Populated by renderStreakBanner(); hidden when there's no streak. -->
+          <button class="streak-banner hidden" id="streak-banner" data-view="quiz" data-mode="daily"></button>
         </div>
         <div class="hero-checkers" aria-hidden="true"></div>
       </div>
@@ -213,6 +229,7 @@
           <div>Actual: <strong id="reveal-actual">—</strong></div>
         </div>
         <div class="odometer" id="odometer">0</div>
+        <p class="reveal-insight hidden" id="reveal-insight"></p>
         <p class="penalty-note hidden" id="practice-penalty"></p>
         <button class="btn-primary" id="next-question">Next</button>
         <button class="btn-ghost data-check-inline" id="data-check-reveal" title="Browse every question with its verified answer">🔍 Check the stats</button>
@@ -225,8 +242,11 @@
         <p>points this session</p>
         <div class="summary-grid" id="summary-grid" aria-label="Your result grid"></div>
         <div class="accuracy-row" id="accuracy-row"></div>
+        <div class="summary-streak hidden" id="summary-streak"></div>
+        <p class="summary-insight hidden" id="summary-insight"></p>
         <div class="ad-slot ad-summary" data-ad="summary-display">ad · summary display</div>
         <button class="btn-primary" id="share-result">Share Result</button>
+        <button class="btn-secondary" id="challenge-friend">🏎️ Challenge a friend</button>
         <button class="btn-secondary" id="summary-back">Back to Modes</button>
         <p class="muted" id="share-status"></p>
       </div>
@@ -273,6 +293,22 @@
           <button class="btn-secondary" id="logout-btn">Log out</button>
         </div>
         <button class="btn-secondary danger" id="reset-btn">Reset local progress</button>
+      </div>
+
+      <!-- Achievements: a data-driven catalog (app.js ACHIEVEMENTS), evaluated
+           client-side after each session/arcade run. Cosmetic + local, like the
+           streak, per Architecture §2.2. -->
+      <div class="card">
+        <div class="ach-head">
+          <h2>Achievements</h2>
+          <span class="badge" id="ach-count">0 / 0</span>
+        </div>
+        <div class="ach-filter" role="tablist" aria-label="Achievement filter">
+          <button class="ach-filter-tab active" data-filter="all">All</button>
+          <button class="ach-filter-tab" data-filter="unlocked">Unlocked</button>
+          <button class="ach-filter-tab" data-filter="locked">Locked</button>
+        </div>
+        <div class="ach-grid" id="ach-grid"></div>
       </div>
 
       <!-- Leaderboards: ranked by SERVER-verified points only (Architecture §2.2
@@ -366,6 +402,12 @@
         <label for="auth-password">Password</label>
         <input type="password" id="auth-password" name="password" autocomplete="current-password"
                placeholder="at least 8 characters" required minlength="8" />
+        <!-- Optional email: register only, for opt-in streak/daily reminders. -->
+        <div id="auth-email-row">
+          <label for="auth-email">Email <span class="auth-optional">optional — for streak reminders</span></label>
+          <input type="email" id="auth-email" name="email" autocomplete="email"
+                 placeholder="you@example.com (optional)" />
+        </div>
         <p class="auth-error hidden" id="auth-error"></p>
         <button type="submit" class="btn-primary" id="auth-submit">Create account</button>
       </form>
@@ -376,7 +418,13 @@
     </div>
   </div>
 
+  <!-- Sector flash: F1 timing-board style scroll across the screen when a guess
+       lands in a purple (≤10%) or green (≤25%) sector. -->
+  <div id="sector-flash" class="sector-flash" aria-hidden="true">
+    <span class="sector-flash-text" id="sector-flash-text"></span>
+  </div>
+
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/app.js?v=12"></script>
+  <script src="/static/app.js?v=14"></script>
 </body>
 </html>

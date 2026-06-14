@@ -103,8 +103,27 @@ const defaultState = () => ({
   is_guest: true, selected_team: "mclaren",
   lifetime_points: 0, games_played: 0, average_closeness: 0,
   daily_streak: 0, last_played_date: null, unlocked_achievements: [],
+  // Streak freeze: one missed day inside a run is forgiven once (re-armed when a
+  // new run starts). Mirrors the server rule in auth.daily_streak.
+  streak_freeze_available: true,
+  // Counters + flags backing the achievement catalog (see ACHIEVEMENTS). Lazily
+  // filled by ensureAch(); kept local/cosmetic like the streak (Architecture §2.2).
+  ach: {},
   _closeness_sum: 0, _q_count: 0,
 });
+
+/* The achievement stat bucket, ensured to exist (older saved states predate it). */
+function ensureAch() {
+  if (!state.ach || typeof state.ach !== "object") state.ach = {};
+  if (!state.ach.flags || typeof state.ach.flags !== "object") state.ach.flags = {};
+  if (!Array.isArray(state.ach.teams_used)) state.ach.teams_used = [];
+  return state.ach;
+}
+function achFlag(name) { ensureAch().flags[name] = true; }
+function recordTeamUse(team) {
+  const a = ensureAch();
+  if (team && !a.teams_used.includes(team)) { a.teams_used.push(team); }
+}
 
 function loadState() {
   try {
@@ -132,19 +151,23 @@ function isoWeek() {
 
 /* ---- All 2026 F1 constructor colour schemes ----
  * Each team has a main (primary) colour and a secondary accent. Main buttons render
- * solid in the primary with a thin secondary stripe along the bottom edge. */
+ * solid in the primary with a thin secondary stripe along the bottom edge.
+ * `ink` is a legibility-safe variant of the colour used for TEXT on the dark UI:
+ * for most teams it equals the primary, but dark primaries (Red Bull navy, Haas
+ * near-black, Williams/RB deep blue, Aston dark teal) are lightened so they don't
+ * vanish against the background. Fills/borders keep the true `primary`. */
 const TEAMS = {
-  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#1B2425", text: "#000" },
-  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#FFEB00", text: "#fff" },
-  mercedes:     { name: "Mercedes",     primary: "#00D2BE", secondary: "#0A0A0A", text: "#000" },
-  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#DC0000", text: "#fff" },
-  aston_martin: { name: "Aston Martin", primary: "#006F62", secondary: "#CEDC00", text: "#fff" },
-  alpine:       { name: "Alpine",       primary: "#FF87BC", secondary: "#0090FF", text: "#000" },
-  williams:     { name: "Williams",     primary: "#0064FF", secondary: "#FFFFFF", text: "#fff" },
-  rb:           { name: "Racing Bulls", primary: "#1634CE", secondary: "#FFFFFF", text: "#fff" },
-  haas:         { name: "Haas",         primary: "#1A1A1A", secondary: "#E8002D", text: "#fff" },
-  audi:         { name: "Audi",         primary: "#8E8E8E", secondary: "#CC0000", text: "#000" },
-  cadillac:     { name: "Cadillac",     primary: "#FFFFFF", secondary: "#0D0D0D", text: "#000" },
+  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#1B2425", text: "#000", ink: "#FF8000" },
+  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#FFEB00", text: "#fff", ink: "#FF3232" },
+  mercedes:     { name: "Mercedes",     primary: "#00D2BE", secondary: "#0A0A0A", text: "#000", ink: "#00D2BE" },
+  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#DC0000", text: "#fff", ink: "#7E7CFF" },
+  aston_martin: { name: "Aston Martin", primary: "#006F62", secondary: "#CEDC00", text: "#fff", ink: "#1FC8AC" },
+  alpine:       { name: "Alpine",       primary: "#FF87BC", secondary: "#0090FF", text: "#000", ink: "#FF87BC" },
+  williams:     { name: "Williams",     primary: "#0064FF", secondary: "#FFFFFF", text: "#fff", ink: "#4D8DFF" },
+  rb:           { name: "Racing Bulls", primary: "#1634CE", secondary: "#FFFFFF", text: "#fff", ink: "#5A77FF" },
+  haas:         { name: "Haas",         primary: "#1A1A1A", secondary: "#E8002D", text: "#fff", ink: "#FF4D67" },
+  audi:         { name: "Audi",         primary: "#8E8E8E", secondary: "#CC0000", text: "#000", ink: "#C7CCD4" },
+  cadillac:     { name: "Cadillac",     primary: "#FFFFFF", secondary: "#0D0D0D", text: "#000", ink: "#FFFFFF" },
 };
 
 /* ---- Theming (Architecture §3.1) ---- */
@@ -154,6 +177,7 @@ function applyTeam(team) {
   root.setAttribute("data-team", team);
   root.style.setProperty("--color-primary", t.primary);
   root.style.setProperty("--color-secondary", t.secondary);
+  root.style.setProperty("--color-ink", t.ink || t.primary);
   root.style.setProperty("--btn-text", t.text);
   /* Header dot: solid main colour with a secondary accent ring */
   const swatch = document.getElementById("team-btn-swatch");
@@ -309,6 +333,7 @@ function navigate(view, mode) {
   if (view === "quiz") { currentMode = mode || currentMode; renderQuizIntro(); }
   if (view === "arcade") loadArcade();
   if (view === "profile") renderProfile();
+  if (view === "home") renderStreakBanner();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
@@ -322,6 +347,10 @@ document.querySelectorAll("[data-view]").forEach((el) => {
 let quiz = null, qPos = 0, sessionScore = 0, sessionCloseness = 0;
 // Per-question scores for this run, used to build the spoiler-free share grid.
 let sessionResults = [];
+// Per-question "beat X% of players" percentiles (social proof), when available.
+let sessionInsights = [];
+// Purple sectors (guesses within 10%) hit this session — for the Grand Slam etc.
+let sessionPurpleCount = 0;
 let practiceCount = 0, practiceTimer = null; // Free Practice: questions answered + penalty countdown
 
 function playedKey(mode) { return `played_${mode}`; }
@@ -367,7 +396,8 @@ async function startQuiz() {
     if (!res.ok) throw new Error(await res.text());
     quiz = await res.json();
     track("quiz_start", { mode: currentMode });
-    qPos = 0; sessionScore = 0; sessionCloseness = 0; sessionResults = [];
+    qPos = 0; sessionScore = 0; sessionCloseness = 0; sessionResults = []; sessionInsights = [];
+    sessionPurpleCount = 0;
     document.getElementById("q-total").textContent = quiz.questions.length;
     document.getElementById("q-mode-badge").textContent = currentMode.replace("_", "-");
     hide("quiz-intro"); show("quiz-play"); hide("quiz-summary"); hide("quiz-reveal");
@@ -394,7 +424,7 @@ async function startFreePractice() {
   const status = document.getElementById("quiz-status");
   status.textContent = "Loading question…";
   clearInterval(practiceTimer);
-  practiceCount = 0; sessionScore = 0; sessionCloseness = 0;
+  practiceCount = 0; sessionScore = 0; sessionCloseness = 0; sessionPurpleCount = 0;
   try {
     const q = await fetchPracticeQuestion();
     track("practice_start");
@@ -614,6 +644,22 @@ async function submitGuess() {
     sessionScore += result.score;
     sessionCloseness += result.score / result.max_score;
     sessionResults.push(result.score / result.max_score);  // 0..1 per question
+    if (result.insight) sessionInsights.push(result.insight.beat_percent);
+
+    // Sector + achievement bookkeeping (all modes). Purple ≤10%, green ≤25%.
+    const sector = sectorForResult(result);
+    result._sector = sector;
+    const a = ensureAch();
+    if (result.score >= result.max_score) a.perfect = (a.perfect || 0) + 1;  // exact hit
+    if (sector === "purple") a.purple = (a.purple || 0) + 1;
+    if (sector === "purple" || sector === "green") a.green = (a.green || 0) + 1;
+    if (quiz && quiz.free) {
+      a.practice_questions = (a.practice_questions || 0) + 1;
+      if (sector === "purple") achFlag("practice_purple");
+    } else if (sector === "purple") {
+      sessionPurpleCount += 1;
+    }
+    evaluateAchievements();
     revealScore(q, result);
   } catch (e) {
     toast("Couldn't score that — try again.");
@@ -664,6 +710,7 @@ function revealScore(q, result) {
   actualText.classList.remove("revealed");
   actualText.classList.add("pending");
   document.getElementById("odometer").textContent = "0";
+  document.getElementById("reveal-insight").classList.add("hidden");
 
   // Drop the guess marker in promptly, then slide the answer bar across slowly
   // with an ease-in-out (speeds up, then eases into the answer — anticipation).
@@ -699,8 +746,53 @@ function slideToAnswer(node, textEl, targetPct, result) {
       textEl.classList.remove("pending");
       textEl.classList.add("revealed");
       tickOdometer(result.score);
+      renderRevealInsight(result);
+      if (result._sector) flashSector(result._sector);
     }
   })(start);
+}
+
+/* Classify a guess by percentage error, F1-timing style:
+ *   purple  — within 10% (a "purple sector", the fastest)
+ *   green   — within 25%
+ *   null    — outside both. */
+function sectorForResult(result) {
+  const actual = Math.abs(result.actual);
+  if (actual === 0) return result.guess === result.actual ? "purple" : null;
+  const err = Math.abs(result.guess - result.actual) / actual;
+  if (err <= 0.10) return "purple";
+  if (err <= 0.25) return "green";
+  return null;
+}
+
+/* The big "<TEAM> PURPLE/GREEN SECTOR" scroll across the screen, in the F1 timing
+ * purple/green. The team name is prefixed so it feels like your garage called it
+ * in. Fixed sector colours (not the team colour) keep it legible on any theme. */
+let sectorFlashTimer = null;
+function flashSector(kind) {
+  const wrap = document.getElementById("sector-flash");
+  const text = document.getElementById("sector-flash-text");
+  if (!wrap || !text) return;
+  const team = (TEAMS[state.selected_team] || TEAMS.mclaren).name.toUpperCase();
+  text.textContent = `${team} ${kind === "purple" ? "PURPLE" : "GREEN"} SECTOR`;
+  wrap.classList.remove("purple", "green", "show");
+  void wrap.offsetWidth;                 // restart the CSS animation
+  wrap.classList.add(kind, "show");
+  clearTimeout(sectorFlashTimer);
+  sectorFlashTimer = setTimeout(() => wrap.classList.remove("show"), 1800);
+}
+
+/* Social proof under the score: how this guess compares to everyone who has
+ * answered the same question. Server-computed (auth.question_insight), shown only
+ * once a small sample exists so it never reads "you beat 0%". */
+function renderRevealInsight(result) {
+  const el = document.getElementById("reveal-insight");
+  if (!el) return;
+  const ins = result && result.insight;
+  if (!ins || ins.players_answered < 5) { el.classList.add("hidden"); return; }
+  el.innerHTML = `You beat <strong>${ins.beat_percent}%</strong> of players here · ` +
+    `avg ${ins.average_score.toLocaleString()} pts`;
+  el.classList.remove("hidden");
 }
 
 function tickOdometer(target) {
@@ -747,18 +839,67 @@ function finishSession() {
       ? Math.round((new Date(today) - new Date(state.last_played_date)) / 864e5) : null;
     if (daysSince === 0) { /* replay same day — keep streak */ }
     else if (daysSince === 1) state.daily_streak += 1;
-    else state.daily_streak = 1;
+    else if (daysSince === 2 && state.streak_freeze_available) {
+      // Streak freeze: forgive a single missed day, once per run.
+      state.daily_streak += 1;
+      state.streak_freeze_available = false;
+      ensureAch().comeback_freezes = (ensureAch().comeback_freezes || 0) + 1;
+      achFlag("comeback");
+    } else {
+      state.daily_streak = 1;            // run reset
+      state.streak_freeze_available = true;  // re-arm the freeze for the new run
+    }
     state.last_played_date = today;
   }
-  awardAchievements(acc);
+
+  // Session-level achievement stats (competitive modes only).
+  const a = ensureAch();
+  a.sessions = (a.sessions || 0) + 1;
+  a.questions = (a.questions || 0) + quiz.questions.length;
+  if (currentMode === "daily") a.daily_sessions = (a.daily_sessions || 0) + 1;
+  if (currentMode === "race_week") a.race_sessions = (a.race_sessions || 0) + 1;
+  a.best_session = Math.max(a.best_session || 0, sessionScore);
+  a.max_purple_in_session = Math.max(a.max_purple_in_session || 0, sessionPurpleCount);
+  a.max_streak = Math.max(a.max_streak || 0, state.daily_streak);
+  const h = new Date().getUTCHours();
+  if (h >= 22 || h < 5) achFlag("night_owl");
+  if (h >= 5 && h < 8) achFlag("early_bird");
+  if (localStorage.getItem("played_daily") === utcDate() &&
+      localStorage.getItem("played_race_week") === utcDate()) achFlag("double_header");
+
   saveState(state);
+  evaluateAchievements();
+
+  // Loud streak callout + session social proof on the summary, plus refresh the
+  // home banner and (signed-in) the authoritative server streak.
+  renderSummaryEngagement();
+  renderStreakBanner();
+  if (isSignedIn()) refreshMe().then(renderProfile);
 }
 
-function awardAchievements(acc) {
-  const add = (a) => { if (!state.unlocked_achievements.includes(a)) { state.unlocked_achievements.push(a); toast(`🏆 Achievement: ${a.replace(/_/g, " ")}`); } };
-  if (sessionScore >= 20000) add("sharp_shooter");
-  if (acc === 100) add("flawless_lap");
-  if (state.daily_streak >= 3) add("podium_streak");
+/* The summary's streak flame and "you beat X% of players" line — the two hooks
+ * that turn one finished run into a reason to come back and to share. */
+function renderSummaryEngagement() {
+  const streakEl = document.getElementById("summary-streak");
+  if (streakEl) {
+    if (currentMode === "daily" && state.daily_streak > 0) {
+      streakEl.innerHTML = `<span class="flame">🔥</span> <strong>${state.daily_streak}-day streak!</strong>` +
+        ` <span class="muted">Come back tomorrow to keep it alive.</span>`;
+      streakEl.classList.remove("hidden");
+    } else {
+      streakEl.classList.add("hidden");
+    }
+  }
+  const insEl = document.getElementById("summary-insight");
+  if (insEl) {
+    if (sessionInsights.length) {
+      const avg = Math.round(sessionInsights.reduce((a, b) => a + b, 0) / sessionInsights.length);
+      insEl.innerHTML = `📊 You beat <strong>${avg}%</strong> of players on average today.`;
+      insEl.classList.remove("hidden");
+    } else {
+      insEl.classList.add("hidden");
+    }
+  }
 }
 
 document.getElementById("summary-back").addEventListener("click", () => navigate("home"));
@@ -780,28 +921,64 @@ function dailyNumber() {
   return Math.floor((Date.now() - epoch) / 864e5) + 1;
 }
 
+/* A clickable deep link back into the exact mode played, so a shared result is a
+ * one-tap invite to the same challenge rather than just the homepage. Parsed on
+ * boot by handleDeepLink(). */
+function shareLink() {
+  const mode = currentMode === "race_week" ? "race"
+             : currentMode === "free_practice" ? "practice" : "daily";
+  return `${location.origin}/?play=${mode}`;
+}
+
 function buildShareText() {
   const grid = sessionResults.map(closenessSquare).join("");
   const max = quiz.questions.length * 5000;
   const tag = currentMode === "daily" ? `Daily #${dailyNumber()}`
             : currentMode === "race_week" ? `Race Challenge #${dailyNumber()}`
             : "Free Practice";
+  // Optional brag line from the per-question percentiles (social proof in shares
+  // is a strong pull — "beat 72% of players" invites a comeback).
+  let brag = "";
+  if (sessionInsights.length) {
+    const avg = Math.round(sessionInsights.reduce((a, b) => a + b, 0) / sessionInsights.length);
+    brag = `\nBeat ${avg}% of players`;
+  }
   // Spoiler-free: shares the closeness pattern and total, never the answers.
-  return `🏁 GridMaster — ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts\n${location.origin}`;
+  return `🏁 GridMaster — ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts${brag}` +
+    `\nCan you beat me? ${shareLink()}`;
 }
 
-document.getElementById("share-result").addEventListener("click", async () => {
-  track("share", { mode: currentMode });
-  const text = buildShareText();
+/* Try the native share sheet, fall back to clipboard, then to inline text. */
+async function shareOrCopy(text, copiedMsg) {
   if (navigator.share) {
     try { await navigator.share({ title: "GridMaster", text }); return; } catch { /* cancelled */ }
   }
   try {
     await navigator.clipboard.writeText(text);
-    document.getElementById("share-status").textContent = "Result copied — paste it to share!";
+    document.getElementById("share-status").textContent = copiedMsg;
   } catch {
     document.getElementById("share-status").textContent = text;
   }
+}
+
+document.getElementById("share-result").addEventListener("click", async () => {
+  track("share", { mode: currentMode });
+  const a = ensureAch(); a.shares = (a.shares || 0) + 1; saveState(state);
+  evaluateAchievements();
+  await shareOrCopy(buildShareText(), "Result copied — paste it to share!");
+});
+
+/* Direct "I dare you" invite — same deep link, framed as a head-to-head challenge
+ * rather than a result post. The two have different psychology, so we offer both. */
+document.getElementById("challenge-friend").addEventListener("click", async () => {
+  track("challenge_friend", { mode: currentMode });
+  const a = ensureAch(); a.challenges = (a.challenges || 0) + 1; saveState(state);
+  evaluateAchievements();
+  const tag = currentMode === "race_week" ? "Daily Race Challenge"
+            : currentMode === "daily" ? "Daily Challenge" : "GridMaster run";
+  const text = `🏁 I just scored ${sessionScore.toLocaleString()} on today's GridMaster ${tag}. ` +
+    `Think you can beat me?\n${shareLink()}`;
+  await shareOrCopy(text, "Challenge copied — send it to a friend!");
 });
 
 /* ===================== ARCADE OVER/UNDER ===================== */
@@ -840,6 +1017,8 @@ function pick(which) {
   if (streak > best) { best = streak; localStorage.setItem("arcade_best", best); }
   document.getElementById("arcade-streak").textContent = streak;
   document.getElementById("arcade-best").textContent = best;
+  achFlag("arcade_played");
+  evaluateAchievements();
   document.getElementById("arcade-result").textContent =
     pickedHigher ? "Correct! Loading next…" : "Streak reset. Loading next…";
   setTimeout(loadArcade, 1400);
@@ -853,6 +1032,27 @@ document.getElementById("arcade-b").addEventListener("click", () => pick("b"));
  * server-scored totals (Architecture §2.2) — falling back to local stats for a
  * guest. Streak / achievements / team stay local (cosmetic). */
 let serverStats = null;
+
+/* The current daily streak to display: the authoritative server value when signed
+ * in, otherwise the guest-local one. */
+function currentStreak() {
+  return (isSignedIn() && serverStats && serverStats.daily_streak != null)
+    ? serverStats.daily_streak : state.daily_streak;
+}
+
+/* Home-page streak hook. Loud and loss-averse: losing a long streak is the moment
+ * players churn, so we remind them it's on the line every time they land on home. */
+function renderStreakBanner() {
+  const el = document.getElementById("streak-banner");
+  if (!el) return;
+  const n = currentStreak();
+  if (!n || n < 1) { el.classList.add("hidden"); return; }
+  const playedToday = isCapped("daily");
+  el.innerHTML = playedToday
+    ? `<span class="flame">🔥</span> <span><strong>${n}-day streak</strong> secured — see you tomorrow!</span>`
+    : `<span class="flame">🔥</span> <span><strong>${n}-day streak</strong> — play today's Daily to keep it alive</span>`;
+  el.classList.remove("hidden");
+}
 
 function renderProfile() {
   const signedIn = isSignedIn();
@@ -873,8 +1073,10 @@ function renderProfile() {
   document.getElementById("p-streak").textContent =
     signedIn && serverStats && serverStats.daily_streak != null
       ? serverStats.daily_streak : state.daily_streak;
-  document.getElementById("p-achievements").textContent =
-    state.unlocked_achievements.length ? state.unlocked_achievements.map((a) => a.replace(/_/g, " ")).join(", ") : "none yet";
+  const achHave = (state.unlocked_achievements || []).filter(
+    (id) => ACHIEVEMENTS.some((a) => a.id === id)).length;
+  document.getElementById("p-achievements").textContent = `${achHave} / ${ACHIEVEMENTS.length} unlocked`;
+  renderAchievements();
 
   document.getElementById("guest-badge").textContent = signedIn ? "member" : "guest";
   document.getElementById("account-guest").classList.toggle("hidden", signedIn);
@@ -992,6 +1194,8 @@ const Auth = (() => {
       register ? "Sign in instead" : "Create one instead";
     document.getElementById("auth-password").setAttribute(
       "autocomplete", register ? "new-password" : "current-password");
+    // Email is only collected at sign-up — hide it on the login form.
+    document.getElementById("auth-email-row").classList.toggle("hidden", !register);
   }
 
   function showError(msg) {
@@ -1004,14 +1208,18 @@ const Auth = (() => {
     e.preventDefault();
     const username = document.getElementById("auth-username").value.trim();
     const password = document.getElementById("auth-password").value;
+    // Email is optional and register-only; omit it entirely when blank or on login.
+    const email = document.getElementById("auth-email").value.trim();
     const btn = document.getElementById("auth-submit");
     btn.disabled = true;
     try {
+      const payload = { username, password, anon_id: anonId(), selected_team: state.selected_team };
+      if (mode === "register" && email) payload.email = email;
       const res = await fetch(`${API}/auth/${mode}`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         // Pledge the locally-chosen team on sign-up so the new account joins that
         // faction in the Constructors' Championship from its first point.
-        body: JSON.stringify({ username, password, anon_id: anonId(), selected_team: state.selected_team }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const detail = await res.json().catch(() => ({}));
@@ -1026,7 +1234,10 @@ const Auth = (() => {
       // Adopt the team the server has on file for this account (it persists the
       // faction across devices, unlike the local-only guest choice).
       if (body.selected_team) applyTeam(body.selected_team);
-      state.is_guest = false; saveState(state);
+      state.is_guest = false;
+      recordTeamUse(body.selected_team);  // the pledged team counts toward collection badges
+      saveState(state);
+      evaluateAchievements();  // "Contract Signed" + any points-based unlocks from the merge
       close();
       toast(body.claimed_events
         ? `Welcome, ${body.username}! ${body.claimed_events} guest result${body.claimed_events === 1 ? "" : "s"} saved to your account.`
@@ -1096,7 +1307,9 @@ const TeamPicker = (() => {
       card.addEventListener("click", () => {
         track("team_select", { team: card.dataset.team });
         applyTeam(card.dataset.team);
+        recordTeamUse(card.dataset.team);  // for the constructor-collection achievements
         saveState(state);
+        evaluateAchievements();
         syncTeam(card.dataset.team);  // persist server-side when signed in
         close();
       });
@@ -1116,6 +1329,158 @@ const TeamPicker = (() => {
 
   return { init };
 })();
+
+/* ===================== ACHIEVEMENTS ===================== *
+ * A data-driven catalog spanning Rookie → Champion difficulty. Each entry has a
+ * pure check(s) predicate run against an achievement snapshot (achSnapshot), so
+ * adding a new badge is just one row. Unlock state is local/cosmetic (like the
+ * streak, Architecture §2.2) — it never touches the server-verified leaderboard.
+ * Counters that back the checks live in state.ach (see ensureAch + the updates in
+ * submitGuess / finishSession / arcade / share / team-select / auth). */
+const ACH_TIERS = { rookie: 1, midfield: 2, podium: 3, champion: 4 };
+const ACH_TIER_LABEL = { rookie: "Rookie", midfield: "Midfield", podium: "Podium", champion: "Champion" };
+
+const ACHIEVEMENTS = [
+  // ── Rookie ──────────────────────────────────────────────────────────────
+  { id: "lights_out",     icon: "🚦", tier: "rookie", name: "Lights Out",        desc: "Answer your very first question.",           check: (s) => s.questions >= 1 || s.practiceQuestions >= 1 },
+  { id: "formation_lap",  icon: "🏁", tier: "rookie", name: "Formation Lap",     desc: "Complete your first full session.",          check: (s) => s.sessions >= 1 },
+  { id: "green_sector",   icon: "🟢", tier: "rookie", name: "Green Sector",      desc: "Land within 25% of an answer.",              check: (s) => s.green >= 1 },
+  { id: "in_the_points",  icon: "➕", tier: "rookie", name: "In the Points",     desc: "Answer 10 questions.",                       check: (s) => s.questions >= 10 },
+  { id: "warm_up",        icon: "🛞", tier: "rookie", name: "Warm-Up Lap",       desc: "Try a Free Practice question.",              check: (s) => s.practiceQuestions >= 1 },
+  { id: "insert_coin",    icon: "🕹️", tier: "rookie", name: "Insert Coin",       desc: "Play a round of Arcade.",                    check: (s) => s.flags.arcade_played === true },
+  { id: "on_the_board",   icon: "📈", tier: "rookie", name: "On the Board",      desc: "Bank 5,000 lifetime points.",                check: (s) => s.points >= 5000 },
+  { id: "pick_a_side",    icon: "🎽", tier: "rookie", name: "Pick a Side",       desc: "Pledge to a constructor.",                   check: (s) => s.teamsUsed >= 1 },
+  { id: "spread_word",    icon: "📣", tier: "rookie", name: "Spread the Word",   desc: "Share a result.",                            check: (s) => s.shares >= 1 },
+  { id: "contract_signed",icon: "✍️", tier: "rookie", name: "Contract Signed",   desc: "Create an account.",                         check: (s) => s.signedIn === true },
+
+  // ── Midfield ────────────────────────────────────────────────────────────
+  { id: "purple_sector",  icon: "🟣", tier: "midfield", name: "Purple Sector",   desc: "Land within 10% of an answer.",              check: (s) => s.purple >= 1 },
+  { id: "hat_trick",      icon: "🎩", tier: "midfield", name: "Hat-Trick",       desc: "Reach a 3-day streak.",                      check: (s) => s.maxStreak >= 3 },
+  { id: "the_ton",        icon: "💯", tier: "midfield", name: "The Ton",         desc: "Answer 100 questions.",                      check: (s) => s.questions >= 100 },
+  { id: "fastest_lap",    icon: "⏱️", tier: "midfield", name: "Fastest Lap",     desc: "Score 22,000+ in a single session.",         check: (s) => s.bestSession >= 22000 },
+  { id: "podium_points",  icon: "🏆", tier: "midfield", name: "Podium Finish",   desc: "Bank 25,000 lifetime points.",               check: (s) => s.points >= 25000 },
+  { id: "double_header",  icon: "📅", tier: "midfield", name: "Double Header",   desc: "Finish the Daily and Race challenge in one day.", check: (s) => s.flags.double_header === true },
+  { id: "box_box",        icon: "🔧", tier: "midfield", name: "Box, Box!",       desc: "Complete 10 sessions.",                      check: (s) => s.sessions >= 10 },
+  { id: "tyre_whisperer", icon: "🛞", tier: "midfield", name: "Tyre Whisperer",  desc: "Answer 50 Free Practice questions.",         check: (s) => s.practiceQuestions >= 50 },
+  { id: "arcade_ace",     icon: "⚡", tier: "midfield", name: "Arcade Ace",      desc: "Reach an Arcade streak of 10.",              check: (s) => s.arcadeBest >= 10 },
+  { id: "night_owl",      icon: "🦉", tier: "midfield", name: "Night Owl",       desc: "Finish a session after midnight (UTC).",     check: (s) => s.flags.night_owl === true },
+  { id: "box_at_dawn",    icon: "🐦", tier: "midfield", name: "Box at Dawn",     desc: "Finish a session at sunrise (UTC).",         check: (s) => s.flags.early_bird === true },
+  { id: "teammate_battle",icon: "🤝", tier: "midfield", name: "Teammate Battle", desc: "Run two different constructors.",            check: (s) => s.teamsUsed >= 2 },
+  { id: "double_points",  icon: "💰", tier: "midfield", name: "Double Points",   desc: "Bank 50,000 lifetime points.",               check: (s) => s.points >= 50000 },
+  { id: "sharp_practice", icon: "🎯", tier: "midfield", name: "Sharp in Practice", desc: "Score a purple sector in Free Practice.",  check: (s) => s.flags.practice_purple === true },
+  { id: "race_ritual",    icon: "📆", tier: "midfield", name: "Race Week Ritual", desc: "Reach a 5-day streak.",                     check: (s) => s.maxStreak >= 5 },
+
+  // ── Podium ──────────────────────────────────────────────────────────────
+  { id: "bullseye",       icon: "🎯", tier: "podium", name: "Bullseye",          desc: "Nail an answer exactly.",                    check: (s) => s.perfect >= 1 },
+  { id: "qualifying_ace", icon: "🥇", tier: "podium", name: "Qualifying Ace",    desc: "Hit 3 purple sectors in one session.",       check: (s) => s.maxPurpleInSession >= 3 },
+  { id: "purple_reign",   icon: "🟣", tier: "podium", name: "Purple Reign",      desc: "Score 25 purple sectors.",                   check: (s) => s.purple >= 25 },
+  { id: "consistency",    icon: "📆", tier: "podium", name: "Consistency is King", desc: "Reach a 7-day streak.",                    check: (s) => s.maxStreak >= 7 },
+  { id: "maximum_attack", icon: "🚀", tier: "podium", name: "Maximum Attack",    desc: "Score 27,000+ in a single session.",         check: (s) => s.bestSession >= 27000 },
+  { id: "race_veteran",   icon: "🎖️", tier: "podium", name: "Race Veteran",      desc: "Answer 500 questions.",                      check: (s) => s.questions >= 500 },
+  { id: "centurion",      icon: "💪", tier: "podium", name: "Centurion",         desc: "Bank 100,000 lifetime points.",              check: (s) => s.points >= 100000 },
+  { id: "comeback_kid",   icon: "🛡️", tier: "podium", name: "Comeback Kid",      desc: "Save a streak with a freeze.",               check: (s) => s.flags.comeback === true },
+  { id: "gauntlet",       icon: "🤜", tier: "podium", name: "Throw Down the Gauntlet", desc: "Send 5 challenges to friends.",        check: (s) => s.challenges >= 5 },
+  { id: "paddock_regular",icon: "🌍", tier: "podium", name: "Paddock Regular",   desc: "Run 5 different constructors.",              check: (s) => s.teamsUsed >= 5 },
+  { id: "iron_driver",    icon: "🦾", tier: "podium", name: "Iron Driver",       desc: "Complete 50 sessions.",                      check: (s) => s.sessions >= 50 },
+  { id: "arcade_legend",  icon: "👾", tier: "podium", name: "Arcade Legend",     desc: "Reach an Arcade streak of 25.",              check: (s) => s.arcadeBest >= 25 },
+  { id: "daily_devotee",  icon: "☀️", tier: "podium", name: "Daily Devotee",     desc: "Complete 25 Daily challenges.",              check: (s) => s.dailySessions >= 25 },
+  { id: "race_specialist",icon: "🏎️", tier: "podium", name: "Race Specialist",   desc: "Complete 25 Race challenges.",               check: (s) => s.raceSessions >= 25 },
+  { id: "sharpshooter",   icon: "🔫", tier: "podium", name: "Sharpshooter",      desc: "Nail 10 exact answers.",                     check: (s) => s.perfect >= 10 },
+
+  // ── Champion ────────────────────────────────────────────────────────────
+  { id: "grand_slam",     icon: "🏆", tier: "champion", name: "Grand Slam",      desc: "All six sectors purple in one session.",     check: (s) => s.maxPurpleInSession >= 6 },
+  { id: "perfect_lap",    icon: "💎", tier: "champion", name: "The Perfect Lap", desc: "A flawless 30,000-point session.",           check: (s) => s.bestSession >= 30000 },
+  { id: "unbeatable",     icon: "🔥", tier: "champion", name: "Unbeatable",      desc: "Reach a 30-day streak.",                     check: (s) => s.maxStreak >= 30 },
+  { id: "world_champion", icon: "👑", tier: "champion", name: "World Champion",  desc: "Bank 500,000 lifetime points.",              check: (s) => s.points >= 500000 },
+  { id: "purple_machine", icon: "🟪", tier: "champion", name: "Purple Machine",  desc: "Score 100 purple sectors.",                  check: (s) => s.purple >= 100 },
+  { id: "lights_to_flag", icon: "🏃", tier: "champion", name: "Lights to Flag",  desc: "Answer 2,000 questions.",                    check: (s) => s.questions >= 2000 },
+  { id: "arcade_immortal",icon: "🌟", tier: "champion", name: "Arcade Immortal", desc: "Reach an Arcade streak of 50.",              check: (s) => s.arcadeBest >= 50 },
+  { id: "full_grid",      icon: "🏟️", tier: "champion", name: "The Full Grid",   desc: "Run all eleven constructors.",               check: (s) => s.teamsUsed >= 11 },
+  { id: "dead_eye",       icon: "🦅", tier: "champion", name: "Dead-Eye",        desc: "Nail 50 exact answers.",                     check: (s) => s.perfect >= 50 },
+  { id: "hall_of_fame",   icon: "🏛️", tier: "champion", name: "Hall of Fame",    desc: "Unlock 40 other achievements.",              check: (s) => s.unlocked >= 40 },
+];
+
+/* A read-only snapshot of everything the achievement checks can inspect. */
+function achSnapshot() {
+  const a = ensureAch();
+  return {
+    points: (isSignedIn() && serverStats ? serverStats.lifetime_points : state.lifetime_points) || 0,
+    questions: a.questions || 0,
+    practiceQuestions: a.practice_questions || 0,
+    sessions: a.sessions || 0,
+    dailySessions: a.daily_sessions || 0,
+    raceSessions: a.race_sessions || 0,
+    perfect: a.perfect || 0,
+    purple: a.purple || 0,
+    green: a.green || 0,
+    bestSession: a.best_session || 0,
+    maxPurpleInSession: a.max_purple_in_session || 0,
+    maxStreak: Math.max(a.max_streak || 0, currentStreak() || 0),
+    shares: a.shares || 0,
+    challenges: a.challenges || 0,
+    teamsUsed: (a.teams_used || []).length,
+    arcadeBest: +localStorage.getItem("arcade_best") || 0,
+    signedIn: isSignedIn(),
+    flags: a.flags || {},
+    unlocked: (state.unlocked_achievements || []).length,
+  };
+}
+
+/* Evaluate the catalog, unlock anything newly earned, celebrate it, and repaint.
+ * Safe to call as often as we like — already-unlocked badges are skipped. */
+function evaluateAchievements() {
+  const s = achSnapshot();
+  const newly = [];
+  for (const ach of ACHIEVEMENTS) {
+    if (state.unlocked_achievements.includes(ach.id)) continue;
+    let ok = false;
+    try { ok = !!ach.check(s); } catch { ok = false; }
+    if (ok) { state.unlocked_achievements.push(ach.id); newly.push(ach); }
+  }
+  if (newly.length) {
+    saveState(state);
+    newly.forEach((ach, i) => setTimeout(() => toast(`${ach.icon} Achievement unlocked: ${ach.name}`), i * 1300));
+    track("achievement", { ids: newly.map((ach) => ach.id) });
+    renderAchievements();
+  }
+  return newly;
+}
+
+/* Render the profile achievement grid (unlocked in colour, locked dimmed). */
+let achFilter = "all";
+function renderAchievements() {
+  const grid = document.getElementById("ach-grid");
+  if (!grid) return;
+  const unlocked = new Set(state.unlocked_achievements || []);
+  const total = ACHIEVEMENTS.length;
+  const have = ACHIEVEMENTS.filter((a) => unlocked.has(a.id)).length;
+  const countEl = document.getElementById("ach-count");
+  if (countEl) countEl.textContent = `${have} / ${total}`;
+
+  const tierRank = (a) => ACH_TIERS[a.tier] || 0;
+  const list = ACHIEVEMENTS
+    .filter((a) => achFilter === "all" || (achFilter === "unlocked") === unlocked.has(a.id))
+    .sort((a, b) => tierRank(a) - tierRank(b));
+
+  grid.innerHTML = list.length ? list.map((a) => {
+    const got = unlocked.has(a.id);
+    return `<div class="ach-card tier-${a.tier} ${got ? "got" : "locked"}" title="${escapeHtml(a.desc)}">
+        <span class="ach-icon">${got ? a.icon : "🔒"}</span>
+        <span class="ach-body">
+          <span class="ach-name">${escapeHtml(a.name)}</span>
+          <span class="ach-desc">${escapeHtml(a.desc)}</span>
+        </span>
+        <span class="ach-tier">${ACH_TIER_LABEL[a.tier]}</span>
+      </div>`;
+  }).join("") : `<p class="muted">Nothing here yet.</p>`;
+}
+
+function setAchFilter(filter) {
+  achFilter = filter;
+  document.querySelectorAll(".ach-filter-tab").forEach((t) =>
+    t.classList.toggle("active", t.dataset.filter === filter));
+  renderAchievements();
+}
 
 /* ===================== DEV DATA CHECK (proofreading) ===================== */
 /* Renders the full question bank WITH verified answers in a filterable, sortable
@@ -1191,21 +1556,43 @@ const DataCheck = (() => {
   return { init };
 })();
 
+/* A shared "?play=<mode>" link opens straight into that challenge — the payoff of
+ * the deep links the share/challenge buttons emit. Unknown values are ignored. */
+function handleDeepLink() {
+  const play = new URLSearchParams(location.search).get("play");
+  if (!play) return false;
+  const map = {
+    daily: ["quiz", "daily"], race: ["quiz", "race_week"],
+    practice: ["quiz", "free_practice"], arcade: ["arcade", null],
+  };
+  const dest = map[play];
+  if (!dest) return false;
+  track("deeplink", { play });
+  navigate(dest[0], dest[1]);
+  return true;
+}
+
 /* ---- Boot ---- */
 function show(id) { document.getElementById(id).classList.remove("hidden"); }
 function hide(id) { document.getElementById(id).classList.add("hidden"); }
 applyTeam(state.selected_team);
 saveState(state);
 renderQuizIntro();
+renderStreakBanner();
 CurveSlider.init();
 DataCheck.init();
 TeamPicker.init();
 Auth.init();
 document.querySelectorAll(".lb-period-tab").forEach((t) =>
   t.addEventListener("click", () => setLeaderboardPeriod(t.dataset.period)));
+document.querySelectorAll(".ach-filter-tab").forEach((t) =>
+  t.addEventListener("click", () => setAchFilter(t.dataset.filter)));
+renderAchievements();
+evaluateAchievements();  // catch anything already earned (e.g. from a prior visit)
 track("app_open", { signed_in: isSignedIn() });  // open the analytics session
 // If a session token is present, pull the authoritative server stats, then
 // repaint the profile so it shows the signed-in totals.
-refreshMe().then(renderProfile);
+refreshMe().then(() => { renderProfile(); renderStreakBanner(); evaluateAchievements(); });
 tickCountdown(); setInterval(tickCountdown, 1000);
 renderRaceWeek(); setInterval(renderRaceWeek, 60000); // refresh past/next state each minute
+handleDeepLink();  // jump straight into a shared challenge, if the URL asks for one
