@@ -53,7 +53,7 @@ services:
       # the five values below. Leaving REPLICA_BUCKET blank keeps the ephemeral
       # behaviour, so the service still deploys as-is.
       - key: LITESTREAM_REPLICA_BUCKET
-        sync: false            # e.g. f1-statguesser-db
+        sync: false            # e.g. gridmaster-db
       - key: LITESTREAM_REPLICA_PATH
         value: f1stats
       - key: LITESTREAM_REPLICA_ENDPOINT

@@ -3,6 +3,9 @@
  * Scoring is NEVER computed here — guesses go to the server, which returns the score. */
 
 const API = "/api/v1";
+// NOTE: these localStorage keys keep the legacy "f1statguesser_" prefix on
+// purpose — the product is now GridMaster, but renaming the keys would orphan
+// every existing player's saved progress, session and guest id. Leave them.
 const STORAGE_KEY = "f1statguesser_user_state";
 const TOKEN_KEY = "f1statguesser_auth_token";
 const ANON_KEY = "f1statguesser_anon_id";

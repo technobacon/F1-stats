@@ -202,7 +202,7 @@ To turn it on (free, ~5 minutes):
 
    | Env var | Example |
    |---|---|
-   | `LITESTREAM_REPLICA_BUCKET` | `f1-statguesser-db` |
+   | `LITESTREAM_REPLICA_BUCKET` | `gridmaster-db` |
    | `LITESTREAM_REPLICA_ENDPOINT` | `s3.us-west-002.backblazeb2.com` |
    | `LITESTREAM_REPLICA_REGION` | `us-west-002` |
    | `LITESTREAM_ACCESS_KEY_ID` | *(your keyID)* |

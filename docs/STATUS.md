@@ -2,7 +2,7 @@
 
 _Last updated: 2026-06-14_
 
-A snapshot of where **F1 Stat Guesser** is, how it fits together, and what could
+A snapshot of where **GridMaster** is, how it fits together, and what could
 come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
 engineering handoff. For question design see [`question-types.md`](./question-types.md).
 
@@ -76,7 +76,7 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
   bank spans 1950–2026. The synthetic in-code seed is the offline fallback.
 
 ### Frontend
-- Polished **landing page**: hero ("Welcome to F1 Stat Guesser") in Titillium
+- Polished **landing page**: hero ("Welcome to GridMaster") in Titillium
   Web, race-themed background that is **photo-ready** (drop `frontend/hero.jpg`),
   four mode cards, feature strip.
 - Sticky blurred top bar, pill nav, single `navigate()` router, team-colour

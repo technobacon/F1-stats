@@ -189,7 +189,7 @@ class JolpicaClient:
         while True:
             self.limiter.acquire()
             try:
-                resp = httpx.get(url, timeout=30.0, headers={"User-Agent": "F1-StatGuesser-ETL"})
+                resp = httpx.get(url, timeout=30.0, headers={"User-Agent": "GridMaster-ETL"})
             except httpx.HTTPError as exc:
                 # Network hiccup: retry a few times with exponential backoff before
                 # giving up, so a single dropped connection doesn't kill a long run.

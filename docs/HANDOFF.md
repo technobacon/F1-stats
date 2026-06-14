@@ -1,4 +1,4 @@
-# F1 Stat Guesser — Engineering Handoff
+# GridMaster — Engineering Handoff
 
 _Last updated: 2026-06-13 · Branch of record: `main` · Live target: Render (free tier)_
 
@@ -15,7 +15,7 @@ see [question-types.md](./question-types.md); for the running snapshot see
 
 ## 1. TL;DR — current state
 
-F1 Stat Guesser is a **guest-first Formula 1 trivia game**: you guess a numeric
+GridMaster is a **guest-first Formula 1 trivia game**: you guess a numeric
 stat (e.g. "career wins for Hamilton") and are scored by how close you are, on an
 exponential-decay curve. It is a **single runnable FastAPI service** that serves a
 vanilla HTML/CSS/JS frontend plus a JSON API, backed by SQLite.
