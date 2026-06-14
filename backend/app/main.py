@@ -178,6 +178,10 @@ def quiz_verify(req: VerifyRequest, authorization: str | None = Header(default=N
                 guess=req.guess,
                 actual=result["actual"],
             )
+            # Social proof: how this guess stacks up against everyone who has
+            # answered the same question (computed after the insert so the player's
+            # own guess is included). Best-effort — never block the score on it.
+            result["insight"] = auth.question_insight(conn, question_id, result["score"])
         except Exception:  # noqa: BLE001 — scoring already succeeded; don't fail the response
             pass
         finally:

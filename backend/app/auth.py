@@ -307,13 +307,24 @@ def claim_anon_events(conn: sqlite3.Connection, anon_id: str | None, user_id: st
     return cur.rowcount
 
 
+# Streak freeze: a single missed day inside an otherwise unbroken run is forgiven
+# once, so one slip doesn't reset a long streak to zero. This is the auto "streak
+# freeze" Duolingo popularised — one of the highest-impact churn reducers there is,
+# because losing a long streak is the moment players quit for good. A second gap,
+# or any gap of two-or-more days in a row, still ends the streak. The forgiven day
+# itself is NOT counted toward the total; it only bridges the run.
+STREAK_FREEZE_MAX_GAP = 2  # a gap of exactly one missing day (2 days apart) is bridgeable
+
+
 def daily_streak(conn: sqlite3.Connection, user_id: str) -> int:
     """Consecutive-day streak of completing a daily-mode challenge, recomputed
     server-side from play_events (Architecture §2.2 — never trusts the client).
 
     A day counts if the user logged any 'daily' play that UTC date. The streak is
-    the run of consecutive days ending today or yesterday; if the most recent
-    daily play is older than yesterday the streak has lapsed and is 0."""
+    the run of days ending today or yesterday; a single missed day inside the run
+    is forgiven once (the streak freeze, see STREAK_FREEZE_MAX_GAP). If the most
+    recent daily play is older than yesterday the streak has lapsed and is 0 — a
+    freeze protects a gap *within* a live run, it does not revive a dead one."""
     rows = conn.execute(
         "SELECT DISTINCT date(created_at) AS d FROM play_events "
         "WHERE user_id = ? AND game_mode = 'daily' ORDER BY d DESC",
@@ -327,14 +338,51 @@ def daily_streak(conn: sqlite3.Connection, user_id: str) -> int:
     if (today - most_recent).days > 1:
         return 0  # lapsed: nothing today or yesterday
     streak, prev = 1, most_recent
+    freeze_available = True
     for d in days[1:]:
         cur = datetime.strptime(d, "%Y-%m-%d").date()
-        if (prev - cur).days == 1:
+        gap = (prev - cur).days
+        if gap == 1:
+            streak += 1
+            prev = cur
+        elif gap == STREAK_FREEZE_MAX_GAP and freeze_available:
+            # Forgive a single one-day gap, once: the missed day isn't counted,
+            # but the run continues from the earlier play.
+            freeze_available = False
             streak += 1
             prev = cur
         else:
             break
     return streak
+
+
+def question_insight(conn: sqlite3.Connection, question_id: str, score: int) -> dict | None:
+    """Aggregate social proof for one question, derived from server-scored
+    play_events: how many players have answered it, the average score, and what
+    percentage of them this score beats. Returns None until a small sample exists
+    so we never show a lonely 'you beat 0%' on a brand-new question.
+
+    Like every number behind the trust boundary (Architecture §2.2) this comes
+    only from server-computed scores, so the comparison can't be gamed."""
+    row = conn.execute(
+        "SELECT COUNT(*) AS n, COALESCE(AVG(score), 0) AS avg_score, "
+        "       SUM(CASE WHEN score < ? THEN 1 ELSE 0 END) AS below "
+        "FROM play_events WHERE question_id = ?",
+        (int(score), question_id),
+    ).fetchone()
+    n = row["n"] or 0
+    if n < _INSIGHT_MIN_SAMPLE:
+        return None
+    return {
+        "players_answered": n,
+        "average_score": int(round(row["avg_score"] or 0)),
+        "beat_percent": int(round((row["below"] or 0) / n * 100)),
+    }
+
+
+# Don't surface "you beat X% of players" until at least this many have answered —
+# a percentile off one or two data points is noise, not social proof.
+_INSIGHT_MIN_SAMPLE = 5
 
 
 def user_stats(conn: sqlite3.Connection, user_id: str) -> dict:

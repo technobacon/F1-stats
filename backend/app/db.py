@@ -171,6 +171,8 @@ CREATE TABLE IF NOT EXISTS play_events (
 CREATE INDEX IF NOT EXISTS idx_play_events_user ON play_events (user_id);
 CREATE INDEX IF NOT EXISTS idx_play_events_anon ON play_events (anon_id);
 CREATE INDEX IF NOT EXISTS idx_play_events_created ON play_events (created_at);
+-- Supports the per-question social-proof aggregate (auth.question_insight).
+CREATE INDEX IF NOT EXISTS idx_play_events_question ON play_events (question_id);
 -- One scored row per (identity, question, day). Partial so the throwaway
 -- anonymous reveals (identity_key NULL/'') are never deduped against each other.
 CREATE UNIQUE INDEX IF NOT EXISTS uq_play_events_dedup

@@ -256,6 +256,82 @@ def test_daily_streak_is_server_derived(client):
     assert streak == 3  # today + yesterday + day before, consecutive
 
 
+def _seed_daily_days(conn, uid, offsets):
+    """Backfill 'daily' play_events for the given day offsets (0 = today)."""
+    import datetime as _dt
+    today = _dt.datetime.now(_dt.timezone.utc).date()
+    for offset in offsets:
+        d = today - _dt.timedelta(days=offset)
+        conn.execute(
+            "INSERT INTO play_events (user_id, question_id, game_mode, score, "
+            "identity_key, period, created_at) VALUES (?, ?, 'daily', 4000, ?, ?, ?)",
+            (uid, f"seed-{offset}", uid, d.isoformat(), f"{d.isoformat()} 12:00:00"),
+        )
+    conn.commit()
+
+
+def test_streak_freeze_forgives_a_single_missed_day(client):
+    from app import auth, db
+
+    uid = auth.create_user(db.connect(), "frozen", "password1")["id"]
+    conn = db.connect()
+    try:
+        # Played today and the day before yesterday, but MISSED yesterday (offset 1).
+        # The streak freeze bridges that single gap instead of resetting to 1.
+        _seed_daily_days(conn, uid, [0, 2, 3])
+        assert auth.daily_streak(conn, uid) == 3  # today + (skip) + day2 + day3
+
+        # A SECOND gap is not forgiven: the run stops at the second missing day.
+        _seed_daily_days(conn, uid, [5])  # day 4 also missing -> second gap
+        assert auth.daily_streak(conn, uid) == 3
+    finally:
+        conn.close()
+
+
+def test_streak_lapses_when_two_days_missed_in_a_row(client):
+    from app import auth, db
+
+    uid = auth.create_user(db.connect(), "lapsed", "password1")["id"]
+    conn = db.connect()
+    try:
+        # Most recent daily play was two days ago: nothing today or yesterday.
+        # A freeze protects a gap inside a live run, not a dead one -> 0.
+        _seed_daily_days(conn, uid, [2, 3, 4])
+        assert auth.daily_streak(conn, uid) == 0
+    finally:
+        conn.close()
+
+
+def test_verify_returns_social_proof_insight(client):
+    # One player answers perfectly, several others answer poorly: the perfect
+    # guess should beat them, and the insight should reflect the sample.
+    # Five guests each post a weak guess on the same (deterministic) daily question
+    # so a sample exists before we measure the percentile.
+    for i in range(5):
+        q = client.get("/api/v1/quiz/daily").json()["questions"][0]["tracking_token"]
+        client.post("/api/v1/quiz/verify",
+                    json={"tracking_token": q, "guess": 0, "anon_id": f"guest-{i}"})
+
+    # A signed-in player nails it; their verify response carries the comparison.
+    token = client.post("/api/v1/auth/register",
+                        json={"username": "sharp", "password": "password1"}).json()["token"]
+    hdr = {"Authorization": f"Bearer {token}"}
+    q = client.get("/api/v1/quiz/daily").json()["questions"][0]["tracking_token"]
+    actual = _answer_for(client, q)
+    res = client.post("/api/v1/quiz/verify",
+                      json={"tracking_token": q, "guess": actual}, headers=hdr).json()
+    assert res["insight"] is not None
+    assert res["insight"]["players_answered"] >= 5
+    assert 0 <= res["insight"]["beat_percent"] <= 100
+
+
+def _answer_for(client, token):
+    """Reveal an answer without polluting a signed-in player's total (uses a guest)."""
+    return client.post("/api/v1/quiz/verify",
+                       json={"tracking_token": token, "guess": 0, "anon_id": "reveal-only"}
+                       ).json()["actual"]
+
+
 def test_daily_and_weekly_leaderboards_filter_by_window(client):
     import datetime as _dt
     from app import db

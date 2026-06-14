@@ -441,3 +441,40 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 /* Spoiler-free result grid on the summary screen */
 .summary-grid { text-align:center; font-size:1.7rem; letter-spacing:.12em; margin:.3rem 0 .2rem;
                 line-height:1; }
+
+/* ===================== ENGAGEMENT HOOKS ===================== *
+ * Retention surfaces: the streak banner (home), the streak callout + social-proof
+ * line (summary), and the per-question social proof (reveal). All themed to the
+ * selected constructor's primary colour. */
+
+/* Home-page streak banner — a tappable, loss-averse nudge to play today's Daily. */
+.streak-banner {
+  display:flex; align-items:center; justify-content:center; gap:.5rem;
+  margin:1.2rem auto 0; max-width:30rem; cursor:pointer; text-align:left;
+  padding:.7rem 1.1rem; border-radius:999px; font-size:.9rem; font-weight:600;
+  color:var(--text); background:color-mix(in srgb, var(--color-primary) 14%, var(--surface));
+  border:1px solid color-mix(in srgb, var(--color-primary) 45%, var(--line));
+  transition:transform .12s ease, border-color .12s ease;
+}
+.streak-banner:hover { transform:translateY(-2px); border-color:var(--color-primary); }
+.streak-banner strong { color:var(--color-primary); }
+
+/* The flame icon shared by the banner and the summary callout. */
+.flame { font-size:1.15em; line-height:1; filter:drop-shadow(0 0 6px color-mix(in srgb, var(--color-primary) 60%, transparent)); }
+
+/* Summary streak callout — big and celebratory after a daily run. */
+.summary-streak {
+  text-align:center; margin:.6rem auto .2rem; padding:.6rem .9rem; max-width:26rem;
+  border-radius:12px; font-size:1.05rem;
+  background:color-mix(in srgb, var(--color-primary) 12%, var(--surface));
+  border:1px solid color-mix(in srgb, var(--color-primary) 35%, var(--line));
+}
+.summary-streak strong { color:var(--color-primary); }
+
+/* Social-proof lines: per-question (reveal) and per-session (summary). */
+.reveal-insight, .summary-insight {
+  text-align:center; color:var(--muted); font-size:.86rem; margin:.4rem 0 0;
+}
+.reveal-insight strong, .summary-insight strong { color:var(--color-primary); }
+.reveal-insight { animation:insight-fade .4s ease; }
+@keyframes insight-fade { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }

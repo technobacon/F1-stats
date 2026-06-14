@@ -8,6 +8,11 @@ prototype** that implements the defensible core of the system described there.
 > **Where we are & what's next:** see [`docs/STATUS.md`](./docs/STATUS.md) for a
 > full status snapshot and roadmap, and [`docs/question-types.md`](./docs/question-types.md)
 > for the question design.
+>
+> **Growth & retention:** [`docs/ENGAGEMENT.md`](./docs/ENGAGEMENT.md) covers the
+> return-visit hooks (streaks + freeze, social proof, deep-linked sharing) and the
+> backlog; [`docs/MARKETING.md`](./docs/MARKETING.md) is the minimal-effort
+> marketing plan.
 
 ---
 

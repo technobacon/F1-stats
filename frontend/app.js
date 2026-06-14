@@ -103,6 +103,9 @@ const defaultState = () => ({
   is_guest: true, selected_team: "mclaren",
   lifetime_points: 0, games_played: 0, average_closeness: 0,
   daily_streak: 0, last_played_date: null, unlocked_achievements: [],
+  // Streak freeze: one missed day inside a run is forgiven once (re-armed when a
+  // new run starts). Mirrors the server rule in auth.daily_streak.
+  streak_freeze_available: true,
   _closeness_sum: 0, _q_count: 0,
 });
 
@@ -309,6 +312,7 @@ function navigate(view, mode) {
   if (view === "quiz") { currentMode = mode || currentMode; renderQuizIntro(); }
   if (view === "arcade") loadArcade();
   if (view === "profile") renderProfile();
+  if (view === "home") renderStreakBanner();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
@@ -322,6 +326,8 @@ document.querySelectorAll("[data-view]").forEach((el) => {
 let quiz = null, qPos = 0, sessionScore = 0, sessionCloseness = 0;
 // Per-question scores for this run, used to build the spoiler-free share grid.
 let sessionResults = [];
+// Per-question "beat X% of players" percentiles (social proof), when available.
+let sessionInsights = [];
 let practiceCount = 0, practiceTimer = null; // Free Practice: questions answered + penalty countdown
 
 function playedKey(mode) { return `played_${mode}`; }
@@ -367,7 +373,7 @@ async function startQuiz() {
     if (!res.ok) throw new Error(await res.text());
     quiz = await res.json();
     track("quiz_start", { mode: currentMode });
-    qPos = 0; sessionScore = 0; sessionCloseness = 0; sessionResults = [];
+    qPos = 0; sessionScore = 0; sessionCloseness = 0; sessionResults = []; sessionInsights = [];
     document.getElementById("q-total").textContent = quiz.questions.length;
     document.getElementById("q-mode-badge").textContent = currentMode.replace("_", "-");
     hide("quiz-intro"); show("quiz-play"); hide("quiz-summary"); hide("quiz-reveal");
@@ -614,6 +620,7 @@ async function submitGuess() {
     sessionScore += result.score;
     sessionCloseness += result.score / result.max_score;
     sessionResults.push(result.score / result.max_score);  // 0..1 per question
+    if (result.insight) sessionInsights.push(result.insight.beat_percent);
     revealScore(q, result);
   } catch (e) {
     toast("Couldn't score that — try again.");
@@ -664,6 +671,7 @@ function revealScore(q, result) {
   actualText.classList.remove("revealed");
   actualText.classList.add("pending");
   document.getElementById("odometer").textContent = "0";
+  document.getElementById("reveal-insight").classList.add("hidden");
 
   // Drop the guess marker in promptly, then slide the answer bar across slowly
   // with an ease-in-out (speeds up, then eases into the answer — anticipation).
@@ -699,8 +707,22 @@ function slideToAnswer(node, textEl, targetPct, result) {
       textEl.classList.remove("pending");
       textEl.classList.add("revealed");
       tickOdometer(result.score);
+      renderRevealInsight(result);
     }
   })(start);
+}
+
+/* Social proof under the score: how this guess compares to everyone who has
+ * answered the same question. Server-computed (auth.question_insight), shown only
+ * once a small sample exists so it never reads "you beat 0%". */
+function renderRevealInsight(result) {
+  const el = document.getElementById("reveal-insight");
+  if (!el) return;
+  const ins = result && result.insight;
+  if (!ins || ins.players_answered < 5) { el.classList.add("hidden"); return; }
+  el.innerHTML = `You beat <strong>${ins.beat_percent}%</strong> of players here · ` +
+    `avg ${ins.average_score.toLocaleString()} pts`;
+  el.classList.remove("hidden");
 }
 
 function tickOdometer(target) {
@@ -747,11 +769,49 @@ function finishSession() {
       ? Math.round((new Date(today) - new Date(state.last_played_date)) / 864e5) : null;
     if (daysSince === 0) { /* replay same day — keep streak */ }
     else if (daysSince === 1) state.daily_streak += 1;
-    else state.daily_streak = 1;
+    else if (daysSince === 2 && state.streak_freeze_available) {
+      // Streak freeze: forgive a single missed day, once per run.
+      state.daily_streak += 1;
+      state.streak_freeze_available = false;
+    } else {
+      state.daily_streak = 1;            // run reset
+      state.streak_freeze_available = true;  // re-arm the freeze for the new run
+    }
     state.last_played_date = today;
   }
   awardAchievements(acc);
   saveState(state);
+
+  // Loud streak callout + session social proof on the summary, plus refresh the
+  // home banner and (signed-in) the authoritative server streak.
+  renderSummaryEngagement();
+  renderStreakBanner();
+  if (isSignedIn()) refreshMe().then(renderProfile);
+}
+
+/* The summary's streak flame and "you beat X% of players" line — the two hooks
+ * that turn one finished run into a reason to come back and to share. */
+function renderSummaryEngagement() {
+  const streakEl = document.getElementById("summary-streak");
+  if (streakEl) {
+    if (currentMode === "daily" && state.daily_streak > 0) {
+      streakEl.innerHTML = `<span class="flame">🔥</span> <strong>${state.daily_streak}-day streak!</strong>` +
+        ` <span class="muted">Come back tomorrow to keep it alive.</span>`;
+      streakEl.classList.remove("hidden");
+    } else {
+      streakEl.classList.add("hidden");
+    }
+  }
+  const insEl = document.getElementById("summary-insight");
+  if (insEl) {
+    if (sessionInsights.length) {
+      const avg = Math.round(sessionInsights.reduce((a, b) => a + b, 0) / sessionInsights.length);
+      insEl.innerHTML = `📊 You beat <strong>${avg}%</strong> of players on average today.`;
+      insEl.classList.remove("hidden");
+    } else {
+      insEl.classList.add("hidden");
+    }
+  }
 }
 
 function awardAchievements(acc) {
@@ -780,28 +840,60 @@ function dailyNumber() {
   return Math.floor((Date.now() - epoch) / 864e5) + 1;
 }
 
+/* A clickable deep link back into the exact mode played, so a shared result is a
+ * one-tap invite to the same challenge rather than just the homepage. Parsed on
+ * boot by handleDeepLink(). */
+function shareLink() {
+  const mode = currentMode === "race_week" ? "race"
+             : currentMode === "free_practice" ? "practice" : "daily";
+  return `${location.origin}/?play=${mode}`;
+}
+
 function buildShareText() {
   const grid = sessionResults.map(closenessSquare).join("");
   const max = quiz.questions.length * 5000;
   const tag = currentMode === "daily" ? `Daily #${dailyNumber()}`
             : currentMode === "race_week" ? `Race Challenge #${dailyNumber()}`
             : "Free Practice";
+  // Optional brag line from the per-question percentiles (social proof in shares
+  // is a strong pull — "beat 72% of players" invites a comeback).
+  let brag = "";
+  if (sessionInsights.length) {
+    const avg = Math.round(sessionInsights.reduce((a, b) => a + b, 0) / sessionInsights.length);
+    brag = `\nBeat ${avg}% of players`;
+  }
   // Spoiler-free: shares the closeness pattern and total, never the answers.
-  return `🏁 GridMaster — ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts\n${location.origin}`;
+  return `🏁 GridMaster — ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts${brag}` +
+    `\nCan you beat me? ${shareLink()}`;
 }
 
-document.getElementById("share-result").addEventListener("click", async () => {
-  track("share", { mode: currentMode });
-  const text = buildShareText();
+/* Try the native share sheet, fall back to clipboard, then to inline text. */
+async function shareOrCopy(text, copiedMsg) {
   if (navigator.share) {
     try { await navigator.share({ title: "GridMaster", text }); return; } catch { /* cancelled */ }
   }
   try {
     await navigator.clipboard.writeText(text);
-    document.getElementById("share-status").textContent = "Result copied — paste it to share!";
+    document.getElementById("share-status").textContent = copiedMsg;
   } catch {
     document.getElementById("share-status").textContent = text;
   }
+}
+
+document.getElementById("share-result").addEventListener("click", async () => {
+  track("share", { mode: currentMode });
+  await shareOrCopy(buildShareText(), "Result copied — paste it to share!");
+});
+
+/* Direct "I dare you" invite — same deep link, framed as a head-to-head challenge
+ * rather than a result post. The two have different psychology, so we offer both. */
+document.getElementById("challenge-friend").addEventListener("click", async () => {
+  track("challenge_friend", { mode: currentMode });
+  const tag = currentMode === "race_week" ? "Daily Race Challenge"
+            : currentMode === "daily" ? "Daily Challenge" : "GridMaster run";
+  const text = `🏁 I just scored ${sessionScore.toLocaleString()} on today's GridMaster ${tag}. ` +
+    `Think you can beat me?\n${shareLink()}`;
+  await shareOrCopy(text, "Challenge copied — send it to a friend!");
 });
 
 /* ===================== ARCADE OVER/UNDER ===================== */
@@ -853,6 +945,27 @@ document.getElementById("arcade-b").addEventListener("click", () => pick("b"));
  * server-scored totals (Architecture §2.2) — falling back to local stats for a
  * guest. Streak / achievements / team stay local (cosmetic). */
 let serverStats = null;
+
+/* The current daily streak to display: the authoritative server value when signed
+ * in, otherwise the guest-local one. */
+function currentStreak() {
+  return (isSignedIn() && serverStats && serverStats.daily_streak != null)
+    ? serverStats.daily_streak : state.daily_streak;
+}
+
+/* Home-page streak hook. Loud and loss-averse: losing a long streak is the moment
+ * players churn, so we remind them it's on the line every time they land on home. */
+function renderStreakBanner() {
+  const el = document.getElementById("streak-banner");
+  if (!el) return;
+  const n = currentStreak();
+  if (!n || n < 1) { el.classList.add("hidden"); return; }
+  const playedToday = isCapped("daily");
+  el.innerHTML = playedToday
+    ? `<span class="flame">🔥</span> <span><strong>${n}-day streak</strong> secured — see you tomorrow!</span>`
+    : `<span class="flame">🔥</span> <span><strong>${n}-day streak</strong> — play today's Daily to keep it alive</span>`;
+  el.classList.remove("hidden");
+}
 
 function renderProfile() {
   const signedIn = isSignedIn();
@@ -1191,12 +1304,29 @@ const DataCheck = (() => {
   return { init };
 })();
 
+/* A shared "?play=<mode>" link opens straight into that challenge — the payoff of
+ * the deep links the share/challenge buttons emit. Unknown values are ignored. */
+function handleDeepLink() {
+  const play = new URLSearchParams(location.search).get("play");
+  if (!play) return false;
+  const map = {
+    daily: ["quiz", "daily"], race: ["quiz", "race_week"],
+    practice: ["quiz", "free_practice"], arcade: ["arcade", null],
+  };
+  const dest = map[play];
+  if (!dest) return false;
+  track("deeplink", { play });
+  navigate(dest[0], dest[1]);
+  return true;
+}
+
 /* ---- Boot ---- */
 function show(id) { document.getElementById(id).classList.remove("hidden"); }
 function hide(id) { document.getElementById(id).classList.add("hidden"); }
 applyTeam(state.selected_team);
 saveState(state);
 renderQuizIntro();
+renderStreakBanner();
 CurveSlider.init();
 DataCheck.init();
 TeamPicker.init();
@@ -1206,6 +1336,7 @@ document.querySelectorAll(".lb-period-tab").forEach((t) =>
 track("app_open", { signed_in: isSignedIn() });  // open the analytics session
 // If a session token is present, pull the authoritative server stats, then
 // repaint the profile so it shows the signed-in totals.
-refreshMe().then(renderProfile);
+refreshMe().then(() => { renderProfile(); renderStreakBanner(); });
 tickCountdown(); setInterval(tickCountdown, 1000);
 renderRaceWeek(); setInterval(renderRaceWeek, 60000); // refresh past/next state each minute
+handleDeepLink();  // jump straight into a shared challenge, if the URL asks for one
