@@ -1,4 +1,4 @@
-# Portable container for the F1 StatGuesser prototype.
+# Portable container for the GridMaster prototype.
 # Works on any Docker host (Render, Railway, Fly.io, Hugging Face Spaces, ...).
 FROM python:3.11-slim
 

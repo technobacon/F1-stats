@@ -420,6 +420,34 @@ def test_constructors_championship_buckets_points_by_team(client):
     assert board[0]["team"] == "ferrari"           # ranked by total points
 
 
+def test_team_overview_lists_every_team_with_headcounts(client):
+    # Two Ferrari fans (one scores) and one McLaren fan who hasn't played.
+    for name, team in [("tic", "ferrari"), ("tac", "ferrari"), ("toe", "mclaren")]:
+        client.post("/api/v1/auth/register",
+                    json={"username": name, "password": "password1", "selected_team": team})
+    tok = client.post("/api/v1/auth/login",
+                      json={"username": "tic", "password": "password1"}).json()["token"]
+    hdr = {"Authorization": f"Bearer {tok}"}
+    quiz = client.get("/api/v1/quiz/daily").json()
+    t = quiz["questions"][0]["tracking_token"]
+    client.post("/api/v1/quiz/verify",
+                json={"tracking_token": t, "guess": _answer(client, t)}, headers=hdr)
+
+    body = client.get("/api/v1/teams/overview").json()
+    by_team = {e["team"]: e for e in body["teams"]}
+    # EVERY known team appears, even ones nobody picked (unlike the championship board).
+    assert len(body["teams"]) == len(auth.TEAMS)
+    assert body["total_players"] == 3
+    assert by_team["ferrari"]["members"] == 2
+    assert by_team["ferrari"]["points"] == 5000
+    assert by_team["mclaren"]["members"] == 1
+    assert by_team["mclaren"]["points"] == 0          # joined but hasn't scored
+    assert by_team["williams"]["members"] == 0        # empty team still listed
+    # Ranked by points: Ferrari (the only scorer) leads.
+    assert body["teams"][0]["team"] == "ferrari"
+    assert body["teams"][0]["rank"] == 1
+
+
 def test_set_team_persists_server_side(client):
     tok = client.post("/api/v1/auth/register",
                       json={"username": "switcher", "password": "password1"}).json()["token"]

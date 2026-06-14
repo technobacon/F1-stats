@@ -1,6 +1,6 @@
-# F1 StatGuesser — Documentation Index
+# GridMaster — Documentation Index
 
-This folder contains the design and engineering documentation for **F1 StatGuesser**, a gamified Formula 1 statistics quiz platform.
+This folder contains the design and engineering documentation for **GridMaster**, a gamified Formula 1 statistics quiz platform.
 
 ## Documents
 

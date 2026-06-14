@@ -3,6 +3,9 @@
  * Scoring is NEVER computed here — guesses go to the server, which returns the score. */
 
 const API = "/api/v1";
+// NOTE: these localStorage keys keep the legacy "f1statguesser_" prefix on
+// purpose — the product is now GridMaster, but renaming the keys would orphan
+// every existing player's saved progress, session and guest id. Leave them.
 const STORAGE_KEY = "f1statguesser_user_state";
 const TOKEN_KEY = "f1statguesser_auth_token";
 const ANON_KEY = "f1statguesser_anon_id";
@@ -320,6 +323,7 @@ function renderRaceWeek() {
 let currentMode = "daily";
 function navigate(view, mode) {
   track("view", { view, mode: mode || null });
+  Sound.play("uiClick");   // subtle tap so the chrome feels responsive
   // Leaving the quiz (or re-entering its intro) always exits immersive mode and
   // cancels any in-flight Free Practice penalty countdown.
   if (view !== "quiz") { document.body.classList.remove("in-game"); clearInterval(practiceTimer); }
@@ -402,6 +406,7 @@ async function startQuiz() {
     document.getElementById("q-mode-badge").textContent = currentMode.replace("_", "-");
     hide("quiz-intro"); show("quiz-play"); hide("quiz-summary"); hide("quiz-reveal");
     document.body.classList.add("in-game"); // go full-screen immersive
+    Sound.play("lightsOut");                // lights out and away we go
     window.scrollTo({ top: 0 });
     renderQuestion();
   } catch (e) {
@@ -434,6 +439,7 @@ async function startFreePractice() {
     document.getElementById("q-mode-badge").textContent = "practice";
     hide("quiz-intro"); show("quiz-play"); hide("quiz-summary"); hide("quiz-reveal");
     document.body.classList.add("in-game");
+    Sound.play("lightsOut");                // lights out and away we go
     window.scrollTo({ top: 0 });
     renderQuestion();
   } catch (e) {
@@ -542,9 +548,15 @@ const CurveSlider = (() => {
     $("curve-val").textContent = fmt(value);
   }
   function setValue(v, fire) {
+    const prev = value;
     value = Math.min(max, Math.max(min, Math.round(v)));
     place();
-    if (fire && onChange) onChange(value);
+    if (fire) {
+      // A spinning-wheel click on each notch the guess crosses (rate-limited in
+      // Sound.tick), so dragging the car along the line feels satisfyingly tactile.
+      if (value !== prev) Sound.tick();
+      if (onChange) onChange(value);
+    }
   }
   function valueFromX(clientX) {
     const box = $("curve-slider").getBoundingClientRect();
@@ -632,6 +644,7 @@ submitBtn.addEventListener("click", submitGuess);
 async function submitGuess() {
   const q = quiz.questions[qPos];
   const guess = parseFloat(document.getElementById("q-input").value) || 0;
+  Sound.play("lockIn");   // confident confirm — the guess is committed
   submitBtn.disabled = true; submitBtn.textContent = "Scoring…";
   try {
     const res = await fetch(`${API}/quiz/verify`, {
@@ -717,7 +730,10 @@ function revealScore(q, result) {
   // The number and score stay hidden until the bar reaches its destination.
   requestAnimationFrame(() => {
     guessNode.style.left = clampPct(result.guess) + "%";
-    setTimeout(() => slideToAnswer(actualNode, actualText, clampPct(result.actual), result), 500);
+    setTimeout(() => {
+      Sound.play("riser");   // anticipation build, timed to land as the answer arrives
+      slideToAnswer(actualNode, actualText, clampPct(result.actual), result);
+    }, 500);
   });
 
   // Free Practice gates the Next button (anti-scouting penalty); every other mode
@@ -747,7 +763,11 @@ function slideToAnswer(node, textEl, targetPct, result) {
       textEl.classList.add("revealed");
       tickOdometer(result.score);
       renderRevealInsight(result);
-      if (result._sector) flashSector(result._sector);
+      if (result._sector) {
+        flashSector(result._sector);
+        // Purple (≤10%) = a whole pack thunders by; green (≤25%) = a single car.
+        Sound.play(result._sector === "purple" ? "purpleSector" : "greenSector");
+      }
     }
   })(start);
 }
@@ -814,6 +834,7 @@ document.getElementById("next-question").addEventListener("click", () => {
 
 function finishSession() {
   hide("quiz-reveal"); show("quiz-summary");
+  Sound.play("sessionComplete");   // chequered-flag fanfare
   const maxPossible = quiz.questions.length * 5000;
   document.getElementById("summary-score").textContent = sessionScore.toLocaleString();
   const acc = Math.round((sessionCloseness / quiz.questions.length) * 100);
@@ -1010,6 +1031,7 @@ function pick(which) {
   const pickedHigher = which === "a" ? a.value >= b.value : b.value >= a.value;
   const card = document.getElementById("arcade-" + which);
   card.classList.add(pickedHigher ? "correct" : "wrong");
+  Sound.play(pickedHigher ? "correct" : "wrong");
   let streak = +localStorage.getItem("arcade_streak") || 0;
   streak = pickedHigher ? streak + 1 : 0;
   localStorage.setItem("arcade_streak", streak);
@@ -1290,9 +1312,59 @@ async function syncTeam(team) {
   } catch { /* best effort — local choice already applied */ }
 }
 
-/* ===================== TEAM PICKER ===================== */
+/* ===================== TEAM PICKER + FIRST-RUN ONBOARDING ===================== *
+ * The same modal serves two jobs: the header's "change my colours" picker, and a
+ * one-time welcome prompt that asks a brand-new player to pick a side. Both show
+ * how many players have pledged to each team and how the Constructors'
+ * Championship is going (from /api/v1/teams/overview), so the choice feels social
+ * and consequential rather than purely cosmetic. */
+const ONBOARD_KEY = "f1sg_onboarded";
 const TeamPicker = (() => {
-  function open() {
+  let onboarding = false;       // true while the forced first-run prompt is open
+  let overview = null;          // cached {teams, total_players} from the server
+
+  // Per-team {members, points, rank}, keyed by team id, for the card footers and
+  // the intro line. Best-effort: if the fetch fails we just render bare cards.
+  async function loadOverview() {
+    try {
+      const res = await fetch(`${API}/teams/overview`);
+      if (!res.ok) throw new Error();
+      overview = await res.json();
+    } catch { overview = null; }
+    return overview;
+  }
+
+  function statFor(key) {
+    if (!overview) return null;
+    return overview.teams.find((t) => t.team === key) || { members: 0, points: 0, rank: null };
+  }
+
+  // The welcome blurb: total players who've picked a side + the current
+  // Constructors' Championship leader, so a newcomer knows what they're joining.
+  function introHtml() {
+    if (!overview || !overview.teams.length) {
+      return "Pick the constructor you'll race for. Your points feed your team's " +
+             "tally in the Constructors' Championship.";
+    }
+    const total = overview.total_players;
+    const leader = overview.teams.find((t) => t.points > 0);
+    const players = total === 1 ? "1 player has" : `${total.toLocaleString()} players have`;
+    const lead = leader
+      ? ` <strong>${escapeHtml((TEAMS[leader.team] || {}).name || leader.team)}</strong> ` +
+        `lead the Constructors' Championship with ${leader.points.toLocaleString()} pts.`
+      : " No team has scored yet — be the first to put points on the board.";
+    return `${players} already picked a side.${lead} Every question you answer adds your ` +
+           `score to your team's tally — choose yours:`;
+  }
+
+  function cardFooter(key) {
+    const s = statFor(key);
+    if (!s) return "";
+    const fans = s.members === 1 ? "1 fan" : `${s.members.toLocaleString()} fans`;
+    return `<span class="team-card-stats">${fans} · ${s.points.toLocaleString()} pts</span>`;
+  }
+
+  function render() {
     const grid = document.getElementById("team-picker-grid");
     grid.innerHTML = Object.entries(TEAMS).map(([key, t]) => {
       const sel = key === state.selected_team;
@@ -1301,33 +1373,77 @@ const TeamPicker = (() => {
                 <span class="team-card-swatch"
                       style="background:${t.primary}; box-shadow:inset 0 -8px 0 ${t.secondary}"></span>
                 <span class="team-card-name">${t.name}<span class="team-card-check">✓</span></span>
+                ${cardFooter(key)}
               </button>`;
     }).join("");
     grid.querySelectorAll(".team-card").forEach((card) => {
-      card.addEventListener("click", () => {
-        track("team_select", { team: card.dataset.team });
-        applyTeam(card.dataset.team);
-        recordTeamUse(card.dataset.team);  // for the constructor-collection achievements
-        saveState(state);
-        evaluateAchievements();
-        syncTeam(card.dataset.team);  // persist server-side when signed in
-        close();
-      });
+      card.addEventListener("click", () => pickTeam(card.dataset.team));
     });
-    show("team-overlay");
   }
 
-  function close() { hide("team-overlay"); }
+  function pickTeam(team) {
+    track("team_select", { team, onboarding });
+    applyTeam(team);
+    recordTeamUse(team);  // for the constructor-collection achievements
+    saveState(state);
+    evaluateAchievements();
+    syncTeam(team);       // persist server-side when signed in
+    if (onboarding) {
+      localStorage.setItem(ONBOARD_KEY, "1");
+      const name = (TEAMS[team] || {}).name || team;
+      toast(`🏎️ You're racing for ${name}! Your points now feed its championship.`);
+    }
+    onboarding = false;
+    close();
+  }
+
+  async function open(opts = {}) {
+    onboarding = !!opts.onboarding;
+    const title = document.getElementById("team-panel-title");
+    const intro = document.getElementById("team-panel-intro");
+    const closeBtn = document.getElementById("team-panel-close");
+    title.textContent = onboarding ? "Pick Your Team" : "Choose Your Team";
+    // During the forced first-run prompt the player must choose, so hide the
+    // close affordance (backdrop/Escape are also ignored — see close()).
+    closeBtn.classList.toggle("hidden", onboarding);
+    intro.classList.add("hidden");
+    show("team-overlay");
+    render();                       // bare cards immediately…
+    await loadOverview();           // …then enrich with live counts + standings
+    render();
+    if (onboarding || overview) {
+      intro.innerHTML = introHtml();
+      intro.classList.toggle("hidden", !onboarding && !overview);
+    }
+  }
+
+  // Ignore close requests mid-onboarding so a brand-new player can't skip the
+  // choice without picking. The normal picker closes freely.
+  function close() {
+    if (onboarding) return;
+    hide("team-overlay");
+  }
+
+  // Show the welcome prompt once, to brand-new guests only. Returning guests (who
+  // already have local progress) and signed-in players are silently marked done.
+  function maybeOnboard() {
+    if (localStorage.getItem(ONBOARD_KEY)) return;
+    if (isSignedIn() || state.games_played > 0) {
+      localStorage.setItem(ONBOARD_KEY, "1");
+      return;
+    }
+    open({ onboarding: true });
+  }
 
   function init() {
-    document.getElementById("team-select-btn").addEventListener("click", open);
+    document.getElementById("team-select-btn").addEventListener("click", () => open());
     document.getElementById("team-panel-close").addEventListener("click", close);
     document.getElementById("team-overlay").addEventListener("click", (e) => {
       if (e.target.id === "team-overlay") close();
     });
   }
 
-  return { init };
+  return { init, open, maybeOnboard };
 })();
 
 /* ===================== ACHIEVEMENTS ===================== *
@@ -1439,6 +1555,7 @@ function evaluateAchievements() {
   }
   if (newly.length) {
     saveState(state);
+    Sound.play("achievement");   // celebratory chime for the unlock(s)
     newly.forEach((ach, i) => setTimeout(() => toast(`${ach.icon} Achievement unlocked: ${ach.name}`), i * 1300));
     track("achievement", { ids: newly.map((ach) => ach.id) });
     renderAchievements();
@@ -1572,6 +1689,34 @@ function handleDeepLink() {
   return true;
 }
 
+/* ===================== SOUND TOGGLE ===================== *
+ * A single, always-visible header control mutes/unmutes every effect. The choice
+ * persists (Sound.setOn writes localStorage), so it sticks across visits. */
+const SoundToggle = (() => {
+  function paint() {
+    const btn = document.getElementById("sound-toggle");
+    const icon = document.getElementById("sound-icon");
+    if (!btn || !icon) return;
+    const on = Sound.isOn();
+    icon.textContent = on ? "🔊" : "🔇";
+    btn.setAttribute("aria-pressed", String(on));
+    btn.classList.toggle("muted", !on);
+    btn.title = on ? "Sound on — click to mute" : "Sound off — click to enable";
+  }
+  function init() {
+    const btn = document.getElementById("sound-toggle");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      const on = Sound.toggle();
+      paint();
+      track("sound_toggle", { on });
+      if (on) Sound.play("uiClick");   // confirm it's back (silent when muting)
+    });
+    paint();
+  }
+  return { init };
+})();
+
 /* ---- Boot ---- */
 function show(id) { document.getElementById(id).classList.remove("hidden"); }
 function hide(id) { document.getElementById(id).classList.add("hidden"); }
@@ -1582,6 +1727,7 @@ renderStreakBanner();
 CurveSlider.init();
 DataCheck.init();
 TeamPicker.init();
+SoundToggle.init();
 Auth.init();
 document.querySelectorAll(".lb-period-tab").forEach((t) =>
   t.addEventListener("click", () => setLeaderboardPeriod(t.dataset.period)));
@@ -1595,4 +1741,7 @@ track("app_open", { signed_in: isSignedIn() });  // open the analytics session
 refreshMe().then(() => { renderProfile(); renderStreakBanner(); evaluateAchievements(); });
 tickCountdown(); setInterval(tickCountdown, 1000);
 renderRaceWeek(); setInterval(renderRaceWeek, 60000); // refresh past/next state each minute
-handleDeepLink();  // jump straight into a shared challenge, if the URL asks for one
+// A shared "?play=" link drops the player straight into a challenge; don't
+// interrupt that with the onboarding prompt. Otherwise, first-run guests are
+// asked to pick a team (with live headcounts + championship standings).
+if (!handleDeepLink()) TeamPicker.maybeOnboard();

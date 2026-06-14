@@ -1,5 +1,5 @@
 # PRODUCT REQUIREMENTS DOCUMENT (PRD)
-## Project: F1 StatGuesser (Working Title)
+## Project: GridMaster
 **Document Version:** 1.0
 **Target Audience:** Frontend Developers, Backend/Data Engineers, UI/UX Designers, QA Engineers
 
@@ -9,7 +9,7 @@
 > the same validation gate, and ad-network integration is still stubbed.
 
 ## 1. Executive Summary
-F1 StatGuesser is a web-based, gamified sports trivia platform built for Formula 1 fans. The application leverages high-accuracy historical data to present users with numerical guessing challenges, scoring them based on their proximity to the true statistic. The platform utilizes a "hybrid-scarcity" retention model, blending capped daily challenges with an unlimited, highly bingeable arcade mode to maximize user engagement and ad-impression inventory.
+GridMaster is a web-based, gamified sports trivia platform built for Formula 1 fans. The application leverages high-accuracy historical data to present users with numerical guessing challenges, scoring them based on their proximity to the true statistic. The platform utilizes a "hybrid-scarcity" retention model, blending capped daily challenges with an unlimited, highly bingeable arcade mode to maximize user engagement and ad-impression inventory.
 
 ## 2. Mathematical Scoring Engine
 For all exact-numerical guessing modes, developers must implement a percentage-error exponential decay algorithm. This normalizes the score regardless of whether the target value is small (e.g., 7 World Championships) or large (e.g., 1,075 Career Points).
