@@ -1,10 +1,16 @@
 # Project status & roadmap
 
-_Last updated: 2026-06-13_
+_Last updated: 2026-06-14_
 
 A snapshot of where **F1 Stat Guesser** is, how it fits together, and what could
 come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
 engineering handoff. For question design see [`question-types.md`](./question-types.md).
+
+> **Latest work (engagement & retention):** streaks + freeze, social proof,
+> deep-linked sharing, a 50-badge achievement system, purple/green sector flash,
+> team-colour legibility, and optional sign-up email. See
+> [`HANDOFF_ENGAGEMENT.md`](./HANDOFF_ENGAGEMENT.md), with rationale in
+> [`ENGAGEMENT.md`](./ENGAGEMENT.md) and growth in [`MARKETING.md`](./MARKETING.md).
 
 ---
 
