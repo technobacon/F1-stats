@@ -725,12 +725,15 @@ function revealScore(q, result) {
   actualText.classList.add("pending");
   document.getElementById("odometer").textContent = "0";
   document.getElementById("reveal-insight").classList.add("hidden");
+  document.getElementById("timeline-fill").style.width = "0%";
+  document.getElementById("reveal-verdict").hidden = true;
 
   // Drop the guess marker in promptly, then slide the answer bar across slowly
   // with an ease-in-out (speeds up, then eases into the answer — anticipation).
   // The number and score stay hidden until the bar reaches its destination.
   requestAnimationFrame(() => {
     guessNode.style.left = clampPct(result.guess) + "%";
+    document.getElementById("timeline-fill").style.width = clampPct(result.guess) + "%";
     setTimeout(() => {
       Sound.play("riser");   // anticipation build, timed to land as the answer arrives
       slideToAnswer(actualNode, actualText, clampPct(result.actual), result);
@@ -764,6 +767,7 @@ function slideToAnswer(node, textEl, targetPct, result) {
       textEl.classList.add("revealed");
       tickOdometer(result.score);
       renderRevealInsight(result);
+      setVerdict(result);
       if (result._sector) {
         flashSector(result._sector);
         // Purple (≤10%) = a whole pack thunders by; green (≤25%) = a single car.
@@ -771,6 +775,21 @@ function slideToAnswer(node, textEl, targetPct, result) {
       }
     }
   })(start);
+}
+
+/* Persistent sector verdict banner shown at the top of the reveal once the answer
+ * lands. Mirrors the transient flashSector scroll, but stays put as context. */
+function setVerdict(result) {
+  const el = document.getElementById("reveal-verdict");
+  const txt = document.getElementById("reveal-verdict-text");
+  if (!el || !txt) return;
+  el.classList.remove("purple", "green", "neutral");
+  let label;
+  if (result._sector === "purple") { el.classList.add("purple"); label = "Purple sector"; }
+  else if (result._sector === "green") { el.classList.add("green"); label = "Green sector"; }
+  else { el.classList.add("neutral"); label = "Chequered flag"; }
+  txt.textContent = label;
+  el.hidden = false;
 }
 
 /* Classify a guess by percentage error, F1-timing style:
