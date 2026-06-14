@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=15" />
+  <link rel="stylesheet" href="/static/style.css?v=16" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -67,6 +67,10 @@
               aria-pressed="true" aria-label="Toggle sound effects">
         <span class="sound-icon" id="sound-icon" aria-hidden="true">🔊</span>
       </button>
+      <button id="theme-toggle" class="sound-toggle theme-toggle" title="Dark mode — click for light"
+              aria-pressed="false" aria-label="Toggle light or dark theme">
+        <span class="theme-icon" id="theme-icon" aria-hidden="true">☾</span>
+      </button>
       <button id="team-select-btn" class="team-select-btn" title="Change team colour theme" aria-haspopup="dialog">
         <span class="team-btn-swatch" id="team-btn-swatch"></span>
         <span id="team-btn-label">McLaren</span>
@@ -78,6 +82,23 @@
   <main>
     <!-- ===================== LANDING / HOME ===================== -->
     <section id="view-home" class="view active">
+      <!-- Variation B: Constructors' Championship timing tower alongside the hero -->
+      <div class="home-top">
+        <aside class="timing-tower" aria-label="Constructors' Championship standings">
+          <div class="tt-head">
+            <span class="tt-live" aria-hidden="true"></span>
+            <p class="tt-eyebrow">Constructors' Championship</p>
+          </div>
+          <h2 class="tt-title">Which fanbase is smartest?</h2>
+          <div class="tt-period" role="tablist" aria-label="Standings window">
+            <button class="tt-period-tab active" data-tower-period="all">All-time</button>
+            <button class="tt-period-tab" data-tower-period="weekly">This week</button>
+            <button class="tt-period-tab" data-tower-period="daily">Today</button>
+          </div>
+          <ol class="tt-list" id="home-tower-list"><li class="muted">Loading…</li></ol>
+          <p class="tt-foot muted">Every point you score feeds your team's tally. <strong>Pick a side</strong> to climb it.</p>
+        </aside>
+
       <div class="hero">
         <div class="hero-inner">
           <p class="hero-eyebrow">Welcome to</p>
@@ -94,6 +115,7 @@
         </div>
         <div class="hero-checkers" aria-hidden="true"></div>
       </div>
+      </div><!-- /home-top -->
 
       <!-- Next race weekend schedule -->
       <section class="race-week" id="race-week" aria-live="polite">
@@ -433,7 +455,7 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/sound.js?v=15"></script>
-  <script src="/static/app.js?v=15"></script>
+  <script src="/static/sound.js?v=16"></script>
+  <script src="/static/app.js?v=16"></script>
 </body>
 </html>

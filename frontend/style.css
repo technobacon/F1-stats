@@ -7,7 +7,8 @@
            deep blue) are nearly invisible as text, so applyTeam() in app.js sets this
            to a lightened variant per team while --color-primary stays the true brand
            colour for fills/borders. This default matches McLaren. */
-        --color-ink:#FF8000;
+        --team-ink-dark:#FF8000; --team-ink-light:#C95E00;
+        --color-ink:var(--team-ink-dark);
         --btn-text:#000; --btn-stripe:3px;
         --radius:14px; --shadow:0 12px 34px rgba(0,0,0,.45);
         /* F1 timing-board sector colours (fixed, high-contrast). */
@@ -25,6 +26,83 @@
 :root[data-team="haas"]         { --color-primary:#1A1A1A; --color-secondary:#E8002D; --btn-text:#fff; }
 :root[data-team="audi"]         { --color-primary:#8E8E8E; --color-secondary:#CC0000; --btn-text:#000; }
 :root[data-team="cadillac"]     { --color-primary:#FFFFFF; --color-secondary:#0D0D0D; --btn-text:#000; }
+
+/* ===================== LIGHT THEME (opt-in: <html data-theme="light">) =====================
+   Team primary stays the accent for fills/borders; --color-ink switches to the per-team
+   legible-on-white variant that applyTeam() feeds in via --team-ink-light. */
+:root[data-theme="light"] {
+  --bg:#f3f4f7; --bg2:#fbfbfd; --surface:#ffffff; --surface2:#f1f2f5;
+  --line:#e3e6eb; --text:#12161d; --muted:#5d6573;
+  --color-ink:var(--team-ink-light);
+  --shadow:0 14px 38px rgba(30,40,55,.14); }
+:root[data-theme="light"] .hud { background:rgba(255,255,255,.85); }
+:root[data-theme="light"] .hero { background:linear-gradient(180deg,#ffffff,#eef0f4); }
+:root[data-theme="light"] .hero::before {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,.72)),
+    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--color-primary) 16%, transparent), transparent 55%),
+    url('/static/hero.jpg') center/cover no-repeat; }
+:root[data-theme="light"] .hero::after {
+  background:repeating-linear-gradient(118deg, transparent 0 44px, rgba(20,24,32,.03) 44px 47px); }
+:root[data-theme="light"] .hero-sub { color:#475061; }
+:root[data-theme="light"] .hero-checkers {
+  background:repeating-conic-gradient(#12161d 0 25%, #fff 0 50%) 0 0/24px 24px; opacity:.12; }
+:root[data-theme="light"] .btn-ghost { background:rgba(20,24,32,.04); }
+:root[data-theme="light"] .btn-secondary { background:#ffffff; }
+:root[data-theme="light"] .game-exit { background:rgba(20,24,32,.05); }
+:root[data-theme="light"] .mode-card,
+:root[data-theme="light"] .race-week,
+:root[data-theme="light"] .feature-strip,
+:root[data-theme="light"] .card { box-shadow:0 2px 12px rgba(30,40,55,.06); }
+:root[data-theme="light"] body.in-game #view-quiz {
+  background:
+    radial-gradient(1200px 720px at 50% -12%, color-mix(in srgb, var(--color-primary) 10%, transparent), transparent 60%),
+    linear-gradient(180deg, #ffffff, #eef0f4); }
+:root[data-theme="light"] .toast { background:#12161d; color:#fff; }
+
+/* ===================== HOME TOP: TIMING TOWER + HERO ===================== */
+.home-top { display:grid; grid-template-columns:320px 1fr; gap:1rem; align-items:stretch; }
+.home-top .hero { height:100%; }
+.home-top .hero-title { font-size:clamp(2.2rem,5vw,3.6rem); }
+.timing-tower { background:linear-gradient(180deg, var(--surface), var(--surface2));
+  border:1px solid var(--line); border-radius:20px; padding:1.3rem 1.1rem; box-shadow:var(--shadow);
+  display:flex; flex-direction:column; }
+.tt-head { display:flex; align-items:center; gap:.5rem; }
+.tt-live { width:7px; height:7px; border-radius:50%; background:var(--f1-green);
+  box-shadow:0 0 8px var(--f1-green); animation:tt-pulse 1.6s ease-in-out infinite; }
+@keyframes tt-pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.25;transform:scale(.7);} }
+.tt-eyebrow { font-size:.58rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+  font-weight:700; margin:0; line-height:1.3; }
+.tt-title { font-style:italic; text-transform:uppercase; font-size:1.05rem; letter-spacing:.02em;
+  margin:.4rem 0 .9rem; }
+.tt-period { display:flex; gap:.35rem; margin:0 0 .8rem; }
+.tt-period-tab { flex:1; padding:.4rem .3rem; border:1px solid var(--line); background:var(--bg2);
+  color:var(--muted); border-radius:8px; font-weight:600; cursor:pointer; font-family:inherit;
+  font-size:.72rem; transition:border-color .15s, color .15s; }
+.tt-period-tab.active { border-color:var(--color-primary); color:var(--color-ink); }
+.tt-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.3rem;
+  font-variant-numeric:tabular-nums; flex:1; }
+.tt-list li { display:grid; grid-template-columns:1.4rem 4px 1fr auto; align-items:center; gap:.55rem;
+  padding:.5rem .55rem; border-radius:8px; background:var(--bg2); border:1px solid var(--line); }
+.tt-list li.me { border-color:var(--color-primary); box-shadow:0 0 0 1px var(--color-primary); }
+.tt-list li.muted { display:block; text-align:center; background:none; border:none; padding:1rem .4rem;
+  line-height:1.4; }
+.tt-rank { font-weight:800; color:var(--muted); text-align:center; }
+.tt-list li.me .tt-rank { color:var(--color-ink); }
+.tt-bar { align-self:stretch; border-radius:2px; min-height:1.6rem; }
+.tt-name { font-weight:700; font-size:.86rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tt-you { font-size:.62rem; color:var(--color-ink); font-weight:700; }
+.tt-pts { font-weight:800; font-size:.82rem; }
+.tt-list li:not(.me) .tt-pts { color:var(--muted); }
+.tt-foot { margin:.9rem 0 0; line-height:1.45; }
+.tt-foot strong { color:var(--color-ink); }
+
+@media (max-width: 860px) {
+  .home-top { grid-template-columns:1fr; }
+  .home-top .hero { order:1; }
+  .timing-tower { order:2; }
+  .home-top .hero-title { font-size:clamp(2.2rem,12vw,3.2rem); }
+}
 
 * { box-sizing:border-box; }
 body { margin:0; font-family:'Titillium Web','Segoe UI',system-ui,sans-serif;
