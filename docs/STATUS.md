@@ -6,7 +6,12 @@ A snapshot of where **F1 Stat Guesser** is, how it fits together, and what could
 come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
 engineering handoff. For question design see [`question-types.md`](./question-types.md).
 
-> **Latest work (engagement & retention):** streaks + freeze, social proof,
+> **Latest work (feel + onboarding):** a synthesized **Web Audio sound layer**
+> (`frontend/sound.js`, zero audio assets) with a header on/off toggle, and a
+> **first-run team-selection prompt** that shows per-team headcounts + the
+> Constructors' Championship standings.
+>
+> **Earlier (engagement & retention):** streaks + freeze, social proof,
 > deep-linked sharing, a 50-badge achievement system, purple/green sector flash,
 > team-colour legibility, and optional sign-up email. See
 > [`HANDOFF_ENGAGEMENT.md`](./HANDOFF_ENGAGEMENT.md), with rationale in
@@ -76,9 +81,16 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
   four mode cards, feature strip.
 - Sticky blurred top bar, pill nav, single `navigate()` router, team-colour
   theming, live countdown HUD, share, PWA / add-to-home-screen.
+- **Synthesized sound effects** (`frontend/sound.js`, Web Audio, no audio assets):
+  slider click, answer-reveal riser, F1 "lights out" session start, purple/green
+  sector drive-bys, lock-in / achievement / session-complete / arcade cues — with
+  an always-visible **header on/off toggle** (persisted).
+- **First-run onboarding**: brand-new guests are prompted to pledge a constructor,
+  shown each team's fan headcount and the Constructors' Championship leader
+  (`/api/v1/teams/overview`).
 
 ### Quality
-- **116 tests passing** (`cd backend && python3 -m pytest -q`): scoring,
+- **124 tests passing** (`cd backend && python3 -m pytest -q`): scoring,
   validation (incl. every metric/aggregation), API trust boundary, all modes,
   accounts/leaderboards/streaks, the replay-proof dedup, analytics ingest +
   reporting + token gate, ETL ingestion, and the dataset export→load→serve

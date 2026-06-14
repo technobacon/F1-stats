@@ -144,6 +144,20 @@ class TeamLeaderboardResponse(BaseModel):
     period: str = "all"
 
 
+class TeamOverviewEntry(BaseModel):
+    rank: int
+    team: str
+    members: int   # registered players who pledged to this faction
+    points: int    # server-verified Constructors' Championship points (all-time)
+
+
+class TeamOverviewResponse(BaseModel):
+    """Per-team headcount + all-time standings for the first-run team picker.
+    Lists EVERY team (including empty ones), unlike the championship board."""
+    teams: list[TeamOverviewEntry]
+    total_players: int
+
+
 class AnalyticsEvent(BaseModel):
     event: str
     # Accept anything for props so one malformed field can't 422 a whole batch;

@@ -111,6 +111,47 @@ lays the groundwork for the email-reminder backlog item below.
 
 ---
 
+## Shipped in the third pass
+
+### 8. Synthesized sound effects (`frontend/sound.js`)
+A feel-good audio layer that makes the core interactions **satisfying** — the
+moment-to-moment dopamine that complements the longer-arc streak/achievement
+hooks. Every effect is **synthesized at runtime with the Web Audio API**, so there
+are no binary audio assets to ship, host or license (the same self-contained ethos
+as the first-party analytics and built-in accounts).
+
+- **Slider click** — a rate-limited spinning-wheel tick as the guess crosses each
+  notch (`CurveSlider.setValue` → `Sound.tick`), so dragging the car feels tactile.
+- **Answer reveal riser** — a rising sweep builds anticipation under the slide-to
+  -answer animation, timed to resolve as the marker lands.
+- **Sector drive-bys** — a single car whoosh on a **green** sector (≤25%), a whole
+  **pack** thundering by (panned across the grid + a sparkle) on a **purple** one
+  (≤10%), reinforcing the existing sector flash.
+- **Lights out** — the F1 five-light start sequence then a launch surge as each
+  session begins.
+- **Plus**: lock-in confirm, achievement chime, session-complete fanfare, arcade
+  correct/wrong cues, and a subtle navigation tap.
+- **Volume** is held under a single master gain so it's satisfying but never
+  startles, and an **always-visible header toggle** (`#sound-toggle`,
+  `SoundToggle`) mutes everything, persisted across visits (`f1sg_sound_on`).
+
+### 9. First-run team-selection onboarding (`TeamPicker`)
+The Constructors' Championship only matters if players pick a side, so brand-new
+guests are now **prompted to pledge a constructor on their first visit**. The
+existing team-picker modal doubles as the welcome prompt (`TeamPicker.maybeOnboard()`):
+
+- It shows, per team, the **fan headcount + championship points**, and an intro
+  naming the **current championship leader** and how many players have picked a
+  side — so the choice feels social and consequential, not just cosmetic. Data
+  from `GET /api/v1/teams/overview` (`auth.team_overview`), which lists **every**
+  team including empty ones (unlike the scored-only championship board).
+- Shown **once**, to new guests only: returning guests (local progress present) and
+  signed-in players are silently flagged done (`f1sg_onboarded`), and a `?play=`
+  deep link suppresses it so a shared challenge isn't interrupted. The close/escape
+  affordances are disabled during onboarding so a side is actually chosen.
+
+---
+
 ## Backlog (impact ÷ effort)
 
 ### Tier 1 — highest ROI

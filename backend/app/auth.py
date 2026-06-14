@@ -505,3 +505,39 @@ def team_leaderboard(conn: sqlite3.Connection, period: str = "all") -> list[dict
         }
         for i, r in enumerate(rows)
     ]
+
+
+def team_overview(conn: sqlite3.Connection) -> dict:
+    """A full-grid snapshot for the first-run team picker: how many registered
+    players have pledged to each constructor and how the Constructors'
+    Championship is going.
+
+    Unlike team_leaderboard (which only lists factions that have already scored),
+    this returns EVERY team — including ones nobody has joined yet — so a newcomer
+    deciding which side to back sees the complete grid: the headcount behind each
+    team and its all-time points race. Members come from the users table;
+    points come only from play_events, so the standings can't be inflated from the
+    client (Architecture §2.2)."""
+    rows = conn.execute(
+        "SELECT u.selected_team AS team, COUNT(DISTINCT u.id) AS members, "
+        "       COALESCE(SUM(e.score), 0) AS points "
+        "FROM users u LEFT JOIN play_events e ON e.user_id = u.id "
+        "GROUP BY u.selected_team",
+    ).fetchall()
+    # Fold each stored team into its normalized key (unknown/legacy values collapse
+    # onto the default rather than appearing as a phantom faction).
+    tally: dict[str, list[int]] = {}
+    for r in rows:
+        key = normalize_team(r["team"])
+        agg = tally.setdefault(key, [0, 0])
+        agg[0] += r["members"]
+        agg[1] += int(r["points"] or 0)
+    teams = []
+    for key in TEAMS:
+        members, points = tally.get(key, (0, 0))
+        teams.append({"team": key, "members": members, "points": points})
+    # Rank by points, then headcount, then name for a stable, sensible order.
+    teams.sort(key=lambda t: (-t["points"], -t["members"], t["team"]))
+    for i, t in enumerate(teams):
+        t["rank"] = i + 1
+    return {"teams": teams, "total_players": sum(t["members"] for t in teams)}

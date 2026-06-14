@@ -40,6 +40,7 @@ from .models import (
     RegisterRequest,
     SetTeamRequest,
     TeamLeaderboardResponse,
+    TeamOverviewResponse,
     VerifyRequest,
     VerifyResponse,
 )
@@ -299,6 +300,19 @@ def team_leaderboard(period: str = "all"):
     finally:
         conn.close()
     return {"entries": entries, "period": period}
+
+
+@app.get("/api/v1/teams/overview", response_model=TeamOverviewResponse)
+def teams_overview():
+    """First-run team picker snapshot: every constructor with its registered
+    headcount and all-time Constructors' Championship points. Public — it shows a
+    newcomer how many players back each side and how the title race is going
+    before they pledge."""
+    conn = get_conn()
+    try:
+        return auth.team_overview(conn)
+    finally:
+        conn.close()
 
 
 @app.post("/api/v1/profile/team", response_model=MeResponse)

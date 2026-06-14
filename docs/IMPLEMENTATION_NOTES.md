@@ -16,7 +16,9 @@ this describes the code as it actually runs.
 > Beyond the question pipeline the service now also has real **accounts**,
 > server-verified **leaderboards** (all-time/weekly/daily) + a **Constructors'
 > Championship**, server-side **streaks**, free **durable storage** (Litestream),
-> and first-party **analytics** — see §9–§11. **116 tests pass.**
+> and first-party **analytics** — see §9–§11. A feel-good **sound layer** and a
+> first-run **team-selection onboarding** prompt round out the client (§12).
+> **124 tests pass.**
 
 ---
 
@@ -35,7 +37,8 @@ this describes the code as it actually runs.
 | `backend/app/models.py` | Pydantic request/response models. |
 | `backend/app/main.py` | FastAPI routes + lifespan (self-seed, analytics prune) + static frontend mount. |
 | `backend/start.sh`, `litestream.yml` | Prod entrypoint wrapping uvicorn with Litestream replication for durable accounts (§11). |
-| `frontend/*` | Guest-first PWA: modes, odometer reveal, leaderboards, share grid, analytics tracker, `analytics.html` dashboard. |
+| `frontend/*` | Guest-first PWA: modes, odometer reveal, leaderboards, share grid, analytics tracker, `analytics.html` dashboard, **first-run team onboarding** (§12). |
+| `frontend/sound.js` | **Web Audio sound effects**, synthesized at runtime — no audio assets shipped or fetched (§12). |
 
 The pipeline has two interchangeable front-ends into the same staging→validation
 →production path, selected by `seed.refresh(source=...)` (env `F1_DATA_SOURCE`):
@@ -293,7 +296,7 @@ front rows, DNFs), again computed through the same validation engine.
 ```bash
 cd backend
 F1_DATA_SOURCE=dataset ./run.sh   # install, load the committed bank, serve :8000
-python -m pytest -q               # 116 tests (offline)
+python -m pytest -q               # 124 tests (offline)
 ```
 
 Test coverage of note:
@@ -331,6 +334,10 @@ against the client `anon_id` and re-keyed to the account on sign-in
   `created_at`; the resetting windows give newcomers a fresh race to win.
 - **Constructors' Championship:** `team_leaderboard` buckets verified points by the
   player's pledged team (persisted via `POST /api/v1/profile/team`).
+- **Team overview (onboarding):** `team_overview` returns **every** team — even
+  empty ones — with its registered headcount and all-time points, served at
+  `GET /api/v1/teams/overview`. It backs the first-run team-selection prompt
+  (§12); points still come only from `play_events`.
 - **Streaks:** `daily_streak` recomputes the consecutive-day run from `play_events`
   (never trusts the client).
 
@@ -362,3 +369,51 @@ durable for free: on boot it restores the latest snapshot from S3-compatible obj
 storage, then runs uvicorn under `litestream replicate`. It's **opt-in** (engaged
 only when `LITESTREAM_REPLICA_BUCKET` is set) and **graceful** (final snapshot on
 SIGTERM), with zero changes to application code or SQL. Setup is in HANDOFF §7.
+
+---
+
+## 12. Sound effects & first-run onboarding (`frontend/sound.js`, `app.js`)
+
+Two client-only feel-good layers; neither touches the trust boundary.
+
+### Sound (`sound.js`)
+
+Every effect is **synthesized at runtime** with the Web Audio API — there are **no
+binary audio assets** to ship, host or fetch (the same self-contained philosophy as
+the first-party analytics and built-in accounts). The module is a small singleton:
+
+- One lazily-created `AudioContext` (built on the first play, resumed inside the
+  triggering user gesture to satisfy autoplay policy) feeding **one master gain**
+  (`MASTER ≈ 0.5`). Each effect's own peak sits under that ceiling, so the palette
+  is loud enough to satisfy but never startles or clips.
+- Low-level voices: `blip` (enveloped oscillator, optional pitch glide) and
+  `whoosh` (band-pass-filtered white noise with a Doppler sweep + optional stereo
+  pan for the car drive-bys).
+- Mapped effects: `lockIn`, `riser`, `greenSector` (one car), `purpleSector` (a
+  whole pack, panned across the grid + a sparkle), `lightsOut` (the five-light F1
+  start sequence then a launch surge), `achievement`, `sessionComplete`,
+  `correct`/`wrong` (arcade), `uiClick`. The slider's spinning-wheel `tick` has its
+  own rate limit so dragging reads as crisp detents, not a buzz.
+- On/off persists in `localStorage` (`f1sg_sound_on`, default **on**) and is
+  honoured before any node is built, so muting is instant and total.
+
+`app.js` fires the cues at the natural moments (guess crossing a notch, lock-in,
+the reveal slide, sector flash, session start/finish, achievement unlock, arcade
+pick, navigation). A single **header toggle** (`#sound-toggle`, wired by
+`SoundToggle`) flips the state and repaints the 🔊/🔇 icon.
+
+### Onboarding (`TeamPicker` in `app.js`)
+
+The team-picker modal doubles as a one-time welcome prompt. `TeamPicker.maybeOnboard()`
+(run at boot) opens it **only** for a brand-new guest — returning guests (local
+progress present) and signed-in players are silently marked done via the
+`f1sg_onboarded` flag, and a `?play=` deep link suppresses it so a shared challenge
+isn't interrupted. In onboarding mode the close affordance and backdrop/Escape
+dismissal are disabled so a side is actually chosen.
+
+It fetches `GET /api/v1/teams/overview` and shows, per team card, the **fan
+headcount + championship points**, plus an intro line naming the current
+Constructors' Championship leader and the total number of players who've picked a
+side — making the choice feel social and consequential from the first visit. The
+selection reuses the existing `applyTeam` / `syncTeam` path (cosmetic locally,
+pledged server-side on sign-in).
