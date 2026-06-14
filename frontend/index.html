@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=16" />
+  <link rel="stylesheet" href="/static/style.css?v=17" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -245,8 +245,13 @@
       <!-- Score reveal -->
       <div id="quiz-reveal" class="card reveal hidden">
         <div class="ad-slot ad-reveal" data-ad="reveal-banner">ad · reveal banner</div>
+        <div class="reveal-verdict" id="reveal-verdict" hidden>
+          <span class="rv-dot" aria-hidden="true"></span>
+          <span class="rv-text" id="reveal-verdict-text"></span>
+        </div>
         <div class="timeline">
           <div class="timeline-track"></div>
+          <div class="timeline-fill" id="timeline-fill"></div>
           <div class="timeline-node guess" id="node-guess"><span>You</span></div>
           <div class="timeline-node actual" id="node-actual"><span>Actual</span></div>
         </div>
@@ -455,7 +460,7 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/sound.js?v=16"></script>
-  <script src="/static/app.js?v=16"></script>
+  <script src="/static/sound.js?v=17"></script>
+  <script src="/static/app.js?v=17"></script>
 </body>
 </html>

@@ -353,15 +353,46 @@ body.in-game #quiz-play .q-hint { text-align:center; }
 body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 
 /* Score reveal */
-.reveal .timeline { position:relative; height:80px; margin:2rem 0 1rem; }
+/* Sector verdict banner — lands with the result and stays as context. Sector colours
+ * (purple ≤10% / green ≤25%) are fixed, not team-themed, so they stay legible. */
+.reveal-verdict { position:relative; overflow:hidden; display:flex; align-items:center;
+  justify-content:center; gap:.55rem; width:fit-content; max-width:100%; margin:.4rem auto 0;
+  padding:.6rem 1.4rem; border-radius:12px; border:1px solid var(--line);
+  background:var(--surface2); animation:insight-fade .4s ease; }
+.reveal-verdict::before { content:""; position:absolute; inset:0; transform:translateX(-130%);
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.14), transparent);
+  animation:rv-sweep 2.6s ease-in-out infinite; }
+@keyframes rv-sweep { 0%{transform:translateX(-130%)} 100%{transform:translateX(130%)} }
+.reveal-verdict .rv-dot { width:10px; height:10px; border-radius:50%; background:var(--muted); }
+.reveal-verdict .rv-text { position:relative; font-style:italic; font-weight:900;
+  text-transform:uppercase; letter-spacing:.02em; font-size:.86rem; white-space:nowrap; }
+.reveal-verdict.purple { border-color:color-mix(in srgb,#b13bff 55%,var(--line));
+  background:color-mix(in srgb,#b13bff 16%,var(--surface)); }
+.reveal-verdict.purple .rv-dot { background:#b13bff; box-shadow:0 0 12px #b13bff; }
+.reveal-verdict.purple .rv-text { color:#d9b3ff; }
+.reveal-verdict.green { border-color:color-mix(in srgb,#33d17a 55%,var(--line));
+  background:color-mix(in srgb,#33d17a 15%,var(--surface)); }
+.reveal-verdict.green .rv-dot { background:#33d17a; box-shadow:0 0 12px #33d17a; }
+.reveal-verdict.green .rv-text { color:#7ee2a8; }
+:root[data-theme="light"] .reveal-verdict.purple .rv-text { color:#7a1fc2; }
+:root[data-theme="light"] .reveal-verdict.green .rv-text { color:#1c8048; }
+.reveal-verdict.neutral .rv-text { color:var(--text); }
+
+.reveal .timeline { position:relative; height:104px; margin:1.6rem 0 1rem; }
 .timeline-track { position:absolute; top:50%; left:0; right:0; height:8px;
                   transform:translateY(-50%); background:var(--line); border-radius:4px; }
-.timeline-node { position:absolute; top:50%; transform:translate(-50%,-50%);
+.timeline-fill { position:absolute; top:50%; left:0; width:0; height:8px;
+                 transform:translateY(-50%); border-radius:4px;
+                 background:linear-gradient(90deg, color-mix(in srgb,var(--color-primary) 30%,transparent), var(--color-primary));
+                 box-shadow:0 0 10px color-mix(in srgb,var(--color-primary) 45%,transparent);
+                 transition:width .5s cubic-bezier(.2,.8,.2,1); }
+.timeline-node { position:absolute; top:50%; transform:translate(-50%, calc(-100% - 5px));
                  width:clamp(46px,12vw,62px); }
-.timeline-node .car-sprite { width:100%; filter:drop-shadow(0 4px 8px rgba(0,0,0,.45)); }
-.timeline-node span { position:absolute; top:-22px; left:50%; transform:translateX(-50%);
-                      font-size:.65rem; white-space:nowrap; color:var(--muted); }
-/* The locked-in guess (full team car) rides above the ghost when they overlap. */
+.timeline-node .car-sprite { width:100%; filter:drop-shadow(0 5px 9px rgba(0,0,0,.5)); }
+.timeline-node span { position:absolute; top:-20px; left:50%; transform:translateX(-50%);
+                      font-size:.65rem; white-space:nowrap; color:var(--muted); font-weight:700; }
+/* The locked-in guess (full team car) rides above the ghost when they overlap.
+ * Only `left` transitions — the raise transform stays put. */
 .timeline-node.guess { z-index:2; transition:left .5s cubic-bezier(.2,.8,.2,1); }
 .timeline-node.actual { z-index:1; }
 .timeline-node.actual span { color:var(--text); }
