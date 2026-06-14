@@ -62,14 +62,65 @@ invites, not bare URLs.
 
 ---
 
+## Shipped in the second pass
+
+### 4. A proper achievement system (50 badges, Rookie → Champion)
+Replaces the three hard-coded `if`s with a **data-driven catalog** in
+`frontend/app.js` (`ACHIEVEMENTS`). Each badge is one row — `{id, icon, tier,
+name, desc, check(s)}` — with a pure predicate run against an achievement snapshot
+(`achSnapshot()`). Adding a badge is a one-liner.
+
+- **50 thematic achievements** across four difficulty tiers (10 Rookie, 15
+  Midfield, 15 Podium, 10 Champion): *Lights Out, Purple Sector, Hat-Trick,
+  Grand Slam, Perfect Lap, Comeback Kid, The Full Grid, Hall of Fame*…
+- **Counters + flags** backing the checks live in `state.ach` (lazy `ensureAch()`),
+  updated from `submitGuess` / `finishSession` / arcade / share / challenge /
+  team-select / auth. Like the streak, this is **local/cosmetic** (Architecture
+  §2.2) — it never touches the server-verified leaderboard.
+- **Profile UI**: a filterable grid (`#ach-grid`, All / Unlocked / Locked) with
+  per-tier accent colours; unlocks raise a celebratory toast and re-render.
+- `evaluateAchievements()` is idempotent (skips already-earned), so it's called
+  liberally — on boot, after every scoring event, and after server refresh.
+
+### 5. Purple / Green sector flash
+On each reveal, a guess is classified by percentage error (`sectorForResult`) and,
+if close, an F1 timing-board scroll sweeps the screen (`flashSector`):
+- **≤10% → "&lt;TEAM&gt; PURPLE SECTOR"** in F1 purple (`--f1-purple`).
+- **≤25% → "&lt;TEAM&gt; GREEN SECTOR"** in F1 green (`--f1-green`).
+
+Fixed sector colours (not the team colour) plus a white stroke + glow keep it
+legible on every theme; honours `prefers-reduced-motion`. Purple hits also feed
+the *Purple Sector / Reign / Machine / Grand Slam* achievements.
+
+### 6. Team-colour text legibility (`--color-ink`)
+Several brand primaries (Red Bull navy, Haas near-black, Williams/RB deep blue,
+Aston dark teal) were nearly invisible as **text** on the dark UI. Fixed by
+splitting the variable:
+- `--color-primary` — the true brand colour, still used for fills, borders,
+  buttons and swatches.
+- `--color-ink` — a legibility-safe (lightened where needed) variant used for
+  **text**. Set per team in `applyTeam()` from the `TEAMS[...].ink` value; all
+  text-colour CSS now references it.
+
+### 7. Optional email at registration
+A new **optional** email field on the sign-up form (register only), for future
+opt-in reminders. Validated loosely and normalised server-side
+(`auth.normalize_email`), stored in `users.email` (nullable; migration in
+`db._migrate`). Blank is fine; a malformed non-empty value returns a 400. This
+lays the groundwork for the email-reminder backlog item below.
+
+---
+
 ## Backlog (impact ÷ effort)
 
 ### Tier 1 — highest ROI
 
 - **Reminders / notifications** — the biggest remaining gap. Nothing yet pulls a
-  player back tomorrow. Two tractable paths, in order of effort:
-  1. **Email reminder** (opt-in): a daily cron + the accounts we already have —
-     "today's challenge is live / your N-day streak is on the line".
+  player back tomorrow. Opt-in **email is now collected at sign-up** (see Shipped
+  §7), so the data side is ready. Two tractable paths, in order of effort:
+  1. **Email reminder** (opt-in): a daily cron + the stored `users.email` —
+     "today's challenge is live / your N-day streak is on the line". Needs an
+     email provider/SMTP env and a scheduler.
   2. **Web Push** (PWA): a service worker + VAPID keys + a server send. Higher
      impact, more setup. Needs a decision on provider/infra (see *Open
      decisions*).

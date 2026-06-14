@@ -219,6 +219,40 @@ def test_replaying_the_daily_does_not_inflate_the_total(client):
     assert after_two["lifetime_points"] == 5000
 
 
+def test_optional_email_is_stored_when_valid(client):
+    from app import db
+    r = client.post("/api/v1/auth/register",
+                    json={"username": "mailed", "password": "password1",
+                          "email": "Fan@Example.com"})
+    assert r.status_code == 200
+    conn = db.connect()
+    try:
+        row = conn.execute("SELECT email FROM users WHERE username='mailed'").fetchone()
+    finally:
+        conn.close()
+    assert row["email"] == "fan@example.com"  # normalized to lower-case
+
+
+def test_registration_without_email_is_allowed(client):
+    from app import db
+    r = client.post("/api/v1/auth/register",
+                    json={"username": "noemail", "password": "password1"})
+    assert r.status_code == 200
+    conn = db.connect()
+    try:
+        row = conn.execute("SELECT email FROM users WHERE username='noemail'").fetchone()
+    finally:
+        conn.close()
+    assert row["email"] is None
+
+
+def test_malformed_email_is_rejected(client):
+    r = client.post("/api/v1/auth/register",
+                    json={"username": "bademail", "password": "password1",
+                          "email": "not-an-email"})
+    assert r.status_code == 400
+
+
 def test_daily_streak_is_server_derived(client):
     import datetime as _dt
     from app import db

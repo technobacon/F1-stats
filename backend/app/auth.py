@@ -51,6 +51,22 @@ def normalize_team(team: str | None) -> str:
 
 # Conservative username rules: keep it simple, predictable and URL/display-safe.
 _USERNAME_RE = re.compile(r"^[A-Za-z0-9_.-]{3,32}$")
+# Email is OPTIONAL (only collected for future opt-in reminders). We validate the
+# shape loosely — a single @ with a dotted domain — rather than trying to be RFC
+# 5322 perfect, and cap the length. Blank/None means "no email", not an error.
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+_MAX_EMAIL_LEN = 254
+
+
+def normalize_email(email: str | None) -> str | None:
+    """Return a trimmed, lower-cased email, or None if blank. Raises AuthError on
+    a non-empty value that doesn't look like an email."""
+    e = (email or "").strip().lower()
+    if not e:
+        return None
+    if len(e) > _MAX_EMAIL_LEN or not _EMAIL_RE.match(e):
+        raise AuthError("That doesn't look like a valid email address.")
+    return e
 _MIN_PASSWORD_LEN = 8
 # Cap the password length BEFORE hashing: PBKDF2 hashes the whole input, so an
 # unbounded password is a cheap denial-of-service (hash a multi-MB string). 1024
@@ -160,11 +176,13 @@ def _user_public(row: sqlite3.Row) -> dict:
 
 
 def create_user(
-    conn: sqlite3.Connection, username: str, password: str, selected_team: str | None = None
+    conn: sqlite3.Connection, username: str, password: str,
+    selected_team: str | None = None, email: str | None = None,
 ) -> dict:
     """Create an account, returning its public view. Raises AuthError on invalid
     input or a taken username. The team is the cosmetic faction the player pledges
-    to (PRD §5.3); an unknown value falls back to the default rather than erroring."""
+    to (PRD §5.3); an unknown value falls back to the default rather than erroring.
+    Email is optional (opt-in reminders) and validated only when provided."""
     username = (username or "").strip()
     if not _USERNAME_RE.match(username):
         raise AuthError(
@@ -174,12 +192,14 @@ def create_user(
         raise AuthError(f"Password must be at least {_MIN_PASSWORD_LEN} characters.")
     if len(password) > _MAX_PASSWORD_LEN:
         raise AuthError(f"Password must be at most {_MAX_PASSWORD_LEN} characters.")
+    email = normalize_email(email)  # raises AuthError on a malformed non-empty value
 
     user_id = str(uuid.uuid4())
     try:
         conn.execute(
-            "INSERT INTO users (id, username, password_hash, selected_team) VALUES (?, ?, ?, ?)",
-            (user_id, username, hash_password(password), normalize_team(selected_team)),
+            "INSERT INTO users (id, username, password_hash, selected_team, email) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (user_id, username, hash_password(password), normalize_team(selected_team), email),
         )
     except sqlite3.IntegrityError as exc:  # UNIQUE(username) — case-insensitive
         raise AuthError("That username is already taken.") from exc

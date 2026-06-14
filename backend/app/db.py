@@ -133,6 +133,7 @@ CREATE TABLE IF NOT EXISTS users (
     username      TEXT NOT NULL UNIQUE COLLATE NOCASE,
     password_hash TEXT NOT NULL,                     -- pbkdf2_sha256$rounds$salt$hash
     selected_team TEXT DEFAULT 'mclaren',            -- cosmetic carry-over (Architecture §2.2)
+    email         TEXT,                              -- OPTIONAL: for future streak/daily reminders
     created_at    TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -220,6 +221,11 @@ def _migrate(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE play_events ADD COLUMN identity_key TEXT")
     if pe_cols and "period" not in pe_cols:
         conn.execute("ALTER TABLE play_events ADD COLUMN period TEXT")
+
+    # users gained an optional email column (for opt-in reminders) after launch.
+    user_cols = {r[1] for r in conn.execute("PRAGMA table_info(users)")}
+    if user_cols and "email" not in user_cols:
+        conn.execute("ALTER TABLE users ADD COLUMN email TEXT")
 
 
 def init_db(conn: sqlite3.Connection) -> None:

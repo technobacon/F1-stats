@@ -73,6 +73,9 @@ class RegisterRequest(BaseModel):
     # The constructor faction the player pledges to (PRD §5.3). Optional; an
     # unknown value is normalized to the default rather than rejected.
     selected_team: str | None = None
+    # OPTIONAL email for future opt-in streak/daily reminders. Blank/None is fine;
+    # a malformed non-empty value is rejected with a 400.
+    email: str | None = None
 
 
 class LoginRequest(BaseModel):

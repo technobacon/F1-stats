@@ -2,8 +2,16 @@
 :root { --bg:#0a0d12; --bg2:#0e131a; --surface:#151b24; --surface2:#10151c;
         --line:#252d38; --text:#eef2f7; --muted:#8b95a5;
         --color-primary:#FF8000; --color-secondary:#1B2425;
+        /* --color-ink: a legibility-safe version of the team colour for TEXT on the
+           dark UI. Some brand primaries (Red Bull navy, Haas near-black, Williams/RB
+           deep blue) are nearly invisible as text, so applyTeam() in app.js sets this
+           to a lightened variant per team while --color-primary stays the true brand
+           colour for fills/borders. This default matches McLaren. */
+        --color-ink:#FF8000;
         --btn-text:#000; --btn-stripe:3px;
-        --radius:14px; --shadow:0 12px 34px rgba(0,0,0,.45); }
+        --radius:14px; --shadow:0 12px 34px rgba(0,0,0,.45);
+        /* F1 timing-board sector colours (fixed, high-contrast). */
+        --f1-purple:#b13bff; --f1-green:#33d17a; }
 
 /* 2026 F1 grid — main (primary) colour + secondary accent (the button bottom stripe) */
 :root[data-team="mclaren"]      { --color-primary:#FF8000; --color-secondary:#1B2425; --btn-text:#000; }
@@ -36,7 +44,7 @@ a { color:inherit; text-decoration:none; }
 .hud-brand { display:flex; align-items:center; gap:.45rem; font-weight:900; font-style:italic;
              letter-spacing:.02em; cursor:pointer; }
 .brand-mark { display:inline-flex; align-items:center; justify-content:center; }
-.brand-logo { width:1.6rem; height:1.6rem; display:block; color:var(--color-primary); }
+.brand-logo { width:1.6rem; height:1.6rem; display:block; color:var(--color-ink); }
 .brand-word { font-size:1rem; letter-spacing:.06em; }
 
 .modes { display:flex; gap:.3rem; margin:0 auto; overflow-x:auto;
@@ -52,7 +60,7 @@ a { color:inherit; text-decoration:none; }
 .hud-countdown { text-align:right; display:flex; flex-direction:column; line-height:1.1; }
 .hud-label { font-size:.58rem; color:var(--muted); letter-spacing:1.5px; }
 .hud-timer { font-variant-numeric:tabular-nums; font-weight:700; font-size:.95rem; }
-.hud-points { font-weight:800; color:var(--color-primary); white-space:nowrap; }
+.hud-points { font-weight:800; color:var(--color-ink); white-space:nowrap; }
 /* Team picker trigger button (replaces old <select>) */
 .team-select-btn { display:flex; align-items:center; gap:.45rem; background:var(--bg2);
                    color:var(--text); border:1px solid var(--line); border-radius:8px;
@@ -84,10 +92,10 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 .hero-inner { position:relative; z-index:2; padding:clamp(2.8rem,8vw,5.5rem) 1.5rem clamp(2rem,5vw,3rem);
               text-align:center; }
 .hero-eyebrow { letter-spacing:.45em; text-transform:uppercase; font-size:.72rem;
-                color:var(--color-primary); font-weight:700; margin:0 0 .4rem; }
+                color:var(--color-ink); font-weight:700; margin:0 0 .4rem; }
 .hero-title { font-weight:900; font-style:italic; text-transform:uppercase; letter-spacing:.01em;
               font-size:clamp(2.4rem,8.5vw,5rem); margin:0; text-shadow:0 4px 30px rgba(0,0,0,.6); }
-.hero-title .accent { color:var(--color-primary); }
+.hero-title .accent { color:var(--color-ink); }
 .hero-sub { color:#c4ccd8; max-width:560px; margin:1.1rem auto 0; font-size:1.02rem; line-height:1.5; }
 .hero-cta { display:flex; gap:.7rem; justify-content:center; flex-wrap:wrap; margin-top:1.6rem; }
 .hero-checkers { position:relative; z-index:2; height:12px;
@@ -105,13 +113,13 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 .rw-head { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem;
            flex-wrap:wrap; margin-bottom:1rem; }
 .rw-eyebrow { letter-spacing:.32em; text-transform:uppercase; font-size:.64rem;
-              color:var(--color-primary); font-weight:700; margin:0 0 .25rem; }
+              color:var(--color-ink); font-weight:700; margin:0 0 .25rem; }
 .rw-title { font-style:italic; font-weight:900; text-transform:uppercase; letter-spacing:.01em;
             font-size:clamp(1.4rem,5vw,2rem); margin:0; }
 .rw-next { text-align:right; display:flex; flex-direction:column; line-height:1.15; }
 .rw-next-label { font-size:.58rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; }
 .rw-next-timer { font-variant-numeric:tabular-nums; font-weight:800; font-size:1.45rem;
-                 color:var(--color-primary); font-style:italic; }
+                 color:var(--color-ink); font-style:italic; }
 .rw-next-name { font-size:.72rem; color:var(--muted); }
 
 .rw-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.35rem; }
@@ -129,7 +137,7 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 .rw-meta { display:flex; flex-direction:column; gap:.1rem; min-width:0; }
 .rw-session { font-weight:700; font-size:.98rem; }
 .rw-kind { font-size:.62rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
-.rw-kind.sprint, .rw-kind.race { color:var(--color-primary); }
+.rw-kind.sprint, .rw-kind.race { color:var(--color-ink); }
 .rw-time { font-variant-numeric:tabular-nums; font-weight:700; font-size:.95rem; white-space:nowrap; }
 .rw-time small { display:block; font-weight:400; font-size:.6rem; color:var(--muted);
                  text-align:right; letter-spacing:.05em; }
@@ -148,14 +156,14 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 .mc-icon { font-size:1.7rem; display:block; }
 .mode-card h3 { margin:.7rem 0 .4rem; font-size:1.18rem; font-weight:700; }
 .mode-card p { color:var(--muted); font-size:.86rem; line-height:1.5; margin:0 0 1.1rem; }
-.mc-cta { color:var(--color-primary); font-weight:700; font-size:.78rem; letter-spacing:.06em;
+.mc-cta { color:var(--color-ink); font-weight:700; font-size:.78rem; letter-spacing:.06em;
           text-transform:uppercase; }
 
 .feature-strip { display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-around;
                  margin-top:2rem; padding:1.2rem; background:var(--surface2);
                  border:1px solid var(--line); border-radius:var(--radius); }
 .feature { text-align:center; display:flex; flex-direction:column; }
-.feature strong { font-size:1.25rem; color:var(--color-primary); font-style:italic; }
+.feature strong { font-size:1.25rem; color:var(--color-ink); font-style:italic; }
 .feature span { color:var(--muted); font-size:.78rem; }
 
 /* ===================== CARDS / BUTTONS ===================== */
@@ -194,7 +202,7 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 /* ===================== CURVED RACE-LINE SLIDER ===================== */
 .curve-wrap { display:flex; flex-direction:column; align-items:center; gap:1rem; margin:1.5rem 0 1.75rem; }
 .curve-readout { font-size:clamp(2.4rem,8vw,3.6rem); font-weight:900; font-style:italic;
-                 color:var(--color-primary); font-variant-numeric:tabular-nums; line-height:1;
+                 color:var(--color-ink); font-variant-numeric:tabular-nums; line-height:1;
                  text-shadow:0 6px 26px color-mix(in srgb, var(--color-primary) 30%, transparent); }
 .curve-slider { position:relative; width:100%; height:clamp(140px,26vw,210px);
                 touch-action:none; user-select:none; -webkit-user-select:none; }
@@ -243,11 +251,11 @@ body.in-game .game-bar { display:flex; align-items:center; gap:1rem; width:100%;
 .game-exit { background:rgba(255,255,255,.06); color:var(--text); border:1px solid var(--line);
   border-radius:99px; padding:.45rem .9rem; font-weight:700; font-size:.82rem; cursor:pointer;
   font-family:inherit; white-space:nowrap; transition:.15s; }
-.game-exit:hover { border-color:var(--color-primary); color:var(--color-primary); }
+.game-exit:hover { border-color:var(--color-primary); color:var(--color-ink); }
 .game-progress { flex:1; height:7px; background:var(--line); border-radius:99px; overflow:hidden; }
 .game-progress span { display:block; height:100%; width:0%; border-radius:99px;
   background:var(--color-primary); transition:width .4s cubic-bezier(.2,.8,.2,1); }
-.game-points { font-weight:800; color:var(--color-primary); white-space:nowrap;
+.game-points { font-weight:800; color:var(--color-ink); white-space:nowrap;
   font-variant-numeric:tabular-nums; }
 body.in-game #quiz-play, body.in-game #quiz-reveal, body.in-game #quiz-summary {
   width:100%; max-width:820px; margin:auto; background:transparent; border:none; box-shadow:none;
@@ -277,8 +285,8 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 #reveal-actual.revealed { animation:pop .35s ease-out; }
 @keyframes pop { 0%{transform:scale(1.5);opacity:0} 60%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
 .odometer { font-size:3.5rem; font-weight:900; font-style:italic; text-align:center;
-            color:var(--color-primary); font-variant-numeric:tabular-nums; margin:1rem 0; }
-.summary-score { font-size:4rem; font-weight:900; font-style:italic; color:var(--color-primary); text-align:center; }
+            color:var(--color-ink); font-variant-numeric:tabular-nums; margin:1rem 0; }
+.summary-score { font-size:4rem; font-weight:900; font-style:italic; color:var(--color-ink); text-align:center; }
 
 /* Ads */
 .ad-slot { border:1px dashed var(--line); color:var(--muted); text-align:center; font-size:.7rem;
@@ -287,7 +295,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 
 /* Arcade */
 .arcade-metric { text-align:center; font-weight:800; font-size:1.25rem; margin:1.2rem 0;
-                 color:var(--color-primary); font-style:italic; }
+                 color:var(--color-ink); font-style:italic; }
 .arcade-pair { display:flex; align-items:center; gap:1rem; }
 .arcade-card { flex:1; background:var(--bg2); border:2px solid var(--line); border-radius:12px;
                padding:1.6rem 1rem; cursor:pointer; color:var(--text); display:flex;
@@ -295,7 +303,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .arcade-card:hover { border-color:var(--color-primary); transform:translateY(-2px); }
 .arcade-card.correct { border-color:#3fb950; } .arcade-card.wrong { border-color:#ff6b6b; }
 .arcade-card .name { font-weight:700; font-size:1.1rem; }
-.arcade-card .val { font-size:1.7rem; color:var(--color-primary); font-weight:800; }
+.arcade-card .val { font-size:1.7rem; color:var(--color-ink); font-weight:800; }
 .vs { font-weight:900; color:var(--muted); font-style:italic; }
 .arcade-streak { text-align:center; margin-top:1.25rem; }
 
@@ -308,10 +316,10 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .data-check-btn { display:block; margin:.7rem auto 0; background:transparent; color:var(--muted);
                   border:1px dashed var(--line); border-radius:8px; padding:.35rem .8rem;
                   font-size:.72rem; cursor:pointer; font-family:inherit; transition:.15s; }
-.data-check-btn:hover { color:var(--color-primary); border-color:var(--color-primary); }
+.data-check-btn:hover { color:var(--color-ink); border-color:var(--color-primary); }
 .data-check-inline { display:block; width:100%; margin-top:.6rem; font-size:.85rem;
                      color:var(--muted); border-style:dashed; }
-.data-check-inline:hover { color:var(--color-primary); border-color:var(--color-primary); }
+.data-check-inline:hover { color:var(--color-ink); border-color:var(--color-primary); }
 .data-overlay { position:fixed; inset:0; z-index:70; background:rgba(5,7,10,.78);
                 backdrop-filter:blur(6px); display:flex; align-items:stretch; justify-content:center;
                 padding:clamp(.6rem,3vw,2rem); }
@@ -335,13 +343,13 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
                  border-bottom:1px solid var(--line); color:var(--muted);
                  text-transform:uppercase; letter-spacing:.06em; font-size:.66rem; }
 .data-table th:hover { color:var(--text); }
-.data-table th.sorted { color:var(--color-primary); }
+.data-table th.sorted { color:var(--color-ink); }
 .data-table th.sorted::after { content:" ▲"; font-size:.6rem; }
 .data-table th.sorted.desc::after { content:" ▼"; }
 .data-table td { padding:.45rem .8rem; border-bottom:1px solid var(--line); vertical-align:top; }
 .data-table tr:hover td { background:rgba(255,255,255,.03); }
 .data-table .num { text-align:right; font-variant-numeric:tabular-nums; }
-.data-table .dt-a { font-weight:800; color:var(--color-primary); white-space:nowrap; }
+.data-table .dt-a { font-weight:800; color:var(--color-ink); white-space:nowrap; }
 .data-table .dt-q { min-width:280px; }
 
 .cap-note { background:rgba(63,185,80,.12); border:1px solid #2e6b3a; color:#9fe0ab;
@@ -381,7 +389,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .team-card-swatch { height:44px; width:100%; display:block; }
 .team-card-name { padding:.4rem .6rem .5rem; font-size:.8rem; font-weight:700;
                   color:var(--text); display:flex; align-items:center; justify-content:space-between; }
-.team-card-check { color:var(--color-primary); font-size:.85rem; opacity:0; transition:opacity .12s; }
+.team-card-check { color:var(--color-ink); font-size:.85rem; opacity:0; transition:opacity .12s; }
 .team-card.selected .team-card-check { opacity:1; }
 
 /* ===================== MOBILE ===================== */
@@ -413,7 +421,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .auth-form .btn-primary { margin-top:1rem; width:100%; justify-content:center; }
 .auth-error { color:#ff6b6b; font-size:.82rem; margin:.6rem 0 0; }
 .auth-switch { padding:0 1.25rem 1.25rem; margin:0; text-align:center; }
-.link-btn { background:none; border:none; color:var(--color-primary); cursor:pointer;
+.link-btn { background:none; border:none; color:var(--color-ink); cursor:pointer;
             font:inherit; font-size:.85rem; text-decoration:underline; padding:0; }
 
 /* ===================== GLOBAL LEADERBOARD ===================== */
@@ -425,14 +433,14 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .leaderboard li.me { border-color:var(--color-primary); }
 .lb-rank { font-weight:700; color:var(--muted); min-width:1.5rem; text-align:center; }
 .lb-name { flex:1; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.lb-points { font-variant-numeric:tabular-nums; font-weight:700; color:var(--color-primary); }
+.lb-points { font-variant-numeric:tabular-nums; font-weight:700; color:var(--color-ink); }
 .lb-team { font-style:normal; font-weight:400; color:var(--muted); font-size:.8em; }
 
 /* Leaderboard window tabs (all-time / weekly / daily) */
 .lb-period { display:flex; gap:.4rem; margin:.2rem 0 .6rem; }
 .lb-period-tab { flex:1; padding:.45rem .6rem; border:1px solid var(--line); background:var(--bg2);
                  color:var(--muted); border-radius:8px; font-weight:600; cursor:pointer; }
-.lb-period-tab.active { border-color:var(--color-primary); color:var(--color-primary); }
+.lb-period-tab.active { border-color:var(--color-primary); color:var(--color-ink); }
 
 /* Constructors' Championship swatch */
 .ctc-swatch { width:.85rem; height:.85rem; border-radius:50%; flex:none;
@@ -457,7 +465,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
   transition:transform .12s ease, border-color .12s ease;
 }
 .streak-banner:hover { transform:translateY(-2px); border-color:var(--color-primary); }
-.streak-banner strong { color:var(--color-primary); }
+.streak-banner strong { color:var(--color-ink); }
 
 /* The flame icon shared by the banner and the summary callout. */
 .flame { font-size:1.15em; line-height:1; filter:drop-shadow(0 0 6px color-mix(in srgb, var(--color-primary) 60%, transparent)); }
@@ -469,12 +477,70 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
   background:color-mix(in srgb, var(--color-primary) 12%, var(--surface));
   border:1px solid color-mix(in srgb, var(--color-primary) 35%, var(--line));
 }
-.summary-streak strong { color:var(--color-primary); }
+.summary-streak strong { color:var(--color-ink); }
 
 /* Social-proof lines: per-question (reveal) and per-session (summary). */
 .reveal-insight, .summary-insight {
   text-align:center; color:var(--muted); font-size:.86rem; margin:.4rem 0 0;
 }
-.reveal-insight strong, .summary-insight strong { color:var(--color-primary); }
+.reveal-insight strong, .summary-insight strong { color:var(--color-ink); }
 .reveal-insight { animation:insight-fade .4s ease; }
 @keyframes insight-fade { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+
+/* ===================== OPTIONAL EMAIL (sign-up) ===================== */
+.auth-optional { color:var(--muted); font-weight:400; font-size:.78rem; }
+
+/* ===================== ACHIEVEMENTS ===================== */
+.ach-head { display:flex; align-items:center; justify-content:space-between; gap:.6rem; }
+.ach-filter { display:flex; gap:.4rem; margin:.7rem 0 .9rem; }
+.ach-filter-tab { flex:1; padding:.4rem .6rem; border:1px solid var(--line); background:var(--bg2);
+                  color:var(--muted); border-radius:8px; font-weight:600; cursor:pointer; font-family:inherit; }
+.ach-filter-tab.active { border-color:var(--color-primary); color:var(--color-ink); }
+.ach-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:.6rem; }
+.ach-card { position:relative; overflow:hidden; display:flex; align-items:center; gap:.7rem;
+            padding:.7rem .85rem .7rem 1rem; border:1px solid var(--line); border-radius:12px;
+            background:var(--bg2); }
+.ach-card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--line); }
+.ach-card.got.tier-rookie::before   { background:#6ea8fe; }
+.ach-card.got.tier-midfield::before { background:#2dd4bf; }
+.ach-card.got.tier-podium::before   { background:#f5b301; }
+.ach-card.got.tier-champion::before { background:var(--f1-purple); }
+.ach-card.locked { opacity:.5; filter:grayscale(.6); }
+.ach-icon { font-size:1.55rem; line-height:1; flex:none; width:2rem; text-align:center; }
+.ach-body { display:flex; flex-direction:column; min-width:0; }
+.ach-name { font-weight:700; font-size:.9rem; }
+.ach-desc { color:var(--muted); font-size:.72rem; line-height:1.3; }
+.ach-tier { position:absolute; top:.45rem; right:.55rem; font-size:.54rem; text-transform:uppercase;
+            letter-spacing:.08em; color:var(--muted); opacity:.75; }
+
+/* ===================== SECTOR FLASH (purple / green) ===================== *
+ * An F1 timing-board style scroll across the screen when a guess lands in a
+ * purple (≤10%) or green (≤25%) sector. Fixed sector colours (not the team
+ * colour) so it stays legible on every theme; a white stroke + glow lift it off
+ * the page. */
+.sector-flash { position:fixed; left:0; right:0; top:32%; z-index:80; pointer-events:none;
+                display:flex; align-items:center; overflow:hidden; opacity:0; }
+.sector-flash.show { opacity:1; }
+.sector-flash-text { white-space:nowrap; font-family:inherit; font-weight:900; font-style:italic;
+                     text-transform:uppercase; letter-spacing:.05em; line-height:1;
+                     font-size:clamp(2rem, 9vw, 5.5rem); transform:translateX(100%); }
+.sector-flash.show .sector-flash-text { animation:sector-scroll 1.8s cubic-bezier(.2,.6,.2,1) forwards; }
+.sector-flash.purple .sector-flash-text {
+  color:var(--f1-purple);
+  text-shadow:0 0 16px rgba(177,59,255,.85), 0 2px 6px rgba(0,0,0,.6);
+  -webkit-text-stroke:1.2px rgba(255,255,255,.28); }
+.sector-flash.green .sector-flash-text {
+  color:var(--f1-green);
+  text-shadow:0 0 16px rgba(51,209,122,.85), 0 2px 6px rgba(0,0,0,.6);
+  -webkit-text-stroke:1.2px rgba(255,255,255,.22); }
+@keyframes sector-scroll {
+  0%   { transform:translateX(100%); }
+  18%  { transform:translateX(8%); }
+  78%  { transform:translateX(-28%); }
+  100% { transform:translateX(-115%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sector-flash { justify-content:center; }
+  .sector-flash-text { transform:none; }
+  .sector-flash.show .sector-flash-text { animation:insight-fade .3s ease forwards; }
+}

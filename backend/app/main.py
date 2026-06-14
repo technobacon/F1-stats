@@ -200,7 +200,9 @@ def auth_register(req: RegisterRequest):
     conn = get_conn()
     try:
         try:
-            user = auth.create_user(conn, req.username, req.password, req.selected_team)
+            user = auth.create_user(
+                conn, req.username, req.password, req.selected_team, req.email
+            )
         except auth.AuthError as exc:
             raise HTTPException(400, str(exc))
         claimed = auth.claim_anon_events(conn, req.anon_id, user["id"])

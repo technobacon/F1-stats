@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=13" />
+  <link rel="stylesheet" href="/static/style.css?v=14" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -295,6 +295,22 @@
         <button class="btn-secondary danger" id="reset-btn">Reset local progress</button>
       </div>
 
+      <!-- Achievements: a data-driven catalog (app.js ACHIEVEMENTS), evaluated
+           client-side after each session/arcade run. Cosmetic + local, like the
+           streak, per Architecture §2.2. -->
+      <div class="card">
+        <div class="ach-head">
+          <h2>Achievements</h2>
+          <span class="badge" id="ach-count">0 / 0</span>
+        </div>
+        <div class="ach-filter" role="tablist" aria-label="Achievement filter">
+          <button class="ach-filter-tab active" data-filter="all">All</button>
+          <button class="ach-filter-tab" data-filter="unlocked">Unlocked</button>
+          <button class="ach-filter-tab" data-filter="locked">Locked</button>
+        </div>
+        <div class="ach-grid" id="ach-grid"></div>
+      </div>
+
       <!-- Leaderboards: ranked by SERVER-verified points only (Architecture §2.2
            trust boundary). The period tabs switch both boards between all-time and
            the resetting daily / weekly windows. -->
@@ -386,6 +402,12 @@
         <label for="auth-password">Password</label>
         <input type="password" id="auth-password" name="password" autocomplete="current-password"
                placeholder="at least 8 characters" required minlength="8" />
+        <!-- Optional email: register only, for opt-in streak/daily reminders. -->
+        <div id="auth-email-row">
+          <label for="auth-email">Email <span class="auth-optional">optional — for streak reminders</span></label>
+          <input type="email" id="auth-email" name="email" autocomplete="email"
+                 placeholder="you@example.com (optional)" />
+        </div>
         <p class="auth-error hidden" id="auth-error"></p>
         <button type="submit" class="btn-primary" id="auth-submit">Create account</button>
       </form>
@@ -396,7 +418,13 @@
     </div>
   </div>
 
+  <!-- Sector flash: F1 timing-board style scroll across the screen when a guess
+       lands in a purple (≤10%) or green (≤25%) sector. -->
+  <div id="sector-flash" class="sector-flash" aria-hidden="true">
+    <span class="sector-flash-text" id="sector-flash-text"></span>
+  </div>
+
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/app.js?v=13"></script>
+  <script src="/static/app.js?v=14"></script>
 </body>
 </html>
