@@ -160,17 +160,17 @@ function isoWeek() {
  * near-black, Williams/RB deep blue, Aston dark teal) are lightened so they don't
  * vanish against the background. Fills/borders keep the true `primary`. */
 const TEAMS = {
-  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#1B2425", text: "#000", ink: "#FF8000" },
-  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#FFEB00", text: "#fff", ink: "#FF3232" },
-  mercedes:     { name: "Mercedes",     primary: "#00D2BE", secondary: "#0A0A0A", text: "#000", ink: "#00D2BE" },
-  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#DC0000", text: "#fff", ink: "#7E7CFF" },
-  aston_martin: { name: "Aston Martin", primary: "#006F62", secondary: "#CEDC00", text: "#fff", ink: "#1FC8AC" },
-  alpine:       { name: "Alpine",       primary: "#FF87BC", secondary: "#0090FF", text: "#000", ink: "#FF87BC" },
-  williams:     { name: "Williams",     primary: "#0064FF", secondary: "#FFFFFF", text: "#fff", ink: "#4D8DFF" },
-  rb:           { name: "Racing Bulls", primary: "#1634CE", secondary: "#FFFFFF", text: "#fff", ink: "#5A77FF" },
-  haas:         { name: "Haas",         primary: "#1A1A1A", secondary: "#E8002D", text: "#fff", ink: "#FF4D67" },
-  audi:         { name: "Audi",         primary: "#8E8E8E", secondary: "#CC0000", text: "#000", ink: "#C7CCD4" },
-  cadillac:     { name: "Cadillac",     primary: "#FFFFFF", secondary: "#0D0D0D", text: "#000", ink: "#FFFFFF" },
+  mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#1B2425", text: "#000", ink: "#FF8000", inkLight: "#C95E00" },
+  ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#FFEB00", text: "#fff", ink: "#FF3232", inkLight: "#D10000" },
+  mercedes:     { name: "Mercedes",     primary: "#00D2BE", secondary: "#0A0A0A", text: "#000", ink: "#00D2BE", inkLight: "#00897B" },
+  red_bull:     { name: "Red Bull",     primary: "#1E1B4B", secondary: "#DC0000", text: "#fff", ink: "#7E7CFF", inkLight: "#2A2570" },
+  aston_martin: { name: "Aston Martin", primary: "#006F62", secondary: "#CEDC00", text: "#fff", ink: "#1FC8AC", inkLight: "#006F62" },
+  alpine:       { name: "Alpine",       primary: "#FF87BC", secondary: "#0090FF", text: "#000", ink: "#FF87BC", inkLight: "#D63384" },
+  williams:     { name: "Williams",     primary: "#0064FF", secondary: "#FFFFFF", text: "#fff", ink: "#4D8DFF", inkLight: "#0056D6" },
+  rb:           { name: "Racing Bulls", primary: "#1634CE", secondary: "#FFFFFF", text: "#fff", ink: "#5A77FF", inkLight: "#1634CE" },
+  haas:         { name: "Haas",         primary: "#1A1A1A", secondary: "#E8002D", text: "#fff", ink: "#FF4D67", inkLight: "#1A1A1A" },
+  audi:         { name: "Audi",         primary: "#8E8E8E", secondary: "#CC0000", text: "#000", ink: "#C7CCD4", inkLight: "#5A5A5A" },
+  cadillac:     { name: "Cadillac",     primary: "#FFFFFF", secondary: "#0D0D0D", text: "#000", ink: "#FFFFFF", inkLight: "#0D0D0D" },
 };
 
 /* ---- Theming (Architecture §3.1) ---- */
@@ -180,7 +180,8 @@ function applyTeam(team) {
   root.setAttribute("data-team", team);
   root.style.setProperty("--color-primary", t.primary);
   root.style.setProperty("--color-secondary", t.secondary);
-  root.style.setProperty("--color-ink", t.ink || t.primary);
+  root.style.setProperty("--team-ink-dark", t.ink || t.primary);
+  root.style.setProperty("--team-ink-light", t.inkLight || t.ink || t.primary);
   root.style.setProperty("--btn-text", t.text);
   /* Header dot: solid main colour with a secondary accent ring */
   const swatch = document.getElementById("team-btn-swatch");
@@ -337,7 +338,7 @@ function navigate(view, mode) {
   if (view === "quiz") { currentMode = mode || currentMode; renderQuizIntro(); }
   if (view === "arcade") loadArcade();
   if (view === "profile") renderProfile();
-  if (view === "home") renderStreakBanner();
+  if (view === "home") { renderStreakBanner(); loadHomeTower(); }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
@@ -1171,6 +1172,43 @@ async function loadTeamLeaderboard() {
   }
 }
 
+/* Home-page Timing Tower (Variation B) — the Constructors' Championship pulled onto
+ * the landing page. Same /leaderboard/teams data as the profile board, but its own
+ * period state (towerPeriod) so the two boards browse independently. */
+let towerPeriod = "all";
+function fmtCompact(n) {
+  return n >= 10000 ? (n / 1000).toFixed(1).replace(/\.0$/, "") + "k" : Number(n).toLocaleString();
+}
+async function loadHomeTower() {
+  const list = document.getElementById("home-tower-list");
+  if (!list) return;
+  try {
+    const res = await fetch(`${API}/leaderboard/teams?period=${towerPeriod}`);
+    const entries = (await res.json()).entries || [];
+    const mine = state.selected_team;
+    list.innerHTML = entries.length
+      ? entries.slice(0, 8).map((e) => {
+          const t = TEAMS[e.team] || { name: e.team, primary: "#888" };
+          const you = e.team === mine ? ` <span class="tt-you">\u00b7 YOUR TEAM</span>` : "";
+          return `<li class="${e.team === mine ? "me" : ""}">
+            <span class="tt-rank">${e.rank}</span>
+            <span class="tt-bar" style="background:${t.primary}"></span>
+            <span class="tt-name">${escapeHtml(t.name)}${you}</span>
+            <span class="tt-pts">${fmtCompact(e.points)}</span>
+          </li>`;
+        }).join("")
+      : `<li class="muted">No team has scored ${towerPeriod === "all" ? "yet" : "in this window"} \u2014 pledge a team and post the first.</li>`;
+  } catch {
+    list.innerHTML = `<li class="muted">Standings unavailable right now.</li>`;
+  }
+}
+function setTowerPeriod(period) {
+  towerPeriod = period;
+  document.querySelectorAll(".tt-period-tab").forEach((t) =>
+    t.classList.toggle("active", t.dataset.towerPeriod === period));
+  loadHomeTower();
+}
+
 function setLeaderboardPeriod(period) {
   lbPeriod = period;
   document.querySelectorAll(".lb-period-tab").forEach((t) =>
@@ -1717,6 +1755,46 @@ const SoundToggle = (() => {
   return { init };
 })();
 
+/* ---- Theme toggle (dark default / light opt-in) ----
+ * Mirrors SoundToggle: flips data-theme="light" on <html>, persists to localStorage,
+ * so it sticks across visits. The team colour still comes from applyTeam(); only the
+ * neutral surfaces + the legible-on-white --color-ink swap (handled in CSS). */
+const THEME_KEY = "gm_theme";
+const ThemeToggle = (() => {
+  function current() { return localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark"; }
+  function paint(theme) {
+    const btn = document.getElementById("theme-toggle");
+    const icon = document.getElementById("theme-icon");
+    if (!btn || !icon) return;
+    const light = theme === "light";
+    icon.textContent = light ? "\u2600" : "\u263e";   // ☀ / ☾
+    btn.setAttribute("aria-pressed", String(light));
+    btn.title = light ? "Light mode \u2014 click for dark" : "Dark mode \u2014 click for light";
+  }
+  function apply(theme) {
+    const root = document.documentElement;
+    if (theme === "light") root.setAttribute("data-theme", "light");
+    else root.removeAttribute("data-theme");
+    paint(theme);
+    const t = TEAMS[state.selected_team] || TEAMS.mclaren;
+    document.querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", theme === "light" ? "#ffffff" : t.primary);
+  }
+  function init() {
+    apply(current());
+    const btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      const next = current() === "light" ? "dark" : "light";
+      localStorage.setItem(THEME_KEY, next);
+      apply(next);
+      track("theme_toggle", { theme: next });
+      Sound.play("uiClick");
+    });
+  }
+  return { init, apply, current };
+})();
+
 /* ---- Boot ---- */
 function show(id) { document.getElementById(id).classList.remove("hidden"); }
 function hide(id) { document.getElementById(id).classList.add("hidden"); }
@@ -1728,9 +1806,13 @@ CurveSlider.init();
 DataCheck.init();
 TeamPicker.init();
 SoundToggle.init();
+ThemeToggle.init();
 Auth.init();
 document.querySelectorAll(".lb-period-tab").forEach((t) =>
   t.addEventListener("click", () => setLeaderboardPeriod(t.dataset.period)));
+document.querySelectorAll(".tt-period-tab").forEach((t) =>
+  t.addEventListener("click", () => setTowerPeriod(t.dataset.towerPeriod)));
+loadHomeTower();
 document.querySelectorAll(".ach-filter-tab").forEach((t) =>
   t.addEventListener("click", () => setAchFilter(t.dataset.filter)));
 renderAchievements();
