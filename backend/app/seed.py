@@ -27,6 +27,7 @@ import os
 import random
 import sqlite3
 import uuid
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -38,6 +39,9 @@ from .validation import compute_metric, validate_ai_question
 DATA_DIR = Path(__file__).resolve().parent / "data"
 DATASET_PATH = DATA_DIR / "questions.json"
 ARCADE_PATH = DATA_DIR / "arcade.json"
+# Provenance for the committed bank: when it was built and the most recent race it
+# covers, surfaced on the home page (see main.data_status). Written by --export.
+DATASET_META_PATH = DATA_DIR / "dataset_meta.json"
 
 
 @dataclass
@@ -893,9 +897,20 @@ def _sample_dataset(rows: list, n: int, seed: int = 42) -> list:
     return chosen
 
 
+def dataset_meta() -> dict:
+    """The committed bank's provenance (see DATASET_META_PATH), or {} if absent."""
+    try:
+        return json.loads(DATASET_META_PATH.read_text())
+    except (OSError, ValueError):
+        return {}
+
+
 def export_dataset(conn: sqlite3.Connection, n: int = 1000, out_path=None) -> dict:
     """Regenerate the full validated pool from the staging already in `conn`, then
-    write an era-weighted, mode-balanced sample of ~n questions to JSON."""
+    write an era-weighted, mode-balanced sample of ~n questions to JSON.
+
+    Also stamps the bank's build date to DATASET_META_PATH, so the dataset-served
+    site can show when its data was last refreshed."""
     drivers = load_entities_from_staging(conn)
     conn.execute("DELETE FROM production_trivia_questions")
     run_validation_pipeline(conn, drivers=drivers, planted=False)
@@ -906,6 +921,9 @@ def export_dataset(conn: sqlite3.Connection, n: int = 1000, out_path=None) -> di
     out = Path(out_path or DATASET_PATH)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(data, indent=1, ensure_ascii=False))
+
+    meta = {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d")}
+    DATASET_META_PATH.write_text(json.dumps(meta, indent=1, ensure_ascii=False))
     return {"written": len(data), "pool": len(rows), "path": str(out)}
 
 

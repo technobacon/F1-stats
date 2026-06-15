@@ -75,6 +75,23 @@ def test_register_validation(client, username, password):
     assert r.status_code == 400
 
 
+@pytest.mark.parametrize("username", [
+    "shitlord", "Sh1tLord", "f.u.c.k.er", "ass", "ass_hat", "xX_fuck_Xx", "n1gger",
+])
+def test_register_rejects_profane_usernames(client, username):
+    r = client.post("/api/v1/auth/register", json={"username": username, "password": "longenough1"})
+    assert r.status_code == 400
+
+
+@pytest.mark.parametrize("username", [
+    "class", "passenger", "Massa_fan", "LewisHam44", "competition", "glasshouse",
+])
+def test_register_allows_innocent_usernames(client, username):
+    # The filter must not trip on clean words that merely contain a rude substring.
+    r = client.post("/api/v1/auth/register", json={"username": username, "password": "longenough1"})
+    assert r.status_code == 200
+
+
 def test_login_wrong_password_401(client):
     client.post("/api/v1/auth/register", json={"username": "checo", "password": "perez1234"})
     r = client.post("/api/v1/auth/login", json={"username": "checo", "password": "nope"})

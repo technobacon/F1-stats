@@ -29,6 +29,8 @@ import time
 import uuid
 from datetime import datetime, timedelta, timezone
 
+from . import profanity
+
 _PBKDF2_ROUNDS = 200_000
 _SALT_BYTES = 16
 _SESSION_TTL = timedelta(days=30)
@@ -188,6 +190,8 @@ def create_user(
         raise AuthError(
             "Username must be 3-32 characters using letters, numbers, '.', '_' or '-'."
         )
+    if profanity.contains_profanity(username):
+        raise AuthError("Please choose a different username.")
     if len(password or "") < _MIN_PASSWORD_LEN:
         raise AuthError(f"Password must be at least {_MIN_PASSWORD_LEN} characters.")
     if len(password) > _MAX_PASSWORD_LEN:

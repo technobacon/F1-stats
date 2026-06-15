@@ -25,7 +25,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import analytics, auth, db, seed, service
+from . import analytics, auth, db, etl, seed, service
 from .models import (
     AnalyticsBatch,
     AnalyticsCollectResponse,
@@ -121,6 +121,22 @@ def health():
     finally:
         conn.close()
     return {"status": "ok", "active_questions": count}
+
+
+@app.get("/api/v1/data/status")
+def data_status():
+    """When the F1 data behind the questions was last refreshed, for the home-page
+    footer. Prefers live ETL bookkeeping (F1_DATA_SOURCE=jolpica); otherwise uses
+    the committed bank's build date. (We don't claim a specific 'as of' race — the
+    dataset bundle can't tell us reliably which race it stops at.)"""
+    conn = get_conn()
+    try:
+        if etl._staging_has_rows(conn):
+            ts = etl.last_refresh(conn)
+            return {"refreshed_at": ts.strftime("%Y-%m-%d") if ts else None}
+        return {"refreshed_at": seed.dataset_meta().get("generated_at")}
+    finally:
+        conn.close()
 
 
 @app.get("/api/v1/quiz/{mode}", response_model=DailyQuizResponse)

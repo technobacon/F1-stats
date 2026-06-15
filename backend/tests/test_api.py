@@ -28,6 +28,29 @@ def test_health(client):
     assert r.json()["active_questions"] >= 5
 
 
+def test_data_status_reports_refresh_date(client):
+    r = client.get("/api/v1/data/status")
+    assert r.status_code == 200
+    # Always carries the key; the value may be None when no refresh stamp exists.
+    assert "refreshed_at" in r.json()
+
+
+def test_arcade_skips_tie_and_zero_pairs():
+    # A tie (including 0 vs 0) has no "who has more?" answer, so the pair picker must
+    # never return one when any metric distinguishes the two entities.
+    import random
+    a, b = {"driver_id": "a"}, {"driver_id": "b"}
+    vals = {("a", "both_zero"): 0.0, ("b", "both_zero"): 0.0,
+            ("a", "equal"): 4.0, ("b", "equal"): 4.0,
+            ("a", "real"): 3.0, ("b", "real"): 8.0}
+    value_fn = lambda e, m: vals[(e["driver_id"], m)]
+    for s in range(25):
+        _, _, metric, va, vb = service._pick_close_pair(
+            [(a, b)], ["both_zero", "equal", "real"], random.Random(s), value_fn, attempts=40)
+        assert va != vb
+        assert metric == "real"
+
+
 def test_daily_quiz_hides_answer(client):
     r = client.get("/api/v1/quiz/daily")
     assert r.status_code == 200
