@@ -12,7 +12,7 @@
     "fastest_laps": 25,
     "points_finishes": 282,
     "front_rows": 42,
-    "dnfs": 78
+    "dnfs": 79
    }
   },
   {
@@ -21,12 +21,12 @@
    "active_from": 2007,
    "active_to": 2026,
    "stats": {
-    "wins": 105,
-    "podiums": 205,
+    "wins": 106,
+    "podiums": 206,
     "poles": 104,
-    "fastest_laps": 68,
-    "points_finishes": 337,
-    "front_rows": 176,
+    "fastest_laps": 69,
+    "points_finishes": 338,
+    "front_rows": 177,
     "dnfs": 32
    }
   },
@@ -162,7 +162,7 @@
     "fastest_laps": 19,
     "points_finishes": 145,
     "front_rows": 46,
-    "dnfs": 29
+    "dnfs": 30
    }
   },
   {
@@ -190,7 +190,7 @@
     "podiums": 128,
     "poles": 48,
     "fastest_laps": 37,
-    "points_finishes": 199,
+    "points_finishes": 200,
     "front_rows": 87,
     "dnfs": 33
    }
@@ -297,7 +297,7 @@
     "fastest_laps": 0,
     "points_finishes": 66,
     "front_rows": 2,
-    "dnfs": 30
+    "dnfs": 31
    }
   },
   {
@@ -340,7 +340,7 @@
     "podiums": 6,
     "poles": 0,
     "fastest_laps": 3,
-    "points_finishes": 80,
+    "points_finishes": 81,
     "front_rows": 1,
     "dnfs": 24
    }
@@ -457,11 +457,11 @@
    "active_to": 2026,
    "stats": {
     "wins": 6,
-    "podiums": 26,
-    "poles": 10,
+    "podiums": 27,
+    "poles": 11,
     "fastest_laps": 11,
-    "points_finishes": 90,
-    "front_rows": 21,
+    "points_finishes": 91,
+    "front_rows": 22,
     "dnfs": 17
    }
   },
@@ -472,10 +472,10 @@
    "active_to": 2026,
    "stats": {
     "wins": 11,
-    "podiums": 45,
+    "podiums": 46,
     "poles": 16,
     "fastest_laps": 19,
-    "points_finishes": 124,
+    "points_finishes": 125,
     "front_rows": 30,
     "dnfs": 13
    }
@@ -507,7 +507,7 @@
     "fastest_laps": 1,
     "points_finishes": 52,
     "front_rows": 0,
-    "dnfs": 23
+    "dnfs": 24
    }
   },
   {
@@ -745,7 +745,7 @@
     "podiums": 28,
     "poles": 6,
     "fastest_laps": 9,
-    "points_finishes": 59,
+    "points_finishes": 60,
     "front_rows": 17,
     "dnfs": 7
    }
@@ -835,7 +835,7 @@
     "podiums": 0,
     "poles": 0,
     "fastest_laps": 0,
-    "points_finishes": 14,
+    "points_finishes": 15,
     "front_rows": 0,
     "dnfs": 6
    }
