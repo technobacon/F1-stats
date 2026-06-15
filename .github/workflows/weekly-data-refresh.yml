@@ -9,7 +9,7 @@ name: Weekly data refresh
 
 on:
   schedule:
-    - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+    - cron: "0 6 * * 2"   # Tuesdays 06:00 UTC
   workflow_dispatch: {}
 
 permissions:
@@ -51,12 +51,14 @@ jobs:
 
       - name: Commit refreshed bank if it changed
         run: |
-          if git diff --quiet -- app/data/questions.json app/data/arcade.json; then
+          # dataset_meta.json carries the refresh date, so it changes every run and
+          # the bank's "Data refreshed" line stays current even on a quiet week.
+          if git diff --quiet -- app/data/questions.json app/data/arcade.json app/data/dataset_meta.json; then
             echo "No data changes this week."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/data/questions.json app/data/arcade.json
+          git add app/data/questions.json app/data/arcade.json app/data/dataset_meta.json
           git commit -m "Weekly data refresh from Jolpica F1 ($(date -u +%Y-%m-%d))"
           git push
