@@ -637,34 +637,3 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .ach-tier { position:absolute; top:.45rem; right:.55rem; font-size:.54rem; text-transform:uppercase;
             letter-spacing:.08em; color:var(--muted); opacity:.75; }
 
-/* ===================== SECTOR FLASH (purple / green) ===================== *
- * An F1 timing-board style scroll across the screen when a guess lands in a
- * purple (≤10%) or green (≤25%) sector. Fixed sector colours (not the team
- * colour) so it stays legible on every theme; a white stroke + glow lift it off
- * the page. */
-.sector-flash { position:fixed; left:0; right:0; top:32%; z-index:80; pointer-events:none;
-                display:flex; align-items:center; overflow:hidden; opacity:0; }
-.sector-flash.show { opacity:1; }
-.sector-flash-text { white-space:nowrap; font-family:inherit; font-weight:900; font-style:italic;
-                     text-transform:uppercase; letter-spacing:.05em; line-height:1;
-                     font-size:clamp(2rem, 9vw, 5.5rem); transform:translateX(100%); }
-.sector-flash.show .sector-flash-text { animation:sector-scroll 1.8s cubic-bezier(.2,.6,.2,1) forwards; }
-.sector-flash.purple .sector-flash-text {
-  color:var(--f1-purple);
-  text-shadow:0 0 16px rgba(177,59,255,.85), 0 2px 6px rgba(0,0,0,.6);
-  -webkit-text-stroke:1.2px rgba(255,255,255,.28); }
-.sector-flash.green .sector-flash-text {
-  color:var(--f1-green);
-  text-shadow:0 0 16px rgba(51,209,122,.85), 0 2px 6px rgba(0,0,0,.6);
-  -webkit-text-stroke:1.2px rgba(255,255,255,.22); }
-@keyframes sector-scroll {
-  0%   { transform:translateX(100%); }
-  18%  { transform:translateX(8%); }
-  78%  { transform:translateX(-28%); }
-  100% { transform:translateX(-115%); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .sector-flash { justify-content:center; }
-  .sector-flash-text { transform:none; }
-  .sector-flash.show .sector-flash-text { animation:insight-fade .3s ease forwards; }
-}

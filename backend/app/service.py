@@ -194,10 +194,12 @@ def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None 
 
     Unlike the daily/race sets, Free Practice is unlimited and personal:
     questions are pulled one at a time, truly at random, from the WHOLE active bank
-    (any game_mode). The mix keeps the same era bias as the rest of the game so
-    practice resembles real play. The verified answer is stashed in the token store
-    (tagged free_practice) and never returned to the client; because the token
-    carries that mode, verify() records nothing for it.
+    (any game_mode). Practice draws UNIFORMLY at random — deliberately without the
+    modern-era weighting the competitive sets use — so successive questions don't
+    cluster on the same recent era and every corner of F1 history turns up. The
+    verified answer is stashed in the token store (tagged free_practice) and never
+    returned to the client; because the token carries that mode, verify() records
+    nothing for it.
     """
     rng = rng or random.Random()
     _prune_tokens()  # keep the in-memory token store bounded
@@ -210,8 +212,7 @@ def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None 
     if not pool:
         return None
 
-    weights = [_era_weight(row["era_year"]) for row in pool]
-    row = _weighted_sample(rng, pool, weights, 1)[0]
+    row = rng.choice(pool)
 
     token = secrets.token_urlsafe(16)
     _TOKEN_STORE[token] = (row["id"], row["verified_answer"], FREE_PRACTICE_MODE, time.monotonic())
