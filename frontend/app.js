@@ -769,7 +769,6 @@ function slideToAnswer(node, textEl, targetPct, result) {
       renderRevealInsight(result);
       setVerdict(result);
       if (result._sector) {
-        flashSector(result._sector);
         // Purple (≤10%) = a whole pack thunders by; green (≤25%) = a single car.
         Sound.play(result._sector === "purple" ? "purpleSector" : "greenSector");
       }
@@ -778,7 +777,7 @@ function slideToAnswer(node, textEl, targetPct, result) {
 }
 
 /* Persistent sector verdict banner shown at the top of the reveal once the answer
- * lands. Mirrors the transient flashSector scroll, but stays put as context. */
+ * lands, classifying the guess as a purple/green sector or a plain chequered flag. */
 function setVerdict(result) {
   const el = document.getElementById("reveal-verdict");
   const txt = document.getElementById("reveal-verdict-text");
@@ -803,23 +802,6 @@ function sectorForResult(result) {
   if (err <= 0.10) return "purple";
   if (err <= 0.25) return "green";
   return null;
-}
-
-/* The big "<TEAM> PURPLE/GREEN SECTOR" scroll across the screen, in the F1 timing
- * purple/green. The team name is prefixed so it feels like your garage called it
- * in. Fixed sector colours (not the team colour) keep it legible on any theme. */
-let sectorFlashTimer = null;
-function flashSector(kind) {
-  const wrap = document.getElementById("sector-flash");
-  const text = document.getElementById("sector-flash-text");
-  if (!wrap || !text) return;
-  const team = (TEAMS[state.selected_team] || TEAMS.mclaren).name.toUpperCase();
-  text.textContent = `${team} ${kind === "purple" ? "PURPLE" : "GREEN"} SECTOR`;
-  wrap.classList.remove("purple", "green", "show");
-  void wrap.offsetWidth;                 // restart the CSS animation
-  wrap.classList.add(kind, "show");
-  clearTimeout(sectorFlashTimer);
-  sectorFlashTimer = setTimeout(() => wrap.classList.remove("show"), 1800);
 }
 
 /* Social proof under the score: how this guess compares to everyone who has
