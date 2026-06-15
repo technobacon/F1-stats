@@ -302,7 +302,8 @@ _HEAD_TO_HEAD = [
     ("vettel", "webber"), ("rosberg", "hamilton"), ("button", "hamilton"),
     ("massa", "raikkonen"),
 ]
-_H2H_METRICS = [("wins", "race wins"), ("podiums", "podiums")]
+_H2H_METRICS = [("wins", "race wins"), ("podiums", "podiums"),
+                ("poles", "pole positions"), ("fastest_laps", "fastest laps")]
 
 # Head-to-head questions are only worth asking when they're hard: the two tallies
 # must be close (within ~20-30% of each other) and both substantial, so the answer
@@ -570,6 +571,31 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
               P(metric_target="second_places"), "race_week", 2.5, category="career")
             E(f"Driving for {cn} ({y1}-{y2}), how many times did {name} climb 10+ places from the grid?",
               P(metric_target="big_comebacks"), "race_week", 4.0, category="racecraft")
+            # ---- New creative angles on the same stint ----
+            E(f"How many third-place (P3) finishes did {name} score for {cn} ({y1}-{y2})?",
+              P(metric_target="third_places"), "race_week", 2.5, category="career")
+            E(f"How many Grands Prix did {name} start for {cn} ({y1}-{y2})?",
+              P(metric_target="starts"), "daily", 2.0, category="career")
+            E(f"What is the most podiums {name} scored in a single season for {cn}?",
+              P(metric_target="podiums", aggregation="best_season"), "race_week", 3.5, category="single_season")
+            E(f"What is the most pole positions {name} took in a single season for {cn}?",
+              P(metric_target="poles", aggregation="best_season"), "race_week", 3.5, category="single_season")
+            E(f"What is the most fastest laps {name} set in a single season for {cn}?",
+              P(metric_target="fastest_laps", aggregation="best_season"), "race_week", 4.0, category="single_season")
+            E(f"Driving for {cn}, in what percentage of races did {name} win?",
+              P(metric_target="wins", aggregation="percentage_of_races"), "race_week", 4.0,
+              kind="percentage", category="rates", dmin=0, dmax=100)
+            E(f"Driving for {cn}, in what percentage of races did {name} finish in the points (top 10)?",
+              P(metric_target="points_finishes", aggregation="percentage_of_races"), "race_week", 4.0,
+              kind="percentage", category="rates", dmin=0, dmax=100)
+            E(f"In which season did {name} take the most pole positions for {cn}?",
+              P(metric_target="poles", aggregation="which_year"), "race_week", 4.0,
+              kind="year", category="milestone", dmin=y1, dmax=y2)
+            E(f"In which year did {name} score their first pole position for {cn}?",
+              P(metric_target="poles", aggregation="first_season"), "race_week", 4.0,
+              kind="year", category="milestone", dmin=y1, dmax=y2)
+            E(f"How many hat-trick weekends (pole, win and fastest lap) did {name} take for {cn}?",
+              P(metric_target="hat_tricks"), "race_week", 4.5, category="feats")
 
         # ---- Career-level questions (no constructor filter) ----
         C = lambda **kw: _p(did, start_year=lo, end_year=hi, **kw)
@@ -630,6 +656,36 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
           kind="year", category="milestone", dmin=lo, dmax=hi)
         E(f"Across every race they started, what is {name}'s average grid position?",
           C(metric_target="avg_grid"), "race_week", 4.0, category="qualifying", dmin=1, dmax=24)
+        # ---- New creative career angles ----
+        E(f"How many career fastest laps does {name} have?",
+          C(metric_target="fastest_laps"), "daily", 3.0, category="career")
+        E(f"How many career front-row starts does {name} have?",
+          C(metric_target="front_rows"), "race_week", 3.0, category="qualifying")
+        E(f"How many career points-scoring finishes (top 10) does {name} have?",
+          C(metric_target="points_finishes"), "daily", 2.5, category="consistency")
+        E(f"How many Grands Prix has {name} started in their career?",
+          C(metric_target="starts"), "daily", 2.0, category="career")
+        E(f"Net across their whole career, how many positions has {name} gained from the grid?",
+          C(metric_target="positions_gained"), "race_week", 4.0, category="racecraft")
+        E(f"Across their career, in what percentage of races did {name} win?",
+          C(metric_target="wins", aggregation="percentage_of_races"), "race_week", 4.0,
+          kind="percentage", category="rates", dmin=0, dmax=100)
+        E(f"Across their career, in what percentage of races did {name} finish in the points (top 10)?",
+          C(metric_target="points_finishes", aggregation="percentage_of_races"), "race_week", 4.0,
+          kind="percentage", category="rates", dmin=0, dmax=100)
+        E(f"What is the most podiums {name} scored in a single season?",
+          C(metric_target="podiums", aggregation="best_season"), "race_week", 3.5, category="single_season")
+        E(f"What is the most pole positions {name} took in a single season?",
+          C(metric_target="poles", aggregation="best_season"), "race_week", 3.5, category="single_season")
+        E(f"In which season did {name} score the most podiums of their career?",
+          C(metric_target="podiums", aggregation="which_year"), "race_week", 3.5,
+          kind="year", category="milestone", dmin=lo, dmax=hi)
+        E(f"In which season did {name} take the most pole positions of their career?",
+          C(metric_target="poles", aggregation="which_year"), "race_week", 4.0,
+          kind="year", category="milestone", dmin=lo, dmax=hi)
+        E(f"In which year did {name} most recently finish on the podium?",
+          C(metric_target="podiums", aggregation="last_season"), "race_week", 4.0,
+          kind="year", category="milestone", dmin=lo, dmax=hi)
 
         # ---- Per-circuit wins (the driver's three best tracks) ----
         for r in conn.execute(
@@ -665,6 +721,14 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
               T(metric_target="one_two_finishes"), "race_week", 4.0, category="team")
             E(f"How many front-row lockouts (P1 and P2 on the grid) did {tn} take in {wlabel}?",
               T(metric_target="front_row_lockouts"), "race_week", 4.0, category="team")
+            E(f"How many fastest laps did {tn} set in {wlabel}?",
+              T(metric_target="fastest_laps"), "race_week", 3.5, category="team")
+            E(f"How many points-scoring finishes (top 10) did {tn} record in {wlabel}?",
+              T(metric_target="points_finishes"), "race_week", 3.0, category="team")
+            E(f"How many front-row starts did {tn} qualify in {wlabel}?",
+              T(metric_target="front_rows"), "race_week", 3.5, category="team")
+            E(f"How many DNFs did {tn} suffer in {wlabel}?",
+              T(metric_target="dnfs"), "race_week", 3.5, category="team")
         span = conn.execute(
             "SELECT MIN(year) AS lo, MAX(year) AS hi FROM staging_race_results WHERE constructor_id = ?",
             (cid,),
@@ -679,6 +743,13 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
           kind="year", category="team", dmin=clo, dmax=chi)
         E(f"How many different drivers have won a Grand Prix driving for {tn}?",
           TC(metric_target="distinct_winning_drivers"), "race_week", 3.0, category="team")
+        E(f"What is the most podiums {tn} scored in a single season?",
+          TC(metric_target="podiums", aggregation="best_season"), "race_week", 3.5, category="team")
+        E(f"In which season did {tn} score the most podium finishes?",
+          TC(metric_target="podiums", aggregation="which_year"), "race_week", 4.0,
+          kind="year", category="team", dmin=clo, dmax=chi)
+        E(f"What is the most pole positions {tn} took in a single season?",
+          TC(metric_target="poles", aggregation="best_season"), "race_week", 3.5, category="team")
 
     # ---- Circuit (venue) questions ----
     for cr in conn.execute(
@@ -702,6 +773,10 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
           V(metric_target="pole_wins"), "race_week", 3.5, category="venue")
         E(f"What is the record number of wins by a single driver at {vn}?",
           V(metric_target="most_wins_one_driver"), "race_week", 3.0, category="venue")
+        E(f"How many races at {vn} have been won from somewhere other than pole position?",
+          V(metric_target="wins_off_pole"), "race_week", 4.0, category="venue")
+        E(f"At {vn}, what is the furthest back on the grid a race winner has started?",
+          V(metric_target="deepest_win_grid"), "race_week", 4.0, category="venue", dmin=1, dmax=30)
 
     # ---- Head-to-head differences (overlapping eras) ----
     # Curated rivalries when their drivers are present (synthetic seed); otherwise

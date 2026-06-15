@@ -41,7 +41,7 @@ jobs:
         run: python -m pip install -q -r requirements.txt
 
       - name: Rebuild bank from the live Jolpica ETL
-        run: python -m app.seed --export --source jolpica --count 1000
+        run: python -m app.seed --export --source jolpica --count 2000
 
       - name: Sanity gate (block bad data)
         run: python -m scripts.verify_bank

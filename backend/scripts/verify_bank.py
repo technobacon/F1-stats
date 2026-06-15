@@ -25,14 +25,19 @@ def _career_wins(conn, did: str) -> int:
 
 
 # Anchors picked across eras so a truncated or synthetic extract can't pass.
-WIN_ANCHORS = {
+# Retired drivers use an EXACT count (their record is fixed forever). Active
+# drivers use a MINIMUM (">= n") so the gate still catches a truncated history
+# without breaking the automated weekly refresh every time they win again.
+EXACT_WIN_ANCHORS = {
     "michael_schumacher": 91,
-    "hamilton": 105,
     "senna": 41,
     "prost": 51,
     "lauda": 25,          # spans pre-1980 — guards against the truncated-history bug
     "mario_andretti": 12,
     "lawson": 0,          # winless — guards the which_year phantom-peak fix
+}
+MIN_WIN_ANCHORS = {
+    "hamilton": 105,      # still racing; floor guards truncation, tolerates new wins
 }
 
 
@@ -40,12 +45,19 @@ def main() -> int:
     conn = db.connect()
     ok = True
 
-    for did, expect in WIN_ANCHORS.items():
+    for did, expect in EXACT_WIN_ANCHORS.items():
         got = _career_wins(conn, did)
         flag = "OK " if got == expect else "FAIL"
         if got != expect:
             ok = False
         print(f"[{flag}] {did} career wins = {got} (expect {expect})")
+
+    for did, floor in MIN_WIN_ANCHORS.items():
+        got = _career_wins(conn, did)
+        flag = "OK " if got >= floor else "FAIL"
+        if got < floor:
+            ok = False
+        print(f"[{flag}] {did} career wins = {got} (expect >= {floor})")
 
     span = conn.execute(
         "SELECT MIN(year), MAX(year), COUNT(*) FROM staging_race_results"
