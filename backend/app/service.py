@@ -307,14 +307,32 @@ def _pick_close_pair(pairs, metrics, rng, value_fn, attempts: int = 80):
         a, b = rng.choice(pairs)
         metric = rng.choice(metrics)
         va, vb = val(a, metric), val(b, metric)
+        # A tie (including both zero) has no "who has more?" answer, so it is never
+        # a valid Over/Under — skip it entirely rather than scoring it as "close".
+        if va == vb:
+            continue
         if _within_gap(va, vb):
             return a, b, metric, va, vb
-        hi = max(abs(va), abs(vb))
-        gap = 0.0 if hi == 0 else abs(va - vb) / hi
+        gap = abs(va - vb) / max(abs(va), abs(vb))  # hi > 0 here (va != vb)
         if best is None or gap < best[0]:
             best = (gap, a, b, metric, va, vb)
-    _, a, b, metric, va, vb = best
-    return a, b, metric, va, vb
+
+    if best is not None:
+        _, a, b, metric, va, vb = best
+        return a, b, metric, va, vb
+
+    # Nothing but ties in the sampled combos: scan deterministically for any pair
+    # whose totals differ on some metric, so we still return a valid question.
+    for a, b in pairs:
+        for metric in metrics:
+            va, vb = val(a, metric), val(b, metric)
+            if va != vb:
+                return a, b, metric, va, vb
+    # Truly degenerate dataset (every entity equal on every metric): fall back to
+    # the first pair on the first metric so the caller still gets a result.
+    a, b = pairs[0]
+    metric = metrics[0]
+    return a, b, metric, val(a, metric), val(b, metric)
 
 
 def build_arcade_pair(conn: sqlite3.Connection, rng: random.Random | None = None) -> dict:

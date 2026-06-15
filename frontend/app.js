@@ -536,7 +536,9 @@ const CurveSlider = (() => {
     const p = ptAtT(t), box = $("curve-slider").getBoundingClientRect();
     const car = $("car-thumb");
     car.style.left = (p.x / 1000) * 100 + "%";
-    car.style.top = (p.y / 280) * 100 + "%";
+    // Ride a touch above the race line rather than sitting on it (wheels just clear
+    // the curve) — the lift is in screen px so it's unaffected by the tangent rotate.
+    car.style.top = `calc(${(p.y / 280) * 100}% - 9px)`;
     // Rotate the car to the curve tangent (convert viewBox delta to screen delta).
     const a = ptAtT(t - 0.012), b = ptAtT(t + 0.012);
     const dx = (b.x - a.x) * (box.width / 1000), dy = (b.y - a.y) * (box.height / 280);
@@ -1203,6 +1205,30 @@ async function loadHomeTower() {
     list.innerHTML = `<li class="muted">Standings unavailable right now.</li>`;
   }
 }
+/* Footer data-provenance line: when the F1 data was last refreshed and the most
+ * recent race it covers (from /data/status). Reassures players the stats are
+ * current and dated. Silent on failure — it's a non-essential, informational line. */
+async function loadDataStatus() {
+  const el = document.getElementById("data-status");
+  if (!el) return;
+  try {
+    const res = await fetch(`${API}/data/status`);
+    if (!res.ok) return;
+    const s = await res.json();
+    const parts = [];
+    if (s.refreshed_at) {
+      const d = new Date(s.refreshed_at + "T00:00:00Z");
+      const when = isNaN(d) ? s.refreshed_at
+        : d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+      parts.push(`Data refreshed ${when}`);
+    }
+    // "as of the race itself": the most recent race the bank covers, with its season.
+    if (s.latest_race) parts.push(`as of ${s.latest_race}${s.season ? ` ${s.season}` : ""}`);
+    else if (s.season) parts.push(`as of the ${s.season} season`);
+    el.textContent = parts.length ? `· ${parts.join(" · ")}` : "";
+  } catch { /* informational only — leave the footer as-is on error */ }
+}
+
 function setTowerPeriod(period) {
   towerPeriod = period;
   document.querySelectorAll(".tt-period-tab").forEach((t) =>
@@ -1814,6 +1840,7 @@ document.querySelectorAll(".lb-period-tab").forEach((t) =>
 document.querySelectorAll(".tt-period-tab").forEach((t) =>
   t.addEventListener("click", () => setTowerPeriod(t.dataset.towerPeriod)));
 loadHomeTower();
+loadDataStatus();
 document.querySelectorAll(".ach-filter-tab").forEach((t) =>
   t.addEventListener("click", () => setAchFilter(t.dataset.filter)));
 renderAchievements();

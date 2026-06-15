@@ -428,6 +428,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .stats dt { color:var(--muted); } .stats dd { margin:0; font-weight:700; text-align:right; }
 
 .foot { text-align:center; color:var(--muted); font-size:.72rem; padding:1.6rem; border-top:1px solid var(--line); }
+.data-status { display:inline; color:var(--muted); opacity:.85; white-space:normal; }
 
 /* ===================== DEV DATA CHECK ===================== */
 .data-check-btn { display:block; margin:.7rem auto 0; background:transparent; color:var(--muted);
@@ -504,10 +505,14 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
                     gap:.75rem; padding:1.25rem; overflow-y:auto; }
 .team-card { border:2px solid var(--line); border-radius:10px; overflow:hidden; cursor:pointer;
              background:var(--bg2); transition:transform .12s, box-shadow .12s;
-             font-family:inherit; padding:0; text-align:left; }
+             font-family:inherit; padding:0; text-align:left;
+             /* Explicit flex column: iOS Safari clips the lower content (name/stats)
+                of a <button> with overflow:hidden unless its layout is forced like
+                this, which is why the team names vanished on mobile. */
+             display:flex; flex-direction:column; }
 .team-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.4); }
 .team-card.selected { box-shadow:0 0 0 1px var(--color-primary), 0 6px 20px rgba(0,0,0,.3); }
-.team-card-swatch { height:44px; width:100%; display:block; }
+.team-card-swatch { height:44px; width:100%; display:block; flex:0 0 44px; }
 .team-card-name { padding:.4rem .6rem .5rem; font-size:.8rem; font-weight:700;
                   color:var(--text); display:flex; align-items:center; justify-content:space-between; }
 .team-card-check { color:var(--color-ink); font-size:.85rem; opacity:0; transition:opacity .12s; }
