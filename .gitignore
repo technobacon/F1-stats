@@ -21,3 +21,6 @@ backend/bin/
 # OS / editor
 .DS_Store
 *.swp
+
+# Transient ETL build log (scripts/build_and_review, one-off full-history build)
+backend/etl_build.log
