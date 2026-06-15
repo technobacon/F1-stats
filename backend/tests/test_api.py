@@ -28,13 +28,11 @@ def test_health(client):
     assert r.json()["active_questions"] >= 5
 
 
-def test_data_status_reports_provenance(client):
+def test_data_status_reports_refresh_date(client):
     r = client.get("/api/v1/data/status")
     assert r.status_code == 200
-    body = r.json()
-    # Season is always derivable; refreshed_at/latest_race may be None offline.
-    assert body["season"] is not None
-    assert {"refreshed_at", "season", "latest_race"} <= set(body)
+    # Always carries the key; the value may be None when no refresh stamp exists.
+    assert "refreshed_at" in r.json()
 
 
 def test_arcade_skips_tie_and_zero_pairs():

@@ -1205,9 +1205,9 @@ async function loadHomeTower() {
     list.innerHTML = `<li class="muted">Standings unavailable right now.</li>`;
   }
 }
-/* Footer data-provenance line: when the F1 data was last refreshed and the most
- * recent race it covers (from /data/status). Reassures players the stats are
- * current and dated. Silent on failure — it's a non-essential, informational line. */
+/* Footer data-provenance line: when the F1 data behind the questions was last
+ * refreshed (from /data/status). Reassures players the stats are current and
+ * dated. Silent on failure — it's a non-essential, informational line. */
 async function loadDataStatus() {
   const el = document.getElementById("data-status");
   if (!el) return;
@@ -1215,17 +1215,11 @@ async function loadDataStatus() {
     const res = await fetch(`${API}/data/status`);
     if (!res.ok) return;
     const s = await res.json();
-    const parts = [];
-    if (s.refreshed_at) {
-      const d = new Date(s.refreshed_at + "T00:00:00Z");
-      const when = isNaN(d) ? s.refreshed_at
-        : d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
-      parts.push(`Data refreshed ${when}`);
-    }
-    // "as of the race itself": the most recent race the bank covers, with its season.
-    if (s.latest_race) parts.push(`as of ${s.latest_race}${s.season ? ` ${s.season}` : ""}`);
-    else if (s.season) parts.push(`as of the ${s.season} season`);
-    el.textContent = parts.length ? `· ${parts.join(" · ")}` : "";
+    if (!s.refreshed_at) { el.textContent = ""; return; }
+    const d = new Date(s.refreshed_at + "T00:00:00Z");
+    const when = isNaN(d) ? s.refreshed_at
+      : d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+    el.textContent = `· Data refreshed ${when}`;
   } catch { /* informational only — leave the footer as-is on error */ }
 }
 

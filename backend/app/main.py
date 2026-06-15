@@ -123,46 +123,18 @@ def health():
     return {"status": "ok", "active_questions": count}
 
 
-def _race_label(lr: dict | None) -> str | None:
-    """A human race label from a latest-race record: an explicit name if the bank
-    snapshot carries one, else the circuit, else a '<Country> Grand Prix'."""
-    if not lr:
-        return None
-    return (lr.get("name") or lr.get("circuit")
-            or (f"{lr['country']} Grand Prix" if lr.get("country") else None))
-
-
 @app.get("/api/v1/data/status")
 def data_status():
-    """Provenance for the F1 data behind the questions: when it was last refreshed
-    and the latest race it covers. Surfaced in the home-page footer. Prefers live
-    staging/ETL bookkeeping (F1_DATA_SOURCE=jolpica); otherwise falls back to the
-    committed bank's snapshot, then to the newest season present in the bank."""
+    """When the F1 data behind the questions was last refreshed, for the home-page
+    footer. Prefers live ETL bookkeeping (F1_DATA_SOURCE=jolpica); otherwise uses
+    the committed bank's build date. (We don't claim a specific 'as of' race — the
+    dataset bundle can't tell us reliably which race it stops at.)"""
     conn = get_conn()
     try:
         if etl._staging_has_rows(conn):
             ts = etl.last_refresh(conn)
-            lr = seed.latest_race(conn)
-            season = lr["season"] if lr else conn.execute(
-                "SELECT MAX(year) AS y FROM staging_race_results"
-            ).fetchone()["y"]
-            return {
-                "refreshed_at": ts.strftime("%Y-%m-%d") if ts else None,
-                "season": season,
-                "latest_race": _race_label(lr),
-            }
-        # Dataset mode (no staging): use the committed snapshot, falling back to the
-        # newest era_year in the bank when no snapshot was shipped.
-        meta = seed.dataset_meta()
-        lr = meta.get("latest_race")
-        season = (lr or {}).get("season") or conn.execute(
-            "SELECT MAX(era_year) AS y FROM production_trivia_questions"
-        ).fetchone()["y"]
-        return {
-            "refreshed_at": meta.get("generated_at"),
-            "season": season,
-            "latest_race": _race_label(lr),
-        }
+            return {"refreshed_at": ts.strftime("%Y-%m-%d") if ts else None}
+        return {"refreshed_at": seed.dataset_meta().get("generated_at")}
     finally:
         conn.close()
 

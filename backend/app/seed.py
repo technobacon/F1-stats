@@ -897,20 +897,6 @@ def _sample_dataset(rows: list, n: int, seed: int = 42) -> list:
     return chosen
 
 
-def latest_race(conn: sqlite3.Connection) -> dict | None:
-    """The most recent race present in staging (max season, then round), with its
-    circuit name/country. None when staging carries no race rows."""
-    row = conn.execute(
-        "SELECT r.year AS year, r.round AS round, c.name AS circuit, c.country AS country "
-        "FROM staging_race_results r LEFT JOIN staging_circuits c ON c.circuit_id = r.circuit_id "
-        "ORDER BY r.year DESC, r.round DESC LIMIT 1"
-    ).fetchone()
-    if row is None:
-        return None
-    return {"season": row["year"], "round": row["round"],
-            "circuit": row["circuit"], "country": row["country"]}
-
-
 def dataset_meta() -> dict:
     """The committed bank's provenance (see DATASET_META_PATH), or {} if absent."""
     try:
@@ -923,9 +909,8 @@ def export_dataset(conn: sqlite3.Connection, n: int = 1000, out_path=None) -> di
     """Regenerate the full validated pool from the staging already in `conn`, then
     write an era-weighted, mode-balanced sample of ~n questions to JSON.
 
-    Also snapshots the bank's provenance (build time + the latest race the staging
-    covers) to DATASET_META_PATH, so the dataset-served site can show when its data
-    was last refreshed and through which race."""
+    Also stamps the bank's build date to DATASET_META_PATH, so the dataset-served
+    site can show when its data was last refreshed."""
     drivers = load_entities_from_staging(conn)
     conn.execute("DELETE FROM production_trivia_questions")
     run_validation_pipeline(conn, drivers=drivers, planted=False)
@@ -937,10 +922,7 @@ def export_dataset(conn: sqlite3.Connection, n: int = 1000, out_path=None) -> di
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(data, indent=1, ensure_ascii=False))
 
-    meta = {
-        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-        "latest_race": latest_race(conn),
-    }
+    meta = {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d")}
     DATASET_META_PATH.write_text(json.dumps(meta, indent=1, ensure_ascii=False))
     return {"written": len(data), "pool": len(rows), "path": str(out)}
 
