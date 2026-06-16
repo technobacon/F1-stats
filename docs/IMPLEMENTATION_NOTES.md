@@ -6,7 +6,7 @@ question-generation and validation systems. Where the spec describes intent,
 this describes the code as it actually runs.
 
 > **Status:** launch-ready service. The default data source is **`dataset`** — the
-> committed, validated **1,000-question bank** (`data/questions.json`, spanning
+> committed, validated **2,000-question bank** (`data/questions.json`, spanning
 > 1950–2026), served with no network. A **real Jolpica ETL** (`etl.py`,
 > `F1_DATA_SOURCE=jolpica`) rebuilds that bank from live F1 history (rate-limited,
 > disk-cached, weekly), and an in-code **synthetic** seed is the offline fallback.
@@ -18,7 +18,7 @@ this describes the code as it actually runs.
 > Championship**, server-side **streaks**, free **durable storage** (Litestream),
 > and first-party **analytics** — see §9–§11. A feel-good **sound layer** and a
 > first-run **team-selection onboarding** prompt round out the client (§12).
-> **124 tests pass.**
+> **139 tests pass.**
 
 ---
 
@@ -199,7 +199,7 @@ still routes every one through the validator before committing — so the
 *mechanism* is exercised on all questions, and the rejection path is proven by a
 deliberately planted wrong answer (§5).
 
-The default `dataset` source serves the committed, validated **1,000-question
+The default `dataset` source serves the committed, validated **2,000-question
 bank** (`data/questions.json`); the synthetic in-code run commits **~560
 questions**. Both span the same **10 categories**:
 
@@ -296,7 +296,7 @@ front rows, DNFs), again computed through the same validation engine.
 ```bash
 cd backend
 F1_DATA_SOURCE=dataset ./run.sh   # install, load the committed bank, serve :8000
-python -m pytest -q               # 124 tests (offline)
+python -m pytest -q               # 139 tests (offline)
 ```
 
 Test coverage of note:

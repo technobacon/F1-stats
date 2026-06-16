@@ -1,6 +1,6 @@
 # GridMaster — Engineering Handoff
 
-_Last updated: 2026-06-13 · Branch of record: `main` · Live target: Render (free tier)_
+_Last updated: 2026-06-16 · Branch of record: `main` · Live target: Render (free tier)_
 
 This is the single document to read first when picking up the project. It covers
 what the game is, exactly where it stands, how it's built, how to run/test/deploy
@@ -22,13 +22,13 @@ vanilla HTML/CSS/JS frontend plus a JSON API, backed by SQLite.
 
 It is **feature-complete for a launch** and past prototype stage:
 
-- Five game modes, server-authoritative scoring, a 1,000-question validated bank.
+- Five game modes, server-authoritative scoring, a 2,000-question validated bank.
 - Real accounts (first-party, no OAuth), server-verified leaderboards (all-time /
   weekly / daily), a Constructors' Championship, server-side daily streaks.
 - A Wordle-style spoiler-free share result (the growth lever).
 - Free, durable accounts via **Litestream** replication (opt-in via env).
 - First-party, privacy-respecting **analytics** + token-gated dashboard.
-- **124 backend tests passing.**
+- **139 backend tests passing.**
 
 **Two manual steps remain to be fully live** (see §3). Nothing in the code blocks
 launch; both are dashboard/env settings.
@@ -113,7 +113,7 @@ FastAPI (main.py)
 |---|---|---|
 | Exp-decay scoring (server-only) | ✅ | `scoring.py` |
 | 5 game modes + deterministic daily | ✅ | `service.py`, `frontend/app.js` (`MODES`) |
-| 1,000-question validated bank (1950–2026) | ✅ | `data/questions.json`, `seed.py`, `validation.py` |
+| 2,000-question validated bank (1950–2026) | ✅ | `data/questions.json`, `seed.py`, `validation.py` |
 | Anti-hallucination gate | ✅ | `validation.py` |
 | Real Jolpica ETL (weekly, cached) | ✅ | `etl.py`, `.github/workflows/weekly-data-refresh.yml` |
 | Accounts (PBKDF2 + sessions), guest→account merge | ✅ | `auth.py` |
@@ -195,17 +195,17 @@ cross-site cookies), consistent with the project's own-auth/own-scoring design.
 # Run locally (committed bank, no network):
 cd backend && F1_DATA_SOURCE=dataset ./run.sh          # http://127.0.0.1:8000
 
-# Tests (124):
+# Tests (139):
 cd backend && python3 -m pytest -q
 
-# Rebuild the 1,000-question bank from live F1 data (1950→present):
+# Rebuild the 2,000-question bank from live F1 data (1950→present):
 cd backend && F1_DATA_SOURCE=jolpica F1_ETL_START_YEAR=1950 python3 -m app.seed --export
 ```
 
 Deploy: branch → merge to `main` → Render auto-deploys via `render.yaml`
 (`buildCommand` installs deps + Litestream; `startCommand` runs `backend/start.sh`).
 A GitHub Action (`weekly-data-refresh.yml`) rebuilds the bank from Jolpica every
-Monday behind a sanity gate.
+Tuesday behind a sanity gate.
 
 ---
 
@@ -268,7 +268,7 @@ backend/
     db.py          SQLite schema + migrations (data tables vs durable account/analytics tables)
     models.py      Pydantic API contracts (no answer leaves the server)
     data/          questions.json (the bank) + arcade.json (offline arcade)
-  tests/           pytest suite (124): scoring, validation, api, auth, analytics, etl, dataset
+  tests/           pytest suite (139): scoring, validation, api, auth, analytics, etl, dataset
   start.sh         prod entrypoint: Litestream restore+replicate around uvicorn (opt-in)
   litestream.yml   S3 replica config (env-driven)
   run.sh           local dev runner

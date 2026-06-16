@@ -22,7 +22,7 @@ services:
       # and is made durable by Litestream replication (below) rather than a disk.
       - key: F1_DB_PATH
         value: /tmp/f1stats.db
-      # Serve the curated, validated 1000-question bank committed in the repo
+      # Serve the curated, validated 2,000-question bank committed in the repo
       # (backend/app/data/questions.json). Instant boot, no network needed.
       # To rebuild the bank from live data:
       #   F1_DATA_SOURCE=jolpica F1_ETL_START_YEAR=1980 python3 -m app.seed --export

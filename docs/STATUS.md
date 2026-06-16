@@ -1,6 +1,6 @@
 # Project status & roadmap
 
-_Last updated: 2026-06-14_
+_Last updated: 2026-06-16_
 
 A snapshot of where **GridMaster** is, how it fits together, and what could
 come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
@@ -58,7 +58,7 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
 - `/api/v1/dev/questions` (answer key) is **off in production** (`F1_DEV_TOOLS=0`).
 
 ### Questions & data
-- **1,000-question curated bank** committed at `backend/app/data/questions.json`,
+- **2,000-question curated bank** committed at `backend/app/data/questions.json`,
   served with no network (`F1_DATA_SOURCE=dataset`). Companion
   `arcade.json` powers Over/Under offline.
 - **20 question types** across **drivers, teams (constructors), and circuits** —
@@ -90,7 +90,7 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
   (`/api/v1/teams/overview`).
 
 ### Quality
-- **124 tests passing** (`cd backend && python3 -m pytest -q`): scoring,
+- **139 tests passing** (`cd backend && python3 -m pytest -q`): scoring,
   validation (incl. every metric/aggregation), API trust boundary, all modes,
   accounts/leaderboards/streaks, the replay-proof dedup, analytics ingest +
   reporting + token gate, ETL ingestion, and the dataset export→load→serve
@@ -139,7 +139,7 @@ normally serves the committed snapshot; the ETL path is for rebuilding it.
 # Run locally (serves the committed bank, no network):
 cd backend && F1_DATA_SOURCE=dataset ./run.sh        # http://127.0.0.1:8000
 
-# Rebuild the 1,000-question bank from live F1 data:
+# Rebuild the 2,000-question bank from live F1 data:
 cd backend && F1_DATA_SOURCE=jolpica F1_ETL_START_YEAR=1980 python3 -m app.seed --export
 
 # Tests:
