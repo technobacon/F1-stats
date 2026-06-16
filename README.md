@@ -5,6 +5,9 @@ Website for F1 stat quizzes — a gamified Formula 1 statistics guessing platfor
 This repo contains the design docs in [`docs/`](./docs) and a **runnable
 prototype** that implements the defensible core of the system described there.
 
+> **Ready to ship?** [`docs/LAUNCH.md`](./docs/LAUNCH.md) is the $0 go-live
+> runbook (Render + free durable accounts), ~20 minutes end to end.
+>
 > **Where we are & what's next:** see [`docs/STATUS.md`](./docs/STATUS.md) for a
 > full status snapshot and roadmap, and [`docs/question-types.md`](./docs/question-types.md)
 > for the question design.
@@ -12,7 +15,7 @@ prototype** that implements the defensible core of the system described there.
 > **Growth & retention:** [`docs/ENGAGEMENT.md`](./docs/ENGAGEMENT.md) covers the
 > return-visit hooks (streaks + freeze, social proof, deep-linked sharing,
 > achievements, sector flash) and the backlog;
-> [`docs/MARKETING.md`](./docs/MARKETING.md) is the minimal-effort marketing plan;
+> [`docs/MARKETING.md`](./docs/MARKETING.md) is the minimal-effort, no-Reddit marketing plan;
 > [`docs/HANDOFF_ENGAGEMENT.md`](./docs/HANDOFF_ENGAGEMENT.md) is the engineering
 > handoff for that work.
 
@@ -96,7 +99,7 @@ Seed complete. Committed 6 questions, rejected 1.
 
 ```bash
 cd backend
-python3 -m pytest -q     # 124 tests: scoring, validation, trust boundary, all modes, accounts, leaderboards, analytics, ETL
+python3 -m pytest -q     # 139 tests: scoring, validation, trust boundary, all modes, accounts, leaderboards, analytics, ETL
 ```
 
 ### Install on your phone (PWA)
@@ -241,7 +244,7 @@ boundary.
   10-second anti-scouting team penalty on low scores) + Arcade Over/Under
   (matchups biased toward close, within-30% calls)
 - Server-authoritative exp-decay scoring; answers never leave the server
-- Deterministic anti-hallucination validation; a **committed 1,000-question bank**
+- Deterministic anti-hallucination validation; a **committed 2,000-question bank**
   (`backend/app/data/questions.json`) drawn from a ~3,100-question validated,
   significance-gated pool
 - 30+ question types across drivers, teams and circuits; era-biased serving with
