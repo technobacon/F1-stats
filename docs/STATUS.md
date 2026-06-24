@@ -6,7 +6,14 @@ A snapshot of where **GridMaster** is, how it fits together, and what could
 come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
 engineering handoff. For question design see [`question-types.md`](./question-types.md).
 
-> **Latest work (feel + onboarding):** a synthesized **Web Audio sound layer**
+> **Latest work (feel like home):** a personalized **"your garage"** home for
+> signed-in players (global rank + day-over-day movement, personal Constructors'
+> Championship stake + within-team board, closest-badge progress, a streak
+> heatmap, last-Daily percentile), an opt-in **local streak reminder** (root-scope
+> service worker), a tightened **race-week panel**, and a team-coloured
+> **Hungaroring** hero outline.
+>
+> **Earlier (feel + onboarding):** a synthesized **Web Audio sound layer**
 > (`frontend/sound.js`, zero audio assets) with a header on/off toggle, and a
 > **first-run team-selection prompt** that shows per-team headcounts + the
 > Constructors' Championship standings.
@@ -52,6 +59,15 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
 - **Daily / weekly / all-time** leaderboards (resetting windows) and a
   **Constructors' Championship** bucketing verified points by team faction.
 - **Server-side daily streaks**, recomputed from play history.
+- **"Your garage" home** (signed-in): a personalized strip with your **global rank
+  + day-over-day movement + percentile** (`/leaderboard/me`), your **personal stake
+  in the Constructors' Championship** and a **within-team leaderboard**
+  (`/leaderboard/team`), the **badges you're closest to** (progress bars), a
+  **streak heatmap** (`/user/play-history`, GitHub-style), and an "I beat X%"
+  echo of your last Daily. Guests see a lighter version with sign-in CTAs.
+- **Opt-in local streak reminder**: a root-scope service worker (`/sw.js`) fires a
+  local notification when you reopen with a streak at risk, and schedules an
+  evening nudge where the browser supports Notification Triggers. No push server.
 - **Spoiler-free Wordle-style share grid** with the day's puzzle number.
 - **First-party analytics** (`analytics.py`): pseudonymous, self-contained event
   pipeline + token-gated `/analytics` dashboard (DAU/WAU/MAU, play funnel, D1/D7
@@ -92,11 +108,11 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
   (`/api/v1/teams/overview`).
 
 ### Quality
-- **139 tests passing** (`cd backend && python3 -m pytest -q`): scoring,
+- **148 tests passing** (`cd backend && python3 -m pytest -q`): scoring,
   validation (incl. every metric/aggregation), API trust boundary, all modes,
-  accounts/leaderboards/streaks, the replay-proof dedup, analytics ingest +
-  reporting + token gate, ETL ingestion, and the dataset export→load→serve
-  round-trip.
+  accounts/leaderboards/streaks, the personal rank / team-stake / play-history
+  garage endpoints, the replay-proof dedup, analytics ingest + reporting + token
+  gate, ETL ingestion, and the dataset export→load→serve round-trip.
 
 ---
 

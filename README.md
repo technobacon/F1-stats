@@ -152,6 +152,10 @@ docs/               # original design documents
 | `GET`  | `/api/v1/leaderboard` | top players by **server-verified** points; `?period=all\|weekly\|daily` for resetting windows |
 | `GET`  | `/api/v1/leaderboard/teams` | **Constructors' Championship** — verified points bucketed by team faction; `?period=` as above |
 | `GET`  | `/api/v1/teams/overview` | per-team **registered headcount + all-time championship points for every team** (including empty ones); powers the first-run team-picker onboarding prompt |
+| `GET`  | `/api/v1/leaderboard/me` | the signed-in player's **own global rank + percentile** for a window (the "your garage" rank card); `?period=`; **auth** |
+| `GET`  | `/api/v1/leaderboard/team` | the caller's **personal stake in the Constructors' Championship** — their faction's standing + a within-team leaderboard; `?period=`; **auth** |
+| `GET`  | `/api/v1/user/play-history` | per-day Daily-Challenge play totals for the **streak heatmap**; `?days=`; **auth** |
+| `GET`  | `/sw.js` | service worker (served at root scope) for the opt-in **local streak reminder** |
 | `POST` | `/api/v1/analytics/collect` | ingest a batch of pseudonymous client events (sendBeacon-friendly); public, bounded, best-effort |
 | `GET`  | `/api/v1/analytics/summary` | DAU/WAU/MAU, the play funnel, D1/D7 retention, mode mix, account growth; **token-gated** (`F1_ANALYTICS_TOKEN`); `?days=` window |
 | `GET`  | `/analytics` | the analytics dashboard page (reads the gated summary; harmless without the token) |

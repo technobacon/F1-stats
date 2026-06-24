@@ -158,6 +158,46 @@ class TeamOverviewResponse(BaseModel):
     total_players: int
 
 
+class MyRankResponse(BaseModel):
+    """The signed-in player's own position on the global board for a window.
+    rank/points are 0 when they haven't scored in the window yet."""
+    rank: int
+    total_ranked: int
+    points: int
+    percentile: int
+    period: str = "all"
+
+
+class TeamMemberEntry(BaseModel):
+    rank: int
+    username: str
+    points: int
+
+
+class TeamDetailResponse(BaseModel):
+    """The caller's personal stake in the Constructors' Championship: their
+    faction's standing plus a within-team leaderboard."""
+    team: str
+    team_rank: int
+    team_points: int
+    members: int
+    your_points: int
+    your_rank_in_team: int
+    leaders: list[TeamMemberEntry]
+    period: str = "all"
+
+
+class PlayHistoryDay(BaseModel):
+    date: str          # ISO 'YYYY-MM-DD'
+    questions: int
+    points: int
+
+
+class PlayHistoryResponse(BaseModel):
+    """Per-day Daily-Challenge play totals for the streak heatmap."""
+    days: list[PlayHistoryDay]
+
+
 class AnalyticsEvent(BaseModel):
     event: str
     # Accept anything for props so one malformed field can't 422 a whole batch;

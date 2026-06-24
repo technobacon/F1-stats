@@ -10,7 +10,11 @@ Endpoints:
                                         tool; disable with F1_DEV_TOOLS=0)
     POST /api/v1/dev/flag            -> flag/unflag a question for later review
     GET  /api/v1/dev/flags           -> the dev review queue (flagged questions)
+    GET  /api/v1/leaderboard/me      -> caller's own global rank + percentile (auth)
+    GET  /api/v1/leaderboard/team    -> caller's CC standing + within-team board (auth)
+    GET  /api/v1/user/play-history   -> per-day Daily play totals for the heatmap (auth)
     GET  /api/v1/health              -> liveness + question count
+    GET  /sw.js                      -> service worker (root scope, local reminders)
     GET  /                           -> static prototype frontend
 
 The verified answer is computed/stored server-side and only returned AFTER a
@@ -40,9 +44,12 @@ from .models import (
     LeaderboardResponse,
     LoginRequest,
     MeResponse,
+    MyRankResponse,
+    PlayHistoryResponse,
     PracticeQuestionResponse,
     RegisterRequest,
     SetTeamRequest,
+    TeamDetailResponse,
     TeamLeaderboardResponse,
     TeamOverviewResponse,
     VerifyRequest,
@@ -322,6 +329,43 @@ def team_leaderboard(period: str = "all"):
     return {"entries": entries, "period": period}
 
 
+@app.get("/api/v1/leaderboard/me", response_model=MyRankResponse)
+def leaderboard_me(period: str = "all", user: dict = Depends(require_user)):
+    """The signed-in player's own global rank + percentile for a window — the
+    'your garage' rank card. Movement (▲/▼) is diffed client-side."""
+    period = period if period in ("all", "daily", "weekly") else "all"
+    conn = get_conn()
+    try:
+        data = auth.my_rank(conn, user["id"], period=period)
+    finally:
+        conn.close()
+    return {**data, "period": period}
+
+
+@app.get("/api/v1/leaderboard/team", response_model=TeamDetailResponse)
+def leaderboard_team(period: str = "all", user: dict = Depends(require_user)):
+    """The caller's personal stake in the Constructors' Championship: their
+    faction's standing plus a within-team leaderboard with the caller located."""
+    period = period if period in ("all", "daily", "weekly") else "all"
+    conn = get_conn()
+    try:
+        data = auth.team_detail(conn, user["id"], user["selected_team"], period=period)
+    finally:
+        conn.close()
+    return {**data, "period": period}
+
+
+@app.get("/api/v1/user/play-history", response_model=PlayHistoryResponse)
+def user_play_history(days: int = 126, user: dict = Depends(require_user)):
+    """Per-day Daily-Challenge play totals for the signed-in player's streak
+    heatmap. Guests fall back to a localStorage history on the client."""
+    conn = get_conn()
+    try:
+        return auth.play_history(conn, user["id"], days=days)
+    finally:
+        conn.close()
+
+
 @app.get("/api/v1/teams/overview", response_model=TeamOverviewResponse)
 def teams_overview():
     """First-run team picker snapshot: every constructor with its registered
@@ -494,6 +538,21 @@ def analytics_dashboard():
     if not page.exists():
         raise HTTPException(404, "Dashboard page not found.")
     return FileResponse(page)
+
+
+@app.get("/sw.js")
+def service_worker():
+    """Serve the service worker from the root path so its scope covers the whole
+    app (a worker served under /static would only control /static). The
+    Service-Worker-Allowed header lets it claim the '/' scope explicitly."""
+    sw = FRONTEND_DIR / "sw.js"
+    if not sw.exists():
+        raise HTTPException(404, "Service worker not found.")
+    return FileResponse(
+        sw,
+        media_type="application/javascript",
+        headers={"Service-Worker-Allowed": "/", "Cache-Control": "no-cache"},
+    )
 
 
 @app.get("/")

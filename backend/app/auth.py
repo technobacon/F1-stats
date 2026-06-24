@@ -545,3 +545,93 @@ def team_overview(conn: sqlite3.Connection) -> dict:
     for i, t in enumerate(teams):
         t["rank"] = i + 1
     return {"teams": teams, "total_players": sum(t["members"] for t in teams)}
+
+
+# ── Personal standing ("your garage") ────────────────────────────────────────
+def my_rank(conn: sqlite3.Connection, user_id: str, period: str = "all") -> dict:
+    """Where the caller sits on the global board for a window, plus a percentile.
+    Rank is 1 + (players with strictly more verified points); percentile is the
+    share of ranked players at or below them. Reuses the same play_events totals
+    the public leaderboard does, so the number can't be forged from the client."""
+    cutoff = _period_cutoff(period)
+    where = "e.created_at >= ?" if cutoff else "1=1"
+    # Per-player point totals for the window (only those who have scored count).
+    rows = conn.execute(
+        "SELECT u.id AS uid, COALESCE(SUM(e.score), 0) AS points "
+        "FROM users u JOIN play_events e ON e.user_id = u.id "
+        f"WHERE {where} "
+        "GROUP BY u.id HAVING COUNT(e.id) > 0",
+        (cutoff,) if cutoff else (),
+    ).fetchall()
+    totals = {r["uid"]: int(r["points"] or 0) for r in rows}
+    mine = totals.get(user_id, 0)
+    total_ranked = len(totals)
+    if user_id not in totals:
+        # Hasn't scored in this window yet: unranked, but report the field size.
+        return {"rank": 0, "total_ranked": total_ranked, "points": 0, "percentile": 0}
+    ahead = sum(1 for p in totals.values() if p > mine)
+    rank = ahead + 1
+    percentile = round(100 * (total_ranked - rank) / max(total_ranked - 1, 1)) if total_ranked > 1 else 100
+    return {"rank": rank, "total_ranked": total_ranked, "points": mine, "percentile": percentile}
+
+
+def team_detail(conn: sqlite3.Connection, user_id: str, team: str, period: str = "all") -> dict:
+    """The caller's personal stake in the Constructors' Championship: their
+    faction's standing (rank + total) and a within-team leaderboard with the
+    caller located in it. All points come only from play_events."""
+    team = normalize_team(team)
+    cutoff = _period_cutoff(period)
+    where = "e.created_at >= ?" if cutoff else "1=1"
+    base_params: tuple = (cutoff,) if cutoff else ()
+
+    # Faction's championship rank for the window (reuse the public board).
+    standings = team_leaderboard(conn, period=period)
+    team_row = next((t for t in standings if t["team"] == team), None)
+    team_rank = team_row["rank"] if team_row else 0
+    team_points = team_row["points"] if team_row else 0
+    members = team_row["members"] if team_row else 0
+
+    # Within-team leaderboard: every scoring member of this faction, ranked.
+    rows = conn.execute(
+        "SELECT u.id AS uid, u.username AS username, COALESCE(SUM(e.score), 0) AS points "
+        "FROM users u JOIN play_events e ON e.user_id = u.id "
+        f"WHERE u.selected_team = ? AND {where} "
+        "GROUP BY u.id HAVING COUNT(e.id) > 0 "
+        "ORDER BY points DESC, u.username ASC",
+        (team, *base_params),
+    ).fetchall()
+    leaders = [
+        {"rank": i + 1, "username": r["username"], "points": int(r["points"] or 0)}
+        for i, r in enumerate(rows)
+    ]
+    me = next((e for e in leaders if rows[e["rank"] - 1]["uid"] == user_id), None)
+    return {
+        "team": team,
+        "team_rank": team_rank,
+        "team_points": team_points,
+        "members": members,
+        "your_points": me["points"] if me else 0,
+        "your_rank_in_team": me["rank"] if me else 0,
+        "leaders": leaders[:8],
+    }
+
+
+def play_history(conn: sqlite3.Connection, user_id: str, days: int = 126) -> dict:
+    """Per-day Daily-Challenge play totals for the last `days` days, for the
+    streak heatmap. Only days the user actually played appear; the client fills
+    the empty cells. Derived from play_events, so it matches the streak/score."""
+    days = max(1, min(days, 366))
+    cutoff = (_now() - timedelta(days=days - 1)).strftime("%Y-%m-%d")
+    rows = conn.execute(
+        "SELECT date(created_at) AS d, COUNT(*) AS q, COALESCE(SUM(score), 0) AS p "
+        "FROM play_events "
+        "WHERE user_id = ? AND game_mode = 'daily' AND date(created_at) >= ? "
+        "GROUP BY date(created_at) ORDER BY d",
+        (user_id, cutoff),
+    ).fetchall()
+    return {
+        "days": [
+            {"date": r["d"], "questions": r["q"], "points": int(r["p"] or 0)}
+            for r in rows
+        ]
+    }

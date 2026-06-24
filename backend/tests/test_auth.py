@@ -492,3 +492,74 @@ def test_accounts_survive_question_bank_reseed(client, tmp_path):
     me = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
     assert me.status_code == 200
     assert me.json()["username"] == "persisty"
+
+
+# ── "Your garage": personal rank, team stake, play history ───────────────────
+def _register(client, username, team=None):
+    token = client.post("/api/v1/auth/register",
+                        json={"username": username, "password": "password1"}).json()["token"]
+    hdr = {"Authorization": f"Bearer {token}"}
+    if team:
+        client.post("/api/v1/profile/team", json={"selected_team": team}, headers=hdr)
+    return hdr
+
+
+def _score_first_n(client, hdr, n):
+    """Score the first n Daily questions perfectly for the user behind `hdr`."""
+    quiz = client.get("/api/v1/quiz/daily").json()
+    for q in quiz["questions"][:n]:
+        tok = q["tracking_token"]
+        actual = _answer(client, tok)  # anonymous reveal (orphan, not counted)
+        client.post("/api/v1/quiz/verify",
+                    json={"tracking_token": tok, "guess": actual}, headers=hdr)
+
+
+def test_leaderboard_me_rank_and_percentile(client):
+    a = _register(client, "ace")
+    b = _register(client, "back")
+    _score_first_n(client, a, 3)   # 15000 pts
+    _score_first_n(client, b, 1)   # 5000 pts
+
+    ra = client.get("/api/v1/leaderboard/me", headers=a).json()
+    rb = client.get("/api/v1/leaderboard/me", headers=b).json()
+    assert (ra["rank"], ra["points"], ra["total_ranked"]) == (1, 15000, 2)
+    assert (rb["rank"], rb["points"]) == (2, 5000)
+    assert ra["percentile"] == 100 and rb["percentile"] == 0
+
+
+def test_leaderboard_me_unranked_when_no_score(client):
+    hdr = _register(client, "rookie")
+    r = client.get("/api/v1/leaderboard/me", headers=hdr).json()
+    assert r["rank"] == 0 and r["points"] == 0  # hasn't scored this window
+
+
+def test_leaderboard_team_detail_and_within_team_board(client):
+    a = _register(client, "tifoso1", team="ferrari")
+    b = _register(client, "tifoso2", team="ferrari")
+    _score_first_n(client, a, 2)   # 10000
+    _score_first_n(client, b, 1)   # 5000
+
+    da = client.get("/api/v1/leaderboard/team", headers=a).json()
+    assert da["team"] == "ferrari"
+    assert da["team_rank"] == 1 and da["team_points"] == 15000 and da["members"] == 2
+    assert da["your_points"] == 10000 and da["your_rank_in_team"] == 1
+    assert [m["username"] for m in da["leaders"]] == ["tifoso1", "tifoso2"]
+
+    db_ = client.get("/api/v1/leaderboard/team", headers=b).json()
+    assert db_["your_rank_in_team"] == 2 and db_["your_points"] == 5000
+
+
+def test_play_history_buckets_daily_play(client):
+    hdr = _register(client, "streaker")
+    _score_first_n(client, hdr, 3)
+    hist = client.get("/api/v1/user/play-history", headers=hdr).json()["days"]
+    assert len(hist) == 1                       # one calendar day of play
+    assert hist[0]["questions"] == 3
+    assert hist[0]["points"] == 15000
+
+
+def test_garage_endpoints_require_auth(client):
+    for path in ("/api/v1/leaderboard/me", "/api/v1/leaderboard/team",
+                 "/api/v1/user/play-history"):
+        assert client.get(path).status_code == 401
+        assert client.get(path, headers={"Authorization": "Bearer nope"}).status_code == 401

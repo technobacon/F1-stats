@@ -99,6 +99,18 @@
         </aside>
 
       <div class="hero">
+        <!-- Stylized Hungaroring circuit outline (original art; track geometry is
+             not copyrightable). Sits behind the hero text and picks up the team
+             colour via stroke:var(--color-primary). -->
+        <svg class="hero-track" viewBox="0 0 200 120" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+          <path d="M28,34 H132 C162,34 178,40 178,58 C178,72 160,72 156,86
+                   C153,96 162,104 150,106 C140,108 138,98 128,99
+                   C117,100 120,112 108,110 C98,108 102,96 92,96
+                   C82,96 86,108 74,108 C62,108 66,92 58,86
+                   C50,80 60,72 52,64 C46,58 34,60 34,50
+                   C34,42 40,42 36,36 Z"/>
+          <circle class="hero-track-sf" cx="30" cy="34" r="4"/>
+        </svg>
         <div class="hero-inner">
           <p class="hero-eyebrow">Welcome to</p>
           <h1 class="hero-title">GRID<span class="accent">MASTER</span></h1>
@@ -115,6 +127,10 @@
         <div class="hero-checkers" aria-hidden="true"></div>
       </div>
       </div><!-- /home-top -->
+
+      <!-- "Your garage": personalized status — rank, team stake, closest badges,
+           streak heatmap. Filled by renderGarage(); richer when signed in. -->
+      <section id="garage" class="garage" aria-label="Your garage"></section>
 
       <!-- Next race weekend schedule -->
       <section class="race-week" id="race-week" aria-live="polite">
@@ -315,6 +331,14 @@
           <button class="btn-secondary" id="logout-btn">Log out</button>
         </div>
         <button class="btn-secondary danger" id="reset-btn">Reset local progress</button>
+      </div>
+
+      <!-- Streak heatmap: a year of Daily play at a glance (server history when
+           signed in, local otherwise). Filled by renderHeatmap(). -->
+      <div class="card">
+        <div class="ach-head"><h2>Daily streak history</h2></div>
+        <p class="muted">Each square is a day — the brighter, the more you played.</p>
+        <div class="heatmap heatmap-lg" id="profile-heatmap"></div>
       </div>
 
       <!-- Achievements: a data-driven catalog (app.js ACHIEVEMENTS), evaluated

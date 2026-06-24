@@ -101,6 +101,8 @@ const defaultState = () => ({
   is_guest: true, selected_team: "mclaren",
   lifetime_points: 0, games_played: 0, average_closeness: 0,
   daily_streak: 0, last_played_date: null, unlocked_achievements: [],
+  played_dates: [],                 // UTC dates with a Daily run, for the heatmap
+  last_daily_percentile: null,      // {pct, date} — echoed on the home garage
   // Streak freeze: one missed day inside a run is forgiven once (re-armed when a
   // new run starts). Mirrors the server rule in auth.daily_streak.
   streak_freeze_available: true,
@@ -333,7 +335,7 @@ function navigate(view, mode) {
   if (view === "quiz") { currentMode = mode || currentMode; renderQuizIntro(); }
   if (view === "arcade") loadArcade();
   if (view === "profile") renderProfile();
-  if (view === "home") { renderStreakBanner(); loadHomeTower(); }
+  if (view === "home") { renderStreakBanner(); loadHomeTower(); renderGarage(); }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
@@ -870,6 +872,11 @@ function finishSession() {
       state.streak_freeze_available = true;  // re-arm the freeze for the new run
     }
     state.last_played_date = today;
+    // Local per-day history for the guest streak heatmap (signed-in players use
+    // the server's /user/play-history instead). Keep ~13 months, deduped.
+    if (!Array.isArray(state.played_dates)) state.played_dates = [];
+    if (!state.played_dates.includes(today)) state.played_dates.push(today);
+    if (state.played_dates.length > 400) state.played_dates = state.played_dates.slice(-400);
   }
 
   // Session-level achievement stats (competitive modes only).
@@ -913,6 +920,11 @@ function renderSummaryEngagement() {
       const avg = Math.round(sessionInsights.reduce((a, b) => a + b, 0) / sessionInsights.length);
       insEl.innerHTML = `📊 You beat <strong>${avg}%</strong> of players on average today.`;
       insEl.classList.remove("hidden");
+      // Stash it so the home "garage" can echo it back next visit ("Last Daily…").
+      if (currentMode === "daily") {
+        state.last_daily_percentile = { pct: avg, date: utcDate() };
+        saveState(state);
+      }
     } else {
       insEl.classList.add("hidden");
     }
@@ -1095,6 +1107,7 @@ function renderProfile() {
     (id) => ACHIEVEMENTS.some((a) => a.id === id)).length;
   document.getElementById("p-achievements").textContent = `${achHave} / ${ACHIEVEMENTS.length} unlocked`;
   renderAchievements();
+  renderHeatmap("profile-heatmap", 26);
 
   document.getElementById("guest-badge").textContent = signedIn ? "member" : "guest";
   document.getElementById("account-guest").classList.toggle("hidden", signedIn);
@@ -1197,6 +1210,251 @@ async function loadHomeTower() {
     list.innerHTML = `<li class="muted">Standings unavailable right now.</li>`;
   }
 }
+/* ===================== YOUR GARAGE ===================== *
+ * The personalized home strip: who you are, where you rank, your stake in the
+ * Constructors' Championship, the badges you're closest to, and your streak
+ * heatmap. Everything works for guests off local state; signing in upgrades the
+ * rank + team-contribution cards to server-authoritative numbers. */
+
+/* Per-day Daily play, for the heatmap. Signed-in players get the authoritative
+ * server history; guests fall back to the locally-recorded played_dates. Returns
+ * a map of 'YYYY-MM-DD' -> intensity level 0..4. */
+async function heatmapLevels(days) {
+  const level = {};
+  if (isSignedIn()) {
+    try {
+      const r = await fetch(`${API}/user/play-history?days=${days}`, { headers: authHeaders() });
+      if (r.ok) {
+        for (const d of (await r.json()).days || []) {
+          const q = d.questions || 0;
+          level[d.date] = q >= 6 ? 4 : q >= 4 ? 3 : q >= 2 ? 2 : q >= 1 ? 1 : 0;
+        }
+        return level;
+      }
+    } catch { /* fall through to local */ }
+  }
+  for (const d of (state.played_dates || [])) level[d] = 3;  // guest: played = solid
+  return level;
+}
+
+/* A GitHub-style contribution grid of the last `weeks` weeks of Daily play,
+ * coloured in the team's primary. Columns are Mon→Sun weeks ending today. */
+async function renderHeatmap(containerId, weeks = 18) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const level = await heatmapLevels(weeks * 7);
+  const today = new Date(utcDate() + "T00:00:00Z");
+  const start = new Date(today);
+  start.setUTCDate(start.getUTCDate() - (weeks * 7 - 1));
+  start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7));  // back to Monday
+  const cells = [];
+  for (let d = new Date(start); d <= today; d.setUTCDate(d.getUTCDate() + 1)) {
+    const iso = d.toISOString().slice(0, 10);
+    const lv = level[iso] || 0;
+    const label = lv ? `${iso} · played` : `${iso} · no Daily`;
+    cells.push(`<i class="hm-cell l${lv}" title="${label}"></i>`);
+  }
+  el.innerHTML =
+    `<div class="hm-grid">${cells.join("")}</div>` +
+    `<div class="hm-legend"><span>Less</span><i class="hm-cell l0"></i><i class="hm-cell l1"></i>` +
+    `<i class="hm-cell l2"></i><i class="hm-cell l3"></i><i class="hm-cell l4"></i><span>More</span></div>`;
+}
+
+/* Rank movement since the last day you checked. Snapshots your rank once per UTC
+ * day in localStorage, so the arrow means "vs. yesterday", not "vs. last click". */
+function rankMovement(period, rank) {
+  if (!rank) return "";
+  const key = `gm_lastrank_${period}`;
+  let prev = null;
+  try { prev = JSON.parse(localStorage.getItem(key) || "null"); } catch { /* ignore */ }
+  const today = utcDate();
+  let html = `<span class="g-move flat">—</span>`;
+  if (prev && prev.date !== today && Number.isFinite(prev.rank)) {
+    const up = prev.rank - rank;                 // smaller rank number = moved up
+    html = up > 0 ? `<span class="g-move up">▲${up}</span>`
+         : up < 0 ? `<span class="g-move down">▼${-up}</span>`
+         : `<span class="g-move flat">—</span>`;
+  }
+  if (!prev || prev.date !== today) localStorage.setItem(key, JSON.stringify({ rank, date: today }));
+  return html;
+}
+
+function garageBadgesCard() {
+  const near = closestAchievements(achSnapshot(), 3);
+  const rows = near.length
+    ? near.map(({ ach, p }) => `
+        <div class="gb-row tier-${ach.tier}">
+          <span class="gb-icon">${ach.icon}</span>
+          <div class="gb-main">
+            <div class="gb-name">${escapeHtml(ach.name)} <span class="gb-frac">${fmtCompact(p.cur)}/${fmtCompact(p.target)}</span></div>
+            <div class="gb-bar"><i style="width:${Math.round(p.pct * 100)}%"></i></div>
+          </div>
+        </div>`).join("")
+    : `<p class="muted g-empty">Every badge unlocked — you're a Hall of Famer. 🏛️</p>`;
+  return `<div class="g-card g-badges">
+      <p class="g-card-label">Almost there</p>
+      ${rows}
+      <button class="g-link" data-view="profile">All badges →</button>
+    </div>`;
+}
+
+async function renderGarage() {
+  const el = document.getElementById("garage");
+  if (!el) return;
+  const signedIn = isSignedIn();
+  const team = TEAMS[state.selected_team] || TEAMS.mclaren;
+  const streak = currentStreak();
+  const name = (serverStats && serverStats.username) ||
+    localStorage.getItem("f1statguesser_username") || "racer";
+
+  const welcome = signedIn
+    ? `Welcome back, ${escapeHtml(name)}`
+    : `Your garage`;
+  const streakBit = streak > 0
+    ? ` <span class="g-flame">🔥 ${streak}-day streak</span>` : "";
+  const sub = signedIn
+    ? `Racing for ${escapeHtml(team.name)}.`
+    : `Sign in to save your progress, back a constructor and climb the boards.`;
+  const last = state.last_daily_percentile;
+  const lastBit = (last && last.pct != null)
+    ? `<p class="g-last">📊 Last Daily — you beat <strong>${last.pct}%</strong> of players.</p>` : "";
+
+  // Card shells (rank + team fill in async; badges + heatmap are local/instant).
+  el.innerHTML = `
+    <div class="garage-head">
+      <h2 class="garage-title">${welcome}${streakBit}</h2>
+      <p class="garage-sub">${sub}</p>
+    </div>
+    <div class="garage-grid">
+      <div class="g-card g-rank" id="g-rank">
+        <p class="g-card-label">Your rank</p>
+        ${signedIn ? `<p class="g-big muted">…</p>` :
+          `<p class="g-big">—</p><p class="g-note">Sign in to rank on the leaderboard.</p>
+           <button class="g-link" data-auth="open">Create an account →</button>`}
+      </div>
+      <div class="g-card g-team" id="g-team" style="--g-accent:${team.primary}">
+        <p class="g-card-label">Constructors' Championship</p>
+        <p class="g-team-name">Racing for <strong>${escapeHtml(team.name)}</strong></p>
+        ${signedIn ? `<p class="g-note muted">…</p>` :
+          `<button class="g-link" data-view="profile">Pick a side →</button>`}
+      </div>
+      ${garageBadgesCard()}
+    </div>
+    ${lastBit}
+    <div class="g-heatwrap">
+      <div class="g-heat-head"><span class="g-card-label">Daily streak history</span>
+        <button class="g-remind ${remindEnabled() ? "on" : ""}" id="g-remind" title="Streak reminder">🔔 ${remindEnabled() ? "Reminders on" : "Remind me"}</button></div>
+      <div class="heatmap" id="garage-heatmap"></div>
+    </div>`;
+
+  renderHeatmap("garage-heatmap", 18);
+
+  if (!signedIn) return;
+  // Rank card (global, all-time) + team stake — server-authoritative.
+  try {
+    const r = await fetch(`${API}/leaderboard/me?period=all`, { headers: authHeaders() });
+    if (r.ok) {
+      const d = await r.json();
+      const box = document.getElementById("g-rank");
+      if (box) box.innerHTML = d.rank
+        ? `<p class="g-card-label">Your rank</p>
+           <p class="g-big">#${d.rank} ${rankMovement("all", d.rank)}</p>
+           <p class="g-note">Top ${100 - d.percentile}% of ${fmtCompact(d.total_ranked)} ranked · ${fmtCompact(d.points)} pts</p>`
+        : `<p class="g-card-label">Your rank</p><p class="g-big">—</p>
+           <p class="g-note">Play today's Daily to join the board.</p>`;
+    }
+  } catch { /* offline — leave the loading state */ }
+  try {
+    const r = await fetch(`${API}/leaderboard/team?period=all`, { headers: authHeaders() });
+    if (r.ok) {
+      const d = await r.json();
+      const box = document.getElementById("g-team");
+      const t = TEAMS[d.team] || team;
+      if (box) box.innerHTML = `<p class="g-card-label">Constructors' Championship</p>
+        <p class="g-team-name">Racing for <strong>${escapeHtml(t.name)}</strong>${d.team_rank ? ` · <span class="g-pos">P${d.team_rank}</span>` : ""}</p>
+        ${d.your_rank_in_team
+          ? `<p class="g-note">You've banked <strong>${fmtCompact(d.your_points)}</strong> pts — #${d.your_rank_in_team} of ${d.members} in your team.</p>`
+          : `<p class="g-note muted">Play today's Daily to score for your team.</p>`}`;
+    }
+  } catch { /* offline */ }
+}
+
+/* ===================== STREAK REMINDER (local, opt-in) ===================== *
+ * There is no push server (and the free host is ephemeral), so this is entirely
+ * local: a service worker is registered only so notifications can be shown — and,
+ * where the browser supports Notification Triggers, scheduled for the evening.
+ * Everything degrades gracefully to an on-reopen nudge. */
+const REMIND_KEY = "gm_streak_remind";
+let swReg = null;
+
+function remindEnabled() {
+  return localStorage.getItem(REMIND_KEY) === "1" &&
+    "Notification" in window && Notification.permission === "granted";
+}
+
+async function initServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  try { swReg = await navigator.serviceWorker.register("/sw.js"); }
+  catch { /* the app works fine without it */ }
+}
+
+function notifyStreak(streak) {
+  const body = `Your ${streak}-day streak ends at midnight UTC — play today's Daily to keep it alive.`;
+  const opts = { body, icon: "/static/icon-180.png", badge: "/static/icon-180.png", tag: "streak" };
+  try {
+    if (swReg && swReg.showNotification) swReg.showNotification("GridMaster", opts);
+    else new Notification("GridMaster", opts);
+  } catch { /* best effort */ }
+}
+
+/* Schedule an evening nudge via Notification Triggers (Chromium-only,
+ * experimental). Where unsupported this is a no-op and the on-open path covers it. */
+function scheduleStreakReminder() {
+  if (!remindEnabled() || !swReg || typeof window.TimestampTrigger === "undefined") return;
+  const now = new Date();
+  const target = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 20, 0, 0);
+  if (target <= Date.now()) return;  // past 20:00 UTC already — on-open nudge handles it
+  try {
+    swReg.showNotification("GridMaster", {
+      tag: "streak-scheduled", icon: "/static/icon-180.png",
+      body: "Don't lose your streak — today's Daily is waiting.",
+      showTrigger: new window.TimestampTrigger(target),
+    });
+  } catch { /* triggers unsupported -> on-open reminder only */ }
+}
+
+/* On app open: if reminders are on, the streak is live, today's Daily isn't done,
+ * and it's already late in the UTC day, nudge immediately; always (re)schedule. */
+function maybeRemindOnOpen() {
+  if (!remindEnabled()) return;
+  const streak = currentStreak();
+  if (streak < 1 || isCapped("daily")) return;
+  if (new Date().getUTCHours() >= 18) notifyStreak(streak);
+  scheduleStreakReminder();
+}
+
+async function toggleReminder() {
+  if (!("Notification" in window)) { toast("Notifications aren't supported on this device."); return; }
+  if (remindEnabled()) {
+    localStorage.setItem(REMIND_KEY, "0");
+    toast("Streak reminders turned off.");
+  } else {
+    let perm = Notification.permission;
+    if (perm !== "granted") perm = await Notification.requestPermission();
+    if (perm === "granted") {
+      localStorage.setItem(REMIND_KEY, "1");
+      toast("Streak reminders on — we'll nudge you before midnight UTC.");
+      scheduleStreakReminder();
+    } else {
+      toast("Allow notifications in your browser to enable reminders.");
+    }
+  }
+  renderGarage();
+}
+document.addEventListener("click", (e) => {
+  if (e.target.closest("#g-remind")) toggleReminder();
+});
+
 /* Footer data-provenance line: when the F1 data behind the questions was last
  * refreshed (from /data/status). Reassures players the stats are current and
  * dated. Silent on failure — it's a non-essential, informational line. */
@@ -1316,6 +1574,7 @@ const Auth = (() => {
         ? `Welcome, ${body.username}! ${body.claimed_events} guest result${body.claimed_events === 1 ? "" : "s"} saved to your account.`
         : `Welcome, ${body.username}!`);
       renderProfile();
+      renderGarage();
     } catch {
       showError("Network error — is the server awake?");
     } finally {
@@ -1332,6 +1591,7 @@ const Auth = (() => {
     state.is_guest = true; saveState(state);
     toast("Logged out.");
     renderProfile();
+    renderGarage();
   }
 
   function init() {
@@ -1344,8 +1604,12 @@ const Auth = (() => {
     document.getElementById("auth-overlay").addEventListener("click", (e) => {
       if (e.target.id === "auth-overlay") close();
     });
+    // Garage's "Create an account →" CTA (rendered dynamically) opens the modal.
+    document.addEventListener("click", (e) => {
+      if (e.target.closest('[data-auth="open"]')) open();
+    });
   }
-  return { init };
+  return { init, open };
 })();
 
 /* Persist the chosen team to the account so it counts in the Constructors'
@@ -1599,6 +1863,32 @@ function achSnapshot() {
     flags: a.flags || {},
     unlocked: (state.unlocked_achievements || []).length,
   };
+}
+
+/* Progress toward a badge, derived from its check's single numeric threshold
+ * (e.g. "s.purple >= 25"). Returns null for compound or flag checks (zero or
+ * multiple thresholds), which the nudge skips. Deriving it from the check keeps
+ * the check the single source of truth — there's no separate target to drift. */
+const _ACH_THRESHOLD = /s\.(\w+)\s*>=\s*(\d+)/g;
+function achProgress(ach, s) {
+  const hits = [...ach.check.toString().matchAll(_ACH_THRESHOLD)];
+  if (hits.length !== 1) return null;            // compound/boolean -> no simple bar
+  const metric = hits[0][1], target = Number(hits[0][2]);
+  const cur = Number(s[metric]) || 0;
+  return { metric, target, cur: Math.min(cur, target), pct: Math.max(0, Math.min(cur / target, 1)) };
+}
+
+/* The locked badges closest to unlocking, for the garage "almost there" nudge.
+ * Ranks by how far along you are, then by the smaller target so a brand-new
+ * player still sees the easiest next goals rather than an empty card. */
+function closestAchievements(s, n = 3) {
+  const unlocked = new Set(state.unlocked_achievements || []);
+  return ACHIEVEMENTS
+    .filter((a) => !unlocked.has(a.id))
+    .map((a) => ({ ach: a, p: achProgress(a, s) }))
+    .filter((x) => x.p && x.p.pct < 1)
+    .sort((a, b) => (b.p.pct - a.p.pct) || (a.p.target - b.p.target))
+    .slice(0, n);
 }
 
 /* Evaluate the catalog, unlock anything newly earned, celebrate it, and repaint.
@@ -1870,6 +2160,7 @@ document.querySelectorAll(".lb-period-tab").forEach((t) =>
 document.querySelectorAll(".tt-period-tab").forEach((t) =>
   t.addEventListener("click", () => setTowerPeriod(t.dataset.towerPeriod)));
 loadHomeTower();
+renderGarage();
 loadDataStatus();
 document.querySelectorAll(".ach-filter-tab").forEach((t) =>
   t.addEventListener("click", () => setAchFilter(t.dataset.filter)));
@@ -1878,7 +2169,8 @@ evaluateAchievements();  // catch anything already earned (e.g. from a prior vis
 track("app_open", { signed_in: isSignedIn() });  // open the analytics session
 // If a session token is present, pull the authoritative server stats, then
 // repaint the profile so it shows the signed-in totals.
-refreshMe().then(() => { renderProfile(); renderStreakBanner(); evaluateAchievements(); });
+refreshMe().then(() => { renderProfile(); renderStreakBanner(); renderGarage(); evaluateAchievements(); });
+initServiceWorker().then(maybeRemindOnOpen);
 tickCountdown(); setInterval(tickCountdown, 1000);
 renderRaceWeek(); setInterval(renderRaceWeek, 60000); // refresh past/next state each minute
 // A shared "?play=" link drops the player straight into a challenge; don't
