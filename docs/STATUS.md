@@ -12,7 +12,7 @@ engineering handoff. For question design see [`question-types.md`](./question-ty
 > Constructors' Championship standings.
 >
 > **Earlier (engagement & retention):** streaks + freeze, social proof,
-> deep-linked sharing, a 50-badge achievement system, purple/green sector flash,
+> deep-linked sharing, a 59-badge achievement system, purple/green sector flash,
 > team-colour legibility, and optional sign-up email. See
 > [`HANDOFF_ENGAGEMENT.md`](./HANDOFF_ENGAGEMENT.md), with rationale in
 > [`ENGAGEMENT.md`](./ENGAGEMENT.md) and growth in [`MARKETING.md`](./MARKETING.md).

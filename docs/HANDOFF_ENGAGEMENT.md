@@ -17,7 +17,7 @@ vars**:
 2. **Social proof** on results ("you beat 78% of players"), server-computed.
 3. **Deep-linked sharing** (`?play=…`), a *Challenge a friend* button, and rich
    link previews (Open Graph / Twitter Card).
-4. A **50-badge achievement system** (Rookie → Champion), data-driven.
+4. A **59-badge achievement system** (Rookie → Champion), data-driven.
 5. **Purple / Green sector flash** on close guesses (F1 timing-board style).
 6. **Team-colour text legibility** fix (`--color-ink`).
 7. **Optional email** at registration (capture only; sending is a later task).

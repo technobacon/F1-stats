@@ -877,15 +877,12 @@ function finishSession() {
   a.sessions = (a.sessions || 0) + 1;
   a.questions = (a.questions || 0) + quiz.questions.length;
   if (currentMode === "daily") a.daily_sessions = (a.daily_sessions || 0) + 1;
-  if (currentMode === "race_week") a.race_sessions = (a.race_sessions || 0) + 1;
   a.best_session = Math.max(a.best_session || 0, sessionScore);
   a.max_purple_in_session = Math.max(a.max_purple_in_session || 0, sessionPurpleCount);
   a.max_streak = Math.max(a.max_streak || 0, state.daily_streak);
   const h = new Date().getUTCHours();
   if (h >= 22 || h < 5) achFlag("night_owl");
   if (h >= 5 && h < 8) achFlag("early_bird");
-  if (localStorage.getItem("played_daily") === utcDate() &&
-      localStorage.getItem("played_race_week") === utcDate()) achFlag("double_header");
 
   saveState(state);
   evaluateAchievements();
@@ -1522,6 +1519,8 @@ const ACHIEVEMENTS = [
   { id: "pick_a_side",    icon: "🎽", tier: "rookie", name: "Pick a Side",       desc: "Pledge to a constructor.",                   check: (s) => s.teamsUsed >= 1 },
   { id: "spread_word",    icon: "📣", tier: "rookie", name: "Spread the Word",   desc: "Share a result.",                            check: (s) => s.shares >= 1 },
   { id: "contract_signed",icon: "✍️", tier: "rookie", name: "Contract Signed",   desc: "Create an account.",                         check: (s) => s.signedIn === true },
+  { id: "quick_study",    icon: "📚", tier: "rookie", name: "Quick Study",       desc: "Answer 25 questions.",                       check: (s) => s.questions >= 25 },
+  { id: "points_paddock", icon: "🪙", tier: "rookie", name: "Into the Paddock",  desc: "Bank 1,000 lifetime points.",                check: (s) => s.points >= 1000 },
 
   // ── Midfield ────────────────────────────────────────────────────────────
   { id: "purple_sector",  icon: "🟣", tier: "midfield", name: "Purple Sector",   desc: "Land within 10% of an answer.",              check: (s) => s.purple >= 1 },
@@ -1529,7 +1528,6 @@ const ACHIEVEMENTS = [
   { id: "the_ton",        icon: "💯", tier: "midfield", name: "The Ton",         desc: "Answer 100 questions.",                      check: (s) => s.questions >= 100 },
   { id: "fastest_lap",    icon: "⏱️", tier: "midfield", name: "Fastest Lap",     desc: "Score 22,000+ in a single session.",         check: (s) => s.bestSession >= 22000 },
   { id: "podium_points",  icon: "🏆", tier: "midfield", name: "Podium Finish",   desc: "Bank 25,000 lifetime points.",               check: (s) => s.points >= 25000 },
-  { id: "double_header",  icon: "📅", tier: "midfield", name: "Double Header",   desc: "Finish the Daily and Race challenge in one day.", check: (s) => s.flags.double_header === true },
   { id: "box_box",        icon: "🔧", tier: "midfield", name: "Box, Box!",       desc: "Complete 10 sessions.",                      check: (s) => s.sessions >= 10 },
   { id: "tyre_whisperer", icon: "🛞", tier: "midfield", name: "Tyre Whisperer",  desc: "Answer 50 Free Practice questions.",         check: (s) => s.practiceQuestions >= 50 },
   { id: "arcade_ace",     icon: "⚡", tier: "midfield", name: "Arcade Ace",      desc: "Reach an Arcade streak of 10.",              check: (s) => s.arcadeBest >= 10 },
@@ -1539,6 +1537,9 @@ const ACHIEVEMENTS = [
   { id: "double_points",  icon: "💰", tier: "midfield", name: "Double Points",   desc: "Bank 50,000 lifetime points.",               check: (s) => s.points >= 50000 },
   { id: "sharp_practice", icon: "🎯", tier: "midfield", name: "Sharp in Practice", desc: "Score a purple sector in Free Practice.",  check: (s) => s.flags.practice_purple === true },
   { id: "race_ritual",    icon: "📆", tier: "midfield", name: "Race Week Ritual", desc: "Reach a 5-day streak.",                     check: (s) => s.maxStreak >= 5 },
+  { id: "regular",        icon: "🔄", tier: "midfield", name: "Regular Starter",  desc: "Complete 25 sessions.",                     check: (s) => s.sessions >= 25 },
+  { id: "practice_makes", icon: "🧪", tier: "midfield", name: "Practice Makes…",  desc: "Answer 200 Free Practice questions.",       check: (s) => s.practiceQuestions >= 200 },
+  { id: "social_butterfly",icon: "🦋", tier: "midfield", name: "Social Butterfly", desc: "Share 10 results.",                        check: (s) => s.shares >= 10 },
 
   // ── Podium ──────────────────────────────────────────────────────────────
   { id: "bullseye",       icon: "🎯", tier: "podium", name: "Bullseye",          desc: "Nail an answer exactly.",                    check: (s) => s.perfect >= 1 },
@@ -1554,8 +1555,11 @@ const ACHIEVEMENTS = [
   { id: "iron_driver",    icon: "🦾", tier: "podium", name: "Iron Driver",       desc: "Complete 50 sessions.",                      check: (s) => s.sessions >= 50 },
   { id: "arcade_legend",  icon: "👾", tier: "podium", name: "Arcade Legend",     desc: "Reach an Arcade streak of 25.",              check: (s) => s.arcadeBest >= 25 },
   { id: "daily_devotee",  icon: "☀️", tier: "podium", name: "Daily Devotee",     desc: "Complete 25 Daily challenges.",              check: (s) => s.dailySessions >= 25 },
-  { id: "race_specialist",icon: "🏎️", tier: "podium", name: "Race Specialist",   desc: "Complete 25 Race challenges.",               check: (s) => s.raceSessions >= 25 },
+  { id: "daily_grinder",  icon: "🔁", tier: "podium", name: "Daily Grinder",     desc: "Complete 100 Daily challenges.",             check: (s) => s.dailySessions >= 100 },
   { id: "sharpshooter",   icon: "🔫", tier: "podium", name: "Sharpshooter",      desc: "Nail 10 exact answers.",                     check: (s) => s.perfect >= 10 },
+  { id: "the_grind",      icon: "⚙️", tier: "podium", name: "The Grind",         desc: "Answer 250 questions.",                      check: (s) => s.questions >= 250 },
+  { id: "purple_patch",   icon: "🔮", tier: "podium", name: "Purple Patch",      desc: "Score 50 purple sectors.",                   check: (s) => s.purple >= 50 },
+  { id: "fortnight",      icon: "🗓️", tier: "podium", name: "Fortnight",         desc: "Reach a 14-day streak.",                     check: (s) => s.maxStreak >= 14 },
 
   // ── Champion ────────────────────────────────────────────────────────────
   { id: "grand_slam",     icon: "🏆", tier: "champion", name: "Grand Slam",      desc: "All six sectors purple in one session.",     check: (s) => s.maxPurpleInSession >= 6 },
@@ -1567,6 +1571,8 @@ const ACHIEVEMENTS = [
   { id: "arcade_immortal",icon: "🌟", tier: "champion", name: "Arcade Immortal", desc: "Reach an Arcade streak of 50.",              check: (s) => s.arcadeBest >= 50 },
   { id: "full_grid",      icon: "🏟️", tier: "champion", name: "The Full Grid",   desc: "Run all eleven constructors.",               check: (s) => s.teamsUsed >= 11 },
   { id: "dead_eye",       icon: "🦅", tier: "champion", name: "Dead-Eye",        desc: "Nail 50 exact answers.",                     check: (s) => s.perfect >= 50 },
+  { id: "high_roller",    icon: "💸", tier: "champion", name: "High Roller",     desc: "Bank 250,000 lifetime points.",              check: (s) => s.points >= 250000 },
+  { id: "millionaire",    icon: "🤑", tier: "champion", name: "Millionaire",     desc: "Bank 1,000,000 lifetime points.",            check: (s) => s.points >= 1000000 },
   { id: "hall_of_fame",   icon: "🏛️", tier: "champion", name: "Hall of Fame",    desc: "Unlock 40 other achievements.",              check: (s) => s.unlocked >= 40 },
 ];
 
@@ -1579,7 +1585,6 @@ function achSnapshot() {
     practiceQuestions: a.practice_questions || 0,
     sessions: a.sessions || 0,
     dailySessions: a.daily_sessions || 0,
-    raceSessions: a.race_sessions || 0,
     perfect: a.perfect || 0,
     purple: a.purple || 0,
     green: a.green || 0,

@@ -64,7 +64,7 @@ invites, not bare URLs.
 
 ## Shipped in the second pass
 
-### 4. A proper achievement system (50 badges, Rookie → Champion)
+### 4. A proper achievement system (59 badges, Rookie → Champion)
 Replaces the three hard-coded `if`s with a **data-driven catalog** in
 `frontend/app.js` (`ACHIEVEMENTS`). Each badge is one row — `{id, icon, tier,
 name, desc, check(s)}` — with a pure predicate run against an achievement snapshot
