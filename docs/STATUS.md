@@ -58,9 +58,10 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
 - `/api/v1/dev/questions` (answer key) is **off in production** (`F1_DEV_TOOLS=0`).
 
 ### Questions & data
-- **2,000-question curated bank** committed at `backend/app/data/questions.json`,
-  served with no network (`F1_DATA_SOURCE=dataset`). Companion
-  `arcade.json` powers Over/Under offline.
+- **~1,200-question curated bank** committed at `backend/app/data/questions.json`
+  (modern-era curation via `backend/scripts/curate_questions.py`; ~70% from 2020s
+  regulars), served with no network (`F1_DATA_SOURCE=dataset`). Companion
+  `arcade.json` powers Over/Under offline (same driver-eligibility filter).
 - **20 question types** across **drivers, teams (constructors), and circuits** —
   wins/podiums/poles/points, comebacks, average finish, distinct circuits won,
   team 1-2s, venue facts, head-to-head differences, and more.

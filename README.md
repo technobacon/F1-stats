@@ -246,8 +246,9 @@ boundary.
   10-second anti-scouting team penalty on low scores) + Arcade Over/Under
   (matchups biased toward close, within-30% calls)
 - Server-authoritative exp-decay scoring; answers never leave the server
-- Deterministic anti-hallucination validation; a **committed 2,000-question bank**
-  (`backend/app/data/questions.json`) drawn from a ~3,100-question validated,
+- Deterministic anti-hallucination validation; a **committed ~1,200-question bank**
+  (`backend/app/data/questions.json`), curated for the modern era (see
+  `backend/scripts/curate_questions.py`) from a ~3,100-question validated,
   significance-gated pool
 - 30+ question types across drivers, teams and circuits; era-biased serving with
   an era-tiered driver significance gate (2020s: 50+ points · 2010s: race winners

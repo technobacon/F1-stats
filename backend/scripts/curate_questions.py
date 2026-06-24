@@ -17,6 +17,13 @@ NON-DRIVER QUESTIONS (team, venue — name a constructor/circuit, no driver)
   KEEP only the modern ones (era_year >= 2010); the pre-2010 constructor- and
   circuit-era questions are exactly the "very old" content that tested badly.
 
+TRIVIAL STINTS (the "feeder-feeling" content)
+  Drop questions scoped to a single-season team stint — a "(YYYY-YYYY)" window
+  with the same start and end year (e.g. "... for Manor Marussia (2016-2016)").
+  These brief one-year backmarker/pass-through stints are the obscure, low-value
+  trivia that reads like a feeder-series question and tested badly, regardless of
+  which driver or team they name.
+
 ERA BIAS (the headline requirement)
   At least 70% of the surviving bank must come from drivers who raced multiple
   seasons in the 2020s. 2020s regulars and the protected multiple-champions are
@@ -104,6 +111,20 @@ def build_index(spans):
     return sorted(spans, key=len, reverse=True)
 
 
+import re
+
+_STINT_WINDOW = re.compile(r"\((\d{4})-(\d{4})\)")
+
+
+def is_single_season_stint(text) -> bool:
+    """True for a question scoped to a one-year team stint — a '(YYYY-YYYY)'
+    window whose start == end, e.g. '... for Manor Marussia (2016-2016)?'. These
+    brief backmarker/pass-through stints are the obscure 'feeder-feeling' trivia
+    we cull regardless of the driver or team named."""
+    m = _STINT_WINDOW.search(text)
+    return bool(m) and m.group(1) == m.group(2)
+
+
 def drivers_in(text, names):
     found, rest = [], text
     for n in names:
@@ -129,7 +150,9 @@ def classify(questions, spans):
     tagged = []
     for q in questions:
         cat = q.get("category", "")
-        if cat in DRIVER_CATEGORIES:
+        if is_single_season_stint(q["question_string"]):
+            tagged.append((q, "cull", "trivial-stint"))
+        elif cat in DRIVER_CATEGORIES:
             ds = drivers_in(q["question_string"], names)
             if not ds:
                 tagged.append((q, "cull", "no-driver-found"))
@@ -186,6 +209,31 @@ def id_set(items):
     return {id(x) for x in items}
 
 
+def curate_arcade(spans, dry):
+    """Apply the SAME driver-eligibility rule to the Over/Under arcade snapshot:
+    keep a driver only if they were active in 2010+ or are a multiple champion.
+    Drops the pre-2010 single-title / non-champion names so arcade matchups are
+    drawn from the same modern, recognisable pool as the question bank."""
+    arcade = json.loads(ARCADE_PATH.read_text())
+    kept, dropped = [], []
+    for d in arcade["drivers"]:
+        n = d["full_name"]
+        if spans[n][1] >= 2010 or WDC.get(n, 0) >= 2:
+            kept.append(d)
+        else:
+            dropped.append(n)
+    print("-" * 64)
+    print(f"ARCADE: {len(arcade['drivers'])} -> {len(kept)} drivers "
+          f"({len(dropped)} dropped)")
+    if dropped:
+        print("  dropped: " + ", ".join(sorted(dropped)))
+    if not dry:
+        ARCADE_PATH.write_text(
+            json.dumps({"drivers": kept}, indent=1, ensure_ascii=False) + "\n")
+        print(f"wrote {len(kept)} drivers -> {ARCADE_PATH}")
+    return kept, dropped
+
+
 def main(argv):
     dry = "--dry-run" in argv
     spans = load_spans()
@@ -221,8 +269,10 @@ def main(argv):
         print(f"  {c:5d}  {d}")
     print("=" * 64)
 
+    curate_arcade(spans, dry)
+
     if dry:
-        print("dry-run: questions.json NOT modified")
+        print("dry-run: questions.json / arcade.json NOT modified")
         return 0
     QUESTIONS_PATH.write_text(json.dumps(final, indent=1, ensure_ascii=False) + "\n")
     print(f"wrote {n} questions -> {QUESTIONS_PATH}")

@@ -858,6 +858,17 @@
   "era_year": 2020
  },
  {
+  "question_string": "How many races at Albert Park Grand Prix Circuit have been won from somewhere other than pole position?",
+  "verified_answer": 16.0,
+  "answer_kind": "count",
+  "category": "venue",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 4.0,
+  "game_mode": "race_week",
+  "era_year": 2011
+ },
+ {
   "question_string": "At Istanbul Park, what is the furthest back on the grid a race winner has started?",
   "verified_answer": 6.0,
   "answer_kind": "count",
@@ -1683,17 +1694,6 @@
   "era_year": 2014
  },
  {
-  "question_string": "How many Grands Prix did Valtteri Bottas start for Sauber (2024-2024)?",
-  "verified_answer": 24.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2024
- },
- {
   "question_string": "How many career points-scoring finishes (top 10) does Lance Stroll have?",
   "verified_answer": 66.0,
   "answer_kind": "count",
@@ -1835,17 +1835,6 @@
   "difficulty_weight": 2.5,
   "game_mode": "daily",
   "era_year": 2024
- },
- {
-  "question_string": "How many Grands Prix did Sergio Pérez start for McLaren (2013-2013)?",
-  "verified_answer": 19.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2013
  },
  {
   "question_string": "How many Grands Prix did Fernando Alonso start for Aston Martin (2023-2026)?",
@@ -2112,17 +2101,6 @@
   "era_year": 2013
  },
  {
-  "question_string": "How many championship points did Daniil Kvyat score for AlphaTauri (2020-2020)?",
-  "verified_answer": 32.0,
-  "answer_kind": "points",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "daily",
-  "era_year": 2020
- },
- {
   "question_string": "How many career fastest laps does Kimi Räikkönen have?",
   "verified_answer": 42.0,
   "answer_kind": "count",
@@ -2365,17 +2343,6 @@
   "era_year": 2024
  },
  {
-  "question_string": "How many race wins did Juan Fangio take with Ferrari (1956-1956)?",
-  "verified_answer": 3.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 1956
- },
- {
   "question_string": "How many race wins did Fernando Alonso take with McLaren (2007-2018)?",
   "verified_answer": 4.0,
   "answer_kind": "count",
@@ -2508,17 +2475,6 @@
   "era_year": 2022
  },
  {
-  "question_string": "How many Grands Prix did Nico Hülkenberg start for Audi (2026-2026)?",
-  "verified_answer": 7.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2026
- },
- {
   "question_string": "How many Grands Prix has Lance Stroll started in their career?",
   "verified_answer": 198.0,
   "answer_kind": "count",
@@ -2585,17 +2541,6 @@
   "era_year": 1986
  },
  {
-  "question_string": "How many Grands Prix did Esteban Ocon start for Manor Marussia (2016-2016)?",
-  "verified_answer": 9.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2016
- },
- {
   "question_string": "How many championship points did Valtteri Bottas score for Mercedes (2017-2021)?",
   "verified_answer": 1327.0,
   "answer_kind": "points",
@@ -2605,17 +2550,6 @@
   "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2019
- },
- {
-  "question_string": "How many Grands Prix did Nico Hülkenberg start for Aston Martin (2022-2022)?",
-  "verified_answer": 2.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2022
  },
  {
   "question_string": "How many championship points did Daniel Ricciardo score for McLaren (2021-2022)?",
@@ -2737,39 +2671,6 @@
   "difficulty_weight": 2.5,
   "game_mode": "daily",
   "era_year": 2012
- },
- {
-  "question_string": "How many Grands Prix did Isack Hadjar start for Red Bull (2026-2026)?",
-  "verified_answer": 7.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2026
- },
- {
-  "question_string": "How many championship points did Liam Lawson score for AlphaTauri (2023-2023)?",
-  "verified_answer": 2.0,
-  "answer_kind": "points",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "daily",
-  "era_year": 2023
- },
- {
-  "question_string": "How many Grands Prix did Pierre Gasly start for Red Bull (2019-2019)?",
-  "verified_answer": 12.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2019
  },
  {
   "question_string": "How many career podiums does Emerson Fittipaldi have?",
@@ -2937,17 +2838,6 @@
   "era_year": 2016
  },
  {
-  "question_string": "How many Grands Prix did Graham Hill start for Shadow (1973-1973)?",
-  "verified_answer": 12.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 1973
- },
- {
   "question_string": "How many podium finishes did Pierre Gasly score for Alpine F1 Team (2023-2026)?",
   "verified_answer": 3.0,
   "answer_kind": "count",
@@ -2992,17 +2882,6 @@
   "era_year": 2024
  },
  {
-  "question_string": "How many championship points did Nico Hülkenberg score for Racing Point (2020-2020)?",
-  "verified_answer": 10.0,
-  "answer_kind": "points",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "daily",
-  "era_year": 2020
- },
- {
   "question_string": "How many race wins did Alain Prost take with McLaren (1980-1989)?",
   "verified_answer": 30.0,
   "answer_kind": "count",
@@ -3023,17 +2902,6 @@
   "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2026
- },
- {
-  "question_string": "How many podium finishes did Juan Fangio score for Ferrari (1956-1956)?",
-  "verified_answer": 5.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "daily",
-  "era_year": 1956
  },
  {
   "question_string": "How many career race wins does Andrea Kimi Antonelli have?",
@@ -3243,6 +3111,17 @@
   "difficulty_weight": 2.0,
   "game_mode": "daily",
   "era_year": 2018
+ },
+ {
+  "question_string": "How many seasons has Nico Rosberg contested?",
+  "verified_answer": 11.0,
+  "answer_kind": "count",
+  "category": "career",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 2.0,
+  "game_mode": "daily",
+  "era_year": 2011
  },
  {
   "question_string": "How many Grands Prix has Kimi Räikkönen started in their career?",
@@ -3465,17 +3344,6 @@
   "era_year": 2024
  },
  {
-  "question_string": "How many Grands Prix did Liam Lawson start for Red Bull (2025-2025)?",
-  "verified_answer": 2.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2025
- },
- {
   "question_string": "How many different constructors has Lance Stroll driven for?",
   "verified_answer": 3.0,
   "answer_kind": "count",
@@ -3551,17 +3419,6 @@
   "difficulty_weight": 2.5,
   "game_mode": "daily",
   "era_year": 2018
- },
- {
-  "question_string": "How many championship points did Isack Hadjar score for RB F1 Team (2025-2025)?",
-  "verified_answer": 51.0,
-  "answer_kind": "points",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "daily",
-  "era_year": 2025
  },
  {
   "question_string": "How many career race wins does Sergio Pérez have?",
@@ -3650,17 +3507,6 @@
   "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2024
- },
- {
-  "question_string": "How many Grands Prix did Liam Lawson start for AlphaTauri (2023-2023)?",
-  "verified_answer": 5.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2023
  },
  {
   "question_string": "How many seasons has Yuki Tsunoda contested?",
@@ -3949,28 +3795,6 @@
   "era_year": 2011
  },
  {
-  "question_string": "How many Grands Prix did Charles Leclerc start for Sauber (2018-2018)?",
-  "verified_answer": 21.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2018
- },
- {
-  "question_string": "How many Grands Prix did Heikki Kovalainen start for Lotus F1 (2013-2013)?",
-  "verified_answer": 2.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2013
- },
- {
   "question_string": "How many seasons has Alexander Albon contested?",
   "verified_answer": 7.0,
   "answer_kind": "count",
@@ -3991,17 +3815,6 @@
   "difficulty_weight": 2.0,
   "game_mode": "daily",
   "era_year": 2023
- },
- {
-  "question_string": "How many Grands Prix did Nico Hülkenberg start for Racing Point (2020-2020)?",
-  "verified_answer": 3.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2020
  },
  {
   "question_string": "How many different constructors has Oscar Piastri driven for?",
@@ -4026,17 +3839,6 @@
   "era_year": 2025
  },
  {
-  "question_string": "How many podium finishes did Alain Prost score for Williams (1993-1993)?",
-  "verified_answer": 12.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "daily",
-  "era_year": 1993
- },
- {
   "question_string": "How many Grands Prix did George Russell start for Williams (2019-2021)?",
   "verified_answer": 59.0,
   "answer_kind": "count",
@@ -4046,17 +3848,6 @@
   "difficulty_weight": 2.0,
   "game_mode": "daily",
   "era_year": 2020
- },
- {
-  "question_string": "How many Grands Prix did Heikki Kovalainen start for Caterham (2012-2012)?",
-  "verified_answer": 20.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.0,
-  "game_mode": "daily",
-  "era_year": 2012
  },
  {
   "question_string": "How many Grands Prix did Sebastian Vettel start for Aston Martin (2021-2022)?",
@@ -4607,17 +4398,6 @@
   "difficulty_weight": 2.5,
   "game_mode": "race_week",
   "era_year": 2018
- },
- {
-  "question_string": "How many points-scoring finishes (top 10) did Daniel Ricciardo record for AlphaTauri (2023-2023)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2023
  },
  {
   "question_string": "What is Oliver Bearman's longest streak of consecutive top-10 finishes?",
@@ -5687,17 +5467,6 @@
   "era_year": 2022
  },
  {
-  "question_string": "How many times did Daniil Kvyat fail to finish (DNF) for AlphaTauri (2020-2020)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 2020
- },
- {
   "question_string": "Across every race they started, what is Lando Norris's average grid position?",
   "verified_answer": 7.0,
   "answer_kind": "count",
@@ -6050,17 +5819,6 @@
   "era_year": 2018
  },
  {
-  "question_string": "How many points-scoring finishes (top 10) did Charles Leclerc record for Sauber (2018-2018)?",
-  "verified_answer": 10.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2018
- },
- {
   "question_string": "Driving for Mercedes (2010-2016), how many times did Nico Rosberg climb 10+ places from the grid?",
   "verified_answer": 3.0,
   "answer_kind": "count",
@@ -6149,17 +5907,6 @@
   "era_year": 2018
  },
  {
-  "question_string": "Net across every start, how many positions did Esteban Ocon gain from the grid for Manor Marussia (2016-2016)?",
-  "verified_answer": 31.0,
-  "answer_kind": "count",
-  "category": "racecraft",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "race_week",
-  "era_year": 2016
- },
- {
   "question_string": "What is the most race wins Andrea Kimi Antonelli scored in a single season for Mercedes?",
   "verified_answer": 5.0,
   "answer_kind": "count",
@@ -6202,17 +5949,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "race_week",
   "era_year": 2024
- },
- {
-  "question_string": "How many times did Isack Hadjar fail to finish (DNF) for Red Bull (2026-2026)?",
-  "verified_answer": 2.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 2026
  },
  {
   "question_string": "How many of Sergio Pérez's pole positions for Red Bull converted into a win?",
@@ -6523,17 +6259,6 @@
   "era_year": 2014
  },
  {
-  "question_string": "How many times did Niki Lauda fail to finish (DNF) for March (1972-1972)?",
-  "verified_answer": 4.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 1972
- },
- {
   "question_string": "How many career second-place (P2) finishes does Mika Häkkinen have?",
   "verified_answer": 14.0,
   "answer_kind": "count",
@@ -6587,17 +6312,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "race_week",
   "era_year": 2022
- },
- {
-  "question_string": "How many points-scoring finishes (top 10) did Sebastian Vettel record for BMW Sauber (2007-2007)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2007
  },
  {
   "question_string": "How many career second-place (P2) finishes does Kimi Räikkönen have?",
@@ -7051,17 +6765,6 @@
   "era_year": 2026
  },
  {
-  "question_string": "How many third-place (P3) finishes did Robert Kubica score for Renault (2010-2010)?",
-  "verified_answer": 2.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2010
- },
- {
   "question_string": "How many runner-up (P2) finishes did Nelson Piquet score for Benetton (1990-1991)?",
   "verified_answer": 1.0,
   "answer_kind": "count",
@@ -7082,17 +6785,6 @@
   "difficulty_weight": 3.5,
   "game_mode": "race_week",
   "era_year": 2020
- },
- {
-  "question_string": "How many third-place (P3) finishes did Isack Hadjar score for RB F1 Team (2025-2025)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2025
  },
  {
   "question_string": "How many points-scoring finishes (top 10) did George Russell record for Mercedes (2020-2026)?",
@@ -7656,17 +7348,6 @@
   "era_year": 1997
  },
  {
-  "question_string": "How many times did Liam Lawson fail to finish (DNF) for Red Bull (2025-2025)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 2025
- },
- {
   "question_string": "In which year did Sebastian Vettel take their most recent race win?",
   "verified_answer": 2019.0,
   "answer_kind": "year",
@@ -7975,39 +7656,6 @@
   "era_year": 2026
  },
  {
-  "question_string": "How many points-scoring finishes (top 10) did Robert Kubica record for Williams (2019-2019)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2019
- },
- {
-  "question_string": "How many points-scoring finishes (top 10) did Liam Lawson record for AlphaTauri (2023-2023)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2023
- },
- {
-  "question_string": "How many times did Yuki Tsunoda fail to finish (DNF) for Red Bull (2025-2025)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 2025
- },
- {
   "question_string": "How many points-scoring finishes (top 10) did Esteban Ocon record for Haas F1 Team (2025-2026)?",
   "verified_answer": 11.0,
   "answer_kind": "count",
@@ -8215,17 +7863,6 @@
   "difficulty_weight": 2.5,
   "game_mode": "race_week",
   "era_year": 2024
- },
- {
-  "question_string": "How many points-scoring finishes (top 10) did Yuki Tsunoda record for Red Bull (2025-2025)?",
-  "verified_answer": 7.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2025
  },
  {
   "question_string": "What is the most podiums Isack Hadjar scored in a single season?",
@@ -8448,17 +8085,6 @@
   "era_year": 2012
  },
  {
-  "question_string": "How many times did Graham Hill fail to finish (DNF) for Lotus-BRM (1967-1967)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 1967
- },
- {
   "question_string": "What is the most pole positions Nelson Piquet took in a single season for Williams?",
   "verified_answer": 4.0,
   "answer_kind": "count",
@@ -8556,17 +8182,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "race_week",
   "era_year": 1962
- },
- {
-  "question_string": "How many points-scoring finishes (top 10) did Juan Fangio record for Ferrari (1956-1956)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 1956
  },
  {
   "question_string": "What is the most pole positions Max Verstappen took in a single season?",
@@ -8963,17 +8578,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "race_week",
   "era_year": 2022
- },
- {
-  "question_string": "How many pole positions did Ayrton Senna take for Williams (1994-1994)?",
-  "verified_answer": 3.0,
-  "answer_kind": "count",
-  "category": "qualifying",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 1994
  },
  {
   "question_string": "Net across every start, how many positions did Sebastian Vettel gain from the grid for Toro Rosso (2007-2008)?",
@@ -9445,17 +9049,6 @@
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 2024
- },
- {
-  "question_string": "How many points-scoring finishes (top 10) did Daniel Ricciardo record for RB F1 Team (2024-2024)?",
-  "verified_answer": 3.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
   "game_mode": "race_week",
   "era_year": 2024
  },
@@ -10263,17 +9856,6 @@
   "era_year": 1993
  },
  {
-  "question_string": "How many times did Nelson Piquet fail to finish (DNF) for Ensign (1978-1978)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 1978
- },
- {
   "question_string": "How many front-row starts did Sergio Pérez qualify for Red Bull (2021-2024)?",
   "verified_answer": 13.0,
   "answer_kind": "count",
@@ -10283,17 +9865,6 @@
   "difficulty_weight": 3.0,
   "game_mode": "race_week",
   "era_year": 2022
- },
- {
-  "question_string": "Net across every start, how many positions did Liam Lawson gain from the grid for AlphaTauri (2023-2023)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
-  "category": "racecraft",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "race_week",
-  "era_year": 2023
  },
  {
   "question_string": "How many fastest laps did Michael Schumacher set for Mercedes (2010-2012)?",
@@ -10439,17 +10010,6 @@
   "era_year": 2024
  },
  {
-  "question_string": "How many points-scoring finishes (top 10) did Graham Hill record for Shadow (1973-1973)?",
-  "verified_answer": 2.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 1973
- },
- {
   "question_string": "What is the furthest back on the grid Carlos Sainz started a race they went on to win?",
   "verified_answer": 2.0,
   "answer_kind": "count",
@@ -10481,17 +10041,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "race_week",
   "era_year": 2014
- },
- {
-  "question_string": "How many front-row starts did Jackie Stewart qualify for March (1970-1970)?",
-  "verified_answer": 4.0,
-  "answer_kind": "count",
-  "category": "qualifying",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 1970
  },
  {
   "question_string": "In which year did Max Verstappen score their first win for Red Bull?",
@@ -10901,17 +10450,6 @@
   "era_year": 2014
  },
  {
-  "question_string": "How many times did Pierre Gasly fail to finish (DNF) for Red Bull (2019-2019)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 2019
- },
- {
   "question_string": "In which year did Oscar Piastri take their most recent race win?",
   "verified_answer": 2025.0,
   "answer_kind": "year",
@@ -11253,17 +10791,6 @@
   "era_year": 2018
  },
  {
-  "question_string": "How many fastest laps did Pierre Gasly set for Red Bull (2019-2019)?",
-  "verified_answer": 2.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2019
- },
- {
   "question_string": "In which year did Esteban Ocon take their most recent race win?",
   "verified_answer": 2021.0,
   "answer_kind": "year",
@@ -11374,17 +10901,6 @@
   "era_year": 2011
  },
  {
-  "question_string": "How many times did Isack Hadjar fail to finish (DNF) for RB F1 Team (2025-2025)?",
-  "verified_answer": 2.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 2025
- },
- {
   "question_string": "How many times in their career did Liam Lawson climb 10+ places from the grid in a race?",
   "verified_answer": 1.0,
   "answer_kind": "count",
@@ -11460,17 +10976,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "race_week",
   "era_year": 2006
- },
- {
-  "question_string": "How many third-place (P3) finishes did Ayrton Senna score for Toleman (1984-1984)?",
-  "verified_answer": 2.0,
-  "answer_kind": "count",
-  "category": "career",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 1984
  },
  {
   "question_string": "Net across every start, how many positions did Lance Stroll gain from the grid for Aston Martin (2021-2026)?",
@@ -11737,17 +11242,6 @@
   "era_year": 2025
  },
  {
-  "question_string": "How many points-scoring finishes (top 10) did Fernando Alonso record for Minardi (2001-2001)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2001
- },
- {
   "question_string": "Driving for AlphaTauri, in what percentage of races did Pierre Gasly finish in the points (top 10)?",
   "verified_answer": 51.0,
   "answer_kind": "percentage",
@@ -11781,17 +11275,6 @@
   "era_year": 1990
  },
  {
-  "question_string": "How many times did Michael Schumacher fail to finish (DNF) for Jordan (1991-1991)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 1991
- },
- {
   "question_string": "How many times did Fernando Alonso fail to finish (DNF) for Renault (2003-2009)?",
   "verified_answer": 20.0,
   "answer_kind": "count",
@@ -11801,17 +11284,6 @@
   "difficulty_weight": 3.0,
   "game_mode": "race_week",
   "era_year": 2006
- },
- {
-  "question_string": "Net across every start, how many positions did Daniel Ricciardo gain from the grid for AlphaTauri (2023-2023)?",
-  "verified_answer": 7.0,
-  "answer_kind": "count",
-  "category": "racecraft",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "race_week",
-  "era_year": 2023
  },
  {
   "question_string": "What is the most race wins George Russell scored in a single season for Mercedes?",
@@ -11880,17 +11352,6 @@
   "era_year": 2016
  },
  {
-  "question_string": "Net across every start, how many positions did Valtteri Bottas gain from the grid for Cadillac F1 Team (2026-2026)?",
-  "verified_answer": 13.0,
-  "answer_kind": "count",
-  "category": "racecraft",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "race_week",
-  "era_year": 2026
- },
- {
   "question_string": "How many times did Daniel Ricciardo win at Hungaroring?",
   "verified_answer": 1.0,
   "answer_kind": "count",
@@ -11933,17 +11394,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "race_week",
   "era_year": 1986
- },
- {
-  "question_string": "How many points-scoring finishes (top 10) did Alain Prost record for Williams (1993-1993)?",
-  "verified_answer": 13.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 1993
  },
  {
   "question_string": "In which season did Esteban Ocon take the most wins of their career?",
@@ -12054,17 +11504,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "race_week",
   "era_year": 2022
- },
- {
-  "question_string": "How many points-scoring finishes (top 10) did Isack Hadjar record for RB F1 Team (2025-2025)?",
-  "verified_answer": 10.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2025
  },
  {
   "question_string": "How many times did Carlos Sainz fail to finish (DNF) for Williams (2025-2026)?",
@@ -12474,17 +11913,6 @@
   "era_year": 1986
  },
  {
-  "question_string": "Net across every start, how many positions did Ayrton Senna gain from the grid for Toleman (1984-1984)?",
-  "verified_answer": 37.0,
-  "answer_kind": "count",
-  "category": "racecraft",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "race_week",
-  "era_year": 1984
- },
- {
   "question_string": "In which year did George Russell take their most recent race win?",
   "verified_answer": 2026.0,
   "answer_kind": "year",
@@ -12672,17 +12100,6 @@
   "era_year": 2016
  },
  {
-  "question_string": "Net across every start, how many positions did Nico Hülkenberg gain from the grid for Aston Martin (2022-2022)?",
-  "verified_answer": 5.0,
-  "answer_kind": "count",
-  "category": "racecraft",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "race_week",
-  "era_year": 2022
- },
- {
   "question_string": "What is Carlos Sainz's longest streak of consecutive top-10 finishes?",
   "verified_answer": 17.0,
   "answer_kind": "count",
@@ -12857,17 +12274,6 @@
   "difficulty_weight": 4.0,
   "game_mode": "race_week",
   "era_year": 2018
- },
- {
-  "question_string": "Net across every start, how many positions did Kimi Räikkönen gain from the grid for Sauber (2001-2001)?",
-  "verified_answer": 32.0,
-  "answer_kind": "count",
-  "category": "racecraft",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "race_week",
-  "era_year": 2001
  },
  {
   "question_string": "What is Lance Stroll's longest streak of consecutive top-10 finishes?",
@@ -13222,17 +12628,6 @@
   "era_year": 2022
  },
  {
-  "question_string": "Net across every start, how many positions did Nico Hülkenberg gain from the grid for Audi (2026-2026)?",
-  "verified_answer": 1.0,
-  "answer_kind": "count",
-  "category": "racecraft",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "race_week",
-  "era_year": 2026
- },
- {
   "question_string": "How many career front-row starts does Ayrton Senna have?",
   "verified_answer": 87.0,
   "answer_kind": "count",
@@ -13354,17 +12749,6 @@
   "era_year": 2022
  },
  {
-  "question_string": "Net across every start, how many positions did Graham Hill gain from the grid for Shadow (1973-1973)?",
-  "verified_answer": 41.0,
-  "answer_kind": "count",
-  "category": "racecraft",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "race_week",
-  "era_year": 1973
- },
- {
   "question_string": "In which year did Valtteri Bottas score their first pole position for Mercedes?",
   "verified_answer": 2017.0,
   "answer_kind": "year",
@@ -13385,6 +12769,17 @@
   "difficulty_weight": 4.0,
   "game_mode": "race_week",
   "era_year": 2020
+ },
+ {
+  "question_string": "How many times did Nico Rosberg win at Albert Park Grand Prix Circuit?",
+  "verified_answer": 2.0,
+  "answer_kind": "count",
+  "category": "circuit",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
+  "game_mode": "race_week",
+  "era_year": 2011
  },
  {
   "question_string": "What is the most race wins Oscar Piastri scored in a single season for McLaren?",
@@ -13585,17 +12980,6 @@
   "era_year": 1996
  },
  {
-  "question_string": "How many points-scoring finishes (top 10) did Pierre Gasly record for Red Bull (2019-2019)?",
-  "verified_answer": 9.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2019
- },
- {
   "question_string": "In which year did Charles Leclerc score their first pole position for Ferrari?",
   "verified_answer": 2019.0,
   "answer_kind": "year",
@@ -13616,28 +13000,6 @@
   "difficulty_weight": 3.0,
   "game_mode": "race_week",
   "era_year": 2023
- },
- {
-  "question_string": "How many times did Daniel Ricciardo fail to finish (DNF) for RB F1 Team (2024-2024)?",
-  "verified_answer": 2.0,
-  "answer_kind": "count",
-  "category": "reliability",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "race_week",
-  "era_year": 2024
- },
- {
-  "question_string": "How many points-scoring finishes (top 10) did Sergio Pérez record for McLaren (2013-2013)?",
-  "verified_answer": 11.0,
-  "answer_kind": "count",
-  "category": "consistency",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 2.5,
-  "game_mode": "race_week",
-  "era_year": 2013
  },
  {
   "question_string": "In which season did Jack Brabham take the most pole positions for Cooper-Climax?",
