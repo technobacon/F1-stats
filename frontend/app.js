@@ -1670,8 +1670,10 @@ const DataCheck = (() => {
   function render() {
     const needle = document.getElementById("data-search").value.trim().toLowerCase();
     const mode = document.getElementById("data-mode-filter").value;
+    const flaggedOnly = document.getElementById("data-flagged-only").checked;
     const view = rows.filter((r) =>
       (!mode || r.game_mode === mode) &&
+      (!flaggedOnly || r.flagged) &&
       (!needle || `${r.question_string} ${r.category}`.toLowerCase().includes(needle)));
     view.sort((a, b) => {
       const va = a[sortKey] ?? "", vb = b[sortKey] ?? "";
@@ -1679,20 +1681,46 @@ const DataCheck = (() => {
         ? va - vb : String(va).localeCompare(String(vb));
       return sortAsc ? cmp : -cmp;
     });
-    document.getElementById("data-count").textContent = `${view.length} / ${rows.length}`;
+    const flagged = rows.filter((r) => r.flagged).length;
+    document.getElementById("data-count").textContent =
+      `${view.length} / ${rows.length}${flagged ? ` · ${flagged} 🚩` : ""}`;
     document.getElementById("data-rows").innerHTML = view.map((r) => `
-      <tr>
+      <tr class="${r.flagged ? "dt-flagged" : ""}">
         <td class="dt-q">${esc(r.question_string)}</td>
         <td class="num dt-a">${fmtAnswer(r.verified_answer)}</td>
         <td>${esc(r.answer_kind)}</td>
         <td>${esc((r.category || "").replace(/_/g, " "))}</td>
         <td>${esc(r.game_mode.replace("_", "-"))}</td>
         <td class="num">${r.era_year ?? "—"}</td>
+        <td><button class="dt-flag-btn ${r.flagged ? "on" : ""}"
+              data-q="${esc(r.question_string)}"
+              title="${r.flagged ? "Flagged — click to clear" : "Flag for review"}"
+              aria-pressed="${r.flagged}">🚩</button></td>
       </tr>`).join("");
     document.querySelectorAll(".data-table th").forEach((th) => {
       th.classList.toggle("sorted", th.dataset.sort === sortKey);
       th.classList.toggle("desc", th.dataset.sort === sortKey && !sortAsc);
     });
+  }
+
+  /* Toggle a flag server-side, then reflect it locally without a full refetch. */
+  async function toggleFlag(qs) {
+    const row = rows.find((r) => r.question_string === qs);
+    if (!row) return;
+    const next = !row.flagged;
+    try {
+      const res = await fetch(`${API}/dev/flag`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question_string: qs, flagged: next }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      row.flagged = next;
+      track("dev_flag", { flagged: next });
+      render();
+    } catch {
+      toast("Could not save the flag (dev tools disabled?).");
+    }
   }
 
   async function open() {
@@ -1720,6 +1748,12 @@ const DataCheck = (() => {
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
     document.getElementById("data-search").addEventListener("input", () => rows && render());
     document.getElementById("data-mode-filter").addEventListener("change", () => rows && render());
+    document.getElementById("data-flagged-only").addEventListener("change", () => rows && render());
+    // Delegated so the per-row 🚩 buttons keep working after every re-render.
+    document.getElementById("data-rows").addEventListener("click", (e) => {
+      const btn = e.target.closest(".dt-flag-btn");
+      if (btn) toggleFlag(btn.dataset.q);
+    });
     document.querySelectorAll(".data-table th").forEach((th) => {
       th.addEventListener("click", () => {
         const key = th.dataset.sort;

@@ -470,6 +470,15 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .data-table .dt-a { font-weight:800; color:var(--color-ink); white-space:nowrap; }
 .data-table .dt-q { min-width:280px; }
 
+/* Dev flagging: a per-row toggle + a tint on flagged rows. */
+.data-flag-filter { display:inline-flex; align-items:center; gap:.35rem; white-space:nowrap;
+                    color:var(--muted); font-size:.8rem; cursor:pointer; }
+.dt-flag-btn { background:none; border:0; cursor:pointer; font-size:1rem; line-height:1;
+               padding:.1rem .3rem; filter:grayscale(1) opacity(.45); transition:filter .12s; }
+.dt-flag-btn:hover { filter:grayscale(.3) opacity(.85); }
+.dt-flag-btn.on { filter:none; }
+.data-table tr.dt-flagged td { background:rgba(229,57,53,.12); }
+
 .cap-note { background:rgba(63,185,80,.12); border:1px solid #2e6b3a; color:#9fe0ab;
             border-radius:10px; padding:.7rem .9rem; margin-bottom:1rem; font-size:.9rem; }
 .accuracy-row { color:var(--muted); margin:.5rem 0 1rem; font-size:.9rem; text-align:center; }

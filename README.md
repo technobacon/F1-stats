@@ -155,7 +155,9 @@ docs/               # original design documents
 | `POST` | `/api/v1/analytics/collect` | ingest a batch of pseudonymous client events (sendBeacon-friendly); public, bounded, best-effort |
 | `GET`  | `/api/v1/analytics/summary` | DAU/WAU/MAU, the play funnel, D1/D7 retention, mode mix, account growth; **token-gated** (`F1_ANALYTICS_TOKEN`); `?days=` window |
 | `GET`  | `/analytics` | the analytics dashboard page (reads the gated summary; harmless without the token) |
-| `GET`  | `/api/v1/dev/questions` | full bank **with answers** for proofreading ("Check the data" button); **disabled in production** (`F1_DEV_TOOLS=0`, set in `render.yaml`) |
+| `GET`  | `/api/v1/dev/questions` | full bank **with answers** for proofreading ("Check the data" button), each row tagged with its review `flagged` state; **disabled in production** (`F1_DEV_TOOLS=0`, set in `render.yaml`) |
+| `POST` | `/api/v1/dev/flag` | flag/unflag a question (by text) for later review — the 🚩 button in "Check the data"; same `F1_DEV_TOOLS` gate |
+| `GET`  | `/api/v1/dev/flags` | the dev review queue (every flagged question); feeds a follow-up cull via `scripts/curate_questions.py` |
 
 The daily/race-week/one-shot selection is **deterministic per period** (seeded by
 mode + UTC date), so everyone gets the same set within a period and it rotates —

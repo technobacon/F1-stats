@@ -8,6 +8,8 @@ Endpoints:
     GET  /api/v1/arcade/pair         -> over/under matchup (non-competitive v1)
     GET  /api/v1/dev/questions       -> full question bank WITH answers (proofreading
                                         tool; disable with F1_DEV_TOOLS=0)
+    POST /api/v1/dev/flag            -> flag/unflag a question for later review
+    GET  /api/v1/dev/flags           -> the dev review queue (flagged questions)
     GET  /api/v1/health              -> liveness + question count
     GET  /                           -> static prototype frontend
 
@@ -33,6 +35,8 @@ from .models import (
     AuthResponse,
     ClaimRequest,
     DailyQuizResponse,
+    DevFlagRequest,
+    DevFlagResponse,
     LeaderboardResponse,
     LoginRequest,
     MeResponse,
@@ -345,25 +349,86 @@ def set_team(req: SetTeamRequest, user: dict = Depends(require_user)):
     return {"username": user["username"], "selected_team": team, "stats": stats}
 
 
-@app.get("/api/v1/dev/questions")
-def dev_questions():
-    """Development proofreading tool: the full active question bank INCLUDING the
-    verified answers, so the stats can be eyeballed against the record books.
-    This intentionally crosses the no-answers-to-the-client trust boundary —
-    set F1_DEV_TOOLS=0 in production to switch it off."""
+def require_dev_tools() -> None:
+    """Gate the dev proofreading tools behind F1_DEV_TOOLS (default on). Set
+    F1_DEV_TOOLS=0 in production to 404 every dev endpoint."""
     if os.environ.get("F1_DEV_TOOLS", "1").lower() in ("0", "false", "off"):
         raise HTTPException(404, "Dev tools are disabled (F1_DEV_TOOLS=0).")
+
+
+@app.get("/api/v1/dev/questions")
+def dev_questions(_: None = Depends(require_dev_tools)):
+    """Development proofreading tool: the full active question bank INCLUDING the
+    verified answers, so the stats can be eyeballed against the record books.
+    Each row also carries `flagged` — whether a maintainer has marked it for
+    review (see POST /api/v1/dev/flag). This intentionally crosses the
+    no-answers-to-the-client trust boundary — set F1_DEV_TOOLS=0 to switch it off."""
     conn = get_conn()
     try:
         rows = conn.execute(
-            "SELECT question_string, verified_answer, answer_kind, category, "
-            "       game_mode, era_year, difficulty_weight "
-            "FROM production_trivia_questions WHERE is_active = 1 "
-            "ORDER BY category, question_string"
+            "SELECT q.question_string, q.verified_answer, q.answer_kind, q.category, "
+            "       q.game_mode, q.era_year, q.difficulty_weight, "
+            "       (f.question_string IS NOT NULL) AS flagged "
+            "FROM production_trivia_questions q "
+            "LEFT JOIN dev_flagged_questions f "
+            "       ON f.question_string = q.question_string "
+            "WHERE q.is_active = 1 "
+            "ORDER BY q.category, q.question_string"
         ).fetchall()
     finally:
         conn.close()
-    return {"count": len(rows), "questions": [dict(r) for r in rows]}
+    questions = [{**dict(r), "flagged": bool(r["flagged"])} for r in rows]
+    return {
+        "count": len(questions),
+        "flagged_count": sum(q["flagged"] for q in questions),
+        "questions": questions,
+    }
+
+
+@app.post("/api/v1/dev/flag", response_model=DevFlagResponse)
+def dev_flag(req: DevFlagRequest, _: None = Depends(require_dev_tools)):
+    """Flag/unflag a question for later review. Idempotent: flagging an
+    already-flagged question (or clearing an unflagged one) is a no-op. Stored by
+    question_string so a flag survives the boot-time bank reseed."""
+    conn = get_conn()
+    try:
+        exists = conn.execute(
+            "SELECT 1 FROM production_trivia_questions WHERE question_string = ?",
+            (req.question_string,),
+        ).fetchone()
+        if not exists:
+            raise HTTPException(404, "No such question in the active bank.")
+        if req.flagged:
+            conn.execute(
+                "INSERT INTO dev_flagged_questions (question_string, note) VALUES (?, ?) "
+                "ON CONFLICT(question_string) DO UPDATE SET note = excluded.note",
+                (req.question_string, req.note),
+            )
+        else:
+            conn.execute(
+                "DELETE FROM dev_flagged_questions WHERE question_string = ?",
+                (req.question_string,),
+            )
+        conn.commit()
+        total = conn.execute("SELECT COUNT(*) AS n FROM dev_flagged_questions").fetchone()["n"]
+    finally:
+        conn.close()
+    return {"question_string": req.question_string, "flagged": req.flagged, "flagged_count": total}
+
+
+@app.get("/api/v1/dev/flags")
+def dev_flags(_: None = Depends(require_dev_tools)):
+    """The review queue: every flagged question (newest first), for triage or to
+    drive a follow-up cull of the committed bank."""
+    conn = get_conn()
+    try:
+        rows = conn.execute(
+            "SELECT question_string, note, created_at "
+            "FROM dev_flagged_questions ORDER BY created_at DESC"
+        ).fetchall()
+    finally:
+        conn.close()
+    return {"count": len(rows), "flags": [dict(r) for r in rows]}
 
 
 @app.get("/api/v1/arcade/pair", response_model=ArcadePairResponse)

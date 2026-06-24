@@ -134,6 +134,50 @@ def test_dev_questions_can_be_disabled(client, monkeypatch):
     assert client.get("/api/v1/dev/questions").status_code == 404
 
 
+def test_dev_flag_round_trips(client):
+    # Grab a real question to flag.
+    qs = client.get("/api/v1/dev/questions").json()["questions"][0]["question_string"]
+
+    # Flag it: it shows up flagged in the bank view and in the review queue.
+    r = client.post("/api/v1/dev/flag", json={"question_string": qs, "note": "too obscure"})
+    assert r.status_code == 200 and r.json()["flagged"] is True
+    assert r.json()["flagged_count"] == 1
+
+    body = client.get("/api/v1/dev/questions").json()
+    assert body["flagged_count"] == 1
+    assert next(q for q in body["questions"] if q["question_string"] == qs)["flagged"] is True
+    flags = client.get("/api/v1/dev/flags").json()
+    assert flags["count"] == 1 and flags["flags"][0]["note"] == "too obscure"
+
+    # Unflag it: back to a clean queue.
+    r = client.post("/api/v1/dev/flag", json={"question_string": qs, "flagged": False})
+    assert r.status_code == 200 and r.json()["flagged"] is False
+    assert client.get("/api/v1/dev/questions").json()["flagged_count"] == 0
+    assert client.get("/api/v1/dev/flags").json()["count"] == 0
+
+
+def test_dev_flag_unknown_question_404s(client):
+    r = client.post("/api/v1/dev/flag", json={"question_string": "not a real question"})
+    assert r.status_code == 404
+
+
+def test_dev_flag_survives_bank_reseed(client):
+    """A flag is keyed by question text, so it must outlive the boot-time reseed
+    that drops and rebuilds production_trivia_questions with fresh UUIDs."""
+    qs = client.get("/api/v1/dev/questions").json()["questions"][0]["question_string"]
+    client.post("/api/v1/dev/flag", json={"question_string": qs})
+    # Reseed the question bank (what every boot does); flags table is preserved.
+    seed.seed_all(db.DB_PATH)
+    flags = client.get("/api/v1/dev/flags").json()
+    assert any(f["question_string"] == qs for f in flags["flags"])
+
+
+def test_dev_flag_disabled_with_dev_tools_off(client, monkeypatch):
+    monkeypatch.setenv("F1_DEV_TOOLS", "0")
+    assert client.post("/api/v1/dev/flag", json={"question_string": "x"}).status_code == 404
+    assert client.get("/api/v1/dev/flags").status_code == 404
+
+
 def test_practice_question_hides_answer(client):
     r = client.get("/api/v1/practice/question")
     assert r.status_code == 200

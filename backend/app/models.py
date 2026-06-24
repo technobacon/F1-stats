@@ -192,3 +192,17 @@ class ArcadePairResponse(BaseModel):
     # v1 is non-competitive / client-evaluated (Architecture §1.2), so values are
     # returned directly. The shape is forward-compatible with a future
     # server-validated pick endpoint.
+
+
+class DevFlagRequest(BaseModel):
+    """Flag (or unflag) a question from the dev proofreading tool. Identified by
+    its text, which is the stable key across the boot-time bank reseed."""
+    question_string: str
+    flagged: bool = True
+    note: str | None = None   # optional reason, e.g. "too obscure"
+
+
+class DevFlagResponse(BaseModel):
+    question_string: str
+    flagged: bool
+    flagged_count: int   # total flags now in the review queue

@@ -199,6 +199,19 @@ CREATE TABLE IF NOT EXISTS analytics_events (
 CREATE INDEX IF NOT EXISTS idx_analytics_created ON analytics_events (created_at);
 CREATE INDEX IF NOT EXISTS idx_analytics_event   ON analytics_events (event);
 CREATE INDEX IF NOT EXISTS idx_analytics_anon    ON analytics_events (anon_id);
+
+-- Dev-only review queue: questions a maintainer flags as "don't like" from the
+-- proofreading tool, so they can be revisited/removed from the committed bank
+-- later (see scripts/curate_questions.py). Keyed by question_string (NOT the
+-- production_trivia_questions UUID) because the bank is dropped and reseeded with
+-- fresh UUIDs on every boot, while the question text is the stable identity. Kept
+-- OUTSIDE reset_db()'s drop list for exactly that reason — a flag must outlive the
+-- reseed. This is maintainer metadata, never served to players.
+CREATE TABLE IF NOT EXISTS dev_flagged_questions (
+    question_string TEXT PRIMARY KEY,
+    note            TEXT,
+    created_at      TEXT DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 
