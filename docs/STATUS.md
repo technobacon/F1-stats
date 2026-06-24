@@ -33,9 +33,10 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
 ## Current state (shipped)
 
 ### Game
-- **Daily General Challenge** — 6 questions across all of F1 history.
-- **Daily Race Challenge** — 6 questions on teams, circuits and race-day feats.
-- **Hardcore** — 3 brutal questions, no slider (type-only).
+- **Daily Challenge** — 6 questions drawn from one general bank spanning all of
+  F1 history (drivers, teams, circuits and race-day feats). The separate Race
+  Challenge has been merged back into this general bank for now; the race-week
+  framework will be revisited later.
 - **Free Practice** — endless single questions with an anti-scouting penalty;
   non-competitive, **never recorded** (no totals/leaderboard write).
 - **Arcade Over/Under** — endless "who has more?" head-to-heads, streak-based.

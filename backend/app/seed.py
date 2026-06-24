@@ -906,7 +906,7 @@ def run_validation_pipeline(
                 q.get("display_min"),
                 q.get("display_max"),
                 q.get("difficulty_weight", 1.0),
-                q.get("game_mode", "daily"),
+                _normalize_game_mode(q.get("game_mode", "daily")),
                 _era_year(q.get("validation_parameters", {})),
                 today,
             ),
@@ -1031,10 +1031,15 @@ def export_arcade(conn: sqlite3.Connection, out_path=None, min_starts: int = 40)
     return {"drivers": len(drivers), "path": str(out)}
 
 
-# Hardcore (one_shot) was retired as a game mode; its validated questions now
-# serve the Daily Race Challenge. Normalise any legacy tag on load so an older
-# committed bank never reintroduces the retired mode into the served data model.
-RETIRED_GAME_MODES = {"one_shot": "race_week"}
+# Modes folded back into the single general bank, normalised on load so neither a
+# legacy committed bank nor the generator's race-week tags reintroduce a separate
+# served mode:
+#   * one_shot  — the retired Hardcore mode.
+#   * race_week — the Daily Race Challenge, merged into the general Daily bank "for
+#     now"; the generator still tags these questions race_week so the race-week
+#     framework can be revived later by dropping this mapping.
+# The Daily Challenge and Free Practice both draw from the resulting unified bank.
+RETIRED_GAME_MODES = {"one_shot": "daily", "race_week": "daily"}
 
 
 def _normalize_game_mode(mode: str) -> str:

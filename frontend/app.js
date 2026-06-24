@@ -75,14 +75,9 @@ document.addEventListener("visibilitychange", () => {
 /* ---- Mode metadata ---- */
 const MODES = {
   daily: {
-    title: "Daily General Challenge",
-    desc: "Six questions spanning all of F1 history. The closer your guess, the more of the 5,000 points per question you keep.",
-    capKey: () => utcDate(), capLabel: "today's Daily General Challenge", slider: true,
-  },
-  race_week: {
-    title: "Daily Race Challenge",
-    desc: "Six questions on teams, circuits and race-day feats from across the eras. The closer your guess, the bigger the score.",
-    capKey: () => utcDate(), capLabel: "today's Daily Race Challenge", slider: true,
+    title: "Daily Challenge",
+    desc: "Six questions spanning all of F1 history — drivers, teams, circuits and race-day feats. The closer your guess, the more of the 5,000 points per question you keep.",
+    capKey: () => utcDate(), capLabel: "today's Daily Challenge", slider: true,
   },
   free_practice: {
     title: "Free Practice",
@@ -1772,7 +1767,9 @@ function handleDeepLink() {
   const play = new URLSearchParams(location.search).get("play");
   if (!play) return false;
   const map = {
-    daily: ["quiz", "daily"], race: ["quiz", "race_week"],
+    // 'race' is a legacy deep link: the Race Challenge was merged into the
+    // general Daily bank, so old shared links now open the Daily Challenge.
+    daily: ["quiz", "daily"], race: ["quiz", "daily"],
     practice: ["quiz", "free_practice"], arcade: ["arcade", null],
   };
   const dest = map[play];

@@ -93,7 +93,7 @@ def test_unknown_token_404(client):
     assert r.status_code == 404
 
 
-@pytest.mark.parametrize("mode,count", [("daily", 6), ("race_week", 6)])
+@pytest.mark.parametrize("mode,count", [("daily", 6)])
 def test_all_modes_serve_and_hide_answers(client, mode, count):
     r = client.get(f"/api/v1/quiz/{mode}")
     assert r.status_code == 200
@@ -102,6 +102,15 @@ def test_all_modes_serve_and_hide_answers(client, mode, count):
     assert len(body["questions"]) == count
     for q in body["questions"]:
         assert "actual" not in q and "verified_answer" not in q
+
+
+def test_race_week_mode_merged_into_daily(client):
+    # The separate Race Challenge was folded back into the general Daily bank:
+    # its mode is no longer served, and legacy race_week questions load as daily.
+    assert "race_week" not in service.MODE_QUESTION_COUNT
+    assert client.get("/api/v1/quiz/race_week").status_code == 404
+    modes = {q["game_mode"] for q in client.get("/api/v1/dev/questions").json()["questions"]}
+    assert modes == {"daily"}
 
 
 def test_unknown_mode_404(client):

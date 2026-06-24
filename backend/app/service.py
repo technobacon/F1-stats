@@ -67,8 +67,11 @@ ARCADE_METRICS = {
     "dnfs": "DNFs",
 }
 
-# Per-mode session size (PRD §4.1). The competitive daily sets are six questions each.
-MODE_QUESTION_COUNT = {"daily": 6, "race_week": 6}
+# Per-mode session size (PRD §4.1). The Daily Challenge is six questions drawn
+# from the single general bank. (The separate race_week set was merged back into
+# the general bank for now — see seed.RETIRED_GAME_MODES — and will return when the
+# race-week framework is revisited.)
+MODE_QUESTION_COUNT = {"daily": 6}
 
 # Free Practice: an unlimited, non-competitive training mode. Questions are drawn
 # one at a time at random and the score is NEVER recorded — verify() looks for

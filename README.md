@@ -139,7 +139,7 @@ docs/               # original design documents
 | Method | Path | Notes |
 |---|---|---|
 | `GET`  | `/api/v1/health` | liveness + active question count |
-| `GET`  | `/api/v1/quiz/{mode}` | `daily` (6) / `race_week` (6); tracking tokens, **no answers** |
+| `GET`  | `/api/v1/quiz/{mode}` | `daily` (6) from the general bank; tracking tokens, **no answers** |
 | `GET`  | `/api/v1/practice/question` | one **random** Free Practice question; unlimited, non-competitive, **no answers** |
 | `POST` | `/api/v1/quiz/verify` | `{tracking_token, guess, anon_id?}` → server-side score; also **records** the scored result (to the signed-in user, or to `anon_id` for a guest) — **except Free Practice**, which is never recorded |
 | `GET`  | `/api/v1/arcade/pair` | over/under matchup (non-competitive v1) |
@@ -159,7 +159,7 @@ docs/               # original design documents
 | `POST` | `/api/v1/dev/flag` | flag/unflag a question (by text) for later review — the 🚩 button in "Check the data"; same `F1_DEV_TOOLS` gate |
 | `GET`  | `/api/v1/dev/flags` | the dev review queue (every flagged question); feeds a follow-up cull via `scripts/curate_questions.py` |
 
-The daily/race-week/one-shot selection is **deterministic per period** (seeded by
+The daily selection is **deterministic per period** (seeded by
 mode + UTC date), so everyone gets the same set within a period and it rotates —
 the prototype's stand-in for the 00:00 UTC cron provisioning (Architecture §1.1).
 
@@ -241,8 +241,8 @@ boundary.
 
 ## Implemented systems
 
-- Polished landing page + two exact-numerical modes (Daily General / Daily Race)
-  + unlimited **Free Practice** (non-competitive, never recorded, with a
+- Polished landing page + the exact-numerical **Daily Challenge** (one general
+  bank) + unlimited **Free Practice** (non-competitive, never recorded, with a
   10-second anti-scouting team penalty on low scores) + Arcade Over/Under
   (matchups biased toward close, within-30% calls)
 - Server-authoritative exp-decay scoring; answers never leave the server

@@ -52,7 +52,6 @@
     <nav class="modes" id="modes">
       <button class="mode-tab active" data-view="home">Home</button>
       <button class="mode-tab" data-view="quiz" data-mode="daily">Daily</button>
-      <button class="mode-tab" data-view="quiz" data-mode="race_week">Race</button>
       <button class="mode-tab" data-view="quiz" data-mode="free_practice">Free Practice</button>
       <button class="mode-tab" data-view="arcade">Arcade</button>
       <button class="mode-tab" data-view="profile">Profile</button>
@@ -137,17 +136,9 @@
       <div class="mode-grid">
         <button class="mode-card" data-view="quiz" data-mode="daily">
           <span class="mc-icon">🏁</span>
-          <h3>Daily General Challenge</h3>
-          <p>Six questions spanning all of F1 history — wins, poles, points, comebacks and more.
-             One run a day. How close can you get?</p>
-          <span class="mc-cta">Play now →</span>
-        </button>
-
-        <button class="mode-card" data-view="quiz" data-mode="race_week">
-          <span class="mc-icon">🏎️</span>
-          <h3>Daily Race Challenge</h3>
-          <p>Six questions themed around teams, circuits and race-day feats. Sharpen up
-             before lights out.</p>
+          <h3>Daily Challenge</h3>
+          <p>Six questions spanning all of F1 history — drivers, teams, circuits and
+             race-day feats. One run a day. How close can you get?</p>
           <span class="mc-cta">Play now →</span>
         </button>
 
@@ -387,7 +378,6 @@
         <select id="data-mode-filter">
           <option value="">All modes</option>
           <option value="daily">daily</option>
-          <option value="race_week">race-week</option>
         </select>
         <label class="data-flag-filter"><input type="checkbox" id="data-flagged-only" /> Flagged only</label>
         <button class="btn-ghost data-close" id="data-close">✕ Close</button>

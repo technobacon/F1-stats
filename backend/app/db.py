@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS production_trivia_questions (
     display_min       REAL,                        -- optional slider bounds (year/percentage)
     display_max       REAL,
     difficulty_weight REAL DEFAULT 1.0,
-    game_mode         TEXT NOT NULL,               -- 'daily','race_week' (legacy 'one_shot' retired -> race_week)
+    game_mode         TEXT NOT NULL,               -- 'daily' (legacy 'one_shot'/'race_week' folded into 'daily' on load)
     era_year          INTEGER,                     -- representative year (mid-span) for era-biased serving
     is_active         INTEGER DEFAULT 1,
     scheduled_date    TEXT,                        -- ISO date for cron rotations
