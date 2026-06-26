@@ -25,14 +25,17 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="GridMaster" />
   <link rel="apple-touch-icon" href="/static/icon-180.png" />
-  <link rel="icon" href="/static/icon-180.png" />
+  <!-- Crisp vector favicon (the brand mark); PNG stays as the Safari fallback. -->
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="icon" type="image/png" href="/static/icon-180.png" />
 
-  <!-- Titillium Web: the open-source typeface F1 used across its own web properties -->
+  <!-- Type pairing: Titillium Web (F1's own brand typeface) for UI + headings,
+       JetBrains Mono for data/labels — the timing-board half of the system. -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=19" />
+  <link rel="stylesheet" href="/static/style.css?v=20" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -46,7 +49,7 @@
           <path d="M16 82 L31 25 L69 25 L84 82" fill="none" stroke="currentColor"
                 stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-      </span><span class="brand-word">GRIDMASTER</span>
+      </span><span class="brand-word">GRID<span class="bw-accent">MASTER</span></span>
     </a>
 
     <nav class="modes" id="modes">
@@ -64,11 +67,11 @@
       </div>
       <button id="sound-toggle" class="sound-toggle" title="Sound on — click to mute"
               aria-pressed="true" aria-label="Toggle sound effects">
-        <span class="sound-icon" id="sound-icon" aria-hidden="true">🔊</span>
+        <span class="sound-icon" id="sound-icon" data-icon="volume-2" aria-hidden="true"></span>
       </button>
       <button id="theme-toggle" class="sound-toggle theme-toggle" title="Dark mode — click for light"
               aria-pressed="false" aria-label="Toggle light or dark theme">
-        <span class="theme-icon" id="theme-icon" aria-hidden="true">☾</span>
+        <span class="theme-icon" id="theme-icon" data-icon="moon" aria-hidden="true"></span>
       </button>
       <button id="team-select-btn" class="team-select-btn" title="Change team colour theme" aria-haspopup="dialog">
         <span class="team-btn-swatch" id="team-btn-swatch"></span>
@@ -151,7 +154,7 @@
       <h2 class="section-title">Choose your challenge</h2>
       <div class="mode-grid">
         <button class="mode-card" data-view="quiz" data-mode="daily">
-          <span class="mc-icon">🏁</span>
+          <span class="mc-icon" data-icon="flag" aria-hidden="true"></span>
           <h3>Daily Challenge</h3>
           <p>Six questions spanning all of F1 history — drivers, teams, circuits and
              race-day feats. One run a day. How close can you get?</p>
@@ -159,7 +162,7 @@
         </button>
 
         <button class="mode-card" data-view="quiz" data-mode="free_practice">
-          <span class="mc-icon">🛞</span>
+          <span class="mc-icon" data-icon="tyre" aria-hidden="true"></span>
           <h3>Free Practice</h3>
           <p>Unlimited random questions to sharpen your instincts. Your score shows here
              but is never saved or ranked — just practice, for fun.</p>
@@ -167,7 +170,7 @@
         </button>
 
         <button class="mode-card" data-view="arcade">
-          <span class="mc-icon">⚡</span>
+          <span class="mc-icon" data-icon="zap" aria-hidden="true"></span>
           <h3>Arcade</h3>
           <p>Endless "who has more?" head-to-heads between drivers. No timer, no cap — just
              build the longest streak you can.</p>
@@ -270,7 +273,7 @@
         <p class="reveal-insight hidden" id="reveal-insight"></p>
         <p class="penalty-note hidden" id="practice-penalty"></p>
         <button class="btn-primary" id="next-question">Next</button>
-        <button class="btn-ghost data-check-inline" id="data-check-reveal" title="Browse every question with its verified answer">🔍 Check the stats</button>
+        <button class="btn-ghost data-check-inline" id="data-check-reveal" title="Browse every question with its verified answer"><i class="ic" data-icon="search" aria-hidden="true"></i> Check the stats</button>
       </div>
 
       <!-- Finish summary -->
@@ -284,7 +287,7 @@
         <p class="summary-insight hidden" id="summary-insight"></p>
         <div class="ad-slot ad-summary" data-ad="summary-display">ad · summary display</div>
         <button class="btn-primary" id="share-result">Share Result</button>
-        <button class="btn-secondary" id="challenge-friend">🏎️ Challenge a friend</button>
+        <button class="btn-secondary" id="challenge-friend"><i class="ic" data-icon="car" aria-hidden="true"></i> Challenge a friend</button>
         <button class="btn-secondary" id="summary-back">Back to Modes</button>
         <p class="muted" id="share-status"></p>
       </div>
@@ -389,7 +392,7 @@
   <footer class="foot">
     GridMaster · a fan-made Formula 1 trivia game · not affiliated with Formula 1
     <span class="data-status" id="data-status" aria-live="polite"></span>
-    <button class="data-check-btn" id="data-check" title="Development tool: browse every question and its verified answer">📋 Check the data</button>
+    <button class="data-check-btn" id="data-check" title="Development tool: browse every question and its verified answer"><i class="ic" data-icon="clipboard" aria-hidden="true"></i> Check the data</button>
   </footer>
 
   <!-- Dev-only proofreading overlay: the full question bank WITH answers,
@@ -472,7 +475,8 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/sound.js?v=19"></script>
-  <script src="/static/app.js?v=19"></script>
+  <script src="/static/icons.js?v=20"></script>
+  <script src="/static/sound.js?v=20"></script>
+  <script src="/static/app.js?v=20"></script>
 </body>
 </html>

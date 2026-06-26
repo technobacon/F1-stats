@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- GridMaster favicon: the brand mark (an unclaimed grid spot — a square seen
+     from a slight top-down angle with its near side left open) on the app's
+     dark surface. Vector, so it stays crisp at every size. The orange matches
+     the default (McLaren) theme; the UI itself recolours per team at runtime. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <rect width="100" height="100" rx="22" fill="#0a0d12"/>
+  <path d="M16 82 L31 25 L69 25 L84 82" fill="none" stroke="#FF8000"
+        stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

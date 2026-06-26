@@ -1,12 +1,23 @@
 # Project status & roadmap
 
-_Last updated: 2026-06-16_
+_Last updated: 2026-06-26_
 
 A snapshot of where **GridMaster** is, how it fits together, and what could
 come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
 engineering handoff. For question design see [`question-types.md`](./question-types.md).
 
-> **Latest work (feel like home):** a personalized **"your garage"** home for
+> **Latest work (design-system pass):** a formal brand/visual-identity layer —
+> a documented `:root` **design-token** system (neutral ramp, type scale, radii,
+> elevation, motion), a real **type pairing** (Titillium Web for UI + headings,
+> **JetBrains Mono** for the timing-board data/labels), a dependency-free inline
+> **SVG icon set** (`frontend/icons.js`) replacing the UI-chrome emoji, flatter
+> surfaces (gradients pared back to flat tokens + accent stripes), a consistent
+> keyboard focus ring, and a crisp vector **favicon** (`frontend/favicon.svg`).
+> The Wordle share-grid squares and achievement-badge medallions intentionally
+> stay emoji (the share squares must survive as plain text; bespoke badge art is
+> its own pass).
+>
+> **Earlier (feel like home):** a personalized **"your garage"** home for
 > signed-in players (global rank + day-over-day movement, personal Constructors'
 > Championship stake + within-team board, closest-badge progress, a streak
 > heatmap, last-Daily percentile), an opt-in **local streak reminder** (root-scope

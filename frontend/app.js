@@ -481,7 +481,7 @@ function startPracticePenalty(score) {
   note.classList.remove("hidden");
   const paint = () => {
     note.innerHTML =
-      `🏴 <strong>${PRACTICE_PENALTY_SECONDS} SECONDS PENALTY TO ${escapeHtml(teamName.toUpperCase())}.</strong> ` +
+      `${Icons.svg("flag")} <strong>${PRACTICE_PENALTY_SECONDS} SECONDS PENALTY TO ${escapeHtml(teamName.toUpperCase())}.</strong> ` +
       `You scored under ${PRACTICE_PENALTY_THRESHOLD.toLocaleString()} points, so the stewards ` +
       `hold you on the grid for ${remaining}s. This is necessary to discourage ` +
       `<em>quiz-scouting</em> — guessing wildly just to reveal and memorise answers — ` +
@@ -907,7 +907,7 @@ function renderSummaryEngagement() {
   const streakEl = document.getElementById("summary-streak");
   if (streakEl) {
     if (currentMode === "daily" && state.daily_streak > 0) {
-      streakEl.innerHTML = `<span class="flame">🔥</span> <strong>${state.daily_streak}-day streak!</strong>` +
+      streakEl.innerHTML = `<span class="flame">${Icons.svg("flame")}</span> <strong>${state.daily_streak}-day streak!</strong>` +
         ` <span class="muted">Come back tomorrow to keep it alive.</span>`;
       streakEl.classList.remove("hidden");
     } else {
@@ -918,7 +918,7 @@ function renderSummaryEngagement() {
   if (insEl) {
     if (sessionInsights.length) {
       const avg = Math.round(sessionInsights.reduce((a, b) => a + b, 0) / sessionInsights.length);
-      insEl.innerHTML = `📊 You beat <strong>${avg}%</strong> of players on average today.`;
+      insEl.innerHTML = `${Icons.svg("chart")} You beat <strong>${avg}%</strong> of players on average today.`;
       insEl.classList.remove("hidden");
       // Stash it so the home "garage" can echo it back next visit ("Last Daily…").
       if (currentMode === "daily") {
@@ -1079,8 +1079,8 @@ function renderStreakBanner() {
   if (!n || n < 1) { el.classList.add("hidden"); return; }
   const playedToday = isCapped("daily");
   el.innerHTML = playedToday
-    ? `<span class="flame">🔥</span> <span><strong>${n}-day streak</strong> secured — see you tomorrow!</span>`
-    : `<span class="flame">🔥</span> <span><strong>${n}-day streak</strong> — play today's Daily to keep it alive</span>`;
+    ? `<span class="flame">${Icons.svg("flame")}</span> <span><strong>${n}-day streak</strong> secured — see you tomorrow!</span>`
+    : `<span class="flame">${Icons.svg("flame")}</span> <span><strong>${n}-day streak</strong> — play today's Daily to keep it alive</span>`;
   el.classList.remove("hidden");
 }
 
@@ -1311,13 +1311,13 @@ async function renderGarage() {
     ? `Welcome back, ${escapeHtml(name)}`
     : `Your garage`;
   const streakBit = streak > 0
-    ? ` <span class="g-flame">🔥 ${streak}-day streak</span>` : "";
+    ? ` <span class="g-flame">${Icons.svg("flame")} ${streak}-day streak</span>` : "";
   const sub = signedIn
     ? `Racing for ${escapeHtml(team.name)}.`
     : `Sign in to save your progress, back a constructor and climb the boards.`;
   const last = state.last_daily_percentile;
   const lastBit = (last && last.pct != null)
-    ? `<p class="g-last">📊 Last Daily — you beat <strong>${last.pct}%</strong> of players.</p>` : "";
+    ? `<p class="g-last">${Icons.svg("chart")} Last Daily — you beat <strong>${last.pct}%</strong> of players.</p>` : "";
 
   // Card shells (rank + team fill in async; badges + heatmap are local/instant).
   el.innerHTML = `
@@ -1343,7 +1343,7 @@ async function renderGarage() {
     ${lastBit}
     <div class="g-heatwrap">
       <div class="g-heat-head"><span class="g-card-label">Daily streak history</span>
-        <button class="g-remind ${remindEnabled() ? "on" : ""}" id="g-remind" title="Streak reminder">🔔 ${remindEnabled() ? "Reminders on" : "Remind me"}</button></div>
+        <button class="g-remind ${remindEnabled() ? "on" : ""}" id="g-remind" title="Streak reminder">${Icons.svg("bell")} ${remindEnabled() ? "Reminders on" : "Remind me"}</button></div>
       <div class="heatmap" id="garage-heatmap"></div>
     </div>`;
 
@@ -1931,7 +1931,7 @@ function renderAchievements() {
   grid.innerHTML = list.length ? list.map((a) => {
     const got = unlocked.has(a.id);
     return `<div class="ach-card tier-${a.tier} ${got ? "got" : "locked"}" title="${escapeHtml(a.desc)}">
-        <span class="ach-icon">${got ? a.icon : "🔒"}</span>
+        <span class="ach-icon">${got ? a.icon : Icons.svg("lock")}</span>
         <span class="ach-body">
           <span class="ach-name">${escapeHtml(a.name)}</span>
           <span class="ach-desc">${escapeHtml(a.desc)}</span>
@@ -1973,7 +1973,7 @@ const DataCheck = (() => {
     });
     const flagged = rows.filter((r) => r.flagged).length;
     document.getElementById("data-count").textContent =
-      `${view.length} / ${rows.length}${flagged ? ` · ${flagged} 🚩` : ""}`;
+      `${view.length} / ${rows.length}${flagged ? ` · ${flagged} ${Icons.svg("flag")}` : ""}`;
     document.getElementById("data-rows").innerHTML = view.map((r) => `
       <tr class="${r.flagged ? "dt-flagged" : ""}">
         <td class="dt-q">${esc(r.question_string)}</td>
@@ -1985,7 +1985,7 @@ const DataCheck = (() => {
         <td><button class="dt-flag-btn ${r.flagged ? "on" : ""}"
               data-q="${esc(r.question_string)}"
               title="${r.flagged ? "Flagged — click to clear" : "Flag for review"}"
-              aria-pressed="${r.flagged}">🚩</button></td>
+              aria-pressed="${r.flagged}">${Icons.svg("flag")}</button></td>
       </tr>`).join("");
     document.querySelectorAll(".data-table th").forEach((th) => {
       th.classList.toggle("sorted", th.dataset.sort === sortKey);
@@ -2083,7 +2083,7 @@ const SoundToggle = (() => {
     const icon = document.getElementById("sound-icon");
     if (!btn || !icon) return;
     const on = Sound.isOn();
-    icon.textContent = on ? "🔊" : "🔇";
+    icon.innerHTML = Icons.svg(on ? "volume-2" : "volume-x");
     btn.setAttribute("aria-pressed", String(on));
     btn.classList.toggle("muted", !on);
     btn.title = on ? "Sound on — click to mute" : "Sound off — click to enable";
@@ -2114,7 +2114,7 @@ const ThemeToggle = (() => {
     const icon = document.getElementById("theme-icon");
     if (!btn || !icon) return;
     const light = theme === "light";
-    icon.textContent = light ? "\u2600" : "\u263e";   // ☀ / ☾
+    icon.innerHTML = Icons.svg(light ? "sun" : "moon");
     btn.setAttribute("aria-pressed", String(light));
     btn.title = light ? "Light mode \u2014 click for dark" : "Dark mode \u2014 click for light";
   }
