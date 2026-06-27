@@ -16,6 +16,8 @@ Endpoints:
     GET  /api/v1/health              -> liveness + question count
     GET  /sw.js                      -> service worker (root scope, local reminders)
     GET  /                           -> static prototype frontend
+    *    (404)                       -> branded HTML page for browser navigations,
+                                        plain JSON for API clients
 
 The verified answer is computed/stored server-side and only returned AFTER a
 guess is submitted — never in the question payload.
@@ -27,8 +29,8 @@ import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, Header, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import analytics, auth, db, etl, seed, service
@@ -558,6 +560,25 @@ def service_worker():
 @app.get("/")
 def index():
     return FileResponse(FRONTEND_DIR / "index.html")
+
+
+@app.exception_handler(404)
+async def not_found(request: Request, exc: HTTPException):
+    """A branded 404 for stray browser navigations; JSON for everything else.
+
+    Only a real browser page request (Accept: text/html on a non-API path) gets
+    the styled page — API clients and the test suite keep the plain JSON body, so
+    the trust boundary and error contracts are untouched."""
+    wants_html = "text/html" in request.headers.get("accept", "")
+    if wants_html and not request.url.path.startswith("/api"):
+        page = FRONTEND_DIR / "404.html"
+        if page.exists():
+            return HTMLResponse(page.read_text(encoding="utf-8"), status_code=404)
+    return JSONResponse(
+        {"detail": getattr(exc, "detail", "Not Found")},
+        status_code=404,
+        headers=getattr(exc, "headers", None),
+    )
 
 
 # Serve the rest of the static prototype frontend (css/js).

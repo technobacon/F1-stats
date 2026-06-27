@@ -3,6 +3,9 @@
  * Scoring is NEVER computed here — guesses go to the server, which returns the score. */
 
 const API = "/api/v1";
+// Build identifier, surfaced in the footer as a real "this is shipped software"
+// signal. Bump alongside the asset version when cutting a release.
+const APP_VERSION = "2026.06.27";
 // NOTE: these localStorage keys keep the legacy "f1statguesser_" prefix on
 // purpose — the product is now GridMaster, but renaming the keys would orphan
 // every existing player's saved progress, session and guest id. Leave them.
@@ -342,6 +345,14 @@ document.querySelectorAll("[data-view]").forEach((el) => {
   el.addEventListener("click", (e) => {
     e.preventDefault();
     navigate(el.dataset.view, el.dataset.mode);
+    // Footer links deep-link into the About page: after navigating, bring the
+    // requested section into view (honouring reduced motion).
+    const anchor = el.dataset.scroll;
+    if (anchor && anchor !== "about-top") {
+      const target = document.getElementById(anchor);
+      if (target) target.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+    }
   });
 });
 
@@ -2183,6 +2194,8 @@ document.querySelectorAll(".tt-period-tab").forEach((t) =>
 loadHomeTower();
 renderGarage();
 loadDataStatus();
+{ const verEl = document.getElementById("app-version");
+  if (verEl) verEl.textContent = `Build ${APP_VERSION}`; }
 document.querySelectorAll(".ach-filter-tab").forEach((t) =>
   t.addEventListener("click", () => setAchFilter(t.dataset.filter)));
 renderAchievements();

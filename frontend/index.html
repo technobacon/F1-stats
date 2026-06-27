@@ -20,7 +20,7 @@
 
   <!-- PWA / iOS add-to-home-screen -->
   <link rel="manifest" href="/static/manifest.json" />
-  <meta name="theme-color" content="#FF8700" />
+  <meta name="theme-color" content="#FF8000" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="GridMaster" />
@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=23" />
+  <link rel="stylesheet" href="/static/style.css?v=24" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -387,10 +387,118 @@
         <p class="muted">Which fanbase is the smartest? Pick your team to add your points to its tally.</p>
       </div>
     </section>
+
+    <!-- ===================== ABOUT / METHODOLOGY ===================== *
+         The trust layer: what the game is, how scoring works, where the data
+         comes from and how every answer is verified, and the privacy posture.
+         Footer links deep-link to the sections by id. -->
+    <section id="view-about" class="view">
+      <div id="about-top" class="about-hero">
+        <p class="hero-eyebrow">About</p>
+        <h1 class="section-title about-title">How GridMaster works</h1>
+        <p class="about-lead">A daily Formula 1 stats game built on real, verified data —
+           no trivia scraped from forums, no answers a model made up. Here's exactly how
+           it's put together.</p>
+      </div>
+
+      <div class="card about-card" id="about-play">
+        <h2>The game</h2>
+        <p>Every question asks for a single number — career wins, pole positions, points in
+           a season — and you're scored on <strong>how close</strong> you get, not just
+           right or wrong. Three ways to play:</p>
+        <ul class="about-list">
+          <li><strong>Daily Challenge</strong> — six questions, the same set for everyone,
+              once a day. This is the ranked, competitive mode.</li>
+          <li><strong>Free Practice</strong> — endless single questions to warm up. Never
+              recorded and never ranked, with a short delay after a wild guess so the bank
+              can't be farmed for answers.</li>
+          <li><strong>Arcade Over/Under</strong> — endless "who has more?" head-to-heads,
+              played for a streak.</li>
+        </ul>
+      </div>
+
+      <div class="card about-card" id="about-scoring">
+        <h2>How scoring works</h2>
+        <p>Each question is worth up to <strong>5,000 points</strong>. The score follows an
+           <strong>exponential-decay curve</strong> on your percentage error: a perfect guess
+           banks the full amount, and points fall away the further off you are — gently at
+           first, then steeply. Land within 10% and you've nailed a <em>purple sector</em>;
+           within 25% is a <em>green</em> one.</p>
+        <p>Your guess never leaves your device until you lock it in, and the answer is only
+           revealed afterwards — scoring happens <strong>on the server</strong>, so leaderboard
+           totals can't be forged by the client.</p>
+      </div>
+
+      <div class="card about-card" id="about-data">
+        <h2>Where the data comes from</h2>
+        <p>Questions are generated from the <strong>Jolpica/Ergast</strong> Formula 1 dataset,
+           which covers every World Championship round from <strong>1950 to today</strong>. The
+           site ships a committed snapshot of that data, so it loads instantly and works with
+           no live API calls.</p>
+        <p>The mix leans modern — more questions from the hybrid era (2014+) — with a deliberate
+           boost for the Senna/Prost and Schumacher generations, and older eras turning up now
+           and then.</p>
+      </div>
+
+      <div class="card about-card" id="about-verify">
+        <h2>How every answer is verified</h2>
+        <p>This is the part most trivia games skip. <strong>No answer is hand-written or taken
+           on trust.</strong> Before a question can ship, the answer is <strong>recomputed from
+           the underlying race data</strong> by a validation step — if the computed number
+           doesn't match, the question is thrown out. That gate is the whole point: it's what
+           keeps a wrong or hallucinated stat from ever reaching you.</p>
+        <p>Spotted something that still looks off? Every question can be flagged from the in-app
+           data tool so it can be reviewed.</p>
+      </div>
+
+      <div class="card about-card" id="about-privacy">
+        <h2>Privacy</h2>
+        <p>GridMaster is <strong>guest-first</strong>: you can play straight away with everything
+           kept in your browser's local storage — no account, no tracking that follows you
+           around.</p>
+        <ul class="about-list">
+          <li><strong>Accounts are optional.</strong> If you create one, passwords are stored
+              salted and hashed (PBKDF2), never in the clear.</li>
+          <li><strong>Email is optional</strong> and only used for the streak reminders you opt
+              into — nothing else.</li>
+          <li><strong>Analytics are pseudonymous and aggregate.</strong> They measure how the
+              game is used in total and <em>never</em> feed your score or leaderboard position.</li>
+          <li><strong>Reminders are local.</strong> The streak nudge runs in your browser; there
+              is no push server collecting subscriptions.</li>
+        </ul>
+      </div>
+
+      <div class="card about-card" id="about-feedback">
+        <h2>Contact &amp; feedback</h2>
+        <p>GridMaster is a fan-made project, not affiliated with Formula 1. Found a bug, a wrong
+           answer, or have an idea? The code and issue tracker live on
+           <a class="about-link" href="https://github.com/technobacon/f1-stats" target="_blank"
+              rel="noopener">GitHub</a> — that's the best place to reach the project and to see
+           what's changed.</p>
+        <p class="about-disclaimer">F1, FORMULA 1 and related marks are trademarks of Formula
+           One Licensing BV. This site is unofficial and is not associated in any way with the
+           Formula 1 companies.</p>
+      </div>
+    </section>
   </main>
 
   <footer class="foot">
-    GridMaster · a fan-made Formula 1 trivia game · not affiliated with Formula 1
+    <nav class="foot-links" aria-label="About GridMaster">
+      <button class="foot-link" data-view="about" data-scroll="about-top">About</button>
+      <span class="foot-sep" aria-hidden="true">·</span>
+      <button class="foot-link" data-view="about" data-scroll="about-scoring">How scoring works</button>
+      <span class="foot-sep" aria-hidden="true">·</span>
+      <button class="foot-link" data-view="about" data-scroll="about-verify">How answers are verified</button>
+      <span class="foot-sep" aria-hidden="true">·</span>
+      <button class="foot-link" data-view="about" data-scroll="about-privacy">Privacy</button>
+      <span class="foot-sep" aria-hidden="true">·</span>
+      <button class="foot-link" data-view="about" data-scroll="about-feedback">Contact</button>
+    </nav>
+    <p class="foot-legal">
+      GridMaster · a fan-made Formula 1 trivia game, not affiliated with Formula 1®
+      <span class="foot-sep" aria-hidden="true">·</span>
+      <span class="foot-version" id="app-version"></span>
+    </p>
     <span class="data-status" id="data-status" aria-live="polite"></span>
     <button class="data-check-btn" id="data-check" title="Development tool: browse every question and its verified answer"><i class="ic" data-icon="clipboard" aria-hidden="true"></i> Check the data</button>
   </footer>
@@ -475,8 +583,8 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/icons.js?v=23"></script>
-  <script src="/static/sound.js?v=23"></script>
-  <script src="/static/app.js?v=23"></script>
+  <script src="/static/icons.js?v=24"></script>
+  <script src="/static/sound.js?v=24"></script>
+  <script src="/static/app.js?v=24"></script>
 </body>
 </html>

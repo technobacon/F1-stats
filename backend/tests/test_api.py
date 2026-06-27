@@ -28,6 +28,28 @@ def test_health(client):
     assert r.json()["active_questions"] >= 5
 
 
+def test_404_serves_branded_page_for_browsers(client):
+    """A stray browser navigation gets the styled 404 page, not a bare error."""
+    r = client.get("/no-such-page", headers={"accept": "text/html"})
+    assert r.status_code == 404
+    assert "text/html" in r.headers["content-type"]
+    assert "Back to the grid" in r.text
+
+
+def test_404_stays_json_for_api_clients(client):
+    """API and non-HTML clients keep the plain JSON 404 contract (trust boundary
+    and error shapes are unchanged by the branded-page handler)."""
+    r = client.get("/api/v1/definitely-not-a-route")
+    assert r.status_code == 404
+    assert r.headers["content-type"].startswith("application/json")
+    assert "detail" in r.json()
+
+    # An existing endpoint's own 404 still surfaces its specific JSON detail.
+    r2 = client.get("/api/v1/quiz/bogus-mode")
+    assert r2.status_code == 404
+    assert "Unknown game mode" in r2.json()["detail"]
+
+
 def test_data_status_reports_refresh_date(client):
     r = client.get("/api/v1/data/status")
     assert r.status_code == 200
