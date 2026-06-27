@@ -408,8 +408,8 @@ async function startQuiz() {
     window.scrollTo({ top: 0 });
     renderQuestion();
   } catch (e) {
-    status.textContent = "Could not load quiz. Tap to retry.";
-    toast("Network error — is the server awake?");
+    status.textContent = "Couldn't load the quiz. Tap to retry.";
+    toast("Couldn't reach the server. Check your connection and try again.");
   }
 }
 
@@ -442,7 +442,7 @@ async function startFreePractice() {
     renderQuestion();
   } catch (e) {
     status.textContent = "Could not load a question. Tap to retry.";
-    toast("Network error — is the server awake?");
+    toast("Couldn't reach the server. Check your connection and try again.");
   }
 }
 
@@ -907,8 +907,8 @@ function renderSummaryEngagement() {
   const streakEl = document.getElementById("summary-streak");
   if (streakEl) {
     if (currentMode === "daily" && state.daily_streak > 0) {
-      streakEl.innerHTML = `<span class="flame">${Icons.svg("flame")}</span> <strong>${state.daily_streak}-day streak!</strong>` +
-        ` <span class="muted">Come back tomorrow to keep it alive.</span>`;
+      streakEl.innerHTML = `<span class="flame">${Icons.svg("flame")}</span> <strong>${state.daily_streak}-day streak</strong>` +
+        ` <span class="muted">Back tomorrow to keep it alive.</span>`;
       streakEl.classList.remove("hidden");
     } else {
       streakEl.classList.add("hidden");
@@ -994,7 +994,7 @@ document.getElementById("share-result").addEventListener("click", async () => {
   track("share", { mode: currentMode });
   const a = ensureAch(); a.shares = (a.shares || 0) + 1; saveState(state);
   evaluateAchievements();
-  await shareOrCopy(buildShareText(), "Result copied — paste it to share!");
+  await shareOrCopy(buildShareText(), "Result copied — paste it anywhere to share.");
 });
 
 /* Direct "I dare you" invite — same deep link, framed as a head-to-head challenge
@@ -1007,7 +1007,7 @@ document.getElementById("challenge-friend").addEventListener("click", async () =
             : currentMode === "daily" ? "Daily Challenge" : "GridMaster run";
   const text = `🏁 I just scored ${sessionScore.toLocaleString()} on today's GridMaster ${tag}. ` +
     `Think you can beat me?\n${shareLink()}`;
-  await shareOrCopy(text, "Challenge copied — send it to a friend!");
+  await shareOrCopy(text, "Challenge copied — send it to a friend.");
 });
 
 /* ===================== ARCADE OVER/UNDER ===================== */
@@ -1023,7 +1023,7 @@ async function loadArcade() {
   try {
     const res = await fetch(`${API}/arcade/pair`);
     arcade = await res.json();
-  } catch { toast("Couldn't load matchup."); return; }
+  } catch { toast("Couldn't load the matchup. Try again."); return; }
   document.getElementById("arcade-metric").textContent = `Who has more ${arcade.metric_label}?`;
   a.querySelector(".name").textContent = arcade.entity_a.full_name;
   b.querySelector(".name").textContent = arcade.entity_b.full_name;
@@ -1050,7 +1050,7 @@ function pick(which) {
   achFlag("arcade_played");
   evaluateAchievements();
   document.getElementById("arcade-result").textContent =
-    pickedHigher ? "Correct! Loading next…" : "Streak reset. Loading next…";
+    pickedHigher ? "Correct — next up…" : "Wrong — streak reset. Next up…";
   setTimeout(loadArcade, 1400);
 }
 document.getElementById("arcade-a").addEventListener("click", () => pick("a"));
@@ -1079,7 +1079,7 @@ function renderStreakBanner() {
   if (!n || n < 1) { el.classList.add("hidden"); return; }
   const playedToday = isCapped("daily");
   el.innerHTML = playedToday
-    ? `<span class="flame">${Icons.svg("flame")}</span> <span><strong>${n}-day streak</strong> secured — see you tomorrow!</span>`
+    ? `<span class="flame">${Icons.svg("flame")}</span> <span><strong>${n}-day streak</strong> secured. See you tomorrow.</span>`
     : `<span class="flame">${Icons.svg("flame")}</span> <span><strong>${n}-day streak</strong> — play today's Daily to keep it alive</span>`;
   el.classList.remove("hidden");
 }
@@ -1575,12 +1575,12 @@ const Auth = (() => {
       evaluateAchievements();  // "Contract Signed" + any points-based unlocks from the merge
       close();
       toast(body.claimed_events
-        ? `Welcome, ${body.username}! ${body.claimed_events} guest result${body.claimed_events === 1 ? "" : "s"} saved to your account.`
-        : `Welcome, ${body.username}!`);
+        ? `Signed in as ${body.username} — ${body.claimed_events} guest result${body.claimed_events === 1 ? "" : "s"} saved to your account.`
+        : `Signed in as ${body.username}.`);
       renderProfile();
       renderGarage();
     } catch {
-      showError("Network error — is the server awake?");
+      showError("Couldn't reach the server. Check your connection and try again.");
     } finally {
       btn.disabled = false;
     }
@@ -1710,7 +1710,7 @@ const TeamPicker = (() => {
     if (onboarding) {
       localStorage.setItem(ONBOARD_KEY, "1");
       const name = (TEAMS[team] || {}).name || team;
-      toast(`🏎️ You're racing for ${name}! Your points now feed its championship.`);
+      toast(`Now racing for ${name}. Your points feed its championship.`);
     }
     onboarding = false;
     close();

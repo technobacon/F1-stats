@@ -1,18 +1,25 @@
 # Project status & roadmap
 
-_Last updated: 2026-06-26_
+_Last updated: 2026-06-27_
 
 A snapshot of where **GridMaster** is, how it fits together, and what could
 come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
 engineering handoff. For question design see [`question-types.md`](./question-types.md).
 
-> **Latest work (design-system pass):** a formal brand/visual-identity layer —
-> a documented `:root` **design-token** system (neutral ramp, type scale, radii,
+> **Latest work (professional-polish passes):** three back-to-back design
+> passes to shed the "AI-generated" tells. **(1) Visual identity** — a
+> documented `:root` **design-token** system (neutral ramp, type scale, radii,
 > elevation, motion), a real **type pairing** (Titillium Web for UI + headings,
 > **JetBrains Mono** for the timing-board data/labels), a dependency-free inline
 > **SVG icon set** (`frontend/icons.js`) replacing the UI-chrome emoji, flatter
-> surfaces (gradients pared back to flat tokens + accent stripes), a consistent
-> keyboard focus ring, and a crisp vector **favicon** (`frontend/favicon.svg`).
+> surfaces, a consistent keyboard focus ring, and a vector **favicon**.
+> **(2) Layout & hierarchy** — radii tightened and every hard-coded corner moved
+> onto the `--r-*` tokens, padding/gaps normalized onto the `--sp-*` grid, glass
+> backgrounds made solid (blur kept only on the sticky bar), denser data rows
+> against the airy hero, plus **loading skeletons** and **designed empty states**
+> for the garage cards. **(3) Copy & tone** — a de-exclaimed, F1-broadcast voice:
+> peppy enthusiasm and stray emoji pulled from toasts/banners, and the jokey
+> network-failure line replaced with calm, branded edge-case microcopy.
 > The Wordle share-grid squares and achievement-badge medallions intentionally
 > stay emoji (the share squares must survive as plain text; bespoke badge art is
 > its own pass).
