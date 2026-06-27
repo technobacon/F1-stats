@@ -6,7 +6,7 @@ A snapshot of where **GridMaster** is, how it fits together, and what could
 come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
 engineering handoff. For question design see [`question-types.md`](./question-types.md).
 
-> **Latest work (professional-polish passes):** three back-to-back design
+> **Latest work (professional-polish passes):** four back-to-back design
 > passes to shed the "AI-generated" tells. **(1) Visual identity** — a
 > documented `:root` **design-token** system (neutral ramp, type scale, radii,
 > elevation, motion), a real **type pairing** (Titillium Web for UI + headings,
@@ -20,6 +20,12 @@ engineering handoff. For question design see [`question-types.md`](./question-ty
 > for the garage cards. **(3) Copy & tone** — a de-exclaimed, F1-broadcast voice:
 > peppy enthusiasm and stray emoji pulled from toasts/banners, and the jokey
 > network-failure line replaced with calm, branded edge-case microcopy.
+> **(4) Motion & polish** — every transition consolidated onto one easing curve
+> (`--ease`) and two interaction durations (`--t-fast`/`--t-med`), with the
+> deliberately-weighted reveal animations (the answer car's drive, the score
+> count-up) kept distinct; the per-question and session-total scores now both
+> count up; and a full **`prefers-reduced-motion`** path (CSS clamps motion,
+> the JS count-ups and answer-slide snap to their end state).
 > The Wordle share-grid squares and achievement-badge medallions intentionally
 > stay emoji (the share squares must survive as plain text; bespoke badge art is
 > its own pass).

@@ -336,7 +336,7 @@ function navigate(view, mode) {
   if (view === "arcade") loadArcade();
   if (view === "profile") renderProfile();
   if (view === "home") { renderStreakBanner(); loadHomeTower(); renderGarage(); }
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
   el.addEventListener("click", (e) => {
@@ -751,27 +751,30 @@ function revealScore(q, result) {
 }
 
 function slideToAnswer(node, textEl, targetPct, result) {
+  // Arrived: reveal the answer, run the score odometer, fire the sector cue.
+  const arrive = () => {
+    node.style.left = targetPct + "%";
+    textEl.textContent = result.actual;
+    textEl.classList.remove("pending");
+    textEl.classList.add("revealed");
+    tickOdometer(result.score);
+    renderRevealInsight(result);
+    setVerdict(result);
+    if (result._sector) {
+      // Purple (≤10%) = a whole pack thunders by; green (≤25%) = a single car.
+      Sound.play(result._sector === "purple" ? "purpleSector" : "greenSector");
+    }
+  };
+  // Reduced motion: skip the long slide and land on the answer straight away.
+  if (prefersReducedMotion()) { arrive(); return; }
   const dur = 2600, start = performance.now();
   // Cubic ease-in-out: accelerate away from 0, decelerate into the target.
   const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   (function step(now) {
     const t = Math.min(1, (now - start) / dur);
     node.style.left = targetPct * easeInOut(t) + "%";
-    if (t < 1) {
-      requestAnimationFrame(step);
-    } else {
-      // Arrived: now reveal the answer and run the score odometer.
-      textEl.textContent = result.actual;
-      textEl.classList.remove("pending");
-      textEl.classList.add("revealed");
-      tickOdometer(result.score);
-      renderRevealInsight(result);
-      setVerdict(result);
-      if (result._sector) {
-        // Purple (≤10%) = a whole pack thunders by; green (≤25%) = a single car.
-        Sound.play(result._sector === "purple" ? "purpleSector" : "greenSector");
-      }
-    }
+    if (t < 1) requestAnimationFrame(step);
+    else arrive();
   })(start);
 }
 
@@ -816,14 +819,28 @@ function renderRevealInsight(result) {
   el.classList.remove("hidden");
 }
 
-function tickOdometer(target) {
-  const el = document.getElementById("odometer");
-  const start = performance.now(), dur = 900;
+/* True when the OS "minimize motion" setting is on. Honoured everywhere: the CSS
+ * clamps transitions/animations (see the reduced-motion media query) and the
+ * JS-driven count-ups + answer-slide below snap straight to their end state. */
+function prefersReducedMotion() {
+  return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+
+/* Count an element up to `target` with an ease-out, or snap to it under reduced
+ * motion. Shared by the per-question score odometer and the session total. */
+function countUp(el, target, dur = 900) {
+  if (!el) return;
+  if (prefersReducedMotion()) { el.textContent = Math.round(target).toLocaleString(); return; }
+  const start = performance.now();
   (function step(now) {
     const p = Math.min(1, (now - start) / dur);
     el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))).toLocaleString();
     if (p < 1) requestAnimationFrame(step);
   })(performance.now());
+}
+
+function tickOdometer(target) {
+  countUp(document.getElementById("odometer"), target);
 }
 
 document.getElementById("next-question").addEventListener("click", () => {
@@ -837,7 +854,7 @@ function finishSession() {
   hide("quiz-reveal"); show("quiz-summary");
   Sound.play("sessionComplete");   // chequered-flag fanfare
   const maxPossible = quiz.questions.length * 5000;
-  document.getElementById("summary-score").textContent = sessionScore.toLocaleString();
+  countUp(document.getElementById("summary-score"), sessionScore, 1100);
   const acc = Math.round((sessionCloseness / quiz.questions.length) * 100);
   track("quiz_complete", { mode: currentMode, score: sessionScore, accuracy: acc });
   document.getElementById("accuracy-row").textContent = `Accuracy: ${acc}% · ${sessionScore.toLocaleString()} / ${maxPossible.toLocaleString()}`;
