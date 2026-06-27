@@ -334,6 +334,8 @@ function navigate(view, mode) {
   document.querySelectorAll(".mode-tab").forEach((t) => {
     const match = t.dataset.view === view && (t.dataset.mode || null) === (mode || null);
     t.classList.toggle("active", match);
+    if (match) t.setAttribute("aria-current", "page");
+    else t.removeAttribute("aria-current");
   });
   if (view === "quiz") { currentMode = mode || currentMode; renderQuizIntro(); }
   if (view === "arcade") loadArcade();
@@ -397,7 +399,10 @@ function renderQuizIntro() {
   }
 }
 
-document.getElementById("start-quiz").addEventListener("click", () => startQuiz());
+document.getElementById("start-quiz").addEventListener("click", () => {
+  // First-timers see the scoring-curve explainer; the run starts when they dismiss it.
+  if (!ScoringIntro.maybeShow(() => startQuiz())) startQuiz();
+});
 document.getElementById("replay-quiz").addEventListener("click", () => startQuiz());
 
 async function startQuiz() {
@@ -830,11 +835,20 @@ function renderRevealInsight(result) {
   el.classList.remove("hidden");
 }
 
-/* True when the OS "minimize motion" setting is on. Honoured everywhere: the CSS
- * clamps transitions/animations (see the reduced-motion media query) and the
- * JS-driven count-ups + answer-slide below snap straight to their end state. */
+/* True when motion should be minimized — either the OS "reduce motion" setting is
+ * on, or the player has flipped the in-app override in Settings. Honoured
+ * everywhere: the CSS clamps transitions/animations (see the reduced-motion media
+ * query) and the JS count-ups + answer-slide snap straight to their end state.
+ * The override also drives a `data-reduce-motion` attribute on <html> so the CSS
+ * can react to the in-app choice, not just the system one. */
+const MOTION_KEY = "gm_reduce_motion";
+function motionOverride() { return localStorage.getItem(MOTION_KEY) === "1"; }
 function prefersReducedMotion() {
-  return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  return motionOverride() ||
+    !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+function applyMotionPref() {
+  document.documentElement.toggleAttribute("data-reduce-motion", motionOverride());
 }
 
 /* Count an element up to `target` with an ease-out, or snap to it under reduced
@@ -1525,12 +1539,13 @@ function escapeHtml(s) {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-document.getElementById("reset-btn").addEventListener("click", () => {
+function resetLocalProgress() {
   localStorage.removeItem(STORAGE_KEY);
   ["arcade_streak", "arcade_best", "played_daily", "played_race_week"].forEach((k) => localStorage.removeItem(k));
   state = defaultState(); applyTeam(state.selected_team); saveState(state);
   toast("Local progress reset.");
-});
+}
+document.getElementById("reset-btn").addEventListener("click", resetLocalProgress);
 
 /* ===================== ACCOUNTS ===================== */
 const Auth = (() => {
@@ -2131,7 +2146,7 @@ const SoundToggle = (() => {
     });
     paint();
   }
-  return { init };
+  return { init, refresh: paint };
 })();
 
 /* ---- Theme toggle (dark default / light opt-in) ----
@@ -2174,6 +2189,119 @@ const ThemeToggle = (() => {
   return { init, apply, current };
 })();
 
+/* ===================== SETTINGS ===================== *
+ * A real preferences surface. It doesn't own any state — each row reads and
+ * writes the existing source of truth (Sound, ThemeToggle, the motion + remind
+ * prefs, the team, local progress) and keeps the quick header toggles in sync.
+ * Reuses the modal pattern: backdrop + Escape close, and focus returns to the
+ * gear button afterwards. */
+const Settings = (() => {
+  let lastFocus = null;
+  const setSwitch = (id, on) =>
+    document.getElementById(id)?.setAttribute("aria-checked", String(!!on));
+
+  function paint() {
+    setSwitch("set-sound", Sound.isOn());
+    setSwitch("set-theme", ThemeToggle.current() === "light");
+    setSwitch("set-motion", motionOverride());
+    setSwitch("set-remind", remindEnabled());
+    const tn = document.getElementById("set-team-name");
+    if (tn) tn.textContent = (TEAMS[state.selected_team] || TEAMS.mclaren).name;
+    const ver = document.getElementById("settings-version");
+    if (ver) ver.textContent = `GridMaster · Build ${APP_VERSION}`;
+  }
+  function open() {
+    lastFocus = document.activeElement;
+    paint();
+    show("settings-overlay");
+    document.getElementById("settings-close")?.focus();
+  }
+  function close() {
+    hide("settings-overlay");
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  function init() {
+    const btn = document.getElementById("settings-btn");
+    if (!btn) return;
+    btn.addEventListener("click", open);
+    document.getElementById("settings-close")?.addEventListener("click", close);
+    document.getElementById("settings-overlay")?.addEventListener("click", (e) => {
+      if (e.target.id === "settings-overlay") close();
+    });
+
+    document.getElementById("set-sound")?.addEventListener("click", () => {
+      const on = Sound.toggle(); SoundToggle.refresh();
+      if (on) Sound.play("uiClick");
+      track("sound_toggle", { on, from: "settings" });
+      paint();
+    });
+    document.getElementById("set-theme")?.addEventListener("click", () => {
+      const next = ThemeToggle.current() === "light" ? "dark" : "light";
+      localStorage.setItem(THEME_KEY, next); ThemeToggle.apply(next);
+      track("theme_toggle", { theme: next, from: "settings" });
+      Sound.play("uiClick"); paint();
+    });
+    document.getElementById("set-motion")?.addEventListener("click", () => {
+      const next = motionOverride() ? "0" : "1";
+      localStorage.setItem(MOTION_KEY, next); applyMotionPref();
+      track("motion_toggle", { reduced: next === "1" });
+      paint();
+    });
+    document.getElementById("set-remind")?.addEventListener("click", async () => {
+      await toggleReminder(); paint();
+    });
+    document.getElementById("set-team")?.addEventListener("click", () => {
+      close(); TeamPicker.open();
+    });
+    document.getElementById("set-reset")?.addEventListener("click", () => {
+      resetLocalProgress(); renderProfile(); renderGarage(); paint();
+    });
+  }
+  return { init, close, isOpen: () => !document.getElementById("settings-overlay")?.classList.contains("hidden") };
+})();
+
+/* ===================== FIRST-RUN SCORING EXPLAINER ===================== *
+ * Shown once — the first time a player opens any challenge — so the closeness
+ * curve is taught before they're scored on it. The promise to start the run is
+ * deferred until they dismiss it. */
+const SCORING_SEEN_KEY = "gm_seen_scoring";
+const ScoringIntro = (() => {
+  let onDone = null;
+  function finish() {
+    hide("scoring-overlay");
+    localStorage.setItem(SCORING_SEEN_KEY, "1");
+    const cb = onDone; onDone = null;
+    if (cb) cb();
+  }
+  /* Returns true if it showed (caller should wait); false if already seen. */
+  function maybeShow(done) {
+    if (localStorage.getItem(SCORING_SEEN_KEY) === "1") return false;
+    onDone = done || null;
+    show("scoring-overlay");
+    document.getElementById("scoring-go")?.focus();
+    track("scoring_intro_shown");
+    return true;
+  }
+  function init() {
+    document.getElementById("scoring-go")?.addEventListener("click", finish);
+    document.getElementById("scoring-close")?.addEventListener("click", finish);
+    document.getElementById("scoring-overlay")?.addEventListener("click", (e) => {
+      if (e.target.id === "scoring-overlay") finish();
+    });
+  }
+  return { init, maybeShow };
+})();
+
+/* One global Escape handler for the lightweight dialogs that don't manage their
+ * own (the team picker stays open during forced onboarding, so it's excluded). */
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (Settings.isOpen()) { Settings.close(); return; }
+  const so = document.getElementById("scoring-overlay");
+  if (so && !so.classList.contains("hidden")) { so.classList.add("hidden"); return; }
+});
+
 /* ---- Boot ---- */
 function show(id) { document.getElementById(id).classList.remove("hidden"); }
 function hide(id) { document.getElementById(id).classList.add("hidden"); }
@@ -2186,6 +2314,9 @@ DataCheck.init();
 TeamPicker.init();
 SoundToggle.init();
 ThemeToggle.init();
+Settings.init();
+ScoringIntro.init();
+applyMotionPref();
 Auth.init();
 document.querySelectorAll(".lb-period-tab").forEach((t) =>
   t.addEventListener("click", () => setLeaderboardPeriod(t.dataset.period)));

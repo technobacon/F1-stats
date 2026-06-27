@@ -835,6 +835,19 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
   }
   .tt-live, .reveal-verdict::before, .sk-line { animation:none !important; }
 }
+/* In-app override (Settings -> Reduce motion), mirroring the media query so the
+ * choice applies even when the OS setting is off. */
+:root[data-reduce-motion] *,
+:root[data-reduce-motion] *::before,
+:root[data-reduce-motion] *::after {
+  animation-duration:1ms !important;
+  animation-iteration-count:1 !important;
+  transition-duration:1ms !important;
+  scroll-behavior:auto !important;
+}
+:root[data-reduce-motion] .tt-live,
+:root[data-reduce-motion] .reveal-verdict::before,
+:root[data-reduce-motion] .sk-line { animation:none !important; }
 
 /* ===================== ABOUT / METHODOLOGY ===================== */
 .about-hero { text-align:center; max-width:42rem; margin:var(--sp-4) auto var(--sp-6); }
@@ -856,3 +869,46 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .about-link:hover { filter:brightness(1.1); }
 .about-disclaimer { font-size:.78rem; color:var(--muted); border-top:1px solid var(--line);
                     padding-top:.8rem; margin-top:.4rem; }
+
+/* ===================== SETTINGS ===================== */
+.settings-panel, .scoring-panel { max-width:480px; }
+.settings-list { display:flex; flex-direction:column; }
+.set-row { display:flex; align-items:center; gap:1rem; padding:.85rem 1.25rem;
+           border-bottom:1px solid var(--line); }
+.set-row:last-child { border-bottom:0; }
+.set-label { display:flex; flex-direction:column; gap:.15rem; min-width:0; flex:1; }
+.set-name { font-weight:700; font-size:.92rem; }
+.set-sub { color:var(--muted); font-size:.72rem; line-height:1.4; }
+.set-action { width:auto; margin:0; padding:.45rem .9rem; flex:none; }
+/* Switch control (role="switch"). The knob slides; the track tints when on. */
+.set-toggle { flex:none; width:44px; height:26px; border-radius:var(--r-pill); cursor:pointer;
+              background:var(--bg2); border:1px solid var(--line); padding:0; position:relative;
+              transition:background var(--t-fast), border-color var(--t-fast); }
+.set-toggle .set-knob { position:absolute; top:2px; left:2px; width:20px; height:20px;
+              border-radius:50%; background:var(--muted); transition:transform var(--t-fast), background var(--t-fast); }
+.set-toggle[aria-checked="true"] { background:color-mix(in srgb, var(--color-primary) 30%, var(--bg2));
+              border-color:var(--color-primary); }
+.set-toggle[aria-checked="true"] .set-knob { transform:translateX(18px); background:var(--color-ink); }
+.settings-foot { text-align:center; padding:.9rem 1.25rem 1.1rem; margin:0;
+              font-family:var(--font-mono); font-size:.66rem; }
+
+/* ===================== SCORING EXPLAINER ===================== */
+.scoring-body { padding:1.1rem 1.25rem .4rem; }
+.scoring-body > p { margin:0 0 .9rem; line-height:1.55; font-size:.95rem; color:var(--n-200); }
+.scoring-body strong { color:var(--text); }
+.scoring-curve { width:100%; height:auto; display:block; margin:.2rem 0 1rem; }
+.sc-axis { stroke:var(--line); stroke-width:1.5; }
+.sc-axis-label { fill:var(--muted); font-size:9px; text-anchor:middle; font-family:var(--font-mono); }
+.sc-line { fill:none; stroke:var(--color-primary); stroke-width:3; stroke-linecap:round; }
+.sc-area { fill:color-mix(in srgb, var(--color-primary) 14%, transparent); stroke:none; }
+.sc-dot { fill:var(--color-ink); }
+.sc-tag { fill:var(--color-ink); font-size:10px; font-weight:700; font-family:var(--font-mono); }
+.scoring-points { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.5rem; }
+.scoring-points li { display:flex; align-items:center; gap:.5rem; font-size:.86rem; color:var(--n-200); }
+.sc-chip { font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em;
+           padding:.12rem .45rem; border-radius:var(--r-sm); flex:none; }
+.sc-chip.purple { background:color-mix(in srgb,#b13bff 22%,var(--surface)); color:#d9b3ff; }
+.sc-chip.green { background:color-mix(in srgb,#33d17a 20%,var(--surface)); color:#7ee2a8; }
+:root[data-theme="light"] .sc-chip.purple { color:#7a1fc2; }
+:root[data-theme="light"] .sc-chip.green { color:#1c8048; }
+.scoring-go { width:calc(100% - 2.5rem); margin:.6rem 1.25rem 1.25rem; justify-content:center; }

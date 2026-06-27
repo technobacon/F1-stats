@@ -6,7 +6,7 @@ A snapshot of where **GridMaster** is, how it fits together, and what could
 come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
 engineering handoff. For question design see [`question-types.md`](./question-types.md).
 
-> **Latest work (professional-polish passes):** five back-to-back design
+> **Latest work (professional-polish passes):** six back-to-back design
 > passes to shed the "AI-generated" tells. **(1) Visual identity** — a
 > documented `:root` **design-token** system (neutral ramp, type scale, radii,
 > elevation, motion), a real **type pairing** (Titillium Web for UI + headings,
@@ -33,6 +33,14 @@ engineering handoff. For question design see [`question-types.md`](./question-ty
 > with About / scoring / privacy / contact links + a build version; a branded
 > **404 page** (served as HTML to browsers, JSON kept for API clients); and
 > aligned `theme-color` across the head + manifest.
+> **(6) Product depth** — the "shipped software" surfaces: a real **Settings**
+> dialog (sound, light theme, a manual **reduce-motion** override, streak
+> reminders, constructor, reset — opened from a header gear, consolidating the
+> scattered toggles), a one-time **first-run scoring explainer** that teaches the
+> closeness curve before you're scored on it, and an **accessibility** pass
+> (`role="switch"` toggles, `aria-current` on the active tab, Escape/backdrop
+> close + focus-return on the dialogs, a polite-live toast). The curve slider
+> already had arrow-key support; fonts already ship `display=swap`.
 > The Wordle share-grid squares and achievement-badge medallions intentionally
 > stay emoji (the share squares must survive as plain text; bespoke badge art is
 > its own pass).

@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=24" />
+  <link rel="stylesheet" href="/static/style.css?v=25" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -72,6 +72,10 @@
       <button id="theme-toggle" class="sound-toggle theme-toggle" title="Dark mode — click for light"
               aria-pressed="false" aria-label="Toggle light or dark theme">
         <span class="theme-icon" id="theme-icon" data-icon="moon" aria-hidden="true"></span>
+      </button>
+      <button id="settings-btn" class="sound-toggle" title="Settings" aria-haspopup="dialog"
+              aria-label="Open settings">
+        <span data-icon="settings" aria-hidden="true"></span>
       </button>
       <button id="team-select-btn" class="team-select-btn" title="Change team colour theme" aria-haspopup="dialog">
         <span class="team-btn-swatch" id="team-btn-swatch"></span>
@@ -582,9 +586,86 @@
     </div>
   </div>
 
-  <div id="toast" class="toast hidden"></div>
-  <script src="/static/icons.js?v=24"></script>
-  <script src="/static/sound.js?v=24"></script>
-  <script src="/static/app.js?v=24"></script>
+  <!-- ===================== SETTINGS ===================== *
+       A real preferences surface: consolidates the quick header toggles and adds
+       motion + reminders + reset in one place. Opened from the header gear. -->
+  <div id="settings-overlay" class="team-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="auth-panel settings-panel">
+      <div class="team-panel-head">
+        <h2 id="settings-title">Settings</h2>
+        <button class="game-exit" id="settings-close" aria-label="Close settings">✕ Close</button>
+      </div>
+      <div class="settings-list">
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Sound effects</span>
+            <span class="set-sub">Lights-out, sector cues, lock-in clicks</span></div>
+          <button class="set-toggle" id="set-sound" role="switch" aria-checked="true"><span class="set-knob"></span></button>
+        </div>
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Light theme</span>
+            <span class="set-sub">Dark by default; switch to a bright pit-wall look</span></div>
+          <button class="set-toggle" id="set-theme" role="switch" aria-checked="false"><span class="set-knob"></span></button>
+        </div>
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Reduce motion</span>
+            <span class="set-sub">Skip the slide-ins and count-ups (also follows your system setting)</span></div>
+          <button class="set-toggle" id="set-motion" role="switch" aria-checked="false"><span class="set-knob"></span></button>
+        </div>
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Streak reminders</span>
+            <span class="set-sub">A local nudge before midnight UTC when a streak is at risk</span></div>
+          <button class="set-toggle" id="set-remind" role="switch" aria-checked="false"><span class="set-knob"></span></button>
+        </div>
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Constructor</span>
+            <span class="set-sub" id="set-team-name">McLaren</span></div>
+          <button class="btn-secondary set-action" id="set-team">Change</button>
+        </div>
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Local progress</span>
+            <span class="set-sub">Clear this device's guest stats, streak and badges</span></div>
+          <button class="btn-secondary set-action danger" id="set-reset">Reset</button>
+        </div>
+      </div>
+      <p class="muted settings-foot" id="settings-version"></p>
+    </div>
+  </div>
+
+  <!-- ===================== FIRST-RUN SCORING EXPLAINER ===================== *
+       Shown once, the first time a player opens a challenge, so they aren't
+       dropped in cold. Teaches the closeness curve with a small visual. -->
+  <div id="scoring-overlay" class="team-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="scoring-title">
+    <div class="auth-panel scoring-panel">
+      <div class="team-panel-head">
+        <h2 id="scoring-title">How close counts</h2>
+        <button class="game-exit" id="scoring-close" aria-label="Close">✕</button>
+      </div>
+      <div class="scoring-body">
+        <p>You guess a number. You're scored on <strong>how close</strong> you land — not just
+           right or wrong.</p>
+        <svg class="scoring-curve" viewBox="0 0 280 120" role="img"
+             aria-label="A curve showing points falling off as your guess gets further from the answer">
+          <line x1="20" y1="100" x2="270" y2="100" class="sc-axis" />
+          <line x1="20" y1="100" x2="20" y2="12" class="sc-axis" />
+          <path class="sc-area" d="M20,18 C70,22 110,55 160,80 C200,98 240,99 270,100 L270,100 L20,100 Z" />
+          <path class="sc-line" d="M20,18 C70,22 110,55 160,80 C200,98 240,99 270,100" />
+          <circle class="sc-dot" cx="20" cy="18" r="5" />
+          <text x="26" y="16" class="sc-tag">5,000 — spot on</text>
+          <text x="150" y="116" class="sc-axis-label">further from the answer →</text>
+        </svg>
+        <ul class="scoring-points">
+          <li><span class="sc-chip purple">Purple</span> within 10% — the fastest sector</li>
+          <li><span class="sc-chip green">Green</span> within 25% — still strong</li>
+          <li>Up to <strong>5,000 points</strong> per question; six per Daily.</li>
+        </ul>
+      </div>
+      <button class="btn-primary scoring-go" id="scoring-go">Got it — let's race</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <script src="/static/icons.js?v=25"></script>
+  <script src="/static/sound.js?v=25"></script>
+  <script src="/static/app.js?v=25"></script>
 </body>
 </html>
