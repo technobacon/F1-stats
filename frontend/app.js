@@ -1328,15 +1328,19 @@ async function renderGarage() {
     <div class="garage-grid">
       <div class="g-card g-rank" id="g-rank">
         <p class="g-card-label">Your rank</p>
-        ${signedIn ? `<p class="g-big muted">…</p>` :
-          `<p class="g-big">—</p><p class="g-note">Sign in to rank on the leaderboard.</p>
-           <button class="g-link" data-auth="open">Create an account →</button>`}
+        ${signedIn
+          ? `<span class="sk-line sk-h" style="width:52%"></span>
+             <span class="sk-line sk-b" style="width:78%;margin-top:.2rem"></span>`
+          : `<p class="g-big">—</p><p class="g-note">Sign in to rank on the leaderboard.</p>
+             <button class="g-link" data-auth="open">Create an account →</button>`}
       </div>
       <div class="g-card g-team" id="g-team" style="--g-accent:${team.primary}">
         <p class="g-card-label">Constructors' Championship</p>
         <p class="g-team-name">Racing for <strong>${escapeHtml(team.name)}</strong></p>
-        ${signedIn ? `<p class="g-note muted">…</p>` :
-          `<button class="g-link" data-view="profile">Pick a side →</button>`}
+        ${signedIn
+          ? `<span class="sk-line sk-b" style="width:65%;margin-top:.35rem"></span>
+             <span class="sk-line sk-sm" style="width:88%"></span>`
+          : `<button class="g-link" data-view="profile">Pick a side →</button>`}
       </div>
       ${garageBadgesCard()}
     </div>
@@ -1360,8 +1364,8 @@ async function renderGarage() {
         ? `<p class="g-card-label">Your rank</p>
            <p class="g-big">#${d.rank} ${rankMovement("all", d.rank)}</p>
            <p class="g-note">Top ${100 - d.percentile}% of ${fmtCompact(d.total_ranked)} ranked · ${fmtCompact(d.points)} pts</p>`
-        : `<p class="g-card-label">Your rank</p><p class="g-big">—</p>
-           <p class="g-note">Play today's Daily to join the board.</p>`;
+        : `<p class="g-card-label">Your rank</p>
+           <div class="empty-state"><p>Play your first Daily to appear on the leaderboard.</p></div>`;
     }
   } catch { /* offline — leave the loading state */ }
   try {

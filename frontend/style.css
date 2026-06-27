@@ -27,7 +27,7 @@
   --surface2:var(--n-880); --line:var(--n-700); --text:var(--n-50); --muted:var(--n-300);
 
   /* — Radii, elevation, spacing, motion. — */
-  --r-sm:8px; --r-md:10px; --r-lg:14px; --r-pill:999px;
+  --r-sm:6px; --r-md:8px; --r-lg:10px; --r-pill:999px;
   --radius:var(--r-lg);
   --e-1:0 1px 3px rgba(0,0,0,.35);
   --e-2:0 10px 30px rgba(0,0,0,.42);
@@ -100,7 +100,7 @@
 .home-top .hero { height:100%; }
 .home-top .hero-title { font-size:clamp(2.2rem,5vw,3.6rem); }
 .timing-tower { background:var(--surface);
-  border:1px solid var(--line); border-radius:var(--r-lg); padding:1.3rem 1.1rem; box-shadow:var(--shadow);
+  border:1px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-4); box-shadow:var(--shadow);
   display:flex; flex-direction:column; }
 .tt-head { display:flex; align-items:center; gap:.5rem; }
 .tt-live { width:7px; height:7px; border-radius:50%; background:var(--f1-green);
@@ -112,13 +112,13 @@
   margin:.4rem 0 .9rem; }
 .tt-period { display:flex; gap:.35rem; margin:0 0 .8rem; }
 .tt-period-tab { flex:1; padding:.4rem .3rem; border:1px solid var(--line); background:var(--bg2);
-  color:var(--muted); border-radius:8px; font-weight:600; cursor:pointer; font-family:inherit;
+  color:var(--muted); border-radius:var(--r-sm); font-weight:600; cursor:pointer; font-family:inherit;
   font-size:.72rem; transition:border-color .15s, color .15s; }
 .tt-period-tab.active { border-color:var(--color-primary); color:var(--color-ink); }
-.tt-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.3rem;
+.tt-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.2rem;
   font-variant-numeric:tabular-nums; flex:1; }
 .tt-list li { display:grid; grid-template-columns:1.4rem 4px 1fr auto; align-items:center; gap:.55rem;
-  padding:.5rem .55rem; border-radius:8px; background:var(--bg2); border:1px solid var(--line); }
+  padding:.38rem .5rem; border-radius:var(--r-sm); background:var(--bg2); border:1px solid var(--line); }
 .tt-list li.me { border-color:var(--color-primary); box-shadow:0 0 0 1px var(--color-primary); }
 .tt-list li.muted { display:block; text-align:center; background:none; border:none; padding:1rem .4rem;
   line-height:1.4; }
@@ -179,7 +179,7 @@ a { color:inherit; text-decoration:none; }
 .brand-word { font-size:1.02rem; letter-spacing:.04em; }
 .bw-accent { color:var(--color-ink); }
 
-.modes { display:flex; gap:.3rem; margin:0 auto; overflow-x:auto;
+.modes { display:flex; gap:.2rem; margin:0 auto; overflow-x:auto;
          -webkit-overflow-scrolling:touch; scrollbar-width:none; }
 .modes::-webkit-scrollbar { display:none; }
 .mode-tab { background:transparent; color:var(--muted); border:1px solid transparent;
@@ -195,14 +195,14 @@ a { color:inherit; text-decoration:none; }
 .hud-points { font-weight:800; color:var(--color-ink); white-space:nowrap; }
 /* Team picker trigger button (replaces old <select>) */
 .team-select-btn { display:flex; align-items:center; gap:.45rem; background:var(--bg2);
-                   color:var(--text); border:1px solid var(--line); border-radius:8px;
+                   color:var(--text); border:1px solid var(--line); border-radius:var(--r-sm);
                    padding:.35rem .7rem; font-family:inherit; cursor:pointer;
                    font-size:.85rem; font-weight:700; transition:border-color .15s; white-space:nowrap; }
 .team-select-btn:hover { border-color:var(--color-primary); }
 .team-btn-swatch { width:10px; height:10px; border-radius:50%; flex-shrink:0; display:inline-block; }
 /* Sound on/off toggle — same chip styling as the team button, square for the icon */
 .sound-toggle { display:flex; align-items:center; justify-content:center; background:var(--bg2);
-                color:var(--text); border:1px solid var(--line); border-radius:8px;
+                color:var(--text); border:1px solid var(--line); border-radius:var(--r-sm);
                 width:34px; height:34px; padding:0; cursor:pointer; font-size:1rem;
                 line-height:1; transition:border-color .15s, opacity .15s; flex-shrink:0; }
 .sound-toggle:hover { border-color:var(--color-primary); color:var(--color-ink); }
@@ -252,7 +252,7 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 
 /* ===================== NEXT RACE WEEKEND ===================== */
 .race-week { margin-top:1.4rem; background:var(--surface);
-             border:1px solid var(--line); border-radius:14px; padding:.85rem .95rem .7rem;
+             border:1px solid var(--line); border-radius:var(--r-lg); padding:.85rem .95rem .7rem;
              box-shadow:var(--shadow); position:relative; overflow:hidden; }
 .race-week::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
                      background:var(--color-primary); }
@@ -272,7 +272,7 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 .rw-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.22rem;
            max-height:13.5rem; overflow-y:auto; }
 .rw-row { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:.7rem;
-          padding:.42rem .6rem; border-radius:9px; background:var(--bg2);
+          padding:.35rem .55rem; border-radius:var(--r-sm); background:var(--bg2);
           border:1px solid var(--line); transition:border-color .15s, transform .1s; }
 .rw-row:hover { border-color:var(--color-primary); }
 .rw-row.is-next { border-color:var(--color-primary);
@@ -294,7 +294,7 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 .mode-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem; }
 .mode-card { position:relative; overflow:hidden; text-align:left; cursor:pointer; color:var(--text);
              background:var(--surface);
-             border:1px solid var(--line); border-radius:var(--radius); padding:1.4rem 1.3rem;
+             border:1px solid var(--line); border-radius:var(--radius); padding:var(--sp-6) var(--sp-4);
              font-family:inherit; transition:transform .16s, border-color .16s, box-shadow .16s; }
 .mode-card:hover { transform:translateY(-4px); border-color:var(--color-primary); box-shadow:var(--shadow); }
 .mode-card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
@@ -326,9 +326,9 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
            border:1px solid color-mix(in srgb, var(--color-primary) 40%, transparent);
            padding:.18rem .5rem; border-radius:999px; }
 .garage-sub { color:var(--muted); font-size:.84rem; margin:.25rem 0 0; }
-.garage-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:.8rem; }
+.garage-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:var(--sp-4); }
 .g-card { position:relative; overflow:hidden; background:var(--surface);
-          border:1px solid var(--line); border-radius:var(--radius); padding:1rem 1.05rem; }
+          border:1px solid var(--line); border-radius:var(--radius); padding:var(--sp-4); }
 .g-card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
                   background:var(--g-accent, var(--color-primary)); opacity:.85; }
 .g-card-label { font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
@@ -382,7 +382,7 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 
 /* ===================== CARDS / BUTTONS ===================== */
 .card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-        padding:1.6rem; box-shadow:var(--shadow); }
+        padding:var(--sp-6); box-shadow:var(--shadow); }
 .card h2 { margin-top:0; }
 .muted { color:var(--muted); font-size:.85rem; }
 .badge { font-size:.62rem; background:var(--color-primary); color:var(--btn-text); padding:.15rem .55rem;
@@ -393,22 +393,22 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 
 .btn-primary { background:var(--color-primary);
                box-shadow:inset 0 calc(-1 * var(--btn-stripe)) 0 var(--color-secondary);
-               color:var(--btn-text); border:none; border-radius:10px;
+               color:var(--btn-text); border:none; border-radius:var(--r-md);
                padding:.8rem 1.5rem; font-weight:800; cursor:pointer; font-size:1rem;
                font-family:inherit; transition:filter .15s, transform .1s; }
 .btn-primary:hover { filter:brightness(1.08); } .btn-primary:active { transform:translateY(1px); }
-.btn-ghost { background:rgba(255,255,255,.06); color:var(--text); border:1px solid var(--line);
-             border-radius:10px; padding:.8rem 1.4rem; font-weight:700; cursor:pointer;
+.btn-ghost { background:var(--bg2); color:var(--text); border:1px solid var(--line);
+             border-radius:var(--r-md); padding:.8rem 1.4rem; font-weight:700; cursor:pointer;
              font-size:1rem; font-family:inherit; }
 .btn-ghost:hover { border-color:var(--color-primary); }
 .btn-secondary { background:transparent; color:var(--text); border:1px solid var(--line);
-                 border-radius:10px; padding:.7rem 1rem; cursor:pointer; margin-top:.5rem;
+                 border-radius:var(--r-md); padding:.7rem 1rem; cursor:pointer; margin-top:.5rem;
                  display:block; width:100%; font-family:inherit; }
 .btn-secondary.danger { color:#ff6b6b; border-color:#5a2a2a; }
 
 .q-progress { color:var(--muted); font-weight:700; margin-bottom:.5rem; }
 #q-input { width:130px; background:var(--bg2); color:var(--text); border:1px solid var(--line);
-           border-radius:10px; padding:.7rem; font-size:1.25rem; text-align:center; font-weight:700;
+           border-radius:var(--r-md); padding:.7rem; font-size:1.25rem; text-align:center; font-weight:700;
            font-variant-numeric:tabular-nums; }
 #q-input:focus { outline:none; border-color:var(--color-primary);
                  box-shadow:0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent); }
@@ -462,7 +462,7 @@ body.in-game #view-quiz { position:fixed; inset:0; z-index:60; display:flex; fle
     linear-gradient(180deg, var(--bg2), var(--bg)); }
 body.in-game .game-bar { display:flex; align-items:center; gap:1rem; width:100%;
   max-width:820px; padding:1rem clamp(1rem,4vw,1.5rem) .4rem; }
-.game-exit { background:rgba(255,255,255,.06); color:var(--text); border:1px solid var(--line);
+.game-exit { background:var(--bg2); color:var(--text); border:1px solid var(--line);
   border-radius:99px; padding:.45rem .9rem; font-weight:700; font-size:.82rem; cursor:pointer;
   font-family:inherit; white-space:nowrap; transition:.15s; }
 .game-exit:hover { border-color:var(--color-primary); color:var(--color-ink); }
@@ -485,7 +485,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
  * (purple ≤10% / green ≤25%) are fixed, not team-themed, so they stay legible. */
 .reveal-verdict { position:relative; overflow:hidden; display:flex; align-items:center;
   justify-content:center; gap:.55rem; width:fit-content; max-width:100%; margin:.4rem auto 0;
-  padding:.6rem 1.4rem; border-radius:12px; border:1px solid var(--line);
+  padding:.6rem 1.4rem; border-radius:var(--r-lg); border:1px solid var(--line);
   background:var(--surface2); animation:insight-fade .4s ease; }
 .reveal-verdict::before { content:""; position:absolute; inset:0; transform:translateX(-130%);
   background:linear-gradient(100deg, transparent, rgba(255,255,255,.14), transparent);
@@ -535,14 +535,14 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 
 /* Ads */
 .ad-slot { border:1px dashed var(--line); color:var(--muted); text-align:center; font-size:.7rem;
-           padding:.6rem; border-radius:8px; margin:1rem 0; letter-spacing:1px; text-transform:uppercase; }
+           padding:.6rem; border-radius:var(--r-sm); margin:1rem 0; letter-spacing:1px; text-transform:uppercase; }
 .ad-summary { min-height:90px; display:flex; align-items:center; justify-content:center; }
 
 /* Arcade */
 .arcade-metric { text-align:center; font-weight:800; font-size:1.25rem; margin:1.2rem 0;
                  color:var(--color-ink); font-style:italic; }
 .arcade-pair { display:flex; align-items:center; gap:1rem; }
-.arcade-card { flex:1; background:var(--bg2); border:2px solid var(--line); border-radius:12px;
+.arcade-card { flex:1; background:var(--bg2); border:2px solid var(--line); border-radius:var(--r-lg);
                padding:1.6rem 1rem; cursor:pointer; color:var(--text); display:flex;
                flex-direction:column; gap:.5rem; transition:border-color .2s, transform .1s; font-family:inherit; }
 .arcade-card:hover { border-color:var(--color-primary); transform:translateY(-2px); }
@@ -555,12 +555,12 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .stats { display:grid; grid-template-columns:1fr 1fr; gap:.5rem 1rem; }
 .stats dt { color:var(--muted); } .stats dd { margin:0; font-weight:700; text-align:right; }
 
-.foot { text-align:center; color:var(--muted); font-size:.72rem; padding:1.6rem; border-top:1px solid var(--line); }
+.foot { text-align:center; color:var(--muted); font-size:.72rem; padding:var(--sp-6); border-top:1px solid var(--line); }
 .data-status { display:inline; color:var(--muted); opacity:.85; white-space:normal; }
 
 /* ===================== DEV DATA CHECK ===================== */
 .data-check-btn { display:block; margin:.7rem auto 0; background:transparent; color:var(--muted);
-                  border:1px dashed var(--line); border-radius:8px; padding:.35rem .8rem;
+                  border:1px dashed var(--line); border-radius:var(--r-sm); padding:.35rem .8rem;
                   font-size:.72rem; cursor:pointer; font-family:inherit; transition:.15s; }
 .data-check-btn:hover { color:var(--color-ink); border-color:var(--color-primary); }
 .data-check-inline { display:block; width:100%; margin-top:.6rem; font-size:.85rem;
@@ -576,10 +576,10 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
              padding:1rem 1.2rem .4rem; }
 .data-head h2 { margin:0; font-size:1.15rem; flex:1 0 auto; }
 .data-head input[type="search"] { flex:1 1 220px; background:var(--bg2); color:var(--text);
-             border:1px solid var(--line); border-radius:8px; padding:.5rem .7rem; font-family:inherit; }
+             border:1px solid var(--line); border-radius:var(--r-sm); padding:.5rem .7rem; font-family:inherit; }
 .data-head input[type="search"]:focus { outline:none; border-color:var(--color-primary); }
 .data-head select { background:var(--bg2); color:var(--text); border:1px solid var(--line);
-             border-radius:8px; padding:.5rem; font-family:inherit; }
+             border-radius:var(--r-sm); padding:.5rem; font-family:inherit; }
 .data-close { width:auto; margin:0; padding:.5rem .9rem; font-size:.82rem; }
 .data-note { margin:.1rem 1.2rem .6rem; }
 .data-table-wrap { overflow:auto; flex:1; border-top:1px solid var(--line); }
@@ -609,19 +609,19 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .data-table tr.dt-flagged td { background:rgba(229,57,53,.12); }
 
 .cap-note { background:rgba(63,185,80,.12); border:1px solid #2e6b3a; color:#9fe0ab;
-            border-radius:10px; padding:.7rem .9rem; margin-bottom:1rem; font-size:.9rem; }
+            border-radius:var(--r-md); padding:.7rem .9rem; margin-bottom:1rem; font-size:.9rem; }
 .accuracy-row { color:var(--muted); margin:.5rem 0 1rem; font-size:.9rem; text-align:center; }
 
 /* Free Practice anti-scouting penalty notice (shown on the reveal card). */
 .penalty-note { background:rgba(210,153,34,.12); border:1px solid #7a5a1e; color:#e6c373;
-                border-radius:10px; padding:.7rem .9rem; margin:.4rem 0 1rem; font-size:.85rem;
+                border-radius:var(--r-md); padding:.7rem .9rem; margin:.4rem 0 1rem; font-size:.85rem;
                 line-height:1.45; text-align:left; }
 .penalty-note strong { color:#ffd479; }
 .penalty-note em { font-style:italic; color:#f0d6a0; }
 #replay-quiz { margin-top:.6rem; }
 .toast { position:fixed; left:50%; bottom:calc(1.25rem + env(safe-area-inset-bottom));
          transform:translateX(-50%); background:#000; color:#fff; border:1px solid var(--color-primary);
-         padding:.7rem 1.1rem; border-radius:10px; font-size:.9rem; z-index:50; max-width:90%;
+         padding:.7rem 1.1rem; border-radius:var(--r-md); font-size:.9rem; z-index:50; max-width:90%;
          text-align:center; box-shadow:0 6px 24px rgba(0,0,0,.5); }
 
 /* ===================== TEAM PICKER MODAL ===================== */
@@ -641,7 +641,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .team-panel-intro strong { color:var(--color-ink); }
 .team-picker-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));
                     gap:.75rem; padding:1.25rem; overflow-y:auto; }
-.team-card { border:2px solid var(--line); border-radius:10px; overflow:hidden; cursor:pointer;
+.team-card { border:2px solid var(--line); border-radius:var(--r-md); overflow:hidden; cursor:pointer;
              background:var(--bg2); transition:transform .12s, box-shadow .12s;
              font-family:inherit; padding:0; text-align:left;
              /* Explicit flex column: iOS Safari clips the lower content (name/stats)
@@ -683,7 +683,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .auth-form label { font-size:.72rem; text-transform:uppercase; letter-spacing:.05em;
                    color:var(--muted); margin-top:.5rem; }
 .auth-form input { background:var(--bg2); color:var(--text); border:1px solid var(--line);
-                   border-radius:9px; padding:.7rem .8rem; font-size:16px; /* >=16px: no iOS zoom */ }
+                   border-radius:var(--r-sm); padding:.7rem .8rem; font-size:16px; /* >=16px: no iOS zoom */ }
 .auth-form input:focus { outline:none; border-color:var(--color-primary); }
 .auth-form .btn-primary { margin-top:1rem; width:100%; justify-content:center; }
 .auth-error { color:#ff6b6b; font-size:.82rem; margin:.6rem 0 0; }
@@ -693,9 +693,9 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 
 /* ===================== GLOBAL LEADERBOARD ===================== */
 .leaderboard { list-style:none; margin:.5rem 0 1rem; padding:0; display:flex;
-               flex-direction:column; gap:.3rem; }
-.leaderboard li { display:flex; align-items:center; gap:.7rem; padding:.55rem .7rem;
-                  background:var(--bg2); border:1px solid var(--line); border-radius:9px; }
+               flex-direction:column; gap:.2rem; }
+.leaderboard li { display:flex; align-items:center; gap:.7rem; padding:.4rem .6rem;
+                  background:var(--bg2); border:1px solid var(--line); border-radius:var(--r-sm); }
 .leaderboard li.muted { background:none; border:none; justify-content:center; }
 .leaderboard li.me { border-color:var(--color-primary); }
 .lb-rank { font-weight:700; color:var(--muted); min-width:1.5rem; text-align:center; }
@@ -706,7 +706,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 /* Leaderboard window tabs (all-time / weekly / daily) */
 .lb-period { display:flex; gap:.4rem; margin:.2rem 0 .6rem; }
 .lb-period-tab { flex:1; padding:.45rem .6rem; border:1px solid var(--line); background:var(--bg2);
-                 color:var(--muted); border-radius:8px; font-weight:600; cursor:pointer; }
+                 color:var(--muted); border-radius:var(--r-sm); font-weight:600; cursor:pointer; }
 .lb-period-tab.active { border-color:var(--color-primary); color:var(--color-ink); }
 
 /* Constructors' Championship swatch */
@@ -741,7 +741,7 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 /* Summary streak callout — big and celebratory after a daily run. */
 .summary-streak {
   text-align:center; margin:.6rem auto .2rem; padding:.6rem .9rem; max-width:26rem;
-  border-radius:12px; font-size:1.05rem;
+  border-radius:var(--r-lg); font-size:1.05rem;
   background:color-mix(in srgb, var(--color-primary) 12%, var(--surface));
   border:1px solid color-mix(in srgb, var(--color-primary) 35%, var(--line));
 }
@@ -762,11 +762,11 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .ach-head { display:flex; align-items:center; justify-content:space-between; gap:.6rem; }
 .ach-filter { display:flex; gap:.4rem; margin:.7rem 0 .9rem; }
 .ach-filter-tab { flex:1; padding:.4rem .6rem; border:1px solid var(--line); background:var(--bg2);
-                  color:var(--muted); border-radius:8px; font-weight:600; cursor:pointer; font-family:inherit; }
+                  color:var(--muted); border-radius:var(--r-sm); font-weight:600; cursor:pointer; font-family:inherit; }
 .ach-filter-tab.active { border-color:var(--color-primary); color:var(--color-ink); }
 .ach-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:.6rem; }
 .ach-card { position:relative; overflow:hidden; display:flex; align-items:center; gap:.7rem;
-            padding:.7rem .85rem .7rem 1rem; border:1px solid var(--line); border-radius:12px;
+            padding:.7rem .85rem .7rem 1rem; border:1px solid var(--line); border-radius:var(--r-lg);
             background:var(--bg2); }
 .ach-card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--line); }
 .ach-card.got.tier-rookie::before   { background:#6ea8fe; }
@@ -781,3 +781,29 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .ach-tier { position:absolute; top:.45rem; right:.55rem; font-size:.54rem; text-transform:uppercase;
             letter-spacing:.08em; color:var(--muted); opacity:.75; }
 
+
+/* ===================== LOADING SKELETONS ===================== */
+@keyframes sk-shimmer {
+  0%   { background-position:-200% 0; }
+  100% { background-position: 200% 0; }
+}
+.sk-line {
+  display:block; border-radius:4px;
+  background:linear-gradient(90deg, var(--n-700) 25%, var(--n-500) 50%, var(--n-700) 75%);
+  background-size:200% 100%;
+  animation:sk-shimmer 1.4s ease-in-out infinite;
+}
+.sk-h  { height:1.4rem; margin:.35rem 0; }
+.sk-b  { height:.75rem; margin:.25rem 0; }
+.sk-sm { height:.6rem;  margin:.2rem 0; }
+:root[data-theme="light"] .sk-line {
+  background:linear-gradient(90deg, var(--line) 25%, var(--n-200) 50%, var(--line) 75%);
+  background-size:200% 100%;
+}
+
+/* ===================== EMPTY STATES ===================== */
+.empty-state {
+  display:flex; flex-direction:column; gap:var(--sp-2);
+  text-align:center; padding:var(--sp-4) var(--sp-2); color:var(--muted);
+}
+.empty-state p { margin:0; font-size:.82rem; line-height:1.5; }
