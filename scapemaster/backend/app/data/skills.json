@@ -1,0 +1,146 @@
+[
+ {
+  "skill_id": "attack",
+  "name": "Attack",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "strength",
+  "name": "Strength",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "defence",
+  "name": "Defence",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "hitpoints",
+  "name": "Hitpoints",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "ranged",
+  "name": "Ranged",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "prayer",
+  "name": "Prayer",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "magic",
+  "name": "Magic",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "runecraft",
+  "name": "Runecraft",
+  "members": 0,
+  "release_year": 2004
+ },
+ {
+  "skill_id": "construction",
+  "name": "Construction",
+  "members": 1,
+  "release_year": 2006
+ },
+ {
+  "skill_id": "agility",
+  "name": "Agility",
+  "members": 1,
+  "release_year": 2002
+ },
+ {
+  "skill_id": "herblore",
+  "name": "Herblore",
+  "members": 1,
+  "release_year": 2002
+ },
+ {
+  "skill_id": "thieving",
+  "name": "Thieving",
+  "members": 1,
+  "release_year": 2002
+ },
+ {
+  "skill_id": "crafting",
+  "name": "Crafting",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "fletching",
+  "name": "Fletching",
+  "members": 1,
+  "release_year": 2002
+ },
+ {
+  "skill_id": "slayer",
+  "name": "Slayer",
+  "members": 1,
+  "release_year": 2005
+ },
+ {
+  "skill_id": "hunter",
+  "name": "Hunter",
+  "members": 1,
+  "release_year": 2006
+ },
+ {
+  "skill_id": "mining",
+  "name": "Mining",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "smithing",
+  "name": "Smithing",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "fishing",
+  "name": "Fishing",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "cooking",
+  "name": "Cooking",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "firemaking",
+  "name": "Firemaking",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "woodcutting",
+  "name": "Woodcutting",
+  "members": 0,
+  "release_year": 2001
+ },
+ {
+  "skill_id": "farming",
+  "name": "Farming",
+  "members": 1,
+  "release_year": 2005
+ },
+ {
+  "skill_id": "sailing",
+  "name": "Sailing",
+  "members": 1,
+  "release_year": 2025
+ }
+]

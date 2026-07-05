@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en" data-god="saradomin">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>ScapeMaster</title>
+  <meta name="description" content="Guess the Old School RuneScape stat, get scored on how close you are. A new daily Gielinor challenge every day — items, monsters, quests and skills across every era." />
+
+  <!-- Rich link previews for shared results (Open Graph + Twitter Card), so a
+       pasted ScapeMaster link unfurls into a card instead of a bare URL. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ScapeMaster" />
+  <meta property="og:title" content="ScapeMaster — the daily Old School RuneScape stats challenge" />
+  <meta property="og:description" content="Guess the OSRS stat, get scored on how close you are. New daily Slayer Task — can you beat your friends?" />
+  <meta property="og:image" content="/static/icon-180.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="ScapeMaster — the daily Old School RuneScape stats challenge" />
+  <meta name="twitter:description" content="Guess the OSRS stat, get scored on how close you are. New daily Slayer Task — can you beat your friends?" />
+  <meta name="twitter:image" content="/static/icon-180.png" />
+
+  <!-- PWA / iOS add-to-home-screen -->
+  <link rel="manifest" href="/static/manifest.json" />
+  <meta name="theme-color" content="#2f6bd8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ScapeMaster" />
+  <link rel="apple-touch-icon" href="/static/icon-180.png" />
+  <!-- Crisp vector favicon (the brand mark); PNG stays as the Safari fallback. -->
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="icon" type="image/png" href="/static/icon-180.png" />
+
+  <!-- Type pairing: a humanist system stack for prose, Pixelify Sans (bundled,
+       OFL — see /static/fonts/OFL.txt) for headings, numbers and labels. No
+       Jagex fonts are used. -->
+  <link rel="stylesheet" href="/static/style.css?v=1" />
+</head>
+<body>
+  <!-- ===================== TOP BAR ===================== -->
+  <header class="hud">
+    <a class="hud-brand" data-view="home" href="#home">
+      <!-- Logo: a rune stone — a rounded standing stone carrying a simple
+           three-stroke "guess" glyph (original mark, no game assets). -->
+      <span class="brand-mark" aria-hidden="true">
+        <svg class="brand-logo" viewBox="0 0 100 100">
+          <rect x="14" y="10" width="72" height="80" rx="16" fill="none"
+                stroke="currentColor" stroke-width="10" />
+          <path d="M34 62 L50 34 L66 62" fill="none" stroke="currentColor"
+                stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span><span class="brand-word">SCAPE<span class="bw-accent">MASTER</span></span>
+    </a>
+
+    <nav class="modes" id="modes">
+      <button class="mode-tab active" data-view="home">Home</button>
+      <button class="mode-tab" data-view="quiz" data-mode="daily">Daily Task</button>
+      <button class="mode-tab" data-view="quiz" data-mode="free_practice">Training</button>
+      <button class="mode-tab" data-view="arcade">Duel Arena</button>
+      <button class="mode-tab" data-view="profile">Profile</button>
+    </nav>
+
+    <div class="hud-profile">
+      <div class="hud-countdown">
+        <span class="hud-label" id="countdown-label">NEW TASK IN</span>
+        <span class="hud-timer" id="countdown-timer">--:--:--</span>
+      </div>
+      <button id="sound-toggle" class="sound-toggle" title="Sound on — click to mute"
+              aria-pressed="true" aria-label="Toggle sound effects">
+        <span class="sound-icon" id="sound-icon" data-icon="volume-2" aria-hidden="true"></span>
+      </button>
+      <button id="theme-toggle" class="sound-toggle theme-toggle" title="Dark mode — click for parchment"
+              aria-pressed="false" aria-label="Toggle light or dark theme">
+        <span class="theme-icon" id="theme-icon" data-icon="moon" aria-hidden="true"></span>
+      </button>
+      <button id="settings-btn" class="sound-toggle" title="Settings" aria-haspopup="dialog"
+              aria-label="Open settings">
+        <span data-icon="settings" aria-hidden="true"></span>
+      </button>
+      <button id="team-select-btn" class="team-select-btn" title="Change god colour theme" aria-haspopup="dialog">
+        <span class="team-btn-swatch" id="team-btn-swatch"></span>
+        <span id="team-btn-label">Saradomin</span>
+      </button>
+      <span class="hud-points" id="hud-points">0 xp</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===================== LANDING / HOME ===================== -->
+    <section id="view-home" class="view active">
+      <!-- God Wars tower alongside the hero -->
+      <div class="home-top">
+        <aside class="timing-tower" aria-label="God Wars championship standings">
+          <div class="tt-head">
+            <span class="tt-live" aria-hidden="true"></span>
+            <p class="tt-eyebrow">God Wars</p>
+          </div>
+          <h2 class="tt-title">Whose followers are wisest?</h2>
+          <div class="tt-period" role="tablist" aria-label="Standings window">
+            <button class="tt-period-tab active" data-tower-period="all">All-time</button>
+            <button class="tt-period-tab" data-tower-period="weekly">This week</button>
+            <button class="tt-period-tab" data-tower-period="daily">Today</button>
+          </div>
+          <ol class="tt-list" id="home-tower-list"><li class="muted">Loading…</li></ol>
+          <p class="tt-foot muted">Every point of XP you earn feeds your god's war effort. <strong>Pledge a side</strong> to climb it.</p>
+        </aside>
+
+      <div class="hero">
+        <!-- Stylized standing scimitar + rune (original art). Picks up the god
+             colour via stroke:var(--color-primary). -->
+        <svg class="hero-track" viewBox="0 0 200 120" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+          <path d="M60,110 C64,70 70,45 96,22 C104,15 116,12 126,14 C118,22 112,28 106,38
+                   C90,62 80,84 76,110 Z"/>
+          <path d="M52,110 L84,110" />
+          <circle class="hero-track-sf" cx="140" cy="30" r="5"/>
+          <path d="M132,52 L148,52 M140,44 L140,60" />
+        </svg>
+        <div class="hero-inner">
+          <p class="hero-eyebrow">Welcome to Gielinor</p>
+          <h1 class="hero-title">SCAPE<span class="accent">MASTER</span></h1>
+          <p class="hero-sub">Test your Old School RuneScape knowledge across every era — from
+             Cook's Assistant to the Colosseum. Guess the stat, get scored on how close you are.</p>
+          <div class="hero-cta">
+            <button class="btn-primary" data-view="quiz" data-mode="daily">Take today's Slayer Task</button>
+            <button class="btn-ghost" data-view="arcade">Enter the Duel Arena</button>
+          </div>
+          <!-- Streak hook: loud, loss-averse reminder to keep the run alive.
+               Populated by renderStreakBanner(); hidden when there's no streak. -->
+          <button class="streak-banner hidden" id="streak-banner" data-view="quiz" data-mode="daily"></button>
+        </div>
+        <div class="hero-checkers" aria-hidden="true"></div>
+      </div>
+      </div><!-- /home-top -->
+
+      <!-- "Your bank": personalized status — rank, god stake, closest badges,
+           streak heatmap. Filled by renderGarage(); richer when signed in. -->
+      <section id="garage" class="garage" aria-label="Your bank"></section>
+
+      <!-- Today's task board -->
+      <section class="race-week" id="race-week" aria-live="polite">
+        <div class="rw-head">
+          <div>
+            <p class="rw-eyebrow">The task board</p>
+            <h2 class="rw-title" id="rw-title">—</h2>
+          </div>
+          <div class="rw-next" id="rw-next">
+            <span class="rw-next-label">New task in</span>
+            <span class="rw-next-timer" id="rw-next-timer">--:--:--</span>
+            <span class="rw-next-name" id="rw-next-name"></span>
+          </div>
+        </div>
+        <ol class="rw-list" id="rw-list"></ol>
+      </section>
+
+      <h2 class="section-title">Choose your grind</h2>
+      <div class="mode-grid">
+        <button class="mode-card" data-view="quiz" data-mode="daily">
+          <span class="mc-icon" data-icon="flag" aria-hidden="true"></span>
+          <h3>Daily Slayer Task</h3>
+          <p>Six questions spanning all of Gielinor — items, monsters, quests and the
+             XP table. One assignment a day. How close can you get?</p>
+          <span class="mc-cta">Play now →</span>
+        </button>
+
+        <button class="mode-card" data-view="quiz" data-mode="free_practice">
+          <span class="mc-icon" data-icon="tyre" aria-hidden="true"></span>
+          <h3>Training Grounds</h3>
+          <p>Unlimited random questions to sharpen your instincts. Your score shows here
+             but is never saved or ranked — just training, for fun.</p>
+          <span class="mc-cta">Play now →</span>
+        </button>
+
+        <button class="mode-card" data-view="arcade">
+          <span class="mc-icon" data-icon="zap" aria-hidden="true"></span>
+          <h3>Duel Arena</h3>
+          <p>Endless "which is greater?" head-to-heads — GE prices, alch values, combat
+             levels. No timer, no cap — just build the longest streak you can.</p>
+          <span class="mc-cta">Play now →</span>
+        </button>
+      </div>
+
+      <div class="feature-strip">
+        <div class="feature"><strong>1,200+</strong><span>verified questions</span></div>
+        <div class="feature"><strong>2001–Now</strong><span>every era of Gielinor</span></div>
+        <div class="feature"><strong>Items · Monsters · Quests · Skills</strong><span>the whole game</span></div>
+      </div>
+    </section>
+
+    <!-- ===================== QUIZ (Daily Task / Training Grounds) ===================== -->
+    <section id="view-quiz" class="view">
+      <!-- Immersive top bar — only visible once a session is in progress -->
+      <div class="game-bar">
+        <button class="game-exit" id="game-exit" data-view="home">✕ Exit</button>
+        <div class="game-progress"><span id="game-progress-fill"></span></div>
+        <span class="game-points" id="game-points">0 xp</span>
+      </div>
+
+      <div id="quiz-intro" class="card">
+        <h2 id="quiz-title">Daily Slayer Task</h2>
+        <p id="quiz-desc">Six questions. Guess the stat — the closer you are, the more
+           of the 5,000 XP you keep.</p>
+        <div id="quiz-cap" class="cap-note hidden"></div>
+        <button class="btn-primary" id="start-quiz">Accept the Task</button>
+        <button class="btn-secondary hidden" id="replay-quiz">Replay (testing)</button>
+        <p class="muted" id="quiz-status"></p>
+      </div>
+
+      <div id="quiz-play" class="card hidden">
+        <div class="q-progress"><span id="q-index">1</span> / <span id="q-total">6</span>
+          · <span id="q-mode-badge" class="badge">daily</span>
+          <span id="q-cat" class="chip"></span></div>
+        <h3 id="q-text">…</h3>
+        <p class="q-hint" id="q-hint"></p>
+
+        <!-- Curved guess slider: a scimitar rides the curve as the guess marker.
+             coins/xp questions map the track logarithmically (see CurveSlider). -->
+        <div class="curve-wrap" id="curve-wrap">
+          <div class="curve-readout" id="curve-val">0</div>
+          <div class="curve-slider" id="curve-slider">
+            <svg class="curve-svg" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-hidden="true">
+              <path class="curve-track" id="curve-track" d="M40 215 Q500 35 960 215" />
+              <path class="curve-fill"  id="curve-fill"  d="M40 215 Q500 35 960 215" />
+            </svg>
+            <div class="car-thumb" id="car-thumb" role="slider" tabindex="0"
+                 aria-label="Your guess" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <!-- Stylized scimitar (nose to the right). Blade takes the selected
+                   god's primary colour; the guard its secondary. See .car-* in
+                   style.css and MARKER_SHAPES in app.js (same shape, reused for
+                   the reveal markers). Original art — no game sprites. -->
+              <svg class="car-sprite" viewBox="0 0 128 52" aria-hidden="true">
+                <circle class="car-hub" cx="12" cy="42" r="5.5" />
+                <rect class="car-dark" x="13" y="38" width="18" height="8" rx="3" />
+                <rect class="car-wing" x="30" y="30" width="7" height="21" rx="2" />
+                <path class="car-body" d="M38 44 C64 41 94 31 116 13
+                  C121 9 124 15 120 20 C101 36 68 46 40 48 C37 48 36 45 38 44 Z" />
+                <path class="car-cockpit" d="M44 42 C68 39 94 30 112 17 L114 19
+                  C96 32 70 41 45 44 Z" />
+              </svg>
+            </div>
+            <span class="curve-end curve-min" id="curve-min">0</span>
+            <span class="curve-end curve-max" id="curve-max">100</span>
+          </div>
+          <input type="number" id="q-input" min="0" value="0" />
+        </div>
+
+        <button class="btn-primary" id="submit-guess">Lock In Guess</button>
+      </div>
+
+      <!-- Score reveal -->
+      <div id="quiz-reveal" class="card reveal hidden">
+        <div class="ad-slot ad-reveal" data-ad="reveal-banner">ad · reveal banner</div>
+        <div class="reveal-verdict" id="reveal-verdict" hidden>
+          <span class="rv-dot" aria-hidden="true"></span>
+          <span class="rv-text" id="reveal-verdict-text"></span>
+        </div>
+        <div class="timeline">
+          <div class="timeline-track"></div>
+          <div class="timeline-fill" id="timeline-fill"></div>
+          <div class="timeline-node guess" id="node-guess"><span>You</span></div>
+          <div class="timeline-node actual" id="node-actual"><span>Actual</span></div>
+        </div>
+        <div class="reveal-numbers">
+          <div>Your guess: <strong id="reveal-guess">—</strong></div>
+          <div>Actual: <strong id="reveal-actual">—</strong></div>
+        </div>
+        <div class="odometer-wrap"><div class="odometer" id="odometer">0</div></div>
+        <p class="chatline hidden" id="reveal-chatline"></p>
+        <p class="reveal-insight hidden" id="reveal-insight"></p>
+        <p class="penalty-note hidden" id="practice-penalty"></p>
+        <button class="btn-primary" id="next-question">Next</button>
+        <button class="btn-ghost data-check-inline" id="data-check-reveal" title="Browse every question with its verified answer"><i class="ic" data-icon="search" aria-hidden="true"></i> Check the stats</button>
+      </div>
+
+      <!-- Finish summary -->
+      <div id="quiz-summary" class="card hidden">
+        <h2>Task Complete</h2>
+        <div class="summary-score" id="summary-score">0</div>
+        <p>XP this task</p>
+        <div class="summary-grid" id="summary-grid" aria-label="Your result grid"></div>
+        <div class="accuracy-row" id="accuracy-row"></div>
+        <div class="summary-streak hidden" id="summary-streak"></div>
+        <p class="summary-insight hidden" id="summary-insight"></p>
+        <div class="ad-slot ad-summary" data-ad="summary-display">ad · summary display</div>
+        <button class="btn-primary" id="share-result">Share Result</button>
+        <button class="btn-secondary" id="challenge-friend"><i class="ic" data-icon="zap" aria-hidden="true"></i> Challenge a friend</button>
+        <button class="btn-secondary" id="summary-back">Back to Modes</button>
+        <p class="muted" id="share-status"></p>
+      </div>
+    </section>
+
+    <!-- ===================== DUEL ARENA OVER/UNDER ===================== -->
+    <section id="view-arcade" class="view">
+      <div class="card">
+        <h2>Duel Arena <span class="badge">∞ unlimited</span></h2>
+        <p class="muted">Which is greater? Build your streak — pick the side with the higher value.</p>
+        <div class="arcade-metric" id="arcade-metric">…</div>
+        <div class="arcade-pair">
+          <button class="arcade-card" id="arcade-a"><span class="name">—</span><span class="val">?</span></button>
+          <div class="vs">VS</div>
+          <button class="arcade-card" id="arcade-b"><span class="name">—</span><span class="val">?</span></button>
+        </div>
+        <div class="arcade-streak">Streak: <strong id="arcade-streak">0</strong>
+          · Best: <strong id="arcade-best">0</strong></div>
+        <p class="muted" id="arcade-result"></p>
+      </div>
+    </section>
+
+    <!-- ===================== PROFILE ===================== -->
+    <section id="view-profile" class="view">
+      <div class="card">
+        <h2>Profile <span class="badge" id="guest-badge">guest</span></h2>
+        <dl class="stats">
+          <dt>Sworn to</dt><dd id="p-team">—</dd>
+          <dt>Lifetime XP</dt><dd id="p-points">0</dd>
+          <dt>Questions answered</dt><dd id="p-games">0</dd>
+          <dt>Avg. accuracy</dt><dd id="p-accuracy">—</dd>
+          <dt>Daily streak</dt><dd id="p-streak">0</dd>
+          <dt>Diary progress</dt><dd id="p-achievements">none yet</dd>
+        </dl>
+        <!-- Account block: swaps between guest and signed-in states (app.js). -->
+        <div id="account-guest">
+          <p class="muted">Your progress is saved on this device. Create a free account to
+             save it to the cloud, play across devices, and join the HiScores.</p>
+          <button class="btn-secondary" id="open-auth-btn">Create account / Sign in →</button>
+        </div>
+        <div id="account-member" class="hidden">
+          <p class="muted">Signed in as <strong id="account-username">—</strong>.
+             Your XP is saved to your account and counted on the HiScores.</p>
+          <button class="btn-secondary" id="logout-btn">Log out</button>
+        </div>
+        <button class="btn-secondary danger" id="reset-btn">Reset local progress</button>
+      </div>
+
+      <!-- Streak heatmap: a year of Daily play at a glance (server history when
+           signed in, local otherwise). Filled by renderHeatmap(). -->
+      <div class="card">
+        <div class="ach-head"><h2>Daily streak history</h2></div>
+        <p class="muted">Each square is a day — the brighter, the more you played.</p>
+        <div class="heatmap heatmap-lg" id="profile-heatmap"></div>
+      </div>
+
+      <!-- Achievement Diary: a data-driven catalog (app.js ACHIEVEMENTS),
+           evaluated client-side after each session/duel. Cosmetic + local. -->
+      <div class="card">
+        <div class="ach-head">
+          <h2>Achievement Diary</h2>
+          <span class="badge" id="ach-count">0 / 0</span>
+        </div>
+        <div class="ach-filter" role="tablist" aria-label="Achievement filter">
+          <button class="ach-filter-tab active" data-filter="all">All</button>
+          <button class="ach-filter-tab" data-filter="unlocked">Unlocked</button>
+          <button class="ach-filter-tab" data-filter="locked">Locked</button>
+        </div>
+        <div class="ach-grid" id="ach-grid"></div>
+      </div>
+
+      <!-- HiScores: ranked by SERVER-verified points only (trust boundary). The
+           period tabs switch both boards between all-time and the resetting
+           daily / weekly windows. -->
+      <div class="lb-period" role="tablist" aria-label="HiScores window">
+        <button class="lb-period-tab active" data-period="all">All-time</button>
+        <button class="lb-period-tab" data-period="weekly">This week</button>
+        <button class="lb-period-tab" data-period="daily">Today</button>
+      </div>
+
+      <div class="card">
+        <h2>HiScores</h2>
+        <ol class="leaderboard" id="leaderboard-list">
+          <li class="muted">Loading…</li>
+        </ol>
+        <p class="muted">Ranked by XP the server scored — local totals can't be posted directly.</p>
+      </div>
+
+      <!-- God Wars championship: every player's verified points bucketed by the
+           god faction they pledged to. -->
+      <div class="card">
+        <h2>God Wars Championship</h2>
+        <ol class="leaderboard ctc" id="team-leaderboard-list">
+          <li class="muted">Loading…</li>
+        </ol>
+        <p class="muted">Whose followers are the wisest? Pledge your god to add your XP to its war effort.</p>
+      </div>
+    </section>
+
+    <!-- ===================== ABOUT / METHODOLOGY ===================== *
+         The trust layer: what the game is, how scoring works, where the data
+         comes from and how every answer is verified, and the privacy posture.
+         Footer links deep-link to the sections by id. -->
+    <section id="view-about" class="view">
+      <div id="about-top" class="about-hero">
+        <p class="hero-eyebrow">About</p>
+        <h1 class="section-title about-title">How ScapeMaster works</h1>
+        <p class="about-lead">A daily Old School RuneScape stats game built on real, verified
+           data — no trivia scraped from forums, no answers a model made up. Here's exactly
+           how it's put together.</p>
+      </div>
+
+      <div class="card about-card" id="about-play">
+        <h2>The game</h2>
+        <p>Every question asks for a single number — a High Alchemy value, a boss's combat
+           level, the XP to level 92 — and you're scored on <strong>how close</strong> you
+           get, not just right or wrong. Three ways to play:</p>
+        <ul class="about-list">
+          <li><strong>Daily Slayer Task</strong> — six questions, the same set for everyone,
+              once a day. This is the ranked, competitive mode.</li>
+          <li><strong>Training Grounds</strong> — endless single questions to warm up. Never
+              recorded and never ranked, with a short delay after a wild guess so the bank
+              can't be farmed for answers.</li>
+          <li><strong>Duel Arena</strong> — endless "which is greater?" head-to-heads,
+              played for a streak.</li>
+        </ul>
+      </div>
+
+      <div class="card about-card" id="about-scoring">
+        <h2>How scoring works</h2>
+        <p>Each question is worth up to <strong>5,000 XP</strong>. The score follows an
+           <strong>exponential-decay curve</strong> on your percentage error: a perfect guess
+           banks the full amount, and XP falls away the further off you are — gently at
+           first, then steeply. Land within 10% and you've hit <em>a purple</em> — the
+           raid-chest jackpot; within 25% is <em>a green</em> — solid loot.</p>
+        <p>Your guess never leaves your device until you lock it in, and the answer is only
+           revealed afterwards — scoring happens <strong>on the server</strong>, so HiScores
+           totals can't be forged by the client.</p>
+      </div>
+
+      <div class="card about-card" id="about-data">
+        <h2>Where the data comes from</h2>
+        <p>Questions are generated from datasets built off the
+           <a class="about-link" href="https://oldschool.runescape.wiki/" target="_blank"
+              rel="noopener">Old School RuneScape Wiki</a> (quest facts, monster stats,
+           release dates — available under
+           <a class="about-link" href="https://creativecommons.org/licenses/by-sa/3.0/"
+              target="_blank" rel="noopener">CC BY-SA 3.0</a>) and the wiki's
+           <a class="about-link" href="https://prices.runescape.wiki/" target="_blank"
+              rel="noopener">real-time prices API</a> (Grand Exchange prices, alch values,
+           buy limits). Skill-XP answers come straight from the exact experience formula.
+           The site ships a committed snapshot of that data, so it loads instantly and works
+           with no live API calls; GE prices reflect the latest weekly snapshot, not the
+           live market.</p>
+        <p>The mix leans toward content today's players know — recent OSRS originals first,
+           the beloved 2005–2007 backports next — with the classic era turning up now
+           and then.</p>
+      </div>
+
+      <div class="card about-card" id="about-verify">
+        <h2>How every answer is verified</h2>
+        <p>This is the part most trivia games skip. <strong>No answer is hand-written or taken
+           on trust.</strong> Before a question can ship, the answer is <strong>recomputed from
+           the underlying datasets</strong> (or the XP formula) by a validation step — if the
+           computed number doesn't match, the question is thrown out. That gate is the whole
+           point: it's what keeps a wrong or hallucinated stat from ever reaching you.</p>
+        <p>Spotted something that still looks off? Every question can be flagged from the in-app
+           data tool so it can be reviewed.</p>
+      </div>
+
+      <div class="card about-card" id="about-privacy">
+        <h2>Privacy</h2>
+        <p>ScapeMaster is <strong>guest-first</strong>: you can play straight away with everything
+           kept in your browser's local storage — no account, no tracking that follows you
+           around.</p>
+        <ul class="about-list">
+          <li><strong>Accounts are optional.</strong> If you create one, passwords are stored
+              salted and hashed (PBKDF2), never in the clear.</li>
+          <li><strong>Email is optional</strong> and only used for the streak reminders you opt
+              into — nothing else.</li>
+          <li><strong>Analytics are pseudonymous and aggregate.</strong> They measure how the
+              game is used in total and <em>never</em> feed your score or HiScores position.</li>
+          <li><strong>Reminders are local.</strong> The streak nudge runs in your browser; there
+              is no push server collecting subscriptions.</li>
+        </ul>
+      </div>
+
+      <div class="card about-card" id="about-feedback">
+        <h2>Contact &amp; feedback</h2>
+        <p>ScapeMaster is a fan-made project, not affiliated with Jagex. Found a bug, a wrong
+           answer, or have an idea? The code and issue tracker live on
+           <a class="about-link" href="https://github.com/technobacon/f1-stats" target="_blank"
+              rel="noopener">GitHub</a> — that's the best place to reach the project and to see
+           what's changed.</p>
+        <p class="about-disclaimer">Old School RuneScape and RuneScape are trademarks of Jagex
+           Ltd. This is an unofficial fan project and is not associated with or endorsed by
+           Jagex. Game data is drawn from the OSRS Wiki under CC BY-SA 3.0; no game assets,
+           fonts or audio are used. The datasets derived from wiki content are likewise
+           shared under CC BY-SA 3.0.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <nav class="foot-links" aria-label="About ScapeMaster">
+      <button class="foot-link" data-view="about" data-scroll="about-top">About</button>
+      <span class="foot-sep" aria-hidden="true">·</span>
+      <button class="foot-link" data-view="about" data-scroll="about-scoring">How scoring works</button>
+      <span class="foot-sep" aria-hidden="true">·</span>
+      <button class="foot-link" data-view="about" data-scroll="about-verify">How answers are verified</button>
+      <span class="foot-sep" aria-hidden="true">·</span>
+      <button class="foot-link" data-view="about" data-scroll="about-privacy">Privacy</button>
+      <span class="foot-sep" aria-hidden="true">·</span>
+      <button class="foot-link" data-view="about" data-scroll="about-feedback">Contact</button>
+    </nav>
+    <p class="foot-legal">
+      ScapeMaster · a fan-made Old School RuneScape trivia game, not affiliated with Jagex ·
+      wiki data CC BY-SA 3.0
+      <span class="foot-sep" aria-hidden="true">·</span>
+      <span class="foot-version" id="app-version"></span>
+    </p>
+    <span class="data-status" id="data-status" aria-live="polite"></span>
+    <button class="data-check-btn" id="data-check" title="Development tool: browse every question and its verified answer"><i class="ic" data-icon="clipboard" aria-hidden="true"></i> Check the data</button>
+  </footer>
+
+  <!-- Dev-only proofreading overlay: the full question bank WITH answers,
+       served by /api/v1/dev/questions (disable with OSRS_DEV_TOOLS=0). -->
+  <div id="data-overlay" class="data-overlay hidden">
+    <div class="data-panel">
+      <div class="data-head">
+        <h2>Question bank <span class="badge" id="data-count">…</span></h2>
+        <input type="search" id="data-search" placeholder="Filter questions…" />
+        <select id="data-mode-filter">
+          <option value="">All modes</option>
+          <option value="daily">daily</option>
+        </select>
+        <label class="data-flag-filter"><input type="checkbox" id="data-flagged-only" /> Flagged only</label>
+        <button class="btn-ghost data-close" id="data-close">✕ Close</button>
+      </div>
+      <p class="muted data-note">Development tool — every active question with its verified answer,
+         recomputed from the staging data. Click a column header to sort; use the 🚩 button to flag
+         a question you want to revisit later.</p>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th data-sort="question_string">Question</th>
+            <th data-sort="verified_answer" class="num">Answer</th>
+            <th data-sort="answer_kind">Kind</th>
+            <th data-sort="category">Category</th>
+            <th data-sort="game_mode">Mode</th>
+            <th data-sort="era_year" class="num">Era</th>
+            <th data-sort="flagged">Flag</th>
+          </tr></thead>
+          <tbody id="data-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- God picker modal. Doubles as the first-run onboarding prompt: the intro
+       line and the live per-god headcount + God Wars standings (populated by
+       GodPicker from /api/v1/gods/overview) help a newcomer pick a side. The
+       close button is hidden during onboarding so a god is chosen. -->
+  <div id="team-overlay" class="team-overlay hidden" role="dialog" aria-modal="true" aria-label="Choose your god">
+    <div class="team-panel">
+      <div class="team-panel-head">
+        <h2 id="team-panel-title">Choose Your God</h2>
+        <button class="game-exit" id="team-panel-close">✕ Close</button>
+      </div>
+      <p class="team-panel-intro hidden" id="team-panel-intro"></p>
+      <div class="team-picker-grid" id="team-picker-grid"></div>
+    </div>
+  </div>
+
+  <!-- Account modal: create account / sign in -->
+  <div id="auth-overlay" class="team-overlay hidden" role="dialog" aria-modal="true" aria-label="Account">
+    <div class="auth-panel">
+      <div class="team-panel-head">
+        <h2 id="auth-title">Create your account</h2>
+        <button class="game-exit" id="auth-close">✕ Close</button>
+      </div>
+      <form id="auth-form" class="auth-form" autocomplete="on">
+        <label for="auth-username">Username</label>
+        <input type="text" id="auth-username" name="username" autocomplete="username"
+               placeholder="3-32 letters, numbers, . _ -" required />
+        <label for="auth-password">Password</label>
+        <input type="password" id="auth-password" name="password" autocomplete="current-password"
+               placeholder="at least 8 characters" required minlength="8" />
+        <!-- Optional email: register only, for opt-in streak/daily reminders. -->
+        <div id="auth-email-row">
+          <label for="auth-email">Email <span class="auth-optional">optional — for streak reminders</span></label>
+          <input type="email" id="auth-email" name="email" autocomplete="email"
+                 placeholder="you@example.com (optional)" />
+        </div>
+        <p class="auth-error hidden" id="auth-error"></p>
+        <button type="submit" class="btn-primary" id="auth-submit">Create account</button>
+      </form>
+      <p class="muted auth-switch">
+        <span id="auth-switch-text">Already have an account?</span>
+        <button type="button" class="link-btn" id="auth-switch-btn">Sign in instead</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- ===================== SETTINGS ===================== *
+       A real preferences surface: consolidates the quick header toggles and adds
+       motion + reminders + reset in one place. Opened from the header gear. -->
+  <div id="settings-overlay" class="team-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="auth-panel settings-panel">
+      <div class="team-panel-head">
+        <h2 id="settings-title">Settings</h2>
+        <button class="game-exit" id="settings-close" aria-label="Close settings">✕ Close</button>
+      </div>
+      <div class="settings-list">
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Sound effects</span>
+            <span class="set-sub">Task-accepted cues, loot fanfares, lock-in clicks</span></div>
+          <button class="set-toggle" id="set-sound" role="switch" aria-checked="true"><span class="set-knob"></span></button>
+        </div>
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Parchment theme</span>
+            <span class="set-sub">Dark stone by default; switch to a bright parchment look</span></div>
+          <button class="set-toggle" id="set-theme" role="switch" aria-checked="false"><span class="set-knob"></span></button>
+        </div>
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Reduce motion</span>
+            <span class="set-sub">Skip the slide-ins and count-ups (also follows your system setting)</span></div>
+          <button class="set-toggle" id="set-motion" role="switch" aria-checked="false"><span class="set-knob"></span></button>
+        </div>
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Streak reminders</span>
+            <span class="set-sub">A local nudge before midnight UTC when a streak is at risk</span></div>
+          <button class="set-toggle" id="set-remind" role="switch" aria-checked="false"><span class="set-knob"></span></button>
+        </div>
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">God</span>
+            <span class="set-sub" id="set-team-name">Saradomin</span></div>
+          <button class="btn-secondary set-action" id="set-team">Change</button>
+        </div>
+        <div class="set-row">
+          <div class="set-label"><span class="set-name">Local progress</span>
+            <span class="set-sub">Clear this device's guest stats, streak and badges</span></div>
+          <button class="btn-secondary set-action danger" id="set-reset">Reset</button>
+        </div>
+      </div>
+      <p class="muted settings-foot" id="settings-version"></p>
+    </div>
+  </div>
+
+  <!-- ===================== FIRST-RUN SCORING EXPLAINER ===================== *
+       Shown once, the first time a player opens a challenge, so they aren't
+       dropped in cold. Teaches the closeness curve with a small visual. -->
+  <div id="scoring-overlay" class="team-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="scoring-title">
+    <div class="auth-panel scoring-panel">
+      <div class="team-panel-head">
+        <h2 id="scoring-title">How close counts</h2>
+        <button class="game-exit" id="scoring-close" aria-label="Close">✕</button>
+      </div>
+      <div class="scoring-body">
+        <p>You guess a number. You're scored on <strong>how close</strong> you land — not just
+           right or wrong.</p>
+        <svg class="scoring-curve" viewBox="0 0 280 120" role="img"
+             aria-label="A curve showing XP falling off as your guess gets further from the answer">
+          <line x1="20" y1="100" x2="270" y2="100" class="sc-axis" />
+          <line x1="20" y1="100" x2="20" y2="12" class="sc-axis" />
+          <path class="sc-area" d="M20,18 C70,22 110,55 160,80 C200,98 240,99 270,100 L270,100 L20,100 Z" />
+          <path class="sc-line" d="M20,18 C70,22 110,55 160,80 C200,98 240,99 270,100" />
+          <circle class="sc-dot" cx="20" cy="18" r="5" />
+          <text x="26" y="16" class="sc-tag">5,000 — spot on</text>
+          <text x="150" y="116" class="sc-axis-label">further from the answer →</text>
+        </svg>
+        <ul class="scoring-points">
+          <li><span class="sc-chip purple">Purple</span> within 10% — a raid-chest jackpot</li>
+          <li><span class="sc-chip green">Green</span> within 25% — solid loot</li>
+          <li>Up to <strong>5,000 XP</strong> per question; six per Daily Task.</li>
+        </ul>
+      </div>
+      <button class="btn-primary scoring-go" id="scoring-go">Got it — let's scape</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <script src="/static/icons.js?v=1"></script>
+  <script src="/static/sound.js?v=1"></script>
+  <script src="/static/app.js?v=1"></script>
+</body>
+</html>

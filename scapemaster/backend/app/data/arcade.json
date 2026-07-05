@@ -1,0 +1,2286 @@
+{
+ "items": [
+  {
+   "entity_id": "2",
+   "full_name": "Steel cannonball",
+   "stats": {
+    "ge_price": 254,
+    "high_alch": 3,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "207",
+   "full_name": "Grimy ranarr weed",
+   "stats": {
+    "ge_price": 5092,
+    "high_alch": 18,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "245",
+   "full_name": "Wine of zamorak",
+   "stats": {
+    "ge_price": 888,
+    "high_alch": 1,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "257",
+   "full_name": "Ranarr weed",
+   "stats": {
+    "ge_price": 5190,
+    "high_alch": 15,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "269",
+   "full_name": "Torstol",
+   "stats": {
+    "ge_price": 3134,
+    "high_alch": 45,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "314",
+   "full_name": "Feather",
+   "stats": {
+    "ge_price": 2,
+    "high_alch": 1,
+    "buy_limit": 30000
+   }
+  },
+  {
+   "entity_id": "373",
+   "full_name": "Swordfish",
+   "stats": {
+    "ge_price": 196,
+    "high_alch": 48,
+    "buy_limit": 6000
+   }
+  },
+  {
+   "entity_id": "377",
+   "full_name": "Raw lobster",
+   "stats": {
+    "ge_price": 126,
+    "high_alch": 42,
+    "buy_limit": 15000
+   }
+  },
+  {
+   "entity_id": "379",
+   "full_name": "Lobster",
+   "stats": {
+    "ge_price": 124,
+    "high_alch": 42,
+    "buy_limit": 6000
+   }
+  },
+  {
+   "entity_id": "383",
+   "full_name": "Raw shark",
+   "stats": {
+    "ge_price": 630,
+    "high_alch": 102,
+    "buy_limit": 15000
+   }
+  },
+  {
+   "entity_id": "385",
+   "full_name": "Shark",
+   "stats": {
+    "ge_price": 974,
+    "high_alch": 102,
+    "buy_limit": 10000
+   }
+  },
+  {
+   "entity_id": "391",
+   "full_name": "Manta ray",
+   "stats": {
+    "ge_price": 1436,
+    "high_alch": 120,
+    "buy_limit": 10000
+   }
+  },
+  {
+   "entity_id": "440",
+   "full_name": "Iron ore",
+   "stats": {
+    "ge_price": 73,
+    "high_alch": 10,
+    "buy_limit": 13000
+   }
+  },
+  {
+   "entity_id": "444",
+   "full_name": "Gold ore",
+   "stats": {
+    "ge_price": 150,
+    "high_alch": 90,
+    "buy_limit": 30000
+   }
+  },
+  {
+   "entity_id": "449",
+   "full_name": "Adamantite ore",
+   "stats": {
+    "ge_price": 568,
+    "high_alch": 240,
+    "buy_limit": 4500
+   }
+  },
+  {
+   "entity_id": "451",
+   "full_name": "Runite ore",
+   "stats": {
+    "ge_price": 10357,
+    "high_alch": 1920,
+    "buy_limit": 4500
+   }
+  },
+  {
+   "entity_id": "453",
+   "full_name": "Coal",
+   "stats": {
+    "ge_price": 152,
+    "high_alch": 27,
+    "buy_limit": 13000
+   }
+  },
+  {
+   "entity_id": "526",
+   "full_name": "Bones",
+   "stats": {
+    "ge_price": 30,
+    "high_alch": 1,
+    "buy_limit": 3000
+   }
+  },
+  {
+   "entity_id": "532",
+   "full_name": "Big bones",
+   "stats": {
+    "ge_price": 242,
+    "high_alch": 1,
+    "buy_limit": 3000
+   }
+  },
+  {
+   "entity_id": "536",
+   "full_name": "Dragon bones",
+   "stats": {
+    "ge_price": 2984,
+    "high_alch": 96,
+    "buy_limit": 7500
+   }
+  },
+  {
+   "entity_id": "560",
+   "full_name": "Death rune",
+   "stats": {
+    "ge_price": 184,
+    "high_alch": 108,
+    "buy_limit": 25000
+   }
+  },
+  {
+   "entity_id": "561",
+   "full_name": "Nature rune",
+   "stats": {
+    "ge_price": 128,
+    "high_alch": 108,
+    "buy_limit": 18000
+   }
+  },
+  {
+   "entity_id": "562",
+   "full_name": "Chaos rune",
+   "stats": {
+    "ge_price": 106,
+    "high_alch": 54,
+    "buy_limit": 18000
+   }
+  },
+  {
+   "entity_id": "563",
+   "full_name": "Law rune",
+   "stats": {
+    "ge_price": 120,
+    "high_alch": 144,
+    "buy_limit": 18000
+   }
+  },
+  {
+   "entity_id": "564",
+   "full_name": "Cosmic rune",
+   "stats": {
+    "ge_price": 112,
+    "high_alch": 30,
+    "buy_limit": 18000
+   }
+  },
+  {
+   "entity_id": "565",
+   "full_name": "Blood rune",
+   "stats": {
+    "ge_price": 284,
+    "high_alch": 240,
+    "buy_limit": 25000
+   }
+  },
+  {
+   "entity_id": "566",
+   "full_name": "Soul rune",
+   "stats": {
+    "ge_price": 380,
+    "high_alch": 180,
+    "buy_limit": 25000
+   }
+  },
+  {
+   "entity_id": "855",
+   "full_name": "Yew longbow",
+   "stats": {
+    "ge_price": 452,
+    "high_alch": 768,
+    "buy_limit": 18000
+   }
+  },
+  {
+   "entity_id": "859",
+   "full_name": "Magic longbow",
+   "stats": {
+    "ge_price": 1082,
+    "high_alch": 1536,
+    "buy_limit": 18000
+   }
+  },
+  {
+   "entity_id": "861",
+   "full_name": "Magic shortbow",
+   "stats": {
+    "ge_price": 761,
+    "high_alch": 960,
+    "buy_limit": 18000
+   }
+  },
+  {
+   "entity_id": "892",
+   "full_name": "Rune arrow",
+   "stats": {
+    "ge_price": 46,
+    "high_alch": 240,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "1079",
+   "full_name": "Rune platelegs",
+   "stats": {
+    "ge_price": 37770,
+    "high_alch": 38400,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "1127",
+   "full_name": "Rune platebody",
+   "stats": {
+    "ge_price": 38352,
+    "high_alch": 39000,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "1135",
+   "full_name": "Green d'hide body",
+   "stats": {
+    "ge_price": 4197,
+    "high_alch": 4680,
+    "buy_limit": 125
+   }
+  },
+  {
+   "entity_id": "1163",
+   "full_name": "Rune full helm",
+   "stats": {
+    "ge_price": 20536,
+    "high_alch": 21120,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "1201",
+   "full_name": "Rune kiteshield",
+   "stats": {
+    "ge_price": 31985,
+    "high_alch": 32640,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "1215",
+   "full_name": "Dragon dagger",
+   "stats": {
+    "ge_price": 17128,
+    "high_alch": 18000,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "1275",
+   "full_name": "Rune pickaxe",
+   "stats": {
+    "ge_price": 18544,
+    "high_alch": 19200,
+    "buy_limit": 40
+   }
+  },
+  {
+   "entity_id": "1319",
+   "full_name": "Rune 2h sword",
+   "stats": {
+    "ge_price": 37966,
+    "high_alch": 38400,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "1333",
+   "full_name": "Rune scimitar",
+   "stats": {
+    "ge_price": 14838,
+    "high_alch": 15360,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "1359",
+   "full_name": "Rune axe",
+   "stats": {
+    "ge_price": 7151,
+    "high_alch": 7680,
+    "buy_limit": 40
+   }
+  },
+  {
+   "entity_id": "1511",
+   "full_name": "Logs",
+   "stats": {
+    "ge_price": 24,
+    "high_alch": 2,
+    "buy_limit": 15000
+   }
+  },
+  {
+   "entity_id": "1513",
+   "full_name": "Magic logs",
+   "stats": {
+    "ge_price": 812,
+    "high_alch": 192,
+    "buy_limit": 12000
+   }
+  },
+  {
+   "entity_id": "1515",
+   "full_name": "Yew logs",
+   "stats": {
+    "ge_price": 114,
+    "high_alch": 96,
+    "buy_limit": 12000
+   }
+  },
+  {
+   "entity_id": "1519",
+   "full_name": "Willow logs",
+   "stats": {
+    "ge_price": 24,
+    "high_alch": 24,
+    "buy_limit": 15000
+   }
+  },
+  {
+   "entity_id": "1521",
+   "full_name": "Oak logs",
+   "stats": {
+    "ge_price": 34,
+    "high_alch": 12,
+    "buy_limit": 15000
+   }
+  },
+  {
+   "entity_id": "1615",
+   "full_name": "Dragonstone",
+   "stats": {
+    "ge_price": 11114,
+    "high_alch": 6000,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "1704",
+   "full_name": "Amulet of glory",
+   "stats": {
+    "ge_price": 10493,
+    "high_alch": 10575,
+    "buy_limit": 10000
+   }
+  },
+  {
+   "entity_id": "1731",
+   "full_name": "Amulet of power",
+   "stats": {
+    "ge_price": 2101,
+    "high_alch": 2115,
+    "buy_limit": 125
+   }
+  },
+  {
+   "entity_id": "1777",
+   "full_name": "Bow string",
+   "stats": {
+    "ge_price": 122,
+    "high_alch": 6,
+    "buy_limit": 13000
+   }
+  },
+  {
+   "entity_id": "1779",
+   "full_name": "Flax",
+   "stats": {
+    "ge_price": 2,
+    "high_alch": 3,
+    "buy_limit": 13000
+   }
+  },
+  {
+   "entity_id": "2353",
+   "full_name": "Steel bar",
+   "stats": {
+    "ge_price": 592,
+    "high_alch": 60,
+    "buy_limit": 10000
+   }
+  },
+  {
+   "entity_id": "2357",
+   "full_name": "Gold bar",
+   "stats": {
+    "ge_price": 96,
+    "high_alch": 180,
+    "buy_limit": 10000
+   }
+  },
+  {
+   "entity_id": "2363",
+   "full_name": "Runite bar",
+   "stats": {
+    "ge_price": 12276,
+    "high_alch": 3000,
+    "buy_limit": 10000
+   }
+  },
+  {
+   "entity_id": "2434",
+   "full_name": "Prayer potion(4)",
+   "stats": {
+    "ge_price": 8543,
+    "high_alch": 114,
+    "buy_limit": 2000
+   }
+  },
+  {
+   "entity_id": "2444",
+   "full_name": "Ranging potion(4)",
+   "stats": {
+    "ge_price": 2190,
+    "high_alch": 216,
+    "buy_limit": 2000
+   }
+  },
+  {
+   "entity_id": "2503",
+   "full_name": "Black d'hide body",
+   "stats": {
+    "ge_price": 7306,
+    "high_alch": 8088,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "2552",
+   "full_name": "Ring of dueling(8)",
+   "stats": {
+    "ge_price": 908,
+    "high_alch": 765,
+    "buy_limit": 15000
+   }
+  },
+  {
+   "entity_id": "2572",
+   "full_name": "Ring of wealth",
+   "stats": {
+    "ge_price": 10818,
+    "high_alch": 10575,
+    "buy_limit": 10000
+   }
+  },
+  {
+   "entity_id": "3000",
+   "full_name": "Snapdragon",
+   "stats": {
+    "ge_price": 7846,
+    "high_alch": 35,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "3024",
+   "full_name": "Super restore(4)",
+   "stats": {
+    "ge_price": 10745,
+    "high_alch": 180,
+    "buy_limit": 2000
+   }
+  },
+  {
+   "entity_id": "3051",
+   "full_name": "Grimy snapdragon",
+   "stats": {
+    "ge_price": 7630,
+    "high_alch": 12,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "3140",
+   "full_name": "Dragon chainbody",
+   "stats": {
+    "ge_price": 184319,
+    "high_alch": 150000,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "3144",
+   "full_name": "Cooked karambwan",
+   "stats": {
+    "ge_price": 400,
+    "high_alch": 150,
+    "buy_limit": 10000
+   }
+  },
+  {
+   "entity_id": "4087",
+   "full_name": "Dragon platelegs",
+   "stats": {
+    "ge_price": 161006,
+    "high_alch": 162000,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "4091",
+   "full_name": "Mystic robe top",
+   "stats": {
+    "ge_price": 71402,
+    "high_alch": 72000,
+    "buy_limit": 125
+   }
+  },
+  {
+   "entity_id": "4151",
+   "full_name": "Abyssal whip",
+   "stats": {
+    "ge_price": 987898,
+    "high_alch": 72000,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "4153",
+   "full_name": "Granite maul",
+   "stats": {
+    "ge_price": 141208,
+    "high_alch": 30000,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "4587",
+   "full_name": "Dragon scimitar",
+   "stats": {
+    "ge_price": 59504,
+    "high_alch": 60000,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "4712",
+   "full_name": "Ahrim's robetop",
+   "stats": {
+    "ge_price": 1849539,
+    "high_alch": 30000,
+    "buy_limit": 15
+   }
+  },
+  {
+   "entity_id": "4718",
+   "full_name": "Dharok's greataxe",
+   "stats": {
+    "ge_price": 1969884,
+    "high_alch": 124800,
+    "buy_limit": 15
+   }
+  },
+  {
+   "entity_id": "4720",
+   "full_name": "Dharok's platebody",
+   "stats": {
+    "ge_price": 952317,
+    "high_alch": 168000,
+    "buy_limit": 15
+   }
+  },
+  {
+   "entity_id": "4726",
+   "full_name": "Guthan's warspear",
+   "stats": {
+    "ge_price": 92588,
+    "high_alch": 60000,
+    "buy_limit": 15
+   }
+  },
+  {
+   "entity_id": "4734",
+   "full_name": "Karil's crossbow",
+   "stats": {
+    "ge_price": 99984,
+    "high_alch": 96000,
+    "buy_limit": 15
+   }
+  },
+  {
+   "entity_id": "5295",
+   "full_name": "Ranarr seed",
+   "stats": {
+    "ge_price": 25029,
+    "high_alch": 30,
+    "buy_limit": 200
+   }
+  },
+  {
+   "entity_id": "5316",
+   "full_name": "Magic seed",
+   "stats": {
+    "ge_price": 71280,
+    "high_alch": 253,
+    "buy_limit": 200
+   }
+  },
+  {
+   "entity_id": "6332",
+   "full_name": "Mahogany logs",
+   "stats": {
+    "ge_price": 180,
+    "high_alch": 30,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "6333",
+   "full_name": "Teak logs",
+   "stats": {
+    "ge_price": 106,
+    "high_alch": 18,
+    "buy_limit": 13000
+   }
+  },
+  {
+   "entity_id": "6573",
+   "full_name": "Onyx",
+   "stats": {
+    "ge_price": 2892233,
+    "high_alch": 120000,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "6585",
+   "full_name": "Amulet of fury",
+   "stats": {
+    "ge_price": 2938639,
+    "high_alch": 121200,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "6685",
+   "full_name": "Saradomin brew(4)",
+   "stats": {
+    "ge_price": 7201,
+    "high_alch": 120,
+    "buy_limit": 2000
+   }
+  },
+  {
+   "entity_id": "6733",
+   "full_name": "Archers ring",
+   "stats": {
+    "ge_price": 2020032,
+    "high_alch": 6000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "6737",
+   "full_name": "Berserker ring",
+   "stats": {
+    "ge_price": 2927442,
+    "high_alch": 6000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "6739",
+   "full_name": "Dragon axe",
+   "stats": {
+    "ge_price": 82081,
+    "high_alch": 33000,
+    "buy_limit": 40
+   }
+  },
+  {
+   "entity_id": "7158",
+   "full_name": "Dragon 2h sword",
+   "stats": {
+    "ge_price": 134890,
+    "high_alch": 132000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "7936",
+   "full_name": "Pure essence",
+   "stats": {
+    "ge_price": 2,
+    "high_alch": 2,
+    "buy_limit": 30000
+   }
+  },
+  {
+   "entity_id": "7946",
+   "full_name": "Monkfish",
+   "stats": {
+    "ge_price": 207,
+    "high_alch": 138,
+    "buy_limit": 13000
+   }
+  },
+  {
+   "entity_id": "8901",
+   "full_name": "Black mask (10)",
+   "stats": {
+    "ge_price": 1419898,
+    "high_alch": 1800,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "9075",
+   "full_name": "Astral rune",
+   "stats": {
+    "ge_price": 99,
+    "high_alch": 30,
+    "buy_limit": 25000
+   }
+  },
+  {
+   "entity_id": "9185",
+   "full_name": "Rune crossbow",
+   "stats": {
+    "ge_price": 9546,
+    "high_alch": 9720,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "10034",
+   "full_name": "Red chinchompa",
+   "stats": {
+    "ge_price": 1354,
+    "high_alch": 96,
+    "buy_limit": 7000
+   }
+  },
+  {
+   "entity_id": "10350",
+   "full_name": "3rd age full helmet",
+   "stats": {
+    "ge_price": 38000000,
+    "high_alch": 54000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11212",
+   "full_name": "Dragon arrow",
+   "stats": {
+    "ge_price": 2372,
+    "high_alch": 480,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "11230",
+   "full_name": "Dragon dart",
+   "stats": {
+    "ge_price": 1192,
+    "high_alch": 300,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "11235",
+   "full_name": "Dark bow",
+   "stats": {
+    "ge_price": 966118,
+    "high_alch": 72001,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11284",
+   "full_name": "Dragonfire shield",
+   "stats": {
+    "ge_price": 3602170,
+    "high_alch": 1200000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11335",
+   "full_name": "Dragon full helm",
+   "stats": {
+    "ge_price": 47412174,
+    "high_alch": 90000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11785",
+   "full_name": "Armadyl crossbow",
+   "stats": {
+    "ge_price": 42297048,
+    "high_alch": 594000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11791",
+   "full_name": "Staff of the dead",
+   "stats": {
+    "ge_price": 6092668,
+    "high_alch": 600003,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11802",
+   "full_name": "Armadyl godsword",
+   "stats": {
+    "ge_price": 7204738,
+    "high_alch": 750000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11804",
+   "full_name": "Bandos godsword",
+   "stats": {
+    "ge_price": 16568540,
+    "high_alch": 750000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11806",
+   "full_name": "Saradomin godsword",
+   "stats": {
+    "ge_price": 21585127,
+    "high_alch": 750000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11808",
+   "full_name": "Zamorak godsword",
+   "stats": {
+    "ge_price": 15057939,
+    "high_alch": 750000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11824",
+   "full_name": "Zamorakian spear",
+   "stats": {
+    "ge_price": 1235528,
+    "high_alch": 60003,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11826",
+   "full_name": "Armadyl helmet",
+   "stats": {
+    "ge_price": 8676236,
+    "high_alch": 173400,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11828",
+   "full_name": "Armadyl chestplate",
+   "stats": {
+    "ge_price": 34796506,
+    "high_alch": 174000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11830",
+   "full_name": "Armadyl chainskirt",
+   "stats": {
+    "ge_price": 25987646,
+    "high_alch": 173940,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11832",
+   "full_name": "Bandos chestplate",
+   "stats": {
+    "ge_price": 23429578,
+    "high_alch": 174006,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11834",
+   "full_name": "Bandos tassets",
+   "stats": {
+    "ge_price": 15594286,
+    "high_alch": 173946,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11838",
+   "full_name": "Saradomin sword",
+   "stats": {
+    "ge_price": 124252,
+    "high_alch": 78000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11840",
+   "full_name": "Dragon boots",
+   "stats": {
+    "ge_price": 230659,
+    "high_alch": 12000,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "11905",
+   "full_name": "Trident of the seas (full)",
+   "stats": {
+    "ge_price": 873414,
+    "high_alch": 41400,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "11920",
+   "full_name": "Dragon pickaxe",
+   "stats": {
+    "ge_price": 541455,
+    "high_alch": 58770,
+    "buy_limit": 40
+   }
+  },
+  {
+   "entity_id": "11959",
+   "full_name": "Black chinchompa",
+   "stats": {
+    "ge_price": 2840,
+    "high_alch": 144,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "12002",
+   "full_name": "Occult necklace",
+   "stats": {
+    "ge_price": 384698,
+    "high_alch": 27000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "12004",
+   "full_name": "Kraken tentacle",
+   "stats": {
+    "ge_price": 239500,
+    "high_alch": 50004,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "12625",
+   "full_name": "Stamina potion(4)",
+   "stats": {
+    "ge_price": 3932,
+    "high_alch": 240,
+    "buy_limit": 2000
+   }
+  },
+  {
+   "entity_id": "12695",
+   "full_name": "Super combat potion(4)",
+   "stats": {
+    "ge_price": 11978,
+    "high_alch": 150,
+    "buy_limit": 2000
+   }
+  },
+  {
+   "entity_id": "12817",
+   "full_name": "Elysian spirit shield",
+   "stats": {
+    "ge_price": 508433640,
+    "high_alch": 1200000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "12821",
+   "full_name": "Spectral spirit shield",
+   "stats": {
+    "ge_price": 24171030,
+    "high_alch": 1200000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "12825",
+   "full_name": "Arcane spirit shield",
+   "stats": {
+    "ge_price": 111667046,
+    "high_alch": 1200000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "12902",
+   "full_name": "Toxic staff (uncharged)",
+   "stats": {
+    "ge_price": 9075261,
+    "high_alch": 600003,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "12922",
+   "full_name": "Tanzanite fang",
+   "stats": {
+    "ge_price": 12818352,
+    "high_alch": 66000,
+    "buy_limit": 5
+   }
+  },
+  {
+   "entity_id": "12924",
+   "full_name": "Toxic blowpipe (empty)",
+   "stats": {
+    "ge_price": 10694854,
+    "high_alch": 72000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "12927",
+   "full_name": "Serpentine visage",
+   "stats": {
+    "ge_price": 3610348,
+    "high_alch": 63000,
+    "buy_limit": 5
+   }
+  },
+  {
+   "entity_id": "12932",
+   "full_name": "Magic fang",
+   "stats": {
+    "ge_price": 3350278,
+    "high_alch": 61200,
+    "buy_limit": 5
+   }
+  },
+  {
+   "entity_id": "12934",
+   "full_name": "Zulrah's scales",
+   "stats": {
+    "ge_price": 168,
+    "high_alch": 12,
+    "buy_limit": 30000
+   }
+  },
+  {
+   "entity_id": "13190",
+   "full_name": "Old school bond",
+   "stats": {
+    "ge_price": 11312160,
+    "buy_limit": 100
+   }
+  },
+  {
+   "entity_id": "13235",
+   "full_name": "Eternal boots",
+   "stats": {
+    "ge_price": 3691320,
+    "high_alch": 45000,
+    "buy_limit": 15
+   }
+  },
+  {
+   "entity_id": "13237",
+   "full_name": "Pegasian boots",
+   "stats": {
+    "ge_price": 30876968,
+    "high_alch": 45000,
+    "buy_limit": 15
+   }
+  },
+  {
+   "entity_id": "13239",
+   "full_name": "Primordial boots",
+   "stats": {
+    "ge_price": 19154638,
+    "high_alch": 45000,
+    "buy_limit": 15
+   }
+  },
+  {
+   "entity_id": "13263",
+   "full_name": "Abyssal bludgeon",
+   "stats": {
+    "ge_price": 17542794,
+    "high_alch": 156000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "13265",
+   "full_name": "Abyssal dagger",
+   "stats": {
+    "ge_price": 1216432,
+    "high_alch": 69000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "13441",
+   "full_name": "Anglerfish",
+   "stats": {
+    "ge_price": 2832,
+    "high_alch": 270,
+    "buy_limit": 10000
+   }
+  },
+  {
+   "entity_id": "13576",
+   "full_name": "Dragon warhammer",
+   "stats": {
+    "ge_price": 15637038,
+    "high_alch": 72000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "13652",
+   "full_name": "Dragon claws",
+   "stats": {
+    "ge_price": 38570998,
+    "high_alch": 123000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "19481",
+   "full_name": "Heavy ballista",
+   "stats": {
+    "ge_price": 947877,
+    "high_alch": 570000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "19493",
+   "full_name": "Zenyte",
+   "stats": {
+    "ge_price": 18700000,
+    "high_alch": 45000,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "19529",
+   "full_name": "Zenyte shard",
+   "stats": {
+    "ge_price": 15906474,
+    "high_alch": 45000,
+    "buy_limit": 11000
+   }
+  },
+  {
+   "entity_id": "19544",
+   "full_name": "Tormented bracelet",
+   "stats": {
+    "ge_price": 19260750,
+    "high_alch": 120600,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "19547",
+   "full_name": "Necklace of anguish",
+   "stats": {
+    "ge_price": 18667094,
+    "high_alch": 121200,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "19550",
+   "full_name": "Ring of suffering",
+   "stats": {
+    "ge_price": 17827586,
+    "high_alch": 120600,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "19553",
+   "full_name": "Amulet of torture",
+   "stats": {
+    "ge_price": 19343328,
+    "high_alch": 121200,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "19669",
+   "full_name": "Redwood logs",
+   "stats": {
+    "ge_price": 669,
+    "high_alch": 270,
+    "buy_limit": 12000
+   }
+  },
+  {
+   "entity_id": "20014",
+   "full_name": "3rd age pickaxe",
+   "stats": {
+    "ge_price": 2147483647,
+    "high_alch": 58770,
+    "buy_limit": 40
+   }
+  },
+  {
+   "entity_id": "20724",
+   "full_name": "Imbued heart",
+   "stats": {
+    "ge_price": 98842565,
+    "high_alch": 300000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "20997",
+   "full_name": "Twisted bow",
+   "stats": {
+    "ge_price": 1476109021,
+    "high_alch": 2400000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "21000",
+   "full_name": "Twisted buckler",
+   "stats": {
+    "ge_price": 21938386,
+    "high_alch": 54000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "21003",
+   "full_name": "Elder maul",
+   "stats": {
+    "ge_price": 108174283,
+    "high_alch": 300006,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "21006",
+   "full_name": "Kodai wand",
+   "stats": {
+    "ge_price": 65720168,
+    "high_alch": 90000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "21012",
+   "full_name": "Dragon hunter crossbow",
+   "stats": {
+    "ge_price": 33910155,
+    "high_alch": 48000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "21018",
+   "full_name": "Ancestral hat",
+   "stats": {
+    "ge_price": 56241705,
+    "high_alch": 27000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "21021",
+   "full_name": "Ancestral robe top",
+   "stats": {
+    "ge_price": 121563770,
+    "high_alch": 72000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "21024",
+   "full_name": "Ancestral robe bottom",
+   "stats": {
+    "ge_price": 81242318,
+    "high_alch": 48000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "21028",
+   "full_name": "Dragon harpoon",
+   "stats": {
+    "ge_price": 2031222,
+    "high_alch": 33000,
+    "buy_limit": 5
+   }
+  },
+  {
+   "entity_id": "21880",
+   "full_name": "Wrath rune",
+   "stats": {
+    "ge_price": 392,
+    "high_alch": 300,
+    "buy_limit": 25000
+   }
+  },
+  {
+   "entity_id": "22124",
+   "full_name": "Superior dragon bones",
+   "stats": {
+    "ge_price": 20692,
+    "high_alch": 96,
+    "buy_limit": 7500
+   }
+  },
+  {
+   "entity_id": "22324",
+   "full_name": "Ghrazi rapier",
+   "stats": {
+    "ge_price": 23981808,
+    "high_alch": 3000000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "22327",
+   "full_name": "Justiciar chestguard",
+   "stats": {
+    "ge_price": 8879926,
+    "high_alch": 3600000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "22477",
+   "full_name": "Avernic defender hilt",
+   "stats": {
+    "ge_price": 31472168,
+    "high_alch": 1500000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "22481",
+   "full_name": "Sanguinesti staff (uncharged)",
+   "stats": {
+    "ge_price": 18199845,
+    "high_alch": 3000000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "22486",
+   "full_name": "Scythe of vitur (uncharged)",
+   "stats": {
+    "ge_price": 1314971298,
+    "high_alch": 2400000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "22978",
+   "full_name": "Dragon hunter lance",
+   "stats": {
+    "ge_price": 49681331,
+    "high_alch": 180000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "23997",
+   "full_name": "Blade of saeldor (inactive)",
+   "stats": {
+    "ge_price": 114921076,
+    "high_alch": 3000000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "24417",
+   "full_name": "Inquisitor's mace",
+   "stats": {
+    "ge_price": 343388922,
+    "high_alch": 3000000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "24422",
+   "full_name": "Nightmare staff",
+   "stats": {
+    "ge_price": 46686070,
+    "high_alch": 360000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "24511",
+   "full_name": "Harmonised orb",
+   "stats": {
+    "ge_price": 432818992,
+    "high_alch": 2400000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "25862",
+   "full_name": "Bow of faerdhinen (inactive)",
+   "stats": {
+    "ge_price": 114944288,
+    "high_alch": 3000000
+   }
+  },
+  {
+   "entity_id": "25975",
+   "full_name": "Lightbearer",
+   "stats": {
+    "ge_price": 3891615,
+    "high_alch": 600000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "25985",
+   "full_name": "Elidinis' ward",
+   "stats": {
+    "ge_price": 3120976,
+    "high_alch": 3000000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "26219",
+   "full_name": "Osmumten's fang",
+   "stats": {
+    "ge_price": 19268732,
+    "high_alch": 600000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "26235",
+   "full_name": "Zaryte vambraces",
+   "stats": {
+    "ge_price": 74554059,
+    "high_alch": 120000,
+    "buy_limit": 7
+   }
+  },
+  {
+   "entity_id": "26374",
+   "full_name": "Zaryte crossbow",
+   "stats": {
+    "ge_price": 383187216,
+    "high_alch": 594000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "26382",
+   "full_name": "Torva full helm",
+   "stats": {
+    "ge_price": 206257634,
+    "high_alch": 120000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "26384",
+   "full_name": "Torva platebody",
+   "stats": {
+    "ge_price": 173279707,
+    "high_alch": 360000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "26386",
+   "full_name": "Torva platelegs",
+   "stats": {
+    "ge_price": 108352655,
+    "high_alch": 240000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "27226",
+   "full_name": "Masori mask",
+   "stats": {
+    "ge_price": 12664594,
+    "high_alch": 480000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "27229",
+   "full_name": "Masori body",
+   "stats": {
+    "ge_price": 40473819,
+    "high_alch": 720000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "27232",
+   "full_name": "Masori chaps",
+   "stats": {
+    "ge_price": 26697604,
+    "high_alch": 600000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "27277",
+   "full_name": "Tumeken's shadow (uncharged)",
+   "stats": {
+    "ge_price": 835000082,
+    "high_alch": 4200000,
+    "buy_limit": 8
+   }
+  },
+  {
+   "entity_id": "27690",
+   "full_name": "Voidwaker",
+   "stats": {
+    "ge_price": 36184688,
+    "high_alch": 1200000,
+    "buy_limit": 70
+   }
+  },
+  {
+   "entity_id": "28307",
+   "full_name": "Ultor ring",
+   "stats": {
+    "ge_price": 124766890,
+    "high_alch": 84000
+   }
+  },
+  {
+   "entity_id": "28310",
+   "full_name": "Venator ring",
+   "stats": {
+    "ge_price": 46202000,
+    "high_alch": 84000
+   }
+  },
+  {
+   "entity_id": "28313",
+   "full_name": "Magus ring",
+   "stats": {
+    "ge_price": 26811990,
+    "high_alch": 84000
+   }
+  },
+  {
+   "entity_id": "28316",
+   "full_name": "Bellator ring",
+   "stats": {
+    "ge_price": 22474661,
+    "high_alch": 84000
+   }
+  },
+  {
+   "entity_id": "28338",
+   "full_name": "Soulreaper axe",
+   "stats": {
+    "ge_price": 353864168,
+    "high_alch": 144000,
+    "buy_limit": 5
+   }
+  }
+ ],
+ "monsters": [
+  {
+   "entity_id": "aberrant_spectre",
+   "full_name": "Aberrant spectre",
+   "stats": {
+    "combat_level": 96,
+    "hitpoints": 90,
+    "slayer_xp": 90.0
+   }
+  },
+  {
+   "entity_id": "abyssal_demon",
+   "full_name": "Abyssal demon",
+   "stats": {
+    "combat_level": 124,
+    "hitpoints": 150,
+    "slayer_xp": 150.0
+   }
+  },
+  {
+   "entity_id": "abyssal_sire",
+   "full_name": "Abyssal Sire",
+   "stats": {
+    "combat_level": 350,
+    "hitpoints": 425,
+    "slayer_xp": 478.0
+   }
+  },
+  {
+   "entity_id": "adamant_dragon",
+   "full_name": "Adamant dragon",
+   "stats": {
+    "combat_level": 338,
+    "hitpoints": 295,
+    "slayer_xp": 324.5
+   }
+  },
+  {
+   "entity_id": "ahrim_the_blighted",
+   "full_name": "Ahrim the Blighted",
+   "stats": {
+    "combat_level": 98,
+    "hitpoints": 100,
+    "slayer_xp": 102.5
+   }
+  },
+  {
+   "entity_id": "akkha",
+   "full_name": "Akkha",
+   "stats": {
+    "combat_level": 337,
+    "hitpoints": 400
+   }
+  },
+  {
+   "entity_id": "alchemical_hydra",
+   "full_name": "Alchemical Hydra",
+   "stats": {
+    "combat_level": 426,
+    "hitpoints": 1100,
+    "slayer_xp": 1320.0
+   }
+  },
+  {
+   "entity_id": "araxxor",
+   "full_name": "Araxxor",
+   "stats": {
+    "combat_level": 890,
+    "hitpoints": 1020,
+    "slayer_xp": 1708.0
+   }
+  },
+  {
+   "entity_id": "ba_ba",
+   "full_name": "Ba-Ba",
+   "stats": {
+    "combat_level": 359,
+    "hitpoints": 380
+   }
+  },
+  {
+   "entity_id": "banshee",
+   "full_name": "Banshee",
+   "stats": {
+    "combat_level": 23,
+    "hitpoints": 22,
+    "slayer_xp": 22.0
+   }
+  },
+  {
+   "entity_id": "basilisk",
+   "full_name": "Basilisk",
+   "stats": {
+    "combat_level": 61,
+    "hitpoints": 75,
+    "slayer_xp": 75.0
+   }
+  },
+  {
+   "entity_id": "blue_dragon",
+   "full_name": "Blue dragon",
+   "stats": {
+    "combat_level": 111,
+    "hitpoints": 105,
+    "slayer_xp": 105.0
+   }
+  },
+  {
+   "entity_id": "brutal_black_dragon",
+   "full_name": "Brutal black dragon",
+   "stats": {
+    "combat_level": 318,
+    "hitpoints": 315,
+    "slayer_xp": 346.4
+   }
+  },
+  {
+   "entity_id": "bryophyta",
+   "full_name": "Bryophyta",
+   "stats": {
+    "combat_level": 128,
+    "hitpoints": 115,
+    "slayer_xp": 115.0
+   }
+  },
+  {
+   "entity_id": "callisto",
+   "full_name": "Callisto",
+   "stats": {
+    "combat_level": 470,
+    "hitpoints": 1000,
+    "slayer_xp": 1300.0
+   }
+  },
+  {
+   "entity_id": "cave_horror",
+   "full_name": "Cave horror",
+   "stats": {
+    "combat_level": 80,
+    "hitpoints": 55,
+    "slayer_xp": 55.0
+   }
+  },
+  {
+   "entity_id": "cave_kraken",
+   "full_name": "Cave kraken",
+   "stats": {
+    "combat_level": 127,
+    "hitpoints": 125,
+    "slayer_xp": 125.0
+   }
+  },
+  {
+   "entity_id": "cerberus",
+   "full_name": "Cerberus",
+   "stats": {
+    "combat_level": 318,
+    "hitpoints": 600,
+    "slayer_xp": 690.0
+   }
+  },
+  {
+   "entity_id": "chaos_elemental",
+   "full_name": "Chaos Elemental",
+   "stats": {
+    "combat_level": 305,
+    "hitpoints": 250,
+    "slayer_xp": 268.75
+   }
+  },
+  {
+   "entity_id": "chicken",
+   "full_name": "Chicken",
+   "stats": {
+    "combat_level": 1,
+    "hitpoints": 3,
+    "slayer_xp": 3.0
+   }
+  },
+  {
+   "entity_id": "cockatrice",
+   "full_name": "Cockatrice",
+   "stats": {
+    "combat_level": 37,
+    "hitpoints": 37,
+    "slayer_xp": 37.0
+   }
+  },
+  {
+   "entity_id": "commander_zilyana",
+   "full_name": "Commander Zilyana",
+   "stats": {
+    "combat_level": 596,
+    "hitpoints": 255,
+    "slayer_xp": 350.0
+   }
+  },
+  {
+   "entity_id": "corporeal_beast",
+   "full_name": "Corporeal Beast",
+   "stats": {
+    "combat_level": 785,
+    "hitpoints": 2000
+   }
+  },
+  {
+   "entity_id": "cow",
+   "full_name": "Cow",
+   "stats": {
+    "combat_level": 2,
+    "hitpoints": 8,
+    "slayer_xp": 8.0
+   }
+  },
+  {
+   "entity_id": "dagannoth_prime",
+   "full_name": "Dagannoth Prime",
+   "stats": {
+    "combat_level": 303,
+    "hitpoints": 255,
+    "slayer_xp": 331.4
+   }
+  },
+  {
+   "entity_id": "dagannoth_rex",
+   "full_name": "Dagannoth Rex",
+   "stats": {
+    "combat_level": 303,
+    "hitpoints": 255,
+    "slayer_xp": 331.4
+   }
+  },
+  {
+   "entity_id": "dagannoth_supreme",
+   "full_name": "Dagannoth Supreme",
+   "stats": {
+    "combat_level": 303,
+    "hitpoints": 255,
+    "slayer_xp": 255.0
+   }
+  },
+  {
+   "entity_id": "dark_beast",
+   "full_name": "Dark beast",
+   "stats": {
+    "combat_level": 182,
+    "hitpoints": 220,
+    "slayer_xp": 225.4
+   }
+  },
+  {
+   "entity_id": "demonic_gorilla",
+   "full_name": "Demonic gorilla",
+   "stats": {
+    "combat_level": 275,
+    "hitpoints": 380,
+    "slayer_xp": 408.5
+   }
+  },
+  {
+   "entity_id": "dharok_the_wretched",
+   "full_name": "Dharok the Wretched",
+   "stats": {
+    "combat_level": 115,
+    "hitpoints": 100,
+    "slayer_xp": 115.0
+   }
+  },
+  {
+   "entity_id": "drake",
+   "full_name": "Drake",
+   "stats": {
+    "combat_level": 192,
+    "hitpoints": 225,
+    "slayer_xp": 230.6
+   }
+  },
+  {
+   "entity_id": "gargoyle",
+   "full_name": "Gargoyle",
+   "stats": {
+    "combat_level": 111,
+    "hitpoints": 105,
+    "slayer_xp": 105.0
+   }
+  },
+  {
+   "entity_id": "general_graardor",
+   "full_name": "General Graardor",
+   "stats": {
+    "combat_level": 624,
+    "hitpoints": 255,
+    "slayer_xp": 338.0
+   }
+  },
+  {
+   "entity_id": "giant_mole",
+   "full_name": "Giant Mole",
+   "stats": {
+    "combat_level": 230,
+    "hitpoints": 200,
+    "slayer_xp": 215.0
+   }
+  },
+  {
+   "entity_id": "hill_giant",
+   "full_name": "Hill Giant",
+   "stats": {
+    "combat_level": 28,
+    "hitpoints": 35,
+    "slayer_xp": 35.0
+   }
+  },
+  {
+   "entity_id": "hydra",
+   "full_name": "Hydra",
+   "stats": {
+    "combat_level": 194,
+    "hitpoints": 300,
+    "slayer_xp": 322.5
+   }
+  },
+  {
+   "entity_id": "jelly",
+   "full_name": "Jelly",
+   "stats": {
+    "combat_level": 78,
+    "hitpoints": 75,
+    "slayer_xp": 75.0
+   }
+  },
+  {
+   "entity_id": "k_ril_tsutsaroth",
+   "full_name": "K'ril Tsutsaroth",
+   "stats": {
+    "combat_level": 650,
+    "hitpoints": 255,
+    "slayer_xp": 350.5
+   }
+  },
+  {
+   "entity_id": "kalphite_queen",
+   "full_name": "Kalphite Queen",
+   "stats": {
+    "combat_level": 333,
+    "hitpoints": 255,
+    "slayer_xp": 535.4
+   }
+  },
+  {
+   "entity_id": "karil_the_tainted",
+   "full_name": "Karil the Tainted",
+   "stats": {
+    "combat_level": 98,
+    "hitpoints": 100,
+    "slayer_xp": 100.0
+   }
+  },
+  {
+   "entity_id": "king_black_dragon",
+   "full_name": "King Black Dragon",
+   "stats": {
+    "combat_level": 276,
+    "hitpoints": 240,
+    "slayer_xp": 258.0
+   }
+  },
+  {
+   "entity_id": "kraken",
+   "full_name": "Kraken",
+   "stats": {
+    "combat_level": 291,
+    "hitpoints": 255,
+    "slayer_xp": 255.0
+   }
+  },
+  {
+   "entity_id": "kree_arra",
+   "full_name": "Kree'arra",
+   "stats": {
+    "combat_level": 580,
+    "hitpoints": 255,
+    "slayer_xp": 357.0
+   }
+  },
+  {
+   "entity_id": "kurask",
+   "full_name": "Kurask",
+   "stats": {
+    "combat_level": 106,
+    "hitpoints": 97,
+    "slayer_xp": 97.0
+   }
+  },
+  {
+   "entity_id": "lava_dragon",
+   "full_name": "Lava dragon",
+   "stats": {
+    "combat_level": 252,
+    "hitpoints": 230,
+    "slayer_xp": 248.0
+   }
+  },
+  {
+   "entity_id": "lizardman_shaman",
+   "full_name": "Lizardman shaman",
+   "stats": {
+    "combat_level": 150,
+    "hitpoints": 150,
+    "slayer_xp": 157.5
+   }
+  },
+  {
+   "entity_id": "mutated_bloodveld",
+   "full_name": "Mutated Bloodveld",
+   "stats": {
+    "combat_level": 123,
+    "hitpoints": 170,
+    "slayer_xp": 170.0
+   }
+  },
+  {
+   "entity_id": "nechryael",
+   "full_name": "Nechryael",
+   "stats": {
+    "combat_level": 115,
+    "hitpoints": 105,
+    "slayer_xp": 105.0
+   }
+  },
+  {
+   "entity_id": "nex",
+   "full_name": "Nex",
+   "stats": {
+    "combat_level": 1001,
+    "hitpoints": 3400
+   }
+  },
+  {
+   "entity_id": "obor",
+   "full_name": "Obor",
+   "stats": {
+    "combat_level": 106,
+    "hitpoints": 120,
+    "slayer_xp": 129.0
+   }
+  },
+  {
+   "entity_id": "red_dragon",
+   "full_name": "Red dragon",
+   "stats": {
+    "combat_level": 152,
+    "hitpoints": 140,
+    "slayer_xp": 143.4
+   }
+  },
+  {
+   "entity_id": "rune_dragon",
+   "full_name": "Rune dragon",
+   "stats": {
+    "combat_level": 380,
+    "hitpoints": 330,
+    "slayer_xp": 363.0
+   }
+  },
+  {
+   "entity_id": "sarachnis",
+   "full_name": "Sarachnis",
+   "stats": {
+    "combat_level": 318,
+    "hitpoints": 400,
+    "slayer_xp": 430.0
+   }
+  },
+  {
+   "entity_id": "scorpia",
+   "full_name": "Scorpia",
+   "stats": {
+    "combat_level": 225,
+    "hitpoints": 200,
+    "slayer_xp": 260.0
+   }
+  },
+  {
+   "entity_id": "skeletal_wyvern",
+   "full_name": "Skeletal Wyvern",
+   "stats": {
+    "combat_level": 140,
+    "hitpoints": 200,
+    "slayer_xp": 210.0
+   }
+  },
+  {
+   "entity_id": "skotizo",
+   "full_name": "Skotizo",
+   "stats": {
+    "combat_level": 321,
+    "hitpoints": 450,
+    "slayer_xp": 618.5
+   }
+  },
+  {
+   "entity_id": "smoke_devil",
+   "full_name": "Smoke devil",
+   "stats": {
+    "combat_level": 160,
+    "hitpoints": 185,
+    "slayer_xp": 185.0
+   }
+  },
+  {
+   "entity_id": "sol_heredit",
+   "full_name": "Sol Heredit",
+   "stats": {
+    "combat_level": 1563,
+    "hitpoints": 1500
+   }
+  },
+  {
+   "entity_id": "the_nightmare",
+   "full_name": "The Nightmare",
+   "stats": {
+    "combat_level": 814,
+    "hitpoints": 2400
+   }
+  },
+  {
+   "entity_id": "thermonuclear_smoke_devil",
+   "full_name": "Thermonuclear smoke devil",
+   "stats": {
+    "combat_level": 301,
+    "hitpoints": 240,
+    "slayer_xp": 240.0
+   }
+  },
+  {
+   "entity_id": "tzkal_zuk",
+   "full_name": "TzKal-Zuk",
+   "stats": {
+    "combat_level": 1400,
+    "hitpoints": 1200,
+    "slayer_xp": 101890.0
+   }
+  },
+  {
+   "entity_id": "tztok_jad",
+   "full_name": "TzTok-Jad",
+   "stats": {
+    "combat_level": 702,
+    "hitpoints": 250,
+    "slayer_xp": 25250.0
+   }
+  },
+  {
+   "entity_id": "unicorn",
+   "full_name": "Unicorn",
+   "stats": {
+    "combat_level": 15,
+    "hitpoints": 19
+   }
+  },
+  {
+   "entity_id": "venenatis",
+   "full_name": "Venenatis",
+   "stats": {
+    "combat_level": 464,
+    "hitpoints": 850,
+    "slayer_xp": 956.2
+   }
+  },
+  {
+   "entity_id": "vet_ion",
+   "full_name": "Vet'ion",
+   "stats": {
+    "combat_level": 454,
+    "hitpoints": 255
+   }
+  },
+  {
+   "entity_id": "waterfiend",
+   "full_name": "Waterfiend",
+   "stats": {
+    "combat_level": 115,
+    "hitpoints": 128,
+    "slayer_xp": 128.0
+   }
+  },
+  {
+   "entity_id": "wyrm",
+   "full_name": "Wyrm",
+   "stats": {
+    "combat_level": 97,
+    "hitpoints": 120,
+    "slayer_xp": 123.0
+   }
+  },
+  {
+   "entity_id": "zebak",
+   "full_name": "Zebak",
+   "stats": {
+    "combat_level": 371,
+    "hitpoints": 580
+   }
+  },
+  {
+   "entity_id": "zulrah",
+   "full_name": "Zulrah",
+   "stats": {
+    "combat_level": 725,
+    "hitpoints": 500,
+    "slayer_xp": 500.0
+   }
+  }
+ ]
+}

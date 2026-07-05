@@ -1,0 +1,77 @@
+# Render Blueprint for ScapeMaster — free, no credit card required.
+#
+# NOTE: Render only reads a render.yaml at the REPOSITORY ROOT. This file is a
+# ready-to-use blueprint for deploying the subproject on its own. Two options:
+#
+#   1. (Recommended) Deploy scapemaster/ as a standalone Docker web service on
+#      Render/Railway/Fly:  build context = scapemaster/, Dockerfile = Dockerfile.
+#   2. Or paste this `services:` block into the repo-root render.yaml (which
+#      already carries the F1 service) — the two are independent.
+#
+# Deploy: render.com -> New -> Blueprint -> connect this repo -> Apply.
+services:
+  - type: web
+    name: scapemaster
+    runtime: python
+    plan: free
+    branch: main
+    rootDir: scapemaster
+    # Install deps, then fetch the Litestream binary into backend/bin so the
+    # start command can stream the SQLite DB to object storage. The download is
+    # best-effort (|| true): if it fails the app still boots, just without
+    # durability (start.sh logs a warning).
+    buildCommand: |
+      pip install -r backend/requirements.txt
+      mkdir -p backend/bin
+      curl -fsSL https://github.com/benbjohnson/litestream/releases/download/v0.3.13/litestream-v0.3.13-linux-amd64.tar.gz \
+        | tar -xz -C backend/bin litestream || echo "litestream download failed; continuing without durability"
+    startCommand: cd backend && ./start.sh
+    envVars:
+      # SQLite path. Render's free filesystem is ephemeral, so this lives in /tmp
+      # and is made durable by Litestream replication (below) rather than a disk.
+      - key: OSRS_DB_PATH
+        value: /tmp/scapemaster.db
+      # Serve the curated, validated question bank committed in the repo
+      # (backend/app/data/questions.json). Instant boot, no network needed.
+      # To rebuild the bank from the entity datasets:
+      #   python3 -m app.seed --export
+      # To refresh Grand Exchange prices from the live wiki API first:
+      #   OSRS_DATA_SOURCE=wiki python3 -m app.seed --export --source wiki
+      - key: OSRS_DATA_SOURCE
+        value: dataset
+      # Turn OFF the proofreading endpoint in production. /api/v1/dev/questions
+      # returns every question WITH its verified answer (a deliberate dev-only
+      # crossing of the no-answers trust boundary); leaving it on lets anyone fetch
+      # the answer key and defeat the HiScores. Defaults ON for local dev.
+      - key: OSRS_DEV_TOOLS
+        value: "0"
+      # First-party analytics. Event collection is always on (pseudonymous, no
+      # third party); the /analytics dashboard + summary API are gated by this
+      # token. Leave it unset to keep the dashboard disabled (collection still
+      # runs); set any strong secret to view metrics at /analytics.
+      - key: OSRS_ANALYTICS_TOKEN
+        sync: false
+
+      # ── Free durable accounts (Litestream → S3-compatible object storage) ────
+      # The question bank is rebuilt from the committed snapshot on every boot, but
+      # accounts, sessions and verified play history live ONLY in the SQLite file —
+      # which the ephemeral free host wipes on every redeploy AND cold start. Rather
+      # than a paid disk or Postgres, Litestream continuously replicates the DB to a
+      # free object-storage bucket and restores it on boot (see start.sh).
+      #
+      # To enable (free, ~5 min — see README → "Free durable accounts"): create a
+      # Backblaze B2 bucket (10 GB free, no card) or Cloudflare R2 bucket, then set
+      # the five values below. Leaving REPLICA_BUCKET blank keeps the ephemeral
+      # behaviour, so the service still deploys as-is.
+      - key: LITESTREAM_REPLICA_BUCKET
+        sync: false            # e.g. scapemaster-db
+      - key: LITESTREAM_REPLICA_PATH
+        value: scapemaster
+      - key: LITESTREAM_REPLICA_ENDPOINT
+        sync: false            # e.g. s3.us-west-002.backblazeb2.com
+      - key: LITESTREAM_REPLICA_REGION
+        sync: false            # e.g. us-west-002
+      - key: LITESTREAM_ACCESS_KEY_ID
+        sync: false            # B2 keyID / R2 access key (secret)
+      - key: LITESTREAM_SECRET_ACCESS_KEY
+        sync: false            # B2 applicationKey / R2 secret (secret)

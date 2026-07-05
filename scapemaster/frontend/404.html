@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Off the map — ScapeMaster</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#2f6bd8" />
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <!-- Self-contained styles: this page must render even if /static is unreachable. -->
+  <style>
+    :root { --bg:#171208; --surface:#2b2214; --line:#4a3c24; --text:#f3ecda;
+            --muted:#a38f68; --accent:#2f6bd8; --gold:#ffd11a; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+           padding:1.5rem; text-align:center; color:var(--text);
+           font-family:'Segoe UI',system-ui,sans-serif;
+           background:radial-gradient(1100px 600px at 80% -10%,
+             color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%), var(--bg); }
+    .wrap { max-width:30rem; }
+    .mark { width:4.5rem; height:4.5rem; color:var(--accent); margin:0 auto 1.4rem; display:block; }
+    .code { font-weight:700; letter-spacing:.25em; font-size:.72rem; text-transform:uppercase;
+            color:var(--muted); margin:0 0 .6rem; }
+    h1 { font-weight:900; text-transform:uppercase; letter-spacing:.01em;
+         font-size:clamp(1.8rem,7vw,2.8rem); margin:0 0 .8rem; }
+    p { color:var(--muted); line-height:1.55; margin:0 0 1.8rem; font-size:1rem; }
+    .btn { display:inline-block; background:var(--accent); color:#fff; font-weight:800;
+           border-radius:4px; padding:.8rem 1.6rem; text-decoration:none; font-size:1rem;
+           box-shadow:inset 1px 1px 0 rgba(255,232,180,.2), inset -1px -1px 0 rgba(0,0,0,.5),
+                      0 1px 0 rgba(0,0,0,.35); transition:filter .12s; }
+    .btn:hover { filter:brightness(1.1); }
+    .strip { height:10px; margin-top:2.2rem;
+             background:repeating-linear-gradient(90deg, var(--gold) 0 16px, transparent 16px 32px);
+             opacity:.4; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
+      <rect x="14" y="10" width="72" height="80" rx="16" fill="none"
+            stroke="currentColor" stroke-width="10" />
+      <path d="M34 62 L50 34 L66 62" fill="none" stroke="currentColor"
+            stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <p class="code">Error 404 · Unreachable region</p>
+    <h1>You've wandered off the map</h1>
+    <p>This corner of Gielinor doesn't exist. The page may have moved, or the
+       teleport fizzled. Let's get you back to somewhere familiar.</p>
+    <a class="btn" href="/">Back to Lumbridge</a>
+    <div class="strip" aria-hidden="true"></div>
+  </div>
+</body>
+</html>

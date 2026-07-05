@@ -1,0 +1,8 @@
+# Runtime + build artifacts (never committed)
+*.db
+*.db-shm
+*.db-wal
+__pycache__/
+*.pyc
+backend/app/data/.http_cache/
+backend/bin/

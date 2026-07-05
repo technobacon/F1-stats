@@ -1,0 +1,1631 @@
+[
+ {
+  "quest_id": "the_ides_of_milk",
+  "name": "The Ides of Milk",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2026,
+  "series": null
+ },
+ {
+  "quest_id": "learning_the_ropes",
+  "name": "Learning the Ropes",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2025,
+  "series": null
+ },
+ {
+  "quest_id": "below_ice_mountain",
+  "name": "Below Ice Mountain",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2021,
+  "series": null
+ },
+ {
+  "quest_id": "x_marks_the_spot",
+  "name": "X Marks the Spot",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2019,
+  "series": "Great Kourend"
+ },
+ {
+  "quest_id": "the_corsair_curse",
+  "name": "The Corsair Curse",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 0,
+  "release_year": 2017,
+  "series": null
+ },
+ {
+  "quest_id": "misthalin_mystery",
+  "name": "Misthalin Mystery",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2017,
+  "series": null
+ },
+ {
+  "quest_id": "rune_mysteries",
+  "name": "Rune Mysteries",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2004,
+  "series": "Order of Wizards"
+ },
+ {
+  "quest_id": "dragon_slayer_i",
+  "name": "Dragon Slayer I",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 0,
+  "release_year": 2001,
+  "series": "Dragonkin"
+ },
+ {
+  "quest_id": "pirate_s_treasure",
+  "name": "Pirate's Treasure",
+  "difficulty": "novice",
+  "quest_points": 2,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "goblin_diplomacy",
+  "name": "Goblin Diplomacy",
+  "difficulty": "novice",
+  "quest_points": 5,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "the_knight_s_sword",
+  "name": "The Knight's Sword",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "witch_s_potion",
+  "name": "Witch's Potion",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "black_knights_fortress",
+  "name": "Black Knights' Fortress",
+  "difficulty": "intermediate",
+  "quest_points": 3,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "doric_s_quest",
+  "name": "Doric's Quest",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "prince_ali_rescue",
+  "name": "Prince Ali Rescue",
+  "difficulty": "novice",
+  "quest_points": 3,
+  "members": 0,
+  "release_year": 2001,
+  "series": "Kharidian"
+ },
+ {
+  "quest_id": "imp_catcher",
+  "name": "Imp Catcher",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "vampyre_slayer",
+  "name": "Vampyre Slayer",
+  "difficulty": "intermediate",
+  "quest_points": 3,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "ernest_the_chicken",
+  "name": "Ernest the Chicken",
+  "difficulty": "novice",
+  "quest_points": 4,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "the_restless_ghost",
+  "name": "The Restless Ghost",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "sheep_shearer",
+  "name": "Sheep Shearer",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "shield_of_arrav",
+  "name": "Shield of Arrav",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "demon_slayer",
+  "name": "Demon Slayer",
+  "difficulty": "novice",
+  "quest_points": 3,
+  "members": 0,
+  "release_year": 2001,
+  "series": "Demon Slayer"
+ },
+ {
+  "quest_id": "romeo_juliet",
+  "name": "Romeo & Juliet",
+  "difficulty": "novice",
+  "quest_points": 5,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "cook_s_assistant",
+  "name": "Cook's Assistant",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 0,
+  "release_year": 2001,
+  "series": null
+ },
+ {
+  "quest_id": "druidic_ritual",
+  "name": "Druidic Ritual",
+  "difficulty": "novice",
+  "quest_points": 4,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "lost_city",
+  "name": "Lost City",
+  "difficulty": "intermediate",
+  "quest_points": 3,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "witch_s_house",
+  "name": "Witch's House",
+  "difficulty": "intermediate",
+  "quest_points": 4,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "merlin_s_crystal",
+  "name": "Merlin's Crystal",
+  "difficulty": "intermediate",
+  "quest_points": 6,
+  "members": 1,
+  "release_year": 2002,
+  "series": "Camelot"
+ },
+ {
+  "quest_id": "heroes_quest",
+  "name": "Heroes' Quest",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "scorpion_catcher",
+  "name": "Scorpion Catcher",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "family_crest",
+  "name": "Family Crest",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "fishing_contest",
+  "name": "Fishing Contest",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "tribal_totem",
+  "name": "Tribal Totem",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "monk_s_friend",
+  "name": "Monk's Friend",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "temple_of_ikov",
+  "name": "Temple of Ikov",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "clock_tower",
+  "name": "Clock Tower",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "holy_grail",
+  "name": "Holy Grail",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2002,
+  "series": "Camelot"
+ },
+ {
+  "quest_id": "tree_gnome_village",
+  "name": "Tree Gnome Village",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2002,
+  "series": "Gnome quest series"
+ },
+ {
+  "quest_id": "fight_arena",
+  "name": "Fight Arena",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2002,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "hazeel_cult",
+  "name": "Hazeel Cult",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "sheep_herder",
+  "name": "Sheep Herder",
+  "difficulty": "novice",
+  "quest_points": 4,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "plague_city",
+  "name": "Plague City",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": "Elf"
+ },
+ {
+  "quest_id": "sea_slug",
+  "name": "Sea Slug",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": "Temple Knight"
+ },
+ {
+  "quest_id": "waterfall_quest",
+  "name": "Waterfall Quest",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "jungle_potion",
+  "name": "Jungle Potion",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2002,
+  "series": null
+ },
+ {
+  "quest_id": "the_grand_tree",
+  "name": "The Grand Tree",
+  "difficulty": "intermediate",
+  "quest_points": 5,
+  "members": 1,
+  "release_year": 2002,
+  "series": "Gnome"
+ },
+ {
+  "quest_id": "underground_pass",
+  "name": "Underground Pass",
+  "difficulty": "experienced",
+  "quest_points": 5,
+  "members": 1,
+  "release_year": 2003,
+  "series": "Elf"
+ },
+ {
+  "quest_id": "observatory_quest",
+  "name": "Observatory Quest",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2003,
+  "series": null
+ },
+ {
+  "quest_id": "the_tourist_trap",
+  "name": "The Tourist Trap",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2003,
+  "series": null
+ },
+ {
+  "quest_id": "watchtower",
+  "name": "Watchtower",
+  "difficulty": "intermediate",
+  "quest_points": 4,
+  "members": 1,
+  "release_year": 2003,
+  "series": null
+ },
+ {
+  "quest_id": "dwarf_cannon",
+  "name": "Dwarf Cannon",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2003,
+  "series": null
+ },
+ {
+  "quest_id": "murder_mystery",
+  "name": "Murder Mystery",
+  "difficulty": "novice",
+  "quest_points": 3,
+  "members": 1,
+  "release_year": 2003,
+  "series": null
+ },
+ {
+  "quest_id": "the_dig_site",
+  "name": "The Dig Site",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2003,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "gertrude_s_cat",
+  "name": "Gertrude's Cat",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2003,
+  "series": null
+ },
+ {
+  "quest_id": "legends_quest",
+  "name": "Legends' Quest",
+  "difficulty": "master",
+  "quest_points": 4,
+  "members": 1,
+  "release_year": 2003,
+  "series": null
+ },
+ {
+  "quest_id": "death_plateau",
+  "name": "Death Plateau",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2004,
+  "series": "Troll"
+ },
+ {
+  "quest_id": "eadgar_s_ruse",
+  "name": "Eadgar's Ruse",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2004,
+  "series": "Troll"
+ },
+ {
+  "quest_id": "big_chompy_bird_hunting",
+  "name": "Big Chompy Bird Hunting",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2004,
+  "series": null
+ },
+ {
+  "quest_id": "elemental_workshop_i",
+  "name": "Elemental Workshop I",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2004,
+  "series": "Elemental Workshop"
+ },
+ {
+  "quest_id": "nature_spirit",
+  "name": "Nature Spirit",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2004,
+  "series": null
+ },
+ {
+  "quest_id": "priest_in_peril",
+  "name": "Priest in Peril",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2004,
+  "series": null
+ },
+ {
+  "quest_id": "regicide",
+  "name": "Regicide",
+  "difficulty": "experienced",
+  "quest_points": 3,
+  "members": 1,
+  "release_year": 2004,
+  "series": "Elf"
+ },
+ {
+  "quest_id": "tai_bwo_wannai_trio",
+  "name": "Tai Bwo Wannai Trio",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2004,
+  "series": null
+ },
+ {
+  "quest_id": "troll_stronghold",
+  "name": "Troll Stronghold",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2004,
+  "series": "Troll"
+ },
+ {
+  "quest_id": "shades_of_mort_ton",
+  "name": "Shades of Mort'ton",
+  "difficulty": "intermediate",
+  "quest_points": 3,
+  "members": 1,
+  "release_year": 2004,
+  "series": null
+ },
+ {
+  "quest_id": "the_fremennik_trials",
+  "name": "The Fremennik Trials",
+  "difficulty": "intermediate",
+  "quest_points": 3,
+  "members": 1,
+  "release_year": 2004,
+  "series": "Fremennik"
+ },
+ {
+  "quest_id": "horror_from_the_deep",
+  "name": "Horror from the Deep",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2004,
+  "series": null
+ },
+ {
+  "quest_id": "throne_of_miscellania",
+  "name": "Throne of Miscellania",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2004,
+  "series": "Miscellania"
+ },
+ {
+  "quest_id": "monkey_madness_i",
+  "name": "Monkey Madness I",
+  "difficulty": "master",
+  "quest_points": 3,
+  "members": 1,
+  "release_year": 2004,
+  "series": "Gnome"
+ },
+ {
+  "quest_id": "haunted_mine",
+  "name": "Haunted Mine",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2004,
+  "series": null
+ },
+ {
+  "quest_id": "troll_romance",
+  "name": "Troll Romance",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "in_search_of_the_myreque",
+  "name": "In Search of the Myreque",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Myreque"
+ },
+ {
+  "quest_id": "creature_of_fenkenstrain",
+  "name": "Creature of Fenkenstrain",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "roving_elves",
+  "name": "Roving Elves",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Elf"
+ },
+ {
+  "quest_id": "ghosts_ahoy",
+  "name": "Ghosts Ahoy",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "one_small_favour",
+  "name": "One Small Favour",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "mountain_daughter",
+  "name": "Mountain Daughter",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "between_a_rock",
+  "name": "Between a Rock...",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "the_feud",
+  "name": "The Feud",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "the_golem",
+  "name": "The Golem",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "desert_treasure_i",
+  "name": "Desert Treasure I",
+  "difficulty": "master",
+  "quest_points": 3,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "icthlarin_s_little_helper",
+  "name": "Icthlarin's Little Helper",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Kharidian"
+ },
+ {
+  "quest_id": "tears_of_guthix",
+  "name": "Tears of Guthix",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "the_lost_tribe",
+  "name": "The Lost Tribe",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Dorgeshuun"
+ },
+ {
+  "quest_id": "the_giant_dwarf",
+  "name": "The Giant Dwarf",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Red Axe"
+ },
+ {
+  "quest_id": "recruitment_drive",
+  "name": "Recruitment Drive",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Temple Knight"
+ },
+ {
+  "quest_id": "mourning_s_end_part_i",
+  "name": "Mourning's End Part I",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Elf"
+ },
+ {
+  "quest_id": "forgettable_tale",
+  "name": "Forgettable Tale...",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Red Axe"
+ },
+ {
+  "quest_id": "garden_of_tranquillity",
+  "name": "Garden of Tranquillity",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "a_tail_of_two_cats",
+  "name": "A Tail of Two Cats",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Dragonkin"
+ },
+ {
+  "quest_id": "wanted",
+  "name": "Wanted!",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Temple Knight"
+ },
+ {
+  "quest_id": "mourning_s_end_part_ii",
+  "name": "Mourning's End Part II",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Elf"
+ },
+ {
+  "quest_id": "rum_deal",
+  "name": "Rum Deal",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Pirate"
+ },
+ {
+  "quest_id": "shadow_of_the_storm",
+  "name": "Shadow of the Storm",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Demon Slayer"
+ },
+ {
+  "quest_id": "making_history",
+  "name": "Making History",
+  "difficulty": "intermediate",
+  "quest_points": 3,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "ratcatchers",
+  "name": "Ratcatchers",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "spirits_of_the_elid",
+  "name": "Spirits of the Elid",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "devious_minds",
+  "name": "Devious Minds",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2005,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "the_hand_in_the_sand",
+  "name": "The Hand in the Sand",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": null
+ },
+ {
+  "quest_id": "enakhra_s_lament",
+  "name": "Enakhra's Lament",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "cabin_fever",
+  "name": "Cabin Fever",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Pirate"
+ },
+ {
+  "quest_id": "fairytale_i_growing_pains",
+  "name": "Fairytale I - Growing Pains",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Fairytale"
+ },
+ {
+  "quest_id": "recipe_for_disaster",
+  "name": "Recipe for Disaster",
+  "difficulty": "special",
+  "quest_points": 10,
+  "members": 1,
+  "release_year": 2006,
+  "series": null
+ },
+ {
+  "quest_id": "in_aid_of_the_myreque",
+  "name": "In Aid of the Myreque",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Myreque"
+ },
+ {
+  "quest_id": "a_soul_s_bane",
+  "name": "A Soul's Bane",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": null
+ },
+ {
+  "quest_id": "rag_and_bone_man_i",
+  "name": "Rag and Bone Man I",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Rag and Bone Man"
+ },
+ {
+  "quest_id": "swan_song",
+  "name": "Swan Song",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2006,
+  "series": null
+ },
+ {
+  "quest_id": "royal_trouble",
+  "name": "Royal Trouble",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Miscellania"
+ },
+ {
+  "quest_id": "death_to_the_dorgeshuun",
+  "name": "Death to the Dorgeshuun",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Dorgeshuun"
+ },
+ {
+  "quest_id": "fairytale_ii_cure_a_queen",
+  "name": "Fairytale II - Cure a Queen",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Fairytale"
+ },
+ {
+  "quest_id": "lunar_diplomacy",
+  "name": "Lunar Diplomacy",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Fremennik"
+ },
+ {
+  "quest_id": "the_eyes_of_glouphrie",
+  "name": "The Eyes of Glouphrie",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Gnome"
+ },
+ {
+  "quest_id": "darkness_of_hallowvale",
+  "name": "Darkness of Hallowvale",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Myreque"
+ },
+ {
+  "quest_id": "the_slug_menace",
+  "name": "The Slug Menace",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Temple Knight"
+ },
+ {
+  "quest_id": "elemental_workshop_ii",
+  "name": "Elemental Workshop II",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Elemental Workshop"
+ },
+ {
+  "quest_id": "my_arm_s_big_adventure",
+  "name": "My Arm's Big Adventure",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Troll"
+ },
+ {
+  "quest_id": "enlightened_journey",
+  "name": "Enlightened Journey",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": null
+ },
+ {
+  "quest_id": "eagles_peak",
+  "name": "Eagles' Peak",
+  "difficulty": "novice",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2006,
+  "series": null
+ },
+ {
+  "quest_id": "animal_magnetism",
+  "name": "Animal Magnetism",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": null
+ },
+ {
+  "quest_id": "contact",
+  "name": "Contact!",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2007,
+  "series": "Kharidian"
+ },
+ {
+  "quest_id": "cold_war",
+  "name": "Cold War",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2007,
+  "series": "Penguin"
+ },
+ {
+  "quest_id": "the_fremennik_isles",
+  "name": "The Fremennik Isles",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2007,
+  "series": "Fremennik"
+ },
+ {
+  "quest_id": "the_great_brain_robbery",
+  "name": "The Great Brain Robbery",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2007,
+  "series": "Pirate"
+ },
+ {
+  "quest_id": "what_lies_below",
+  "name": "What Lies Below",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2007,
+  "series": null
+ },
+ {
+  "quest_id": "olaf_s_quest",
+  "name": "Olaf's Quest",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2007,
+  "series": null
+ },
+ {
+  "quest_id": "another_slice_of_h_a_m",
+  "name": "Another Slice of H.A.M.",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2007,
+  "series": "Dorgeshuun"
+ },
+ {
+  "quest_id": "dream_mentor",
+  "name": "Dream Mentor",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2007,
+  "series": null
+ },
+ {
+  "quest_id": "grim_tales",
+  "name": "Grim Tales",
+  "difficulty": "master",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2007,
+  "series": null
+ },
+ {
+  "quest_id": "king_s_ransom",
+  "name": "King's Ransom",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2007,
+  "series": "Camelot"
+ },
+ {
+  "quest_id": "shilo_village",
+  "name": "Shilo Village",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2003,
+  "series": null
+ },
+ {
+  "quest_id": "biohazard",
+  "name": "Biohazard",
+  "difficulty": "novice",
+  "quest_points": 3,
+  "members": 1,
+  "release_year": 2002,
+  "series": "Elf"
+ },
+ {
+  "quest_id": "tower_of_life",
+  "name": "Tower of Life",
+  "difficulty": "novice",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2007,
+  "series": null
+ },
+ {
+  "quest_id": "rag_and_bone_man_ii",
+  "name": "Rag and Bone Man II",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2006,
+  "series": "Rag and Bone Man"
+ },
+ {
+  "quest_id": "land_of_the_goblins",
+  "name": "Land of the Goblins",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2022,
+  "series": "Dorgeshuun"
+ },
+ {
+  "quest_id": "while_guthix_sleeps",
+  "name": "While Guthix Sleeps",
+  "difficulty": "grandmaster",
+  "quest_points": 5,
+  "members": 1,
+  "release_year": 2024,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "zogre_flesh_eaters",
+  "name": "Zogre Flesh Eaters",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2005,
+  "series": null
+ },
+ {
+  "quest_id": "monkey_madness_ii",
+  "name": "Monkey Madness II",
+  "difficulty": "grandmaster",
+  "quest_points": 4,
+  "members": 1,
+  "release_year": 2016,
+  "series": "Gnome"
+ },
+ {
+  "quest_id": "client_of_kourend",
+  "name": "Client of Kourend",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2017,
+  "series": "Great Kourend"
+ },
+ {
+  "quest_id": "the_queen_of_thieves",
+  "name": "The Queen of Thieves",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2017,
+  "series": "Great Kourend"
+ },
+ {
+  "quest_id": "bone_voyage",
+  "name": "Bone Voyage",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2017,
+  "series": null
+ },
+ {
+  "quest_id": "dragon_slayer_ii",
+  "name": "Dragon Slayer II",
+  "difficulty": "grandmaster",
+  "quest_points": 5,
+  "members": 1,
+  "release_year": 2018,
+  "series": "Dragonkin"
+ },
+ {
+  "quest_id": "the_depths_of_despair",
+  "name": "The Depths of Despair",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2017,
+  "series": "Great Kourend"
+ },
+ {
+  "quest_id": "a_taste_of_hope",
+  "name": "A Taste of Hope",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2018,
+  "series": "Myreque"
+ },
+ {
+  "quest_id": "tale_of_the_righteous",
+  "name": "Tale of the Righteous",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2018,
+  "series": "Great Kourend"
+ },
+ {
+  "quest_id": "making_friends_with_my_arm",
+  "name": "Making Friends with My Arm",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2018,
+  "series": "Troll"
+ },
+ {
+  "quest_id": "song_of_the_elves",
+  "name": "Song of the Elves",
+  "difficulty": "grandmaster",
+  "quest_points": 4,
+  "members": 1,
+  "release_year": 2019,
+  "series": "Elf"
+ },
+ {
+  "quest_id": "the_ascent_of_arceuus",
+  "name": "The Ascent of Arceuus",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2019,
+  "series": "Great Kourend"
+ },
+ {
+  "quest_id": "the_forsaken_tower",
+  "name": "The Forsaken Tower",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2019,
+  "series": "Great Kourend"
+ },
+ {
+  "quest_id": "the_fremennik_exiles",
+  "name": "The Fremennik Exiles",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2019,
+  "series": "Fremennik"
+ },
+ {
+  "quest_id": "the_curse_of_arrav",
+  "name": "The Curse of Arrav",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2024,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "defender_of_varrock",
+  "name": "Defender of Varrock",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2024,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "sins_of_the_father",
+  "name": "Sins of the Father",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2020,
+  "series": "Myreque"
+ },
+ {
+  "quest_id": "a_kingdom_divided",
+  "name": "A Kingdom Divided",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2021,
+  "series": "Great Kourend"
+ },
+ {
+  "quest_id": "a_porcine_of_interest",
+  "name": "A Porcine of Interest",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2020,
+  "series": null
+ },
+ {
+  "quest_id": "getting_ahead",
+  "name": "Getting Ahead",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2020,
+  "series": "Twisted Tales"
+ },
+ {
+  "quest_id": "a_night_at_the_theatre",
+  "name": "A Night at the Theatre",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2021,
+  "series": null
+ },
+ {
+  "quest_id": "beneath_cursed_sands",
+  "name": "Beneath Cursed Sands",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2022,
+  "series": "Kharidian"
+ },
+ {
+  "quest_id": "temple_of_the_eye",
+  "name": "Temple of the Eye",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2022,
+  "series": "Order of Wizards"
+ },
+ {
+  "quest_id": "the_path_of_glouphrie",
+  "name": "The Path of Glouphrie",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2023,
+  "series": "Gnome"
+ },
+ {
+  "quest_id": "sleeping_giants",
+  "name": "Sleeping Giants",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2022,
+  "series": null
+ },
+ {
+  "quest_id": "the_garden_of_death",
+  "name": "The Garden of Death",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2022,
+  "series": "Twisted Tales"
+ },
+ {
+  "quest_id": "desert_treasure_ii_the_fallen_empire",
+  "name": "Desert Treasure II - The Fallen Empire",
+  "difficulty": "grandmaster",
+  "quest_points": 5,
+  "members": 1,
+  "release_year": 2023,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "secrets_of_the_north",
+  "name": "Secrets of the North",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2023,
+  "series": "Mahjarrat"
+ },
+ {
+  "quest_id": "children_of_the_sun",
+  "name": "Children of the Sun",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2024,
+  "series": "Twilight Emissaries"
+ },
+ {
+  "quest_id": "perilous_moons",
+  "name": "Perilous Moons",
+  "difficulty": "master",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2024,
+  "series": null
+ },
+ {
+  "quest_id": "the_ribbiting_tale_of_a_lily_pad_labour_dispute",
+  "name": "The Ribbiting Tale of a Lily Pad Labour Dispute",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2024,
+  "series": null
+ },
+ {
+  "quest_id": "twilight_s_promise",
+  "name": "Twilight's Promise",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2024,
+  "series": "Twilight Emissaries"
+ },
+ {
+  "quest_id": "at_first_light",
+  "name": "At First Light",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2024,
+  "series": null
+ },
+ {
+  "quest_id": "the_heart_of_darkness",
+  "name": "The Heart of Darkness",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2024,
+  "series": "Twilight Emissaries"
+ },
+ {
+  "quest_id": "death_on_the_isle",
+  "name": "Death on the Isle",
+  "difficulty": "intermediate",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2024,
+  "series": null
+ },
+ {
+  "quest_id": "meat_and_greet",
+  "name": "Meat and Greet",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2024,
+  "series": null
+ },
+ {
+  "quest_id": "ethically_acquired_antiquities",
+  "name": "Ethically Acquired Antiquities",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2024,
+  "series": null
+ },
+ {
+  "quest_id": "the_blood_moon_rises",
+  "name": "The Blood Moon Rises",
+  "difficulty": "grandmaster",
+  "quest_points": 4,
+  "members": 1,
+  "release_year": 2026,
+  "series": "Myreque"
+ },
+ {
+  "quest_id": "the_final_dawn",
+  "name": "The Final Dawn",
+  "difficulty": "master",
+  "quest_points": 3,
+  "members": 1,
+  "release_year": 2025,
+  "series": "Twilight Emissaries"
+ },
+ {
+  "quest_id": "pandemonium",
+  "name": "Pandemonium",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2025,
+  "series": null
+ },
+ {
+  "quest_id": "prying_times",
+  "name": "Prying Times",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2025,
+  "series": null
+ },
+ {
+  "quest_id": "current_affairs",
+  "name": "Current Affairs",
+  "difficulty": "novice",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2025,
+  "series": null
+ },
+ {
+  "quest_id": "troubled_tortugans",
+  "name": "Troubled Tortugans",
+  "difficulty": "experienced",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2025,
+  "series": "Tortugan"
+ },
+ {
+  "quest_id": "the_red_reef",
+  "name": "The Red Reef",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2026,
+  "series": "Tortugan"
+ },
+ {
+  "quest_id": "shadows_of_custodia",
+  "name": "Shadows of Custodia",
+  "difficulty": "experienced",
+  "quest_points": 2,
+  "members": 1,
+  "release_year": 2025,
+  "series": null
+ },
+ {
+  "quest_id": "scrambled",
+  "name": "Scrambled!",
+  "difficulty": "intermediate",
+  "quest_points": 1,
+  "members": 1,
+  "release_year": 2025,
+  "series": null
+ }
+]
