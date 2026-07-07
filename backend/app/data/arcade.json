@@ -22,10 +22,10 @@
    "active_to": 2026,
    "stats": {
     "wins": 106,
-    "podiums": 206,
+    "podiums": 207,
     "poles": 104,
     "fastest_laps": 69,
-    "points_finishes": 339,
+    "points_finishes": 340,
     "front_rows": 177,
     "dnfs": 32
    }
@@ -340,7 +340,7 @@
     "podiums": 6,
     "poles": 0,
     "fastest_laps": 3,
-    "points_finishes": 81,
+    "points_finishes": 82,
     "front_rows": 1,
     "dnfs": 24
    }
@@ -351,12 +351,12 @@
    "active_from": 2018,
    "active_to": 2026,
    "stats": {
-    "wins": 8,
-    "podiums": 52,
+    "wins": 9,
+    "podiums": 53,
     "poles": 27,
     "fastest_laps": 11,
-    "points_finishes": 138,
-    "front_rows": 44,
+    "points_finishes": 139,
+    "front_rows": 45,
     "dnfs": 26
    }
   },
@@ -457,10 +457,10 @@
    "active_to": 2026,
    "stats": {
     "wins": 7,
-    "podiums": 28,
+    "podiums": 29,
     "poles": 12,
     "fastest_laps": 11,
-    "points_finishes": 92,
+    "points_finishes": 93,
     "front_rows": 23,
     "dnfs": 17
    }
@@ -475,7 +475,7 @@
     "podiums": 46,
     "poles": 16,
     "fastest_laps": 19,
-    "points_finishes": 126,
+    "points_finishes": 127,
     "front_rows": 30,
     "dnfs": 13
    }
@@ -507,7 +507,7 @@
     "fastest_laps": 1,
     "points_finishes": 52,
     "front_rows": 0,
-    "dnfs": 24
+    "dnfs": 25
    }
   },
   {
@@ -835,7 +835,7 @@
     "podiums": 0,
     "poles": 0,
     "fastest_laps": 0,
-    "points_finishes": 16,
+    "points_finishes": 17,
     "front_rows": 0,
     "dnfs": 6
    }

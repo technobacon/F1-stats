@@ -2124,7 +2124,7 @@
  },
  {
   "question_string": "How many more career podiums does Lewis Hamilton have than Michael Schumacher?",
-  "verified_answer": 51.0,
+  "verified_answer": 52.0,
   "answer_kind": "count",
   "category": "head_to_head",
   "display_min": null,
@@ -3928,7 +3928,7 @@
  },
  {
   "question_string": "How many championship races has Silverstone Circuit hosted?",
-  "verified_answer": 60.0,
+  "verified_answer": 61.0,
   "answer_kind": "count",
   "category": "venue",
   "display_min": null,
@@ -5743,7 +5743,7 @@
  },
  {
   "question_string": "Net across their whole career, how many positions has Pierre Gasly gained from the grid?",
-  "verified_answer": 100.0,
+  "verified_answer": 105.0,
   "answer_kind": "count",
   "category": "racecraft",
   "display_min": null,
@@ -6425,7 +6425,7 @@
  },
  {
   "question_string": "How many career pole positions does Andrea Kimi Antonelli have?",
-  "verified_answer": 4.0,
+  "verified_answer": 5.0,
   "answer_kind": "count",
   "category": "qualifying",
   "display_min": null,
@@ -6513,7 +6513,7 @@
  },
  {
   "question_string": "Net across their whole career, how many positions has Carlos Sainz gained from the grid?",
-  "verified_answer": 193.0,
+  "verified_answer": 190.0,
   "answer_kind": "count",
   "category": "racecraft",
   "display_min": null,
@@ -6623,7 +6623,7 @@
  },
  {
   "question_string": "Driving for Ferrari, in what percentage of races did Charles Leclerc finish on the podium?",
-  "verified_answer": 32.0,
+  "verified_answer": 33.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -6744,7 +6744,7 @@
  },
  {
   "question_string": "Net across every start, how many positions did Esteban Ocon gain from the grid for Haas F1 Team (2025-2026)?",
-  "verified_answer": 80.0,
+  "verified_answer": 84.0,
   "answer_kind": "count",
   "category": "racecraft",
   "display_min": null,
@@ -7272,7 +7272,7 @@
  },
  {
   "question_string": "Across their career, in what percentage of races did Andrea Kimi Antonelli win?",
-  "verified_answer": 16.0,
+  "verified_answer": 15.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -8042,7 +8042,7 @@
  },
  {
   "question_string": "How many career points has Oscar Piastri scored?",
-  "verified_answer": 879.0,
+  "verified_answer": 881.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -8361,7 +8361,7 @@
  },
  {
   "question_string": "Across their career, in what percentage of races did Isack Hadjar finish in the points (top 10)?",
-  "verified_answer": 47.0,
+  "verified_answer": 48.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -8383,7 +8383,7 @@
  },
  {
   "question_string": "How many fastest laps did Andrea Kimi Antonelli set for Mercedes (2025-2026)?",
-  "verified_answer": 8.0,
+  "verified_answer": 9.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -8416,7 +8416,7 @@
  },
  {
   "question_string": "How many Grands Prix did Fernando Alonso start for Aston Martin (2023-2026)?",
-  "verified_answer": 78.0,
+  "verified_answer": 79.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -8504,7 +8504,7 @@
  },
  {
   "question_string": "How many Grands Prix has Isack Hadjar started in their career?",
-  "verified_answer": 32.0,
+  "verified_answer": 33.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -8746,7 +8746,7 @@
  },
  {
   "question_string": "How many career points has George Russell scored?",
-  "verified_answer": 1164.0,
+  "verified_answer": 1187.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -8779,7 +8779,7 @@
  },
  {
   "question_string": "How many championship points did Pierre Gasly score for Alpine F1 Team (2023-2026)?",
-  "verified_answer": 167.0,
+  "verified_answer": 168.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -8911,7 +8911,7 @@
  },
  {
   "question_string": "How many front-row starts did Charles Leclerc qualify for Ferrari (2019-2026)?",
-  "verified_answer": 44.0,
+  "verified_answer": 45.0,
   "answer_kind": "count",
   "category": "qualifying",
   "display_min": null,
@@ -9032,7 +9032,7 @@
  },
  {
   "question_string": "On average, how many championship points has Lando Norris scored per season?",
-  "verified_answer": 189.0,
+  "verified_answer": 191.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -9065,7 +9065,7 @@
  },
  {
   "question_string": "How many career podiums does Lewis Hamilton have?",
-  "verified_answer": 206.0,
+  "verified_answer": 207.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -9516,7 +9516,7 @@
  },
  {
   "question_string": "On average, how many championship points has Andrea Kimi Antonelli scored per season?",
-  "verified_answer": 160.0,
+  "verified_answer": 164.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -9769,7 +9769,7 @@
  },
  {
   "question_string": "How many podium finishes did Charles Leclerc score for Ferrari (2019-2026)?",
-  "verified_answer": 52.0,
+  "verified_answer": 53.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -10352,7 +10352,7 @@
  },
  {
   "question_string": "Across their career, in what percentage of races did Oscar Piastri win?",
-  "verified_answer": 12.0,
+  "verified_answer": 11.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -10715,7 +10715,7 @@
  },
  {
   "question_string": "How many Grands Prix has Andrea Kimi Antonelli started in their career?",
-  "verified_answer": 32.0,
+  "verified_answer": 33.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -10737,7 +10737,7 @@
  },
  {
   "question_string": "How many career points has Lando Norris scored?",
-  "verified_answer": 1509.0,
+  "verified_answer": 1527.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -11210,7 +11210,7 @@
  },
  {
   "question_string": "Driving for Haas F1 Team, in what percentage of races did Esteban Ocon finish in the points (top 10)?",
-  "verified_answer": 34.0,
+  "verified_answer": 33.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -11221,7 +11221,7 @@
  },
  {
   "question_string": "Driving for McLaren, in what percentage of races did Oscar Piastri finish on the podium?",
-  "verified_answer": 36.0,
+  "verified_answer": 35.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -11331,7 +11331,7 @@
  },
  {
   "question_string": "How many career race wins does Charles Leclerc have?",
-  "verified_answer": 8.0,
+  "verified_answer": 9.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -12211,7 +12211,7 @@
  },
  {
   "question_string": "How many Grands Prix did Carlos Sainz start for Williams (2025-2026)?",
-  "verified_answer": 32.0,
+  "verified_answer": 33.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -12288,7 +12288,7 @@
  },
  {
   "question_string": "How many Grands Prix did Nico Hülkenberg start for Audi (2026-2026)?",
-  "verified_answer": 8.0,
+  "verified_answer": 9.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -12475,7 +12475,7 @@
  },
  {
   "question_string": "How many times did Nico Hülkenberg fail to finish (DNF) for Audi (2026-2026)?",
-  "verified_answer": 3.0,
+  "verified_answer": 4.0,
   "answer_kind": "count",
   "category": "reliability",
   "display_min": null,
@@ -12508,7 +12508,7 @@
  },
  {
   "question_string": "How many Grands Prix did Valtteri Bottas start for Cadillac F1 Team (2026-2026)?",
-  "verified_answer": 8.0,
+  "verified_answer": 9.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -12805,7 +12805,7 @@
  },
  {
   "question_string": "How many career points has Pierre Gasly scored?",
-  "verified_answer": 499.0,
+  "verified_answer": 500.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -13091,7 +13091,7 @@
  },
  {
   "question_string": "Net across their whole career, how many positions has Sergio Pérez gained from the grid?",
-  "verified_answer": 420.0,
+  "verified_answer": 426.0,
   "answer_kind": "count",
   "category": "racecraft",
   "display_min": null,
@@ -13311,7 +13311,7 @@
  },
  {
   "question_string": "Driving for Williams, in what percentage of races did Carlos Sainz finish in the points (top 10)?",
-  "verified_answer": 41.0,
+  "verified_answer": 39.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -13388,7 +13388,7 @@
  },
  {
   "question_string": "Driving for Mercedes, in what percentage of races did Andrea Kimi Antonelli win?",
-  "verified_answer": 16.0,
+  "verified_answer": 15.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -13674,7 +13674,7 @@
  },
  {
   "question_string": "Driving for Mercedes, in what percentage of races did Andrea Kimi Antonelli finish on the podium?",
-  "verified_answer": 31.0,
+  "verified_answer": 30.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -14103,7 +14103,7 @@
  },
  {
   "question_string": "On average, how many championship points has Lewis Hamilton scored per season?",
-  "verified_answer": 257.0,
+  "verified_answer": 258.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -14180,7 +14180,7 @@
  },
  {
   "question_string": "How many Grands Prix did Lewis Hamilton start for Ferrari (2025-2026)?",
-  "verified_answer": 32.0,
+  "verified_answer": 33.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -14202,7 +14202,7 @@
  },
  {
   "question_string": "On average, how many championship points has Charles Leclerc scored per season?",
-  "verified_answer": 195.0,
+  "verified_answer": 198.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -14433,7 +14433,7 @@
  },
  {
   "question_string": "Driving for McLaren, in what percentage of races did Oscar Piastri finish in the points (top 10)?",
-  "verified_answer": 78.0,
+  "verified_answer": 77.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -14499,7 +14499,7 @@
  },
  {
   "question_string": "How many championship points did Lando Norris score for McLaren (2019-2026)?",
-  "verified_answer": 1509.0,
+  "verified_answer": 1527.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -15126,7 +15126,7 @@
  },
  {
   "question_string": "How many career podiums does Charles Leclerc have?",
-  "verified_answer": 52.0,
+  "verified_answer": 53.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -15247,7 +15247,7 @@
  },
  {
   "question_string": "Net across their whole career, how many positions has Charles Leclerc gained from the grid?",
-  "verified_answer": 71.0,
+  "verified_answer": 72.0,
   "answer_kind": "count",
   "category": "racecraft",
   "display_min": null,
@@ -15423,7 +15423,7 @@
  },
  {
   "question_string": "How many career fastest laps does Andrea Kimi Antonelli have?",
-  "verified_answer": 8.0,
+  "verified_answer": 9.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -15456,7 +15456,7 @@
  },
  {
   "question_string": "How many career front-row starts does Andrea Kimi Antonelli have?",
-  "verified_answer": 7.0,
+  "verified_answer": 8.0,
   "answer_kind": "count",
   "category": "qualifying",
   "display_min": null,
@@ -15588,7 +15588,7 @@
  },
  {
   "question_string": "How many career points has Liam Lawson scored?",
-  "verified_answer": 74.0,
+  "verified_answer": 83.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -15786,7 +15786,7 @@
  },
  {
   "question_string": "How many career front-row starts does Charles Leclerc have?",
-  "verified_answer": 44.0,
+  "verified_answer": 45.0,
   "answer_kind": "count",
   "category": "qualifying",
   "display_min": null,
@@ -16127,7 +16127,7 @@
  },
  {
   "question_string": "Net across their whole career, how many positions has Max Verstappen gained from the grid?",
-  "verified_answer": 271.0,
+  "verified_answer": 258.0,
   "answer_kind": "count",
   "category": "racecraft",
   "display_min": null,
@@ -16215,7 +16215,7 @@
  },
  {
   "question_string": "How many Grands Prix did Alexander Albon start for Williams (2022-2026)?",
-  "verified_answer": 99.0,
+  "verified_answer": 100.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -16270,7 +16270,7 @@
  },
  {
   "question_string": "How many Grands Prix did Charles Leclerc start for Ferrari (2019-2026)?",
-  "verified_answer": 160.0,
+  "verified_answer": 161.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -16336,7 +16336,7 @@
  },
  {
   "question_string": "How many Grands Prix did Andrea Kimi Antonelli start for Mercedes (2025-2026)?",
-  "verified_answer": 32.0,
+  "verified_answer": 33.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -16446,7 +16446,7 @@
  },
  {
   "question_string": "How many championship points did Oscar Piastri score for McLaren (2023-2026)?",
-  "verified_answer": 879.0,
+  "verified_answer": 881.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -16908,7 +16908,7 @@
  },
  {
   "question_string": "How many career second-place (P2) finishes does George Russell have?",
-  "verified_answer": 7.0,
+  "verified_answer": 8.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -16919,7 +16919,7 @@
  },
  {
   "question_string": "How many Grands Prix did Lando Norris start for McLaren (2019-2026)?",
-  "verified_answer": 160.0,
+  "verified_answer": 161.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -17315,7 +17315,7 @@
  },
  {
   "question_string": "How many points-scoring finishes (top 10) did Charles Leclerc record for Ferrari (2019-2026)?",
-  "verified_answer": 128.0,
+  "verified_answer": 129.0,
   "answer_kind": "count",
   "category": "consistency",
   "display_min": null,
@@ -17645,7 +17645,7 @@
  },
  {
   "question_string": "Driving for Ferrari, in what percentage of races did Lewis Hamilton finish on the podium?",
-  "verified_answer": 12.0,
+  "verified_answer": 15.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -17777,7 +17777,7 @@
  },
  {
   "question_string": "How many career third-place (P3) finishes does Lewis Hamilton have?",
-  "verified_answer": 41.0,
+  "verified_answer": 42.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -18041,7 +18041,7 @@
  },
  {
   "question_string": "Net across every start, how many positions did Valtteri Bottas gain from the grid for Cadillac F1 Team (2026-2026)?",
-  "verified_answer": 13.0,
+  "verified_answer": 15.0,
   "answer_kind": "count",
   "category": "racecraft",
   "display_min": null,
@@ -18129,7 +18129,7 @@
  },
  {
   "question_string": "On average, how many championship points has Isack Hadjar scored per season?",
-  "verified_answer": 46.0,
+  "verified_answer": 52.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -18745,7 +18745,7 @@
  },
  {
   "question_string": "How many championship points did Max Verstappen score for Red Bull (2016-2026)?",
-  "verified_answer": 3455.5,
+  "verified_answer": 3458.5,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -18855,7 +18855,7 @@
  },
  {
   "question_string": "What is the most fastest laps Andrea Kimi Antonelli set in a single season for Mercedes?",
-  "verified_answer": 5.0,
+  "verified_answer": 6.0,
   "answer_kind": "count",
   "category": "single_season",
   "display_min": null,
@@ -18943,7 +18943,7 @@
  },
  {
   "question_string": "How many of Charles Leclerc's career race wins came from off pole position?",
-  "verified_answer": 3.0,
+  "verified_answer": 4.0,
   "answer_kind": "count",
   "category": "feats",
   "display_min": null,
@@ -18965,7 +18965,7 @@
  },
  {
   "question_string": "Net across their whole career, how many positions has Esteban Ocon gained from the grid?",
-  "verified_answer": 282.0,
+  "verified_answer": 286.0,
   "answer_kind": "count",
   "category": "racecraft",
   "display_min": null,
@@ -19229,7 +19229,7 @@
  },
  {
   "question_string": "How many Grands Prix did George Russell start for Mercedes (2020-2026)?",
-  "verified_answer": 101.0,
+  "verified_answer": 102.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -19295,7 +19295,7 @@
  },
  {
   "question_string": "How many Grands Prix has Carlos Sainz started in their career?",
-  "verified_answer": 240.0,
+  "verified_answer": 241.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -19471,7 +19471,7 @@
  },
  {
   "question_string": "How many points-scoring finishes (top 10) did Lando Norris record for McLaren (2019-2026)?",
-  "verified_answer": 126.0,
+  "verified_answer": 127.0,
   "answer_kind": "count",
   "category": "consistency",
   "display_min": null,
@@ -19669,7 +19669,7 @@
  },
  {
   "question_string": "How many championship points did Lewis Hamilton score for Ferrari (2025-2026)?",
-  "verified_answer": 281.0,
+  "verified_answer": 303.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -19845,7 +19845,7 @@
  },
  {
   "question_string": "Net across their whole career, how many positions has Valtteri Bottas gained from the grid?",
-  "verified_answer": 32.0,
+  "verified_answer": 34.0,
   "answer_kind": "count",
   "category": "racecraft",
   "display_min": null,
@@ -19911,7 +19911,7 @@
  },
  {
   "question_string": "Net across every start, how many positions did Max Verstappen gain from the grid for Red Bull (2016-2026)?",
-  "verified_answer": 250.0,
+  "verified_answer": 237.0,
   "answer_kind": "count",
   "category": "racecraft",
   "display_min": null,
@@ -20076,7 +20076,7 @@
  },
  {
   "question_string": "How many runner-up (P2) finishes did George Russell score for Mercedes (2020-2026)?",
-  "verified_answer": 6.0,
+  "verified_answer": 7.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -20197,7 +20197,7 @@
  },
  {
   "question_string": "How many career points-scoring finishes (top 10) does Lando Norris have?",
-  "verified_answer": 126.0,
+  "verified_answer": 127.0,
   "answer_kind": "count",
   "category": "consistency",
   "display_min": null,
@@ -20582,7 +20582,7 @@
  },
  {
   "question_string": "How many career points has Andrea Kimi Antonelli scored?",
-  "verified_answer": 321.0,
+  "verified_answer": 329.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -20890,7 +20890,7 @@
  },
  {
   "question_string": "How many Grands Prix has Oscar Piastri started in their career?",
-  "verified_answer": 78.0,
+  "verified_answer": 79.0,
   "answer_kind": "count",
   "category": "career",
   "display_min": null,
@@ -20912,7 +20912,7 @@
  },
  {
   "question_string": "In which year did Charles Leclerc take their most recent race win?",
-  "verified_answer": 2024.0,
+  "verified_answer": 2026.0,
   "answer_kind": "year",
   "category": "milestone",
   "display_min": 2018.0,
@@ -21242,7 +21242,7 @@
  },
  {
   "question_string": "On average, how many championship points has George Russell scored per season?",
-  "verified_answer": 146.0,
+  "verified_answer": 148.0,
   "answer_kind": "points",
   "category": "career",
   "display_min": null,
@@ -21583,7 +21583,7 @@
  },
  {
   "question_string": "Driving for Red Bull, in what percentage of races did Max Verstappen win?",
-  "verified_answer": 33.0,
+  "verified_answer": 32.0,
   "answer_kind": "percentage",
   "category": "rates",
   "display_min": 0.0,
@@ -21880,7 +21880,7 @@
  },
  {
   "question_string": "How many pole positions did Andrea Kimi Antonelli take for Mercedes (2025-2026)?",
-  "verified_answer": 4.0,
+  "verified_answer": 5.0,
   "answer_kind": "count",
   "category": "qualifying",
   "display_min": null,
@@ -21902,7 +21902,7 @@
  },
  {
   "question_string": "How many points-scoring finishes (top 10) did Liam Lawson record for RB F1 Team (2024-2026)?",
-  "verified_answer": 15.0,
+  "verified_answer": 16.0,
   "answer_kind": "count",
   "category": "consistency",
   "display_min": null,
