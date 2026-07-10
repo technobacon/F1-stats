@@ -46,21 +46,6 @@
    }
   },
   {
-   "driver_id": "barrichello",
-   "full_name": "Rubens Barrichello",
-   "active_from": 1993,
-   "active_to": 2011,
-   "stats": {
-    "wins": 11,
-    "podiums": 68,
-    "poles": 14,
-    "fastest_laps": 6,
-    "points_finishes": 172,
-    "front_rows": 34,
-    "dnfs": 97
-   }
-  },
-  {
    "driver_id": "button",
    "full_name": "Jenson Button",
    "active_from": 2000,
@@ -121,21 +106,6 @@
    }
   },
   {
-   "driver_id": "massa",
-   "full_name": "Felipe Massa",
-   "active_from": 2002,
-   "active_to": 2017,
-   "stats": {
-    "wins": 11,
-    "podiums": 41,
-    "poles": 16,
-    "fastest_laps": 15,
-    "points_finishes": 187,
-    "front_rows": 27,
-    "dnfs": 42
-   }
-  },
-  {
    "driver_id": "ricciardo",
    "full_name": "Daniel Ricciardo",
    "active_from": 2011,
@@ -166,21 +136,6 @@
    }
   },
   {
-   "driver_id": "coulthard",
-   "full_name": "David Coulthard",
-   "active_from": 1994,
-   "active_to": 2008,
-   "stats": {
-    "wins": 13,
-    "podiums": 62,
-    "poles": 12,
-    "fastest_laps": 0,
-    "points_finishes": 146,
-    "front_rows": 37,
-    "dnfs": 78
-   }
-  },
-  {
    "driver_id": "max_verstappen",
    "full_name": "Max Verstappen",
    "active_from": 2015,
@@ -208,36 +163,6 @@
     "points_finishes": 152,
     "front_rows": 15,
     "dnfs": 43
-   }
-  },
-  {
-   "driver_id": "fisichella",
-   "full_name": "Giancarlo Fisichella",
-   "active_from": 1996,
-   "active_to": 2009,
-   "stats": {
-    "wins": 3,
-    "podiums": 19,
-    "poles": 4,
-    "fastest_laps": 1,
-    "points_finishes": 112,
-    "front_rows": 11,
-    "dnfs": 69
-   }
-  },
-  {
-   "driver_id": "webber",
-   "full_name": "Mark Webber",
-   "active_from": 2002,
-   "active_to": 2013,
-   "stats": {
-    "wins": 9,
-    "podiums": 42,
-    "poles": 13,
-    "fastest_laps": 19,
-    "points_finishes": 132,
-    "front_rows": 37,
-    "dnfs": 57
    }
   },
   {
@@ -301,21 +226,6 @@
    }
   },
   {
-   "driver_id": "mansell",
-   "full_name": "Nigel Mansell",
-   "active_from": 1980,
-   "active_to": 1995,
-   "stats": {
-    "wins": 31,
-    "podiums": 59,
-    "poles": 32,
-    "fastest_laps": 0,
-    "points_finishes": 90,
-    "front_rows": 56,
-    "dnfs": 92
-   }
-  },
-  {
    "driver_id": "ocon",
    "full_name": "Esteban Ocon",
    "active_from": 2016,
@@ -358,21 +268,6 @@
     "points_finishes": 139,
     "front_rows": 45,
     "dnfs": 26
-   }
-  },
-  {
-   "driver_id": "ralf_schumacher",
-   "full_name": "Ralf Schumacher",
-   "active_from": 1997,
-   "active_to": 2007,
-   "stats": {
-    "wins": 6,
-    "podiums": 27,
-    "poles": 6,
-    "fastest_laps": 1,
-    "points_finishes": 105,
-    "front_rows": 19,
-    "dnfs": 58
    }
   },
   {
@@ -526,51 +421,6 @@
    }
   },
   {
-   "driver_id": "mario_andretti",
-   "full_name": "Mario Andretti",
-   "active_from": 1968,
-   "active_to": 1982,
-   "stats": {
-    "wins": 12,
-    "podiums": 19,
-    "poles": 18,
-    "fastest_laps": 0,
-    "points_finishes": 55,
-    "front_rows": 24,
-    "dnfs": 66
-   }
-  },
-  {
-   "driver_id": "jones",
-   "full_name": "Alan Jones",
-   "active_from": 1975,
-   "active_to": 1986,
-   "stats": {
-    "wins": 12,
-    "podiums": 24,
-    "poles": 6,
-    "fastest_laps": 0,
-    "points_finishes": 54,
-    "front_rows": 13,
-    "dnfs": 49
-   }
-  },
-  {
-   "driver_id": "damon_hill",
-   "full_name": "Damon Hill",
-   "active_from": 1992,
-   "active_to": 1999,
-   "stats": {
-    "wins": 22,
-    "podiums": 42,
-    "poles": 20,
-    "fastest_laps": 0,
-    "points_finishes": 70,
-    "front_rows": 47,
-    "dnfs": 39
-   }
-  },
-  {
    "driver_id": "tsunoda",
    "full_name": "Yuki Tsunoda",
    "active_from": 2021,
@@ -586,81 +436,6 @@
    }
   },
   {
-   "driver_id": "keke_rosberg",
-   "full_name": "Keke Rosberg",
-   "active_from": 1978,
-   "active_to": 1986,
-   "stats": {
-    "wins": 5,
-    "podiums": 17,
-    "poles": 5,
-    "fastest_laps": 0,
-    "points_finishes": 52,
-    "front_rows": 10,
-    "dnfs": 55
-   }
-  },
-  {
-   "driver_id": "surtees",
-   "full_name": "John Surtees",
-   "active_from": 1960,
-   "active_to": 1972,
-   "stats": {
-    "wins": 6,
-    "podiums": 24,
-    "poles": 8,
-    "fastest_laps": 0,
-    "points_finishes": 50,
-    "front_rows": 18,
-    "dnfs": 58
-   }
-  },
-  {
-   "driver_id": "scheckter",
-   "full_name": "Jody Scheckter",
-   "active_from": 1972,
-   "active_to": 1980,
-   "stats": {
-    "wins": 10,
-    "podiums": 33,
-    "poles": 3,
-    "fastest_laps": 0,
-    "points_finishes": 68,
-    "front_rows": 12,
-    "dnfs": 35
-   }
-  },
-  {
-   "driver_id": "kovalainen",
-   "full_name": "Heikki Kovalainen",
-   "active_from": 2007,
-   "active_to": 2013,
-   "stats": {
-    "wins": 1,
-    "podiums": 4,
-    "poles": 1,
-    "fastest_laps": 2,
-    "points_finishes": 36,
-    "front_rows": 5,
-    "dnfs": 21
-   }
-  },
-  {
-   "driver_id": "hulme",
-   "full_name": "Denny Hulme",
-   "active_from": 1965,
-   "active_to": 1974,
-   "stats": {
-    "wins": 8,
-    "podiums": 33,
-    "poles": 1,
-    "fastest_laps": 0,
-    "points_finishes": 72,
-    "front_rows": 15,
-    "dnfs": 34
-   }
-  },
-  {
    "driver_id": "stewart",
    "full_name": "Jackie Stewart",
    "active_from": 1965,
@@ -673,66 +448,6 @@
     "points_finishes": 61,
     "front_rows": 33,
     "dnfs": 37
-   }
-  },
-  {
-   "driver_id": "kubica",
-   "full_name": "Robert Kubica",
-   "active_from": 2006,
-   "active_to": 2021,
-   "stats": {
-    "wins": 1,
-    "podiums": 12,
-    "poles": 1,
-    "fastest_laps": 1,
-    "points_finishes": 52,
-    "front_rows": 4,
-    "dnfs": 14
-   }
-  },
-  {
-   "driver_id": "maldonado",
-   "full_name": "Pastor Maldonado",
-   "active_from": 2011,
-   "active_to": 2015,
-   "stats": {
-    "wins": 1,
-    "podiums": 1,
-    "poles": 1,
-    "fastest_laps": 0,
-    "points_finishes": 14,
-    "front_rows": 2,
-    "dnfs": 29
-   }
-  },
-  {
-   "driver_id": "montoya",
-   "full_name": "Juan Pablo Montoya",
-   "active_from": 2001,
-   "active_to": 2006,
-   "stats": {
-    "wins": 7,
-    "podiums": 30,
-    "poles": 13,
-    "fastest_laps": 3,
-    "points_finishes": 58,
-    "front_rows": 26,
-    "dnfs": 33
-   }
-  },
-  {
-   "driver_id": "hunt",
-   "full_name": "James Hunt",
-   "active_from": 1973,
-   "active_to": 1979,
-   "stats": {
-    "wins": 10,
-    "podiums": 23,
-    "poles": 14,
-    "fastest_laps": 0,
-    "points_finishes": 45,
-    "front_rows": 24,
-    "dnfs": 47
    }
   },
   {
@@ -766,21 +481,6 @@
    }
   },
   {
-   "driver_id": "rindt",
-   "full_name": "Jochen Rindt",
-   "active_from": 1964,
-   "active_to": 1970,
-   "stats": {
-    "wins": 6,
-    "podiums": 13,
-    "poles": 10,
-    "fastest_laps": 0,
-    "points_finishes": 22,
-    "front_rows": 15,
-    "dnfs": 36
-   }
-  },
-  {
    "driver_id": "fangio",
    "full_name": "Juan Fangio",
    "active_from": 1950,
@@ -793,36 +493,6 @@
     "points_finishes": 43,
     "front_rows": 42,
     "dnfs": 14
-   }
-  },
-  {
-   "driver_id": "phil_hill",
-   "full_name": "Phil Hill",
-   "active_from": 1958,
-   "active_to": 1964,
-   "stats": {
-    "wins": 3,
-    "podiums": 16,
-    "poles": 6,
-    "fastest_laps": 0,
-    "points_finishes": 30,
-    "front_rows": 7,
-    "dnfs": 18
-   }
-  },
-  {
-   "driver_id": "hawthorn",
-   "full_name": "Mike Hawthorn",
-   "active_from": 1952,
-   "active_to": 1958,
-   "stats": {
-    "wins": 3,
-    "podiums": 18,
-    "poles": 4,
-    "fastest_laps": 0,
-    "points_finishes": 33,
-    "front_rows": 7,
-    "dnfs": 15
    }
   },
   {

@@ -249,15 +249,19 @@ boundary.
   bank) + unlimited **Free Practice** (non-competitive, never recorded, with a
   10-second anti-scouting team penalty on low scores) + Arcade Over/Under
   (matchups biased toward close, within-30% calls)
-- Server-authoritative exp-decay scoring; answers never leave the server
-- Deterministic anti-hallucination validation; a **committed ~1,200-question bank**
-  (`backend/app/data/questions.json`), curated for the modern era (see
-  `backend/scripts/curate_questions.py`) from a ~3,100-question validated,
-  significance-gated pool
-- 30+ question types across drivers, teams and circuits; era-biased serving with
-  an era-tiered driver significance gate (2020s: 50+ points · 2010s: race winners
-  · 2000s: 3+ wins · pre-2000: world champions only). The same gate filters the
-  Arcade Over/Under roster, so it never pits insignificant also-rans
+- Server-authoritative exp-decay scoring, **kind-aware** (counts/points by
+  percentage error; years by years-off; percentages by points-of-percentage);
+  answers never leave the server
+- Deterministic anti-hallucination validation; a **committed 2,000-question bank**
+  (`backend/app/data/questions.json`), sampled era-weighted from a ~4,600-question
+  validated, significance-gated pool rebuilt weekly from the full 1950→now record
+- 35+ question types across drivers, teams and circuits — career totals, season
+  spotlights ("how many races did Verstappen win in 2023?"), dominant-team
+  seasons, win streaks/spans, head-to-head rivalries — era-biased toward the
+  current grid, with an era-tiered driver significance gate (2020s: 50+ points ·
+  2010s: 3+ wins or a title · 2000s: champions · pre-2000: multiple champions
+  only). The same gate filters the Arcade Over/Under roster, so it never pits
+  insignificant also-rans
 - Guest-first localStorage: lifetime points, accuracy, streaks, achievements
 - **User accounts** (username + PBKDF2-hashed password, server sessions) with
   server-side saving, guest→account merge, and a server-verified Global
