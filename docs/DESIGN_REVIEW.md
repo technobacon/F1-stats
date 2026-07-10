@@ -540,7 +540,7 @@ vs without (A/B by question).
 
 | # | Item | Type | Impact | Effort | Notes |
 |---|---|---|---|---|---|
-| 1 | G1/G2/G3 scoring & bounds fixes | Balance | ★★★★★ | S | Correctness of the core economy; do before anything amplifies sharing |
+| 1 | G1/G2/G3 scoring & bounds fixes | Balance | ★★★★★ | S | ✅ **Shipped** — per-kind curves (years/percentage on absolute error, kind-aware sectors), zero-answer fallback, randomized leak-free slider bounds |
 | 2 | G7 After-the-flag funnel | Loop | ★★★★ | S | ✅ **Shipped** — summary + capped-intro next-step rows, guest sign-up nudge |
 | 3 | F1 Ghost Race | Feature | ★★★★★ | M | The share loop becomes a game |
 | 4 | V1/V2/V4/V6/V8 visual fixes | Polish | ★★★ | S | ✅ **Shipped** — hero 404 removed, Cadillac/Audi accent split, ✕/🚩 chrome → SVG icons, exit confirm, locked-badge progress bars |

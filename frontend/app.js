@@ -765,7 +765,7 @@ async function submitGuess() {
     if (result.insight) sessionInsights.push(result.insight.beat_percent);
 
     // Sector + achievement bookkeeping (all modes). Purple ≤10%, green ≤25%.
-    const sector = sectorForResult(result);
+    const sector = sectorForResult(result, q.answer_kind);
     result._sector = sector;
     const a = ensureAch();
     if (result.score >= result.max_score) a.perfect = (a.perfect || 0) + 1;  // exact hit
@@ -904,14 +904,23 @@ function setVerdict(result) {
   el.hidden = false;
 }
 
-/* Classify a guess by percentage error, F1-timing style:
- *   purple  — within 10% (a "purple sector", the fastest)
- *   green   — within 25%
- *   null    — outside both. */
-function sectorForResult(result) {
+/* Classify a guess F1-timing style, on the same per-kind yardstick the server
+ * scores with:
+ *   count/points — percentage error: purple ≤10%, green ≤25%
+ *   year         — years off:        purple ≤1,   green ≤3
+ *   percentage   — points off:       purple ≤2,   green ≤5
+ *   null — outside both. */
+function sectorForResult(result, kind) {
+  const off = Math.abs(result.guess - result.actual);
+  if (kind === "year") {
+    return off <= 1 ? "purple" : off <= 3 ? "green" : null;
+  }
+  if (kind === "percentage") {
+    return off <= 2 ? "purple" : off <= 5 ? "green" : null;
+  }
   const actual = Math.abs(result.actual);
   if (actual === 0) return result.guess === result.actual ? "purple" : null;
-  const err = Math.abs(result.guess - result.actual) / actual;
+  const err = off / actual;
   if (err <= 0.10) return "purple";
   if (err <= 0.25) return "green";
   return null;

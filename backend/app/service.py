@@ -13,6 +13,7 @@ change behind these functions.
 from __future__ import annotations
 
 import hashlib
+import math
 import json
 import random
 import secrets
@@ -24,9 +25,11 @@ from pathlib import Path
 from . import scoring
 from .validation import compute_metric
 
-# tracking_token -> (question_id, verified_answer, game_mode, issued_at). Server-
-# side only; the answer is never serialized to the client. Redis in production.
-_TOKEN_STORE: dict[str, tuple[str, float, str, float]] = {}
+# tracking_token -> (question_id, verified_answer, game_mode, issued_at,
+# answer_kind). Server-side only; the answer is never serialized to the client.
+# The kind rides along so verify() can score each answer on the right error
+# scale (years off vs percentage error). Redis in production.
+_TOKEN_STORE: dict[str, tuple[str, float, str, float, str]] = {}
 # Robustness: this in-memory store would otherwise grow without bound (a new
 # token per question served, forever). Tokens expire after a generous play window
 # and the store is capped, evicting the oldest. Redis TTLs replace this in prod.
@@ -46,7 +49,7 @@ def _prune_tokens() -> None:
             del _TOKEN_STORE[t]
 
 
-def _live_token(token: str) -> tuple[str, float, str, float] | None:
+def _live_token(token: str) -> tuple[str, float, str, float, str] | None:
     """Return a token's entry if present and not expired, else None (expired
     tokens are dropped, so the caller sees them as unknown)."""
     entry = _TOKEN_STORE.get(token)
@@ -131,18 +134,25 @@ def _deterministic_rng(*parts: str) -> random.Random:
     return random.Random(int(digest[:16], 16))
 
 
-def _slider_bounds(answer: float) -> tuple[float, float]:
+def _slider_bounds(answer: float, key: str = "") -> tuple[float, float]:
     """Derive non-revealing slider bounds for the odometer UI (Architecture §3.2).
 
-    Bounds are a wide, rounded band that contains the answer without pinning it —
-    the true value is not recoverable from min/max alone.
+    Bounds are a wide, rounded band that contains the answer without pinning it.
+    The old doubling scheme quietly guaranteed the answer sat in the second
+    quarter of every slider (upper ∈ [2a, 4a) ⇒ a ∈ (upper/4, upper/2]), which a
+    player could exploit by always parking at ~35%. Instead the answer's position
+    in the band is drawn deterministically per question (seeded by `key`, stable
+    across boots), then the bound is rounded up to two significant figures so it
+    still reads as a clean scale mark.
     """
     if answer <= 0:
         return 0.0, 10.0
-    upper = 10.0
-    while upper < answer * 2:
-        upper *= 2
-    return 0.0, round(upper)
+    rng = _deterministic_rng("slider-bounds", key or str(answer))
+    frac = rng.uniform(0.18, 0.82)   # where in the band the answer lands
+    upper = max(10.0, answer / frac)
+    mag = 10 ** max(0, math.floor(math.log10(upper)) - 1)
+    upper = math.ceil(upper / mag) * mag
+    return 0.0, float(upper)
 
 
 def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str | None = None) -> dict:
@@ -175,12 +185,13 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     questions = []
     for row in rows:
         token = secrets.token_urlsafe(16)
-        _TOKEN_STORE[token] = (row["id"], row["verified_answer"], game_mode, time.monotonic())
+        _TOKEN_STORE[token] = (row["id"], row["verified_answer"], game_mode,
+                               time.monotonic(), row["answer_kind"] or "count")
         # Prefer explicit display bounds (year/percentage); else a non-revealing band.
         if row["display_min"] is not None and row["display_max"] is not None:
             smin, smax = row["display_min"], row["display_max"]
         else:
-            smin, smax = _slider_bounds(row["verified_answer"])
+            smin, smax = _slider_bounds(row["verified_answer"], row["question_string"])
         questions.append({
             "tracking_token": token,
             "question_text": row["question_string"],
@@ -219,11 +230,12 @@ def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None 
     row = rng.choice(pool)
 
     token = secrets.token_urlsafe(16)
-    _TOKEN_STORE[token] = (row["id"], row["verified_answer"], FREE_PRACTICE_MODE, time.monotonic())
+    _TOKEN_STORE[token] = (row["id"], row["verified_answer"], FREE_PRACTICE_MODE,
+                           time.monotonic(), row["answer_kind"] or "count")
     if row["display_min"] is not None and row["display_max"] is not None:
         smin, smax = row["display_min"], row["display_max"]
     else:
-        smin, smax = _slider_bounds(row["verified_answer"])
+        smin, smax = _slider_bounds(row["verified_answer"], row["question_string"])
     return {
         "game_mode": FREE_PRACTICE_MODE,
         "question": {
@@ -239,12 +251,14 @@ def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None 
 
 
 def verify_guess(token: str, guess: float) -> dict | None:
-    """Score a guess server-side. Returns None if the token is unknown/expired."""
+    """Score a guess server-side. Returns None if the token is unknown/expired.
+    Scoring is kind-aware: years and percentages decay on absolute error, counts
+    and points on percentage error (see scoring.score_guess)."""
     entry = _live_token(token)
     if entry is None:
         return None
-    _question_id, actual, _game_mode, _issued = entry
-    score = scoring.score_guess(guess, actual)
+    _question_id, actual, _game_mode, _issued, kind = entry
+    score = scoring.score_guess(guess, actual, kind=kind)
     return {"score": score, "actual": actual, "guess": guess, "max_score": scoring.MAX_SCORE}
 
 
@@ -254,7 +268,7 @@ def token_meta(token: str) -> tuple[str, str] | None:
     entry = _live_token(token)
     if entry is None:
         return None
-    question_id, _actual, game_mode, _issued = entry
+    question_id, _actual, game_mode, _issued, _kind = entry
     return question_id, game_mode
 
 

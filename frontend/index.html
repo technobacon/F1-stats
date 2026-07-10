@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=26" />
+  <link rel="stylesheet" href="/static/style.css?v=27" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -469,10 +469,14 @@
       <div class="card about-card" id="about-scoring">
         <h2>How scoring works</h2>
         <p>Each question is worth up to <strong>5,000 points</strong>. The score follows an
-           <strong>exponential-decay curve</strong> on your percentage error: a perfect guess
-           banks the full amount, and points fall away the further off you are — gently at
-           first, then steeply. Land within 10% and you've nailed a <em>purple sector</em>;
-           within 25% is a <em>green</em> one.</p>
+           <strong>exponential-decay curve</strong>: a perfect guess banks the full amount,
+           and points fall away the further off you are — gently at first, then steeply.
+           Every kind of answer is judged on a fair yardstick: counts and points totals by
+           <strong>percentage error</strong>, year answers by <strong>how many years off</strong>
+           you are, and percentage answers by <strong>points of percentage</strong>.</p>
+        <p>Get close and you've nailed a <em>purple sector</em> (within 10%, a year, or two
+           points, by kind); a little further out is a <em>green</em> one (within 25%, three
+           years, or five points).</p>
         <p>Your guess never leaves your device until you lock it in, and the answer is only
            revealed afterwards — scoring happens <strong>on the server</strong>, so leaderboard
            totals can't be forged by the client.</p>
@@ -727,8 +731,8 @@
   </div>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-  <script src="/static/icons.js?v=26"></script>
-  <script src="/static/sound.js?v=26"></script>
-  <script src="/static/app.js?v=26"></script>
+  <script src="/static/icons.js?v=27"></script>
+  <script src="/static/sound.js?v=27"></script>
+  <script src="/static/app.js?v=27"></script>
 </body>
 </html>
