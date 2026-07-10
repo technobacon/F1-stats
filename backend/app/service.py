@@ -85,11 +85,12 @@ FREE_PRACTICE_MODE = "free_practice"
 # year (production_trivia_questions.era_year). Tune the bands here.
 ERA_WEIGHT_BANDS = (
     # (year_lo, year_hi, weight)
-    (2014, 9999, 1.00),   # modern turbo-hybrid era — the primary focus
-    (2007, 2013, 0.50),   # recent, but not current
-    (1994, 2006, 0.38),   # Schumacher era — occasional, with a lean
-    (1984, 1993, 0.42),   # Prost / Senna / Mansell / Piquet — a touch more
-    (1980, 1983, 0.16),   # early '80s — rare
+    (2020, 9999, 1.30),   # the current grid — the primary focus
+    (2014, 2019, 0.70),   # turbo-hybrid era — recent, but not current
+    (2007, 2013, 0.42),   # Vettel/late-Schumacher years — occasional
+    (1994, 2006, 0.36),   # Schumacher era — occasional, with a lean
+    (1984, 1993, 0.40),   # Prost / Senna / Piquet — the golden-era legends
+    (1980, 1983, 0.14),   # early '80s — rare
 )
 DEFAULT_ERA_WEIGHT = 0.12  # outside the bands (pre-1980) or unknown era
 

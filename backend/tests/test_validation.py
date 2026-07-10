@@ -321,41 +321,118 @@ def test_circuit_keyed_metrics(conn):
     assert 1 <= record <= wins_there
 
 
+# ---- New metrics: streaks, pole spread, win longevity ------------------------
+
+def test_longest_win_streak_bounded_by_wins(conn):
+    p = {"target_entity": "driver", "entity_id": "schumacher",
+         "start_year": 1991, "end_year": 2012}
+    streak = compute_metric(conn, {**p, "metric_target": "longest_win_streak"})
+    wins = compute_metric(conn, {**p, "metric_target": "wins"})
+    assert 1 <= streak <= wins
+
+
+def test_distinct_circuits_poled_bounded(conn):
+    p = {"target_entity": "driver", "entity_id": "senna",
+         "start_year": 1984, "end_year": 1994}
+    circuits = compute_metric(conn, {**p, "metric_target": "distinct_circuits_poled"})
+    poles = compute_metric(conn, {**p, "metric_target": "poles"})
+    assert 0 <= circuits <= poles
+
+
+def test_win_span_years(conn):
+    p = {"target_entity": "driver", "entity_id": "schumacher",
+         "start_year": 1991, "end_year": 2012}
+    span = compute_metric(conn, {**p, "metric_target": "win_span_years"})
+    first = compute_metric(conn, {**p, "metric_target": "wins", "aggregation": "first_season"})
+    last = compute_metric(conn, {**p, "metric_target": "wins", "aggregation": "last_season"})
+    assert span == last - first
+    # A driver with no wins spans zero years.
+    nowin = {"target_entity": "driver", "entity_id": "rosberg",
+             "start_year": 2006, "end_year": 2009, "metric_target": "win_span_years"}
+    assert compute_metric(conn, nowin) == 0
+
+
+# ---- Generator content-quality rules ------------------------------------------
+
+def test_generator_content_rules(conn):
+    """The weed rules hold across the whole generated pool: no '(2009-2009)'
+    windows, no degenerate answer-of-one superlatives, no small-sample rate
+    questions, and no present-tense questions about long-retired drivers."""
+    import re
+    from app.seed import DRIVERS, generate_questions
+    questions = generate_questions(conn, DRIVERS)
+    assert questions, "generator produced nothing"
+    for q in questions:
+        text = q["question_text"]
+        # Single-year windows read "(2009)", never "(2009-2009)".
+        assert not re.search(r"\((\d{4})-\1\)", text), text
+        # A superlative with an answer of 1 is filler, not a question.
+        if text.startswith("What is the most"):
+            assert q["proposed_answer"] >= 2, text
+        # Long-retired drivers are asked in the past tense.
+        assert "does Ayrton Senna have" not in text
+        assert "has Ayrton Senna" not in text
+    # The tense flip is present-perfect for the current grid...
+    assert any("does Max Verstappen have" in q["question_text"] for q in questions)
+    # ...and simple past for the legends.
+    assert any("did Ayrton Senna take" in q["question_text"] for q in questions)
+
+
+def test_generator_emits_season_spotlights(conn):
+    import re
+    from app.seed import DRIVERS, generate_questions
+    questions = generate_questions(conn, DRIVERS)
+    spotlights = [q for q in questions
+                  if re.search(r"in the \d{4} season\?$", q["question_text"])]
+    assert spotlights, "no season-spotlight questions generated"
+    for q in spotlights:
+        p = q["validation_parameters"]
+        assert p["start_year"] == p["end_year"]
+
+
 # ---- Driver significance gate -------------------------------------------------
 
 def test_significance_tiers():
     from app.seed import _is_significant
     # 2020s: 50+ career points is enough, no win needed.
-    assert _is_significant(2022, 0, 120.0, False) is True
-    assert _is_significant(2022, 0, 12.0, False) is False
-    # 2010s: must be a race winner.
-    assert _is_significant(2015, 1, 900.0, False) is True
-    assert _is_significant(2015, 0, 900.0, False) is False
-    # 2000s: multiple (3+) wins.
-    assert _is_significant(2004, 3, 0.0, False) is True
-    assert _is_significant(2004, 2, 500.0, False) is False
-    # Pre-2000: world champions only.
-    assert _is_significant(1991, 40, 500.0, False) is False
-    assert _is_significant(1991, 40, 500.0, True) is True
+    assert _is_significant(2022, 0, 120.0, 0) is True
+    assert _is_significant(2022, 0, 12.0, 0) is False
+    # 2010s: multiple (3+) race wins, or a title.
+    assert _is_significant(2015, 3, 900.0, 0) is True
+    assert _is_significant(2015, 1, 900.0, 0) is False
+    assert _is_significant(2015, 0, 900.0, 1) is True
+    # 2000s: World Champions only.
+    assert _is_significant(2004, 10, 900.0, 0) is False
+    assert _is_significant(2004, 3, 0.0, 1) is True
+    # Pre-2000: MULTIPLE World Champions only (the Senna/Prost tier).
+    assert _is_significant(1991, 40, 500.0, 1) is False
+    assert _is_significant(1991, 40, 500.0, 2) is True
 
 
 def test_generated_pool_respects_significance_gate(conn):
-    from app.seed import (DRIVERS, _champion_ids, _driver_career_stats,
-                          generate_questions)
-    champions = _champion_ids(conn)
+    from app.seed import (DRIVERS, _champion_titles,
+                          _driver_career_stats, generate_questions)
+    titles = _champion_titles(conn)
     stats = _driver_career_stats(conn)
-    # Synthetic Webber is a winner but no champion: his pre-2010 stint questions
-    # (2002+ era) survive only via the 2000s multiple-winner rule.
-    assert "webber" not in champions and stats["webber"][0] >= 3
+    # Synthetic Webber is a multiple winner but no champion: under the tightened
+    # gate his 2000s-era stints are culled while his 2010s Red Bull years stay.
+    assert titles.get("webber", 0) == 0 and stats["webber"][0] >= 3
     questions = generate_questions(conn, DRIVERS)
-    # No question featuring a non-champion may be scoped pre-2000.
     for q in questions:
         p = q["validation_parameters"]
         if p.get("target_entity") != "driver":
             continue
         era = round((p["start_year"] + p["end_year"]) / 2)
-        if era < 2000:
-            assert p["entity_id"] in champions
+        for key in ("entity_id", "entity_id_b"):
+            did = p.get(key)
+            if did is None:
+                continue
+            # No question scoped to the 2000s may feature a non-champion, and
+            # nothing pre-2000 may feature anyone below a multiple champion.
+            if 2000 <= era < 2010:
+                assert titles.get(did, 0) >= 1, q["question_text"]
+            if era < 2000:
+                assert titles.get(did, 0) >= 2, q["question_text"]
 
 
 # ---- Validation gate --------------------------------------------------------

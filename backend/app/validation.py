@@ -57,6 +57,12 @@ _RACE_METRICS = {
     "avg_finish":           "COALESCE(CAST(ROUND(AVG(position)) AS INTEGER), 0)",
     # How many *different* circuits the entity has a win at.
     "distinct_circuits_won":"COUNT(DISTINCT CASE WHEN position = 1 THEN circuit_id END)",
+    # How many *different* circuits the entity has started from pole at.
+    "distinct_circuits_poled": "COUNT(DISTINCT CASE WHEN grid = 1 THEN circuit_id END)",
+    # Years between the first and the most recent win in scope (0 = one winning
+    # year or none) — the "longevity" stat that makes long careers sing.
+    "win_span_years":       "COALESCE(MAX(CASE WHEN position = 1 THEN year END) - "
+                            "MIN(CASE WHEN position = 1 THEN year END), 0)",
     # How many distinct seasons featured at least one win.
     "winning_seasons":      "COUNT(DISTINCT CASE WHEN position = 1 THEN year END)",
     "distinct_constructors":"COUNT(DISTINCT constructor_id)",
@@ -88,8 +94,8 @@ _QUALI_METRICS: dict[str, str] = {}
 # scoped aggregate expression (entity_id meaning varies — see each function).
 _SPECIAL_METRICS = {
     "poles_converted", "one_two_finishes", "distinct_winners", "races_held",
-    "longest_points_streak", "longest_podium_streak", "teammate_count",
-    "front_row_lockouts", "most_wins_one_driver",
+    "longest_points_streak", "longest_podium_streak", "longest_win_streak",
+    "teammate_count", "front_row_lockouts", "most_wins_one_driver",
 }
 
 _AGGREGATIONS = {
@@ -293,6 +299,8 @@ def compute_metric(conn: sqlite3.Connection, params: dict) -> Decimal:
             return Decimal(str(_longest_streak(conn, entity, params, max_position=10)))
         if metric == "longest_podium_streak":
             return Decimal(str(_longest_streak(conn, entity, params, max_position=3)))
+        if metric == "longest_win_streak":
+            return Decimal(str(_longest_streak(conn, entity, params, max_position=1)))
         if metric == "teammate_count":
             return Decimal(str(_teammate_count(conn, entity, params)))
         if metric == "front_row_lockouts":
