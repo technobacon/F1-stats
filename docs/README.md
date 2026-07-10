@@ -10,6 +10,7 @@ This folder contains the design and engineering documentation for **GridMaster**
 | 🚀 [Launch Runbook](./LAUNCH.md) | Whoever ships it | The $0 go-live checklist: deploy to Render free tier, free durable accounts, analytics, pre-share checks. |
 | [Marketing Plan](./MARKETING.md) | Growth | Minimal-effort, no-Reddit growth plan: ride the race calendar, let the share loop do the work. |
 | [Status & Roadmap](./STATUS.md) | Everyone | Living snapshot of what's shipped and what's next. |
+| [Design Review](./DESIGN_REVIEW.md) | Product / Design / Engineering | Professional game-design + visual-design audit of the shipped game: balance findings (scoring-curve flaws, slider-bounds leak), UX findings, and five fleshed-out feature specs (Ghost Race, GP Weekend, Arcade 2.0, Super Licence, reveal enrichment) with a prioritised roadmap. |
 | [Product Requirements Document](./PRD.md) | Product, Frontend, Backend, UI/UX, QA | Executive summary, scoring engine, data pipeline overview, gameplay modes, gamification & monetization. |
 | [Technical Pipeline Specs](./TECHNICAL_PIPELINE_SPECS.md) | Backend / Data Engineers | ETL ingestion engine, LLM context chunking, deterministic anti-hallucination validation layer, production SQL schema. |
 | [Full Architecture Blueprint](./ARCHITECTURE_BLUEPRINT.md) | Full-Stack / DevOps | Game logic & API state, guest-first frontend state, constructor theming, score-reveal animation, ad-network integration. |
