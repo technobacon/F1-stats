@@ -78,6 +78,7 @@
       'l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>' +
       '<circle cx="12" cy="12" r="3"/>',
     check: '<path d="M20 6 9 17l-5-5"/>',
+    x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
   };
 
   function svg(name, opts) {

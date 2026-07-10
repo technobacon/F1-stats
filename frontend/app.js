@@ -5,7 +5,7 @@
 const API = "/api/v1";
 // Build identifier, surfaced in the footer as a real "this is shipped software"
 // signal. Bump alongside the asset version when cutting a release.
-const APP_VERSION = "2026.06.27";
+const APP_VERSION = "2026.07.10";
 // NOTE: these localStorage keys keep the legacy "f1statguesser_" prefix on
 // purpose — the product is now GridMaster, but renaming the keys would orphan
 // every existing player's saved progress, session and guest id. Leave them.
@@ -158,7 +158,12 @@ function isoWeek() {
  * `ink` is a legibility-safe variant of the colour used for TEXT on the dark UI:
  * for most teams it equals the primary, but dark primaries (Red Bull navy, Haas
  * near-black, Williams/RB deep blue, Aston dark teal) are lightened so they don't
- * vanish against the background. Fills/borders keep the true `primary`. */
+ * vanish against the background.
+ * `accent` / `accentLight` are the same split for FILLS: where the brand colour
+ * has no contrast on a theme (Cadillac's white on white surfaces, Audi's mid-grey
+ * that reads as disabled UI), interactive states use the accent while the true
+ * `primary` stays the livery (car sprite, swatches, --team-livery). `textLight`
+ * overrides the button-text colour on light when the accent flips dark/light. */
 const TEAMS = {
   mclaren:      { name: "McLaren",      primary: "#FF8000", secondary: "#1B2425", text: "#000", ink: "#FF8000", inkLight: "#C95E00" },
   ferrari:      { name: "Ferrari",      primary: "#DC0000", secondary: "#FFEB00", text: "#fff", ink: "#FF3232", inkLight: "#D10000" },
@@ -169,20 +174,26 @@ const TEAMS = {
   williams:     { name: "Williams",     primary: "#0064FF", secondary: "#FFFFFF", text: "#fff", ink: "#4D8DFF", inkLight: "#0056D6" },
   rb:           { name: "Racing Bulls", primary: "#1634CE", secondary: "#FFFFFF", text: "#fff", ink: "#5A77FF", inkLight: "#1634CE" },
   haas:         { name: "Haas",         primary: "#1A1A1A", secondary: "#E8002D", text: "#fff", ink: "#FF4D67", inkLight: "#1A1A1A" },
-  audi:         { name: "Audi",         primary: "#8E8E8E", secondary: "#CC0000", text: "#000", ink: "#C7CCD4", inkLight: "#5A5A5A" },
-  cadillac:     { name: "Cadillac",     primary: "#FFFFFF", secondary: "#0D0D0D", text: "#000", ink: "#FFFFFF", inkLight: "#0D0D0D" },
+  audi:         { name: "Audi",         primary: "#8E8E8E", secondary: "#CC0000", text: "#fff", ink: "#C7CCD4", inkLight: "#5A5A5A",
+                  accent: "#CC0000" },
+  cadillac:     { name: "Cadillac",     primary: "#FFFFFF", secondary: "#0D0D0D", text: "#000", ink: "#FFFFFF", inkLight: "#0D0D0D",
+                  accentLight: "#0D0D0D", textLight: "#fff" },
 };
 
 /* ---- Theming (Architecture §3.1) ---- */
 function applyTeam(team) {
   const t = TEAMS[team] || TEAMS.mclaren;
   const root = document.documentElement;
+  const light = root.getAttribute("data-theme") === "light";
+  // Functional accent for the current theme; falls back to the true brand colour.
+  const accent = (light ? t.accentLight : t.accent) || t.accent || t.primary;
   root.setAttribute("data-team", team);
-  root.style.setProperty("--color-primary", t.primary);
+  root.style.setProperty("--team-livery", t.primary);
+  root.style.setProperty("--color-primary", accent);
   root.style.setProperty("--color-secondary", t.secondary);
   root.style.setProperty("--team-ink-dark", t.ink || t.primary);
   root.style.setProperty("--team-ink-light", t.inkLight || t.ink || t.primary);
-  root.style.setProperty("--btn-text", t.text);
+  root.style.setProperty("--btn-text", (light && t.textLight) || t.text);
   /* Header dot: solid main colour with a secondary accent ring */
   const swatch = document.getElementById("team-btn-swatch");
   const label  = document.getElementById("team-btn-label");
@@ -322,7 +333,24 @@ function renderRaceWeek() {
 /* One router for everything that carries data-view: the top-nav tabs, the brand,
  * the hero buttons and the landing-page mode cards. */
 let currentMode = "daily";
-function navigate(view, mode) {
+
+/* URL state: each view gets a hash so the browser back button walks the app
+ * instead of leaving the site (especially jarring as an installed PWA), and a
+ * view can be bookmarked/shared. The ?play= deep links are unaffected. */
+function viewHash(view, mode) {
+  if (view === "quiz") return mode === "free_practice" ? "#practice" : "#daily";
+  return view === "home" ? "" : "#" + view;
+}
+function parseViewHash(h) {
+  const map = {
+    daily: ["quiz", "daily"], practice: ["quiz", "free_practice"],
+    arcade: ["arcade", null], profile: ["profile", null], about: ["about", null],
+    home: ["home", null], "": ["home", null],
+  };
+  return map[(h || "").replace(/^#/, "")] || null;
+}
+
+function navigate(view, mode, opts = {}) {
   track("view", { view, mode: mode || null });
   Sound.play("uiClick");   // subtle tap so the chrome feels responsive
   // Leaving the quiz (or re-entering its intro) always exits immersive mode and
@@ -341,12 +369,29 @@ function navigate(view, mode) {
   if (view === "arcade") loadArcade();
   if (view === "profile") renderProfile();
   if (view === "home") { renderStreakBanner(); loadHomeTower(); renderGarage(); }
+  // Record the view in history (skipped when history itself drove the change,
+  // and deduped so repeat taps on the same tab don't stack entries).
+  const st = history.state;
+  if (!opts.fromHistory && !(st && st.view === view && (st.mode || null) === (mode || null))) {
+    history.pushState({ view, mode: mode || null }, "",
+      viewHash(view, mode) || location.pathname + location.search);
+  }
   window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
 }
+window.addEventListener("popstate", (e) => {
+  const h = parseViewHash(location.hash);
+  const s = e.state || (h ? { view: h[0], mode: h[1] } : { view: "home", mode: null });
+  navigate(s.view, s.mode, { fromHistory: true });
+});
 document.querySelectorAll("[data-view]").forEach((el) => {
   el.addEventListener("click", (e) => {
     e.preventDefault();
+    // Backing out of a live competitive run costs the summary/streak/share for
+    // the questions already scored — that deserves one deliberate confirm.
+    if (el.id === "game-exit" && competitiveRunActive()) { ExitConfirm.open(); return; }
     navigate(el.dataset.view, el.dataset.mode);
+    // "Today's leaderboard" style shortcuts pre-select a board window.
+    if (el.dataset.period) setLeaderboardPeriod(el.dataset.period);
     // Footer links deep-link into the About page: after navigating, bring the
     // requested section into view (honouring reduced motion).
     const anchor = el.dataset.scroll;
@@ -357,6 +402,32 @@ document.querySelectorAll("[data-view]").forEach((el) => {
     }
   });
 });
+
+/* True while a competitive (recorded) run is mid-flight — the intro and the
+ * summary don't count, and Free Practice has nothing to lose by leaving. */
+function competitiveRunActive() {
+  return document.body.classList.contains("in-game") && quiz && !quiz.free &&
+    document.getElementById("quiz-summary").classList.contains("hidden");
+}
+
+/* The mid-run exit dialog. The safe action (keep racing) is the primary one. */
+const ExitConfirm = (() => {
+  function open() { show("exit-overlay"); document.getElementById("exit-cancel")?.focus(); }
+  function close() { hide("exit-overlay"); }
+  function init() {
+    document.getElementById("exit-cancel")?.addEventListener("click", close);
+    document.getElementById("exit-confirm")?.addEventListener("click", () => {
+      close();
+      track("quiz_abandon", { mode: currentMode, at: qPos + 1 });
+      navigate("home");
+    });
+    document.getElementById("exit-overlay")?.addEventListener("click", (e) => {
+      if (e.target.id === "exit-overlay") close();
+    });
+  }
+  return { init, open, close,
+    isOpen: () => !document.getElementById("exit-overlay")?.classList.contains("hidden") };
+})();
 
 /* ===================== QUIZ (Daily / Race-Week / One-Shots) ===================== */
 let quiz = null, qPos = 0, sessionScore = 0, sessionCloseness = 0;
@@ -397,6 +468,8 @@ function renderQuizIntro() {
     startBtn.textContent = "Start Session";
     replayBtn.classList.add("hidden");
   }
+  // A capped Daily shouldn't dead-end a warmed-up player: surface the next laps.
+  document.getElementById("intro-next")?.classList.toggle("hidden", !isCapped(currentMode));
 }
 
 document.getElementById("start-quiz").addEventListener("click", () => {
@@ -657,6 +730,22 @@ function renderQuestion() {
 const submitBtn = document.getElementById("submit-guess");
 submitBtn.addEventListener("click", submitGuess);
 
+/* Fine-tune steppers (−10 / −1 / +1 / +10) around the typed input. They write
+ * the input and fire its input event, so the existing handler keeps the curve
+ * slider in sync; a tick per press keeps the tactility of the drag. */
+document.querySelectorAll(".stepper").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const input = document.getElementById("q-input");
+    const min = parseFloat(input.min) || 0;
+    const max = input.max !== "" && !isNaN(parseFloat(input.max)) ? parseFloat(input.max) : Infinity;
+    const next = Math.min(max, Math.max(min, (parseFloat(input.value) || 0) + Number(btn.dataset.step)));
+    if (String(next) === input.value) return;
+    input.value = next;
+    input.dispatchEvent(new Event("input"));
+    Sound.tick();
+  });
+});
+
 async function submitGuess() {
   const q = quiz.questions[qPos];
   const guess = parseFloat(document.getElementById("q-input").value) || 0;
@@ -730,6 +819,12 @@ function revealScore(q, result) {
   const guessNode = document.getElementById("node-guess");
   const actualNode = document.getElementById("node-actual");
   const actualText = document.getElementById("reveal-actual");
+
+  // Close call? Under ~8% separation the cars/labels would collide exactly at
+  // the moment of triumph — drop the ghost below the track (photo-finish framing).
+  const timeline = document.querySelector("#quiz-reveal .timeline");
+  if (timeline) timeline.classList.toggle("close-call",
+    Math.abs(clampPct(result.guess) - clampPct(result.actual)) < 8);
 
   // Reset: park both markers at the start, keep the answer hidden for now.
   guessNode.style.left = "0%";
@@ -940,6 +1035,9 @@ function finishSession() {
   // home banner and (signed-in) the authoritative server streak.
   renderSummaryEngagement();
   renderStreakBanner();
+  // Highest-intent moment for the account ask: fresh points that a guest can
+  // put on the board. Hidden for members.
+  document.getElementById("summary-signup")?.classList.toggle("hidden", isSignedIn());
   if (isSignedIn()) refreshMe().then(renderProfile);
 }
 
@@ -976,12 +1074,15 @@ function renderSummaryEngagement() {
 document.getElementById("summary-back").addEventListener("click", () => navigate("home"));
 
 /* Map a per-question closeness (0..1) to a coloured square — the spoiler-free
- * Wordle-style result. No numbers that reveal the answer, just how close. */
+ * Wordle-style result. No numbers that reveal the answer, just how close.
+ * Purple-as-best speaks the game's own "purple sector" language, and the
+ * purple→green→yellow→white→black ramp survives greyscale and colourblind
+ * viewing better than the old blue/green/orange mix. */
 function closenessSquare(c) {
-  if (c >= 0.999) return "🟦";  // bullseye
+  if (c >= 0.999) return "🟪";  // bullseye — a purple sector
   if (c >= 0.80) return "🟩";   // very close
   if (c >= 0.50) return "🟨";   // in the ballpark
-  if (c >= 0.20) return "🟧";   // miles off
+  if (c >= 0.20) return "⬜";   // a long way off
   return "⬛";                   // way off
 }
 
@@ -1066,7 +1167,8 @@ async function loadArcade() {
     const res = await fetch(`${API}/arcade/pair`);
     arcade = await res.json();
   } catch { toast("Couldn't load the matchup. Try again."); return; }
-  document.getElementById("arcade-metric").textContent = `Who has more ${arcade.metric_label}?`;
+  // The "Who has more" eyebrow above carries the question; this line is the stat.
+  document.getElementById("arcade-metric").textContent = `${arcade.metric_label}?`;
   a.querySelector(".name").textContent = arcade.entity_a.full_name;
   b.querySelector(".name").textContent = arcade.entity_b.full_name;
 }
@@ -1076,8 +1178,10 @@ function pick(which) {
   locked = true;
   track("arcade_play");
   const a = arcade.entity_a, b = arcade.entity_b;
-  document.querySelector("#arcade-a .val").textContent = a.value;
-  document.querySelector("#arcade-b .val").textContent = b.value;
+  // Count the two totals up in place — the same reveal language as the quiz
+  // odometer — instead of snapping the numbers in.
+  countUp(document.querySelector("#arcade-a .val"), a.value, 600);
+  countUp(document.querySelector("#arcade-b .val"), b.value, 600);
   const pickedHigher = which === "a" ? a.value >= b.value : b.value >= a.value;
   const card = document.getElementById("arcade-" + which);
   card.classList.add(pickedHigher ? "correct" : "wrong");
@@ -1091,9 +1195,16 @@ function pick(which) {
   document.getElementById("arcade-best").textContent = best;
   achFlag("arcade_played");
   evaluateAchievements();
+  // Show the margin — "wrong" teaches nothing, "wrong by 3" is a stat learned.
+  const winner = a.value >= b.value ? a : b;
+  const diff = Math.abs(a.value - b.value);
+  const margin = diff === 0
+    ? "a dead heat, so either pick counts"
+    : `${winner.full_name} had it by ${diff.toLocaleString()}`;
   document.getElementById("arcade-result").textContent =
-    pickedHigher ? "Correct — next up…" : "Wrong — streak reset. Next up…";
-  setTimeout(loadArcade, 1400);
+    pickedHigher ? `Correct — ${margin}. Next up…` : `Wrong — ${margin}. Streak reset.`;
+  // A miss earns a beat longer to read the margin before the board rotates.
+  setTimeout(loadArcade, pickedHigher ? 1600 : 2400);
 }
 document.getElementById("arcade-a").addEventListener("click", () => pick("a"));
 document.getElementById("arcade-b").addEventListener("click", () => pick("b"));
@@ -1975,13 +2086,25 @@ function renderAchievements() {
     .filter((a) => achFilter === "all" || (achFilter === "unlocked") === unlocked.has(a.id))
     .sort((a, b) => tierRank(a) - tierRank(b));
 
+  // Locked threshold badges render their progress — a bar turns wallpaper into
+  // a goal. Compound/flag badges (no single threshold) stay bar-less.
+  const snap = achSnapshot();
   grid.innerHTML = list.length ? list.map((a) => {
     const got = unlocked.has(a.id);
+    let progress = "";
+    if (!got) {
+      const p = achProgress(a, snap);
+      if (p && p.cur > 0) {
+        progress = `<span class="ach-progress" aria-hidden="true"><i style="width:${Math.round(p.pct * 100)}%"></i></span>` +
+          `<span class="ach-progress-label">${p.cur.toLocaleString()} / ${p.target.toLocaleString()}</span>`;
+      }
+    }
     return `<div class="ach-card tier-${a.tier} ${got ? "got" : "locked"}" title="${escapeHtml(a.desc)}">
         <span class="ach-icon">${got ? a.icon : Icons.svg("lock")}</span>
         <span class="ach-body">
           <span class="ach-name">${escapeHtml(a.name)}</span>
           <span class="ach-desc">${escapeHtml(a.desc)}</span>
+          ${progress}
         </span>
         <span class="ach-tier">${ACH_TIER_LABEL[a.tier]}</span>
       </div>`;
@@ -2169,6 +2292,8 @@ const ThemeToggle = (() => {
     const root = document.documentElement;
     if (theme === "light") root.setAttribute("data-theme", "light");
     else root.removeAttribute("data-theme");
+    // Re-resolve the team accent for the new theme (Cadillac/Audi differ per theme).
+    applyTeam(state.selected_team);
     paint(theme);
     const t = TEAMS[state.selected_team] || TEAMS.mclaren;
     document.querySelector('meta[name="theme-color"]')
@@ -2297,6 +2422,7 @@ const ScoringIntro = (() => {
  * own (the team picker stays open during forced onboarding, so it's excluded). */
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
+  if (ExitConfirm.isOpen()) { ExitConfirm.close(); return; }
   if (Settings.isOpen()) { Settings.close(); return; }
   const so = document.getElementById("scoring-overlay");
   if (so && !so.classList.contains("hidden")) { so.classList.add("hidden"); return; }
@@ -2312,6 +2438,7 @@ renderStreakBanner();
 CurveSlider.init();
 DataCheck.init();
 TeamPicker.init();
+ExitConfirm.init();
 SoundToggle.init();
 ThemeToggle.init();
 Settings.init();
@@ -2338,7 +2465,18 @@ refreshMe().then(() => { renderProfile(); renderStreakBanner(); renderGarage(); 
 initServiceWorker().then(maybeRemindOnOpen);
 tickCountdown(); setInterval(tickCountdown, 1000);
 renderRaceWeek(); setInterval(renderRaceWeek, 60000); // refresh past/next state each minute
+// History routing: the first entry is home (hash stripped), so the browser
+// back button always has an in-app floor to land on instead of leaving the
+// site. A view hash (#daily, #arcade…) then navigates on top of it.
+// NOTE: capture the hash BEFORE replaceState — rewriting the URL clears it.
+const bootHash = location.hash;
+history.replaceState({ view: "home", mode: null }, "", location.pathname + location.search);
 // A shared "?play=" link drops the player straight into a challenge; don't
-// interrupt that with the onboarding prompt. Otherwise, first-run guests are
-// asked to pick a team (with live headcounts + championship standings).
-if (!handleDeepLink()) TeamPicker.maybeOnboard();
+// interrupt that with the onboarding prompt. Otherwise a bookmarkable view
+// hash opens that view; otherwise first-run guests are asked to pick a team
+// (with live headcounts + championship standings).
+if (!handleDeepLink()) {
+  const dest = parseViewHash(bootHash);
+  if (dest && dest[0] !== "home") navigate(dest[0], dest[1]);
+  else TeamPicker.maybeOnboard();
+}

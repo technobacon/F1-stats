@@ -541,16 +541,16 @@ vs without (A/B by question).
 | # | Item | Type | Impact | Effort | Notes |
 |---|---|---|---|---|---|
 | 1 | G1/G2/G3 scoring & bounds fixes | Balance | ★★★★★ | S | Correctness of the core economy; do before anything amplifies sharing |
-| 2 | G7 After-the-flag funnel | Loop | ★★★★ | S | Re-plumb existing surfaces |
+| 2 | G7 After-the-flag funnel | Loop | ★★★★ | S | ✅ **Shipped** — summary + capped-intro next-step rows, guest sign-up nudge |
 | 3 | F1 Ghost Race | Feature | ★★★★★ | M | The share loop becomes a game |
-| 4 | V1/V2/V4/V6/V8 visual fixes | Polish | ★★★ | S | One pass, half a day total |
+| 4 | V1/V2/V4/V6/V8 visual fixes | Polish | ★★★ | S | ✅ **Shipped** — hero 404 removed, Cadillac/Audi accent split, ✕/🚩 chrome → SVG icons, exit confirm, locked-badge progress bars |
 | 5 | G4 Daily dramaturgy (ramp → Overtake) | Mechanic | ★★★★ | S–M | Ramp first; wager once G1 lands |
 | 6 | F4 Super Licence + liveries | Progression | ★★★★ | M | Ladder first, liveries second |
-| 7 | F3 Arcade "Qualifying" | Mode | ★★★ | M | Pairs with #2's funnel |
+| 7 | F3 Arcade "Qualifying" | Mode | ★★★ | M | Visual layer **shipped** (verdict stripes, count-up reveal, margin copy, stat chips); lives/ramp/server runs still open |
 | 8 | G9 onboarding timing, G6 practice penalty | Funnel | ★★★ | S | Measure via existing analytics |
 | 9 | F2 GP Weekend events | Feature | ★★★ | M | Needs the schedule feed (backlog Tier 2) |
 | 10 | F5 Reveal enrichment | Content | ★★★ | M | Best paired with the ETL/LLM roadmap step |
-| 11 | V7 history routing, V5 steppers, V9 collisions | Polish | ★★ | S | Quality-of-life batch |
+| 11 | V7 history routing, V5 steppers, V9 collisions | Polish | ★★ | S | ✅ **Shipped** — hash routing + back-button support, ±1/±10 steppers, photo-finish reveal layout; V10 share palette now purple-as-best |
 
 **The order in one sentence:** first make the scoring economy sound (1), then
 make finishing the Daily lead somewhere (2), then make sharing a two-player

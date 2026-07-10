@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=25" />
+  <link rel="stylesheet" href="/static/style.css?v=26" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -193,9 +193,12 @@
     <section id="view-quiz" class="view">
       <!-- Immersive top bar — only visible once a session is in progress -->
       <div class="game-bar">
-        <button class="game-exit" id="game-exit" data-view="home">✕ Exit</button>
+        <button class="game-exit" id="game-exit" data-view="home"><i class="ic" data-icon="x" aria-hidden="true"></i> Exit</button>
         <div class="game-progress"><span id="game-progress-fill"></span></div>
-        <span class="game-points" id="game-points">0 pts</span>
+        <!-- Labelled "session" so the in-run tally isn't mistaken for the
+             lifetime balance shown in the header when the run ends. -->
+        <span class="game-points-wrap"><span class="gp-tag" aria-hidden="true">session</span>
+          <span class="game-points" id="game-points">0 pts</span></span>
       </div>
 
       <div id="quiz-intro" class="card">
@@ -205,6 +208,18 @@
         <div id="quiz-cap" class="cap-note hidden"></div>
         <button class="btn-primary" id="start-quiz">Start Session</button>
         <button class="btn-secondary hidden" id="replay-quiz">Replay (testing)</button>
+        <!-- Shown when today's Daily is done: don't dead-end a warmed-up player. -->
+        <div class="next-steps hidden" id="intro-next">
+          <p class="ns-title">While you wait for tomorrow</p>
+          <div class="ns-row">
+            <button class="ns-btn" data-view="profile" data-scroll="leaderboard-card" data-period="daily">
+              <i class="ic" data-icon="trophy" aria-hidden="true"></i> See how the grid did</button>
+            <button class="ns-btn" data-view="quiz" data-mode="free_practice">
+              <i class="ic" data-icon="tyre" aria-hidden="true"></i> Free Practice</button>
+            <button class="ns-btn" data-view="arcade">
+              <i class="ic" data-icon="zap" aria-hidden="true"></i> Arcade</button>
+          </div>
+        </div>
         <p class="muted" id="quiz-status"></p>
       </div>
 
@@ -250,7 +265,16 @@
             <span class="curve-end curve-min" id="curve-min">0</span>
             <span class="curve-end curve-max" id="curve-max">100</span>
           </div>
-          <input type="number" id="q-input" min="0" value="0" />
+          <!-- Precision entry: on a wide range one pixel of drag can be 20+
+               units, so the drag gets fine-tune steppers either side of the
+               typed input. -->
+          <div class="guess-entry" role="group" aria-label="Fine-tune your guess">
+            <button type="button" class="stepper" data-step="-10" aria-label="Decrease guess by 10">−10</button>
+            <button type="button" class="stepper" data-step="-1" aria-label="Decrease guess by 1">−1</button>
+            <input type="number" id="q-input" min="0" value="0" />
+            <button type="button" class="stepper" data-step="1" aria-label="Increase guess by 1">+1</button>
+            <button type="button" class="stepper" data-step="10" aria-label="Increase guess by 10">+10</button>
+          </div>
         </div>
 
         <button class="btn-primary" id="submit-guess">Lock In Guess</button>
@@ -292,6 +316,22 @@
         <div class="ad-slot ad-summary" data-ad="summary-display">ad · summary display</div>
         <button class="btn-primary" id="share-result">Share Result</button>
         <button class="btn-secondary" id="challenge-friend"><i class="ic" data-icon="car" aria-hidden="true"></i> Challenge a friend</button>
+        <!-- After-the-flag funnel: the moment the player is warmest, offer the
+             next lap instead of only Share/Back. -->
+        <div class="next-steps" id="summary-next">
+          <p class="ns-title">What's next</p>
+          <div class="ns-row">
+            <button class="ns-btn" data-view="profile" data-scroll="leaderboard-card" data-period="daily">
+              <i class="ic" data-icon="trophy" aria-hidden="true"></i> Today's leaderboard</button>
+            <button class="ns-btn" data-view="quiz" data-mode="free_practice">
+              <i class="ic" data-icon="tyre" aria-hidden="true"></i> Free Practice</button>
+            <button class="ns-btn" data-view="arcade">
+              <i class="ic" data-icon="zap" aria-hidden="true"></i> Arcade</button>
+          </div>
+          <p class="muted ns-signup hidden" id="summary-signup">Playing as a guest —
+            <button type="button" class="link-btn" data-auth="open">create a free account</button>
+            to get these points on the board.</p>
+        </div>
         <button class="btn-secondary" id="summary-back">Back to Modes</button>
         <p class="muted" id="share-status"></p>
       </div>
@@ -299,18 +339,23 @@
 
     <!-- ===================== ARCADE OVER/UNDER ===================== -->
     <section id="view-arcade" class="view">
-      <div class="card">
+      <div class="card arcade-shell">
         <h2>Arcade Over/Under <span class="badge">∞ unlimited</span></h2>
         <p class="muted">Who has more? Build your streak — pick the driver with the higher total.</p>
-        <div class="arcade-metric" id="arcade-metric">…</div>
+        <div class="arcade-metric-wrap">
+          <p class="arcade-eyebrow"><i class="ic" data-icon="zap" aria-hidden="true"></i> Who has more</p>
+          <div class="arcade-metric" id="arcade-metric">…</div>
+        </div>
         <div class="arcade-pair">
           <button class="arcade-card" id="arcade-a"><span class="name">—</span><span class="val">?</span></button>
-          <div class="vs">VS</div>
+          <div class="vs" aria-hidden="true">VS</div>
           <button class="arcade-card" id="arcade-b"><span class="name">—</span><span class="val">?</span></button>
         </div>
-        <div class="arcade-streak">Streak: <strong id="arcade-streak">0</strong>
-          · Best: <strong id="arcade-best">0</strong></div>
-        <p class="muted" id="arcade-result"></p>
+        <div class="arcade-streak">
+          <span class="as-chip"><span class="as-label">Streak</span><strong id="arcade-streak">0</strong></span>
+          <span class="as-chip"><span class="as-label">Best</span><strong id="arcade-best">0</strong></span>
+        </div>
+        <p class="muted arcade-result" id="arcade-result" aria-live="polite"></p>
       </div>
     </section>
 
@@ -373,7 +418,7 @@
         <button class="lb-period-tab" data-period="daily">Today</button>
       </div>
 
-      <div class="card">
+      <div class="card" id="leaderboard-card">
         <h2>Global Leaderboard</h2>
         <ol class="leaderboard" id="leaderboard-list">
           <li class="muted">Loading…</li>
@@ -519,10 +564,10 @@
           <option value="daily">daily</option>
         </select>
         <label class="data-flag-filter"><input type="checkbox" id="data-flagged-only" /> Flagged only</label>
-        <button class="btn-ghost data-close" id="data-close">✕ Close</button>
+        <button class="btn-ghost data-close" id="data-close"><i class="ic" data-icon="x" aria-hidden="true"></i> Close</button>
       </div>
       <p class="muted data-note">Development tool — every active question with its verified answer,
-         recomputed from the staging data. Click a column header to sort; use the 🚩 button to flag
+         recomputed from the staging data. Click a column header to sort; use the flag button to flag
          a question you want to revisit later.</p>
       <div class="data-table-wrap">
         <table class="data-table">
@@ -549,7 +594,7 @@
     <div class="team-panel">
       <div class="team-panel-head">
         <h2 id="team-panel-title">Choose Your Team</h2>
-        <button class="game-exit" id="team-panel-close">✕ Close</button>
+        <button class="game-exit" id="team-panel-close"><i class="ic" data-icon="x" aria-hidden="true"></i> Close</button>
       </div>
       <p class="team-panel-intro hidden" id="team-panel-intro"></p>
       <div class="team-picker-grid" id="team-picker-grid"></div>
@@ -561,7 +606,7 @@
     <div class="auth-panel">
       <div class="team-panel-head">
         <h2 id="auth-title">Create your account</h2>
-        <button class="game-exit" id="auth-close">✕ Close</button>
+        <button class="game-exit" id="auth-close"><i class="ic" data-icon="x" aria-hidden="true"></i> Close</button>
       </div>
       <form id="auth-form" class="auth-form" autocomplete="on">
         <label for="auth-username">Username</label>
@@ -593,7 +638,7 @@
     <div class="auth-panel settings-panel">
       <div class="team-panel-head">
         <h2 id="settings-title">Settings</h2>
-        <button class="game-exit" id="settings-close" aria-label="Close settings">✕ Close</button>
+        <button class="game-exit" id="settings-close" aria-label="Close settings"><i class="ic" data-icon="x" aria-hidden="true"></i> Close</button>
       </div>
       <div class="settings-list">
         <div class="set-row">
@@ -638,7 +683,7 @@
     <div class="auth-panel scoring-panel">
       <div class="team-panel-head">
         <h2 id="scoring-title">How close counts</h2>
-        <button class="game-exit" id="scoring-close" aria-label="Close">✕</button>
+        <button class="game-exit" id="scoring-close" aria-label="Close"><i class="ic" data-icon="x" aria-hidden="true"></i></button>
       </div>
       <div class="scoring-body">
         <p>You guess a number. You're scored on <strong>how close</strong> you land — not just
@@ -663,9 +708,27 @@
     </div>
   </div>
 
+  <!-- ===================== MID-RUN EXIT CONFIRM ===================== *
+       Leaving a competitive run throws away the summary/streak/share for the
+       questions already scored, so it deserves one deliberate tap. The safe
+       action is the primary one. -->
+  <div id="exit-overlay" class="team-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="exit-title">
+    <div class="auth-panel exit-panel">
+      <div class="team-panel-head">
+        <h2 id="exit-title">Retire from the session?</h2>
+      </div>
+      <p class="exit-copy">Your scored answers stand, but this run banks no summary,
+         no streak credit and no shareable result.</p>
+      <div class="exit-actions">
+        <button class="btn-primary" id="exit-cancel">Keep racing</button>
+        <button class="btn-secondary danger" id="exit-confirm">Retire</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-  <script src="/static/icons.js?v=25"></script>
-  <script src="/static/sound.js?v=25"></script>
-  <script src="/static/app.js?v=25"></script>
+  <script src="/static/icons.js?v=26"></script>
+  <script src="/static/sound.js?v=26"></script>
+  <script src="/static/app.js?v=26"></script>
 </body>
 </html>

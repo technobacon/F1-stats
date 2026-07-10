@@ -35,13 +35,18 @@
   --sp-1:.25rem; --sp-2:.5rem; --sp-3:.75rem; --sp-4:1rem; --sp-6:1.5rem; --sp-8:2rem;
   --ease:cubic-bezier(.2,.8,.2,1); --t-fast:.12s; --t-med:.22s;
 
-  /* — Brand (default = McLaren; overridden per data-team below). — */
+  /* — Brand (default = McLaren; overridden per data-team below). Two layers:
+       · --team-livery — the TRUE constructor colour. Used only where the brand
+         itself is the point (the car sprite, colour swatches) and contrast is
+         guaranteed by shape, ring or shadow rather than the colour.
+       · --color-primary — the FUNCTIONAL accent: buttons, borders, active
+         states, fills. Usually equals the livery, but a brand colour with no
+         contrast on a theme (Cadillac white on white, Audi mid-grey) gets a
+         per-theme accent — applyTeam() in app.js resolves it.
+     --color-ink is the same split for TEXT (Red Bull navy, Haas near-black
+     etc. are lightened per team in JS). */
+  --team-livery:#FF8000;
   --color-primary:#FF8000; --color-secondary:#1B2425;
-  /* --color-ink: a legibility-safe version of the team colour for TEXT on the
-     dark UI. Some brand primaries (Red Bull navy, Haas near-black, Williams/RB
-     deep blue) are nearly invisible as text, so applyTeam() in app.js sets this
-     to a lightened variant per team while --color-primary stays the true brand
-     colour for fills/borders. This default matches McLaren. */
   --team-ink-dark:#FF8000; --team-ink-light:#C95E00;
   --color-ink:var(--team-ink-dark);
   --btn-text:#000; --btn-stripe:3px;
@@ -49,18 +54,21 @@
   --f1-purple:#b13bff; --f1-green:#33d17a;
 }
 
-/* 2026 F1 grid — main (primary) colour + secondary accent (the button bottom stripe) */
-:root[data-team="mclaren"]      { --color-primary:#FF8000; --color-secondary:#1B2425; --btn-text:#000; }
-:root[data-team="ferrari"]      { --color-primary:#DC0000; --color-secondary:#FFEB00; --btn-text:#fff; }
-:root[data-team="mercedes"]     { --color-primary:#00D2BE; --color-secondary:#0A0A0A; --btn-text:#000; }
-:root[data-team="red_bull"]     { --color-primary:#1E1B4B; --color-secondary:#DC0000; --btn-text:#fff; }
-:root[data-team="aston_martin"] { --color-primary:#006F62; --color-secondary:#CEDC00; --btn-text:#fff; }
-:root[data-team="alpine"]       { --color-primary:#FF87BC; --color-secondary:#0090FF; --btn-text:#000; }
-:root[data-team="williams"]     { --color-primary:#0064FF; --color-secondary:#FFFFFF; --btn-text:#fff; }
-:root[data-team="rb"]           { --color-primary:#1634CE; --color-secondary:#FFFFFF; --btn-text:#fff; }
-:root[data-team="haas"]         { --color-primary:#1A1A1A; --color-secondary:#E8002D; --btn-text:#fff; }
-:root[data-team="audi"]         { --color-primary:#8E8E8E; --color-secondary:#CC0000; --btn-text:#000; }
-:root[data-team="cadillac"]     { --color-primary:#FFFFFF; --color-secondary:#0D0D0D; --btn-text:#000; }
+/* 2026 F1 grid — pre-JS fallback so the first paint isn't unthemed. applyTeam()
+   in app.js is the authority (it also resolves the per-theme accent + livery
+   split for Cadillac/Audi); these static rules only cover the moment before it
+   runs, so they set the straightforward values. */
+:root[data-team="mclaren"]      { --team-livery:#FF8000; --color-primary:#FF8000; --color-secondary:#1B2425; --btn-text:#000; }
+:root[data-team="ferrari"]      { --team-livery:#DC0000; --color-primary:#DC0000; --color-secondary:#FFEB00; --btn-text:#fff; }
+:root[data-team="mercedes"]     { --team-livery:#00D2BE; --color-primary:#00D2BE; --color-secondary:#0A0A0A; --btn-text:#000; }
+:root[data-team="red_bull"]     { --team-livery:#1E1B4B; --color-primary:#1E1B4B; --color-secondary:#DC0000; --btn-text:#fff; }
+:root[data-team="aston_martin"] { --team-livery:#006F62; --color-primary:#006F62; --color-secondary:#CEDC00; --btn-text:#fff; }
+:root[data-team="alpine"]       { --team-livery:#FF87BC; --color-primary:#FF87BC; --color-secondary:#0090FF; --btn-text:#000; }
+:root[data-team="williams"]     { --team-livery:#0064FF; --color-primary:#0064FF; --color-secondary:#FFFFFF; --btn-text:#fff; }
+:root[data-team="rb"]           { --team-livery:#1634CE; --color-primary:#1634CE; --color-secondary:#FFFFFF; --btn-text:#fff; }
+:root[data-team="haas"]         { --team-livery:#1A1A1A; --color-primary:#1A1A1A; --color-secondary:#E8002D; --btn-text:#fff; }
+:root[data-team="audi"]         { --team-livery:#8E8E8E; --color-primary:#CC0000; --color-secondary:#CC0000; --btn-text:#fff; }
+:root[data-team="cadillac"]     { --team-livery:#FFFFFF; --color-primary:#FFFFFF; --color-secondary:#0D0D0D; --btn-text:#000; }
 
 /* ===================== LIGHT THEME (opt-in: <html data-theme="light">) =====================
    Team primary stays the accent for fills/borders; --color-ink switches to the per-team
@@ -75,8 +83,7 @@
 :root[data-theme="light"] .hero::before {
   background:
     linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,.72)),
-    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--color-primary) 16%, transparent), transparent 55%),
-    url('/static/hero.jpg') center/cover no-repeat; }
+    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--color-primary) 16%, transparent), transparent 55%); }
 :root[data-theme="light"] .hero::after {
   background:repeating-linear-gradient(118deg, transparent 0 44px, rgba(20,24,32,.03) 44px 47px); }
 :root[data-theme="light"] .hero-sub { color:#475061; }
@@ -217,13 +224,13 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 /* ===================== HERO ===================== */
 .hero { position:relative; overflow:hidden; border-radius:var(--r-lg); border:1px solid var(--line);
         background:linear-gradient(180deg,#121821 0%, #0a0e13 100%); box-shadow:var(--shadow); }
-.hero::before { /* drop a licensed photo at /static/hero.jpg to use it; otherwise this
-                  stays a clean dark wash. The gradient keeps text readable either way. */
+.hero::before { /* pure-CSS atmosphere: a dark wash lit from above by the team
+                  colour. (No photo asset — an unresolved url() here used to 404
+                  on every load.) */
   content:""; position:absolute; inset:0; z-index:0; opacity:.9;
   background:
     linear-gradient(180deg, rgba(8,11,16,.62), rgba(8,11,16,.92)),
-    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 55%),
-    url('/static/hero.jpg') center/cover no-repeat; }
+    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 55%); }
 .hero::after { /* motion / speed streaks */
   content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
   background:repeating-linear-gradient(118deg, transparent 0 44px, rgba(255,255,255,.022) 44px 47px);
@@ -431,7 +438,9 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 .car-thumb:focus-visible .car-body { stroke:#fff; stroke-width:2; }
 .car-thumb.dragging { cursor:grabbing; filter:drop-shadow(0 10px 18px rgba(0,0,0,.6)); }
 .car-sprite { display:block; width:100%; height:auto; }
-.car-body { fill:var(--color-primary); }
+/* The car wears the TRUE livery, not the functional accent — a white Cadillac
+ * stays white (the drop shadow and dark tyres carry the silhouette). */
+.car-body { fill:var(--team-livery, var(--color-primary)); }
 .car-wing { fill:var(--color-secondary); }
 .car-dark { fill:#0b0e13; }
 .car-tyre { fill:#15181f; }
@@ -538,19 +547,41 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
            padding:.6rem; border-radius:var(--r-sm); margin:1rem 0; letter-spacing:1px; text-transform:uppercase; }
 .ad-summary { min-height:90px; display:flex; align-items:center; justify-content:center; }
 
-/* Arcade */
-.arcade-metric { text-align:center; font-weight:800; font-size:1.25rem; margin:1.2rem 0;
+/* Arcade — styled to the same timing-board language as the quiz: an eyebrow +
+ * metric headline, driver cards with a sector-colour verdict stripe, and the
+ * streak as mono stat chips instead of an inline sentence. */
+.arcade-metric-wrap { text-align:center; margin:1.2rem 0; }
+.arcade-eyebrow { display:flex; align-items:center; justify-content:center; gap:.4rem;
+                  margin:0 0 .2rem; font-family:var(--font-mono); font-size:.6rem;
+                  letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+.arcade-metric { text-align:center; font-weight:800; font-size:1.35rem;
                  color:var(--color-ink); font-style:italic; }
 .arcade-pair { display:flex; align-items:center; gap:1rem; }
-.arcade-card { flex:1; background:var(--bg2); border:2px solid var(--line); border-radius:var(--r-lg);
-               padding:1.6rem 1rem; cursor:pointer; color:var(--text); display:flex;
-               flex-direction:column; gap:.5rem; transition:border-color var(--t-fast), transform var(--t-fast); font-family:inherit; }
+.arcade-card { flex:1; position:relative; overflow:hidden; background:var(--bg2);
+               border:2px solid var(--line); border-radius:var(--r-lg);
+               padding:1.7rem 1rem 1.5rem; cursor:pointer; color:var(--text); display:flex;
+               flex-direction:column; gap:.5rem; align-items:center;
+               transition:border-color var(--t-fast), transform var(--t-fast); font-family:inherit; }
+/* Verdict stripe along the top edge: team accent on hover, sector colours on reveal. */
+.arcade-card::before { content:""; position:absolute; left:0; right:0; top:0; height:3px;
+               background:var(--color-primary); opacity:0; transition:opacity var(--t-fast); }
 .arcade-card:hover { border-color:var(--color-primary); transform:translateY(-2px); }
-.arcade-card.correct { border-color:#3fb950; } .arcade-card.wrong { border-color:#ff6b6b; }
+.arcade-card:hover::before { opacity:1; }
+.arcade-card.correct { border-color:var(--f1-green); }
+.arcade-card.correct::before { background:var(--f1-green); opacity:1; }
+.arcade-card.wrong { border-color:#ff6b6b; }
+.arcade-card.wrong::before { background:#ff6b6b; opacity:1; }
 .arcade-card .name { font-weight:700; font-size:1.1rem; }
 .arcade-card .val { font-size:1.7rem; color:var(--color-ink); font-weight:800; }
 .vs { font-weight:900; color:var(--muted); font-style:italic; }
-.arcade-streak { text-align:center; margin-top:1.25rem; }
+.arcade-streak { display:flex; justify-content:center; gap:.55rem; margin-top:1.25rem; }
+.as-chip { display:flex; align-items:baseline; gap:.55rem; padding:.42rem .85rem;
+           border:1px solid var(--line); border-radius:var(--r-sm); background:var(--bg2); }
+.as-label { font-family:var(--font-mono); font-size:.58rem; text-transform:uppercase;
+            letter-spacing:.14em; color:var(--muted); }
+.as-chip strong { font-family:var(--font-mono); font-variant-numeric:tabular-nums;
+                  font-size:1.05rem; font-style:italic; color:var(--color-ink); }
+.arcade-result { text-align:center; min-height:1.3em; margin-top:.7rem; }
 
 .stats { display:grid; grid-template-columns:1fr 1fr; gap:.5rem 1rem; }
 .stats dt { color:var(--muted); } .stats dd { margin:0; font-weight:700; text-align:right; }
@@ -891,6 +922,65 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .set-toggle[aria-checked="true"] .set-knob { transform:translateX(18px); background:var(--color-ink); }
 .settings-foot { text-align:center; padding:.9rem 1.25rem 1.1rem; margin:0;
               font-family:var(--font-mono); font-size:.66rem; }
+
+/* ===================== GAME-BAR SESSION TAG ===================== */
+.game-points-wrap { display:flex; align-items:baseline; gap:.45rem; white-space:nowrap; }
+.gp-tag { font-family:var(--font-mono); font-size:.56rem; text-transform:uppercase;
+          letter-spacing:.14em; color:var(--muted); }
+
+/* ===================== GUESS STEPPERS ===================== *
+ * Fine-tune chips flanking the typed input: on a wide slider range a single
+ * pixel of drag can be worth 20+ units, so precision needs its own control. */
+.guess-entry { display:flex; align-items:center; justify-content:center; gap:.45rem; }
+.stepper { min-width:44px; height:44px; padding:0 .5rem; border-radius:var(--r-md);
+           border:1px solid var(--line); background:var(--bg2); color:var(--text);
+           cursor:pointer; font-family:var(--font-mono); font-weight:700; font-size:.85rem;
+           font-variant-numeric:tabular-nums;
+           transition:border-color var(--t-fast), color var(--t-fast); }
+.stepper:hover { border-color:var(--color-primary); color:var(--color-ink); }
+.stepper:active { transform:translateY(1px); }
+
+/* ===================== REVEAL: CLOSE-CALL LAYOUT ===================== *
+ * When guess ≈ actual the two cars and labels collide exactly at the moment of
+ * triumph. Under ~8% separation the ghost drops BELOW the track with its label
+ * underneath — a photo-finish framing instead of an unreadable clump. */
+.reveal .timeline.close-call .timeline-node.actual { transform:translate(-50%, 10px); }
+.reveal .timeline.close-call .timeline-node.actual span { top:auto; bottom:-18px; }
+
+/* ===================== NEXT STEPS (after-the-flag funnel) ===================== *
+ * The summary and the capped Daily intro both funnel a warmed-up player to the
+ * next lap — leaderboard, practice, arcade — instead of dead-ending. */
+.next-steps { margin-top:1.1rem; padding-top:1rem; border-top:1px solid var(--line); }
+.ns-title { margin:0 0 .55rem; font-size:.6rem; font-family:var(--font-mono);
+            text-transform:uppercase; letter-spacing:.16em; color:var(--muted);
+            text-align:center; }
+.ns-row { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; }
+.ns-btn { display:inline-flex; align-items:center; gap:.45rem; padding:.55rem .95rem;
+          border-radius:var(--r-pill); border:1px solid var(--line); background:var(--bg2);
+          color:var(--text); font-family:inherit; font-weight:700; font-size:.82rem;
+          cursor:pointer;
+          transition:border-color var(--t-fast), color var(--t-fast), transform var(--t-fast); }
+.ns-btn:hover { border-color:var(--color-primary); color:var(--color-ink);
+                transform:translateY(-1px); }
+.ns-signup { text-align:center; margin:.8rem 0 0; }
+
+/* ===================== MID-RUN EXIT CONFIRM ===================== */
+.exit-panel { max-width:400px; }
+.exit-copy { margin:0; padding:1rem 1.25rem 0; color:var(--muted); font-size:.9rem;
+             line-height:1.5; }
+.exit-actions { display:flex; gap:.6rem; padding:1.1rem 1.25rem 1.25rem; }
+.exit-actions .btn-primary { flex:1; }
+.exit-actions .btn-secondary { flex:1; margin-top:0; width:auto; }
+
+/* ===================== ACHIEVEMENT PROGRESS ===================== *
+ * Locked threshold badges show how far along they are — a locked badge with a
+ * bar is a goal; a grey box is wallpaper. */
+.ach-progress { height:4px; border-radius:3px; background:var(--bg); margin-top:.4rem;
+                overflow:hidden; border:1px solid var(--line); }
+.ach-progress > i { display:block; height:100%; background:var(--color-primary);
+                    border-radius:3px; }
+.ach-progress-label { font-size:.6rem; color:var(--muted); font-family:var(--font-mono);
+                      font-variant-numeric:tabular-nums; margin-top:.2rem; }
 
 /* ===================== SCORING EXPLAINER ===================== */
 .scoring-body { padding:1.1rem 1.25rem .4rem; }
