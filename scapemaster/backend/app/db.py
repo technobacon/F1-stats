@@ -126,6 +126,16 @@ CREATE TABLE IF NOT EXISTS etl_metadata (
     value TEXT
 );
 
+-- Small persistent key/value store for app-level secrets and settings that must
+-- survive both reboots and the boot-time bank reseed (reset_db drops
+-- etl_metadata, so they can't live there; this table is OUTSIDE the drop list).
+-- Currently holds 'slider_salt' — the server-side secret mixed into the
+-- slider-bounds RNG so the bounds can't be inverted client-side (service.py).
+CREATE TABLE IF NOT EXISTS app_kv (
+    key   TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
 -- ── User accounts & server-authoritative play history ───────────────────────
 -- IMPORTANT: these tables are deliberately OUTSIDE reset_db()'s drop list. The
 -- question bank is wiped and reloaded on every boot (load_dataset -> reset_db),

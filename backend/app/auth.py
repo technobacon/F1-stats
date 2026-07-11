@@ -72,8 +72,11 @@ def normalize_email(email: str | None) -> str | None:
 _MIN_PASSWORD_LEN = 8
 # Cap the password length BEFORE hashing: PBKDF2 hashes the whole input, so an
 # unbounded password is a cheap denial-of-service (hash a multi-MB string). 1024
-# is far above any real password and well within OWASP guidance.
-_MAX_PASSWORD_LEN = 1024
+# is far above any real password and well within OWASP guidance. The cap is in
+# UTF-8 BYTES and enforced identically at registration (reject) and login
+# (cheap reject, no hash) — the two paths must agree, or a password whose byte
+# length exceeds what one of them hashes could never verify.
+_MAX_PASSWORD_BYTES = 1024
 
 
 class AuthError(ValueError):
@@ -107,14 +110,19 @@ def hash_password(password: str) -> str:
 
 def verify_password(password: str, stored: str) -> bool:
     """Constant-time check of ``password`` against a stored PBKDF2 hash."""
+    encoded = (password or "").encode()
+    if len(encoded) > _MAX_PASSWORD_BYTES:
+        # Registration rejects these, so no stored hash can match; reject before
+        # hashing (never truncate — a truncated digest could silently diverge
+        # from the registration-time hash of the full input).
+        return False
     try:
         algo, rounds_s, salt_hex, hash_hex = stored.split("$")
         if algo != "pbkdf2_sha256":
             return False
         expected = bytes.fromhex(hash_hex)
         candidate = hashlib.pbkdf2_hmac(
-            "sha256", (password or "").encode()[:_MAX_PASSWORD_LEN],
-            bytes.fromhex(salt_hex), int(rounds_s),
+            "sha256", encoded, bytes.fromhex(salt_hex), int(rounds_s),
         )
     except (ValueError, AttributeError):
         return False
@@ -194,8 +202,8 @@ def create_user(
         raise AuthError("Please choose a different username.")
     if len(password or "") < _MIN_PASSWORD_LEN:
         raise AuthError(f"Password must be at least {_MIN_PASSWORD_LEN} characters.")
-    if len(password) > _MAX_PASSWORD_LEN:
-        raise AuthError(f"Password must be at most {_MAX_PASSWORD_LEN} characters.")
+    if len(password.encode()) > _MAX_PASSWORD_BYTES:
+        raise AuthError("That password is too long.")
     email = normalize_email(email)  # raises AuthError on a malformed non-empty value
 
     user_id = str(uuid.uuid4())
@@ -266,6 +274,17 @@ def delete_session(conn: sqlite3.Connection, token: str | None) -> None:
         return
     conn.execute("DELETE FROM auth_sessions WHERE token = ?", (token,))
     conn.commit()
+
+
+def prune_expired_sessions(conn: sqlite3.Connection) -> int:
+    """Bulk-delete expired sessions; returns how many were removed. session_user
+    only prunes a token when it is presented, so sessions of users who never
+    return would otherwise accumulate forever. Run at boot (main.lifespan)."""
+    cur = conn.execute(
+        "DELETE FROM auth_sessions WHERE expires_at < ?", (_iso(_now()),)
+    )
+    conn.commit()
+    return cur.rowcount
 
 
 def set_selected_team(conn: sqlite3.Connection, user_id: str, team: str) -> str:

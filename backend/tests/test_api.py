@@ -254,3 +254,66 @@ def test_arcade_pair_shape(client):
     body = r.json()
     assert body["entity_a"]["driver_id"] != body["entity_b"]["driver_id"]
     assert "value" in body["entity_a"] and "value" in body["entity_b"]
+
+
+def test_practice_rate_limit_kicks_in(client, monkeypatch):
+    """Free Practice is an answer oracle over the same bank the Daily uses, so
+    drawing questions must be throttled server-side — the frontend's stewards
+    penalty alone is bypassable by calling the API directly."""
+    from app import main
+    monkeypatch.setattr(main, "_PRACTICE_MAX_PER_WINDOW", 3)
+    for _ in range(3):
+        assert client.get("/api/v1/practice/question").status_code == 200
+    r = client.get("/api/v1/practice/question")
+    assert r.status_code == 429
+    assert int(r.headers["Retry-After"]) > 0
+
+
+def test_security_headers_on_html_and_api(client):
+    home = client.get("/")
+    assert home.headers["X-Content-Type-Options"] == "nosniff"
+    csp = home.headers["Content-Security-Policy"]
+    assert "script-src 'self'" in csp and "frame-ancestors 'none'" in csp
+    # API responses get the generic hardening headers but no CSP (not HTML).
+    api = client.get("/api/v1/health")
+    assert api.headers["X-Content-Type-Options"] == "nosniff"
+    assert "Content-Security-Policy" not in api.headers
+
+
+def test_slider_bounds_use_the_server_salt(client):
+    """Trust boundary: the slider band must not be reproducible from public data.
+    An attacker knows the (public) bounds algorithm and the served question text;
+    if the RNG were seeded by those alone they could recover the answer's
+    position in the band and invert the bound back to the answer within a few
+    percent. So a non-empty server-side secret must exist, and the served bounds
+    must be exactly the salted computation (test_scoring proves a different salt
+    moves the bounds, so together these pin the leak shut)."""
+    served = client.get("/api/v1/quiz/daily").json()["questions"]
+    conn = db.connect()
+    try:
+        salt = service._get_slider_salt(conn)
+        explicit = {
+            r["question_string"]
+            for r in conn.execute(
+                "SELECT question_string FROM production_trivia_questions "
+                "WHERE display_min IS NOT NULL AND display_max IS NOT NULL"
+            )
+        }
+    finally:
+        conn.close()
+    assert salt, "a server-side slider salt must exist"
+    # Questions with explicit display bounds (years, percentages, ...) don't use
+    # the derived band at all, so they are exempt.
+    derived = [q for q in served if q["question_text"] not in explicit]
+    checked = 0
+    for q in derived:
+        actual = client.post(
+            "/api/v1/quiz/verify",
+            json={"tracking_token": q["tracking_token"], "guess": 0},
+        ).json()["actual"]
+        if actual <= 0:
+            continue  # zero answers use the fixed (0, 10) band — nothing to leak
+        salted = service._slider_bounds(actual, q["question_text"], salt)
+        assert (q["slider_min"], q["slider_max"]) == salted
+        checked += 1
+    assert checked, "expected at least one nonzero derived-bounds question"

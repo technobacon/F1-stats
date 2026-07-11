@@ -1155,7 +1155,13 @@ def export_dataset(conn: sqlite3.Connection, n: int = 1000, out_path=None) -> di
     out.write_text(json.dumps(data, indent=1, ensure_ascii=False))
 
     meta = {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d")}
-    DATASET_META_PATH.write_text(json.dumps(meta, indent=1, ensure_ascii=False))
+    # The meta stamp lives NEXT TO the exported bank, not hard-wired to the
+    # committed copy: an export to a custom out_path (e.g. the test suite's tmp
+    # dir) must never touch the committed dataset_meta.json — that left a dirty
+    # working tree after every pytest run.
+    (out.parent / DATASET_META_PATH.name).write_text(
+        json.dumps(meta, indent=1, ensure_ascii=False)
+    )
     return {"written": len(data), "pool": len(rows), "path": str(out)}
 
 

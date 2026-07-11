@@ -25,7 +25,9 @@ guess is submitted — never in the question payload.
 
 from __future__ import annotations
 
+import logging
 import os
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -60,6 +62,8 @@ from .models import (
 
 FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -81,12 +85,15 @@ async def lifespan(_app: FastAPI):
         # boot is safe and only hits the network when the data is stale; the
         # dataset source just reloads the committed bank (cheap, offline).
         seed.refresh(source=source)
-    # Bound the analytics log so it can't grow without limit on a long-lived DB.
+    # Housekeeping on a long-lived DB: bound the analytics log and clear out
+    # expired sessions (session_user only prunes tokens that are presented, so
+    # sessions of users who never return would otherwise accumulate forever).
     conn = db.connect()
     try:
         db.init_db(conn)
         analytics.prune(conn)
-    except Exception:  # noqa: BLE001 — analytics housekeeping must never block boot
+        auth.prune_expired_sessions(conn)
+    except Exception:  # noqa: BLE001 — housekeeping must never block boot
         pass
     finally:
         conn.close()
@@ -95,13 +102,44 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title="GridMaster API", version="0.1.0-prototype", lifespan=lifespan)
 
+# Defense in depth for the innerHTML-heavy frontend: server data is escaped
+# before rendering (frontend escapeHtml), but with bearer tokens in localStorage
+# one missed escape would be a session-stealing XSS. The CSP confines scripts to
+# same-origin files (no inline scripts anywhere in the frontend — keep it that
+# way), and styles/fonts to self + Google Fonts (index.html). Inline style
+# attributes/<style> blocks are used throughout, hence 'unsafe-inline' for
+# styles only.
+_CSP = (
+    "default-src 'self'; "
+    "script-src 'self'; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "img-src 'self' data:; "
+    "connect-src 'self'; "
+    "base-uri 'self'; "
+    "form-action 'self'; "
+    "frame-ancestors 'none'"
+)
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "same-origin")
+    if response.headers.get("content-type", "").startswith("text/html"):
+        response.headers.setdefault("Content-Security-Policy", _CSP)
+        response.headers.setdefault("X-Frame-Options", "DENY")
+    return response
+
 
 def get_conn():
     # One connection per request keeps the prototype simple; production swaps in a
-    # pooled Postgres session (Architecture §0).
-    conn = db.connect()
-    db.init_db(conn)
-    return conn
+    # pooled Postgres session (Architecture §0). Schema creation/migration happens
+    # once at boot (lifespan) — and in tests via the seed fixtures — NOT here:
+    # running the DDL script per request added write traffic that competes with
+    # score writes under WAL.
+    return db.connect()
 
 
 def _bearer(authorization: str | None) -> str | None:
@@ -166,11 +204,55 @@ def quiz(mode: str):
     return payload
 
 
+# Free Practice throttle. Practice serves unlimited questions from the SAME bank
+# as the Daily, and verify reveals the true answer after any guess — so with no
+# server-side limit a script could farm the whole answer key overnight and then
+# ace every Daily (the frontend's "stewards penalty" only slows humans down; it
+# is trivially bypassed by calling the API directly). The window is generous for
+# a human (a question takes 10s+ to read and answer) but makes scripted farming
+# of a ~2,000-question bank take days instead of minutes. In-memory sliding
+# window keyed by client IP, same pattern as the login limiter (auth.py); Redis
+# in production.
+_PRACTICE_WINDOW_SECONDS = 600  # 10 minutes
+_PRACTICE_MAX_PER_WINDOW = 60
+_practice_hits: dict[str, list[float]] = {}
+
+
+def _check_practice_allowed(client_ip: str) -> None:
+    """Raise a 429 when this client has drawn too many practice questions in the
+    window; otherwise record the draw. Also evicts idle clients so the in-memory
+    map can't grow without bound."""
+    now = time.monotonic()
+    if len(_practice_hits) > 10_000:
+        for ip in [k for k, v in _practice_hits.items()
+                   if not v or now - v[-1] > _PRACTICE_WINDOW_SECONDS]:
+            del _practice_hits[ip]
+    hits = [t for t in _practice_hits.get(client_ip, []) if now - t < _PRACTICE_WINDOW_SECONDS]
+    if len(hits) >= _PRACTICE_MAX_PER_WINDOW:
+        _practice_hits[client_ip] = hits
+        retry_after = int(_PRACTICE_WINDOW_SECONDS - (now - hits[0])) + 1
+        raise HTTPException(
+            429,
+            "Easy on the throttle — you've hit the Free Practice limit. "
+            "Take a breather and come back in a few minutes.",
+            headers={"Retry-After": str(retry_after)},
+        )
+    hits.append(now)
+    _practice_hits[client_ip] = hits
+
+
+def reset_practice_limits() -> None:
+    """Clear the practice throttle state (used by tests)."""
+    _practice_hits.clear()
+
+
 @app.get("/api/v1/practice/question", response_model=PracticeQuestionResponse)
-def practice_question():
+def practice_question(request: Request):
     """Serve one random Free Practice question. The mode is unlimited and its
     scores are never recorded (see quiz_verify), so there is no daily cap and no
-    deterministic per-period seeding — every request is a fresh random draw."""
+    deterministic per-period seeding — every request is a fresh random draw.
+    Rate-limited per client so the bank can't be scripted-farmed for answers."""
+    _check_practice_allowed(request.client.host if request.client else "unknown")
     conn = get_conn()
     try:
         payload = service.build_practice_question(conn)
@@ -213,7 +295,9 @@ def quiz_verify(req: VerifyRequest, authorization: str | None = Header(default=N
             # own guess is included). Best-effort — never block the score on it.
             result["insight"] = auth.question_insight(conn, question_id, result["score"])
         except Exception:  # noqa: BLE001 — scoring already succeeded; don't fail the response
-            pass
+            # Still best-effort, but a systemic storage failure (every score shown
+            # to players silently vanishing from their totals) must be discoverable.
+            logger.exception("Failed to record play event for question %s", question_id)
         finally:
             conn.close()
     return result

@@ -93,3 +93,19 @@ def test_slider_bounds_do_not_pin_the_answer():
         assert (lo, hi) == _slider_bounds(answer, f"question {i}")
         fracs.append(answer / hi)
     assert min(fracs) < 0.25 and max(fracs) > 0.55
+
+
+def test_slider_bounds_change_with_the_server_salt():
+    """The band position must depend on a server-side secret: with an empty or
+    known salt the seed is just the public question string plus a public
+    algorithm, so a client could re-run the RNG and invert the bound back to
+    the answer within a few percent."""
+    from app.service import _slider_bounds
+    differing = 0
+    for i in range(50):
+        answer = 10 + i * 3
+        key = f"question {i}"
+        if _slider_bounds(answer, key, "salt-a") != _slider_bounds(answer, key, "salt-b"):
+            differing += 1
+    # The salt must actually move the bounds for (nearly) every question.
+    assert differing > 45

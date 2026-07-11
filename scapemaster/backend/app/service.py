@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
+import os
 import random
 import secrets
 import sqlite3
@@ -130,30 +132,81 @@ def _deterministic_rng(*parts: str) -> random.Random:
     return random.Random(int(digest[:16], 16))
 
 
-def _slider_bounds(answer: float, answer_kind: str = "count") -> tuple[float, float]:
+# Server-side secret mixed into the slider-bounds RNG seed, cached per process.
+# Without it the seed would be just the public question string plus a public
+# algorithm, so a client could re-run the RNG, recover the answer's position in
+# the band, and invert the bound back to the answer within a few percent —
+# quietly defeating the "answer never reaches the client" trust boundary.
+_SLIDER_SALT: str | None = None
+
+
+def _get_slider_salt(conn: sqlite3.Connection) -> str:
+    """The slider-bounds secret: OSRS_SLIDER_SALT if set, else a random value
+    generated once and persisted in app_kv (which survives reboots and the
+    boot-time bank reseed, so bounds stay stable per question)."""
+    global _SLIDER_SALT
+    if _SLIDER_SALT:
+        return _SLIDER_SALT
+    env = os.environ.get("OSRS_SLIDER_SALT")
+    if env:
+        _SLIDER_SALT = env
+        return env
+    try:
+        row = conn.execute("SELECT value FROM app_kv WHERE key = 'slider_salt'").fetchone()
+        if row is None:
+            conn.execute(
+                "INSERT OR IGNORE INTO app_kv (key, value) VALUES ('slider_salt', ?)",
+                (secrets.token_hex(16),),
+            )
+            conn.commit()
+            row = conn.execute("SELECT value FROM app_kv WHERE key = 'slider_salt'").fetchone()
+        _SLIDER_SALT = row["value"]
+    except sqlite3.OperationalError:
+        # Un-migrated DB with no app_kv table: fall back to a per-process salt.
+        # Still unpredictable, just not stable across restarts.
+        _SLIDER_SALT = secrets.token_hex(16)
+    return _SLIDER_SALT
+
+
+def reset_slider_salt_cache() -> None:
+    """Forget the cached salt (used by tests that swap databases)."""
+    global _SLIDER_SALT
+    _SLIDER_SALT = None
+
+
+def _slider_bounds(answer: float, answer_kind: str = "count",
+                   key: str = "", salt: str = "") -> tuple[float, float]:
     """Derive non-revealing slider bounds for the guess UI.
 
     Bounds are a wide, rounded band that contains the answer without pinning it —
     the true value is not recoverable from min/max alone.
 
-    * count/level/etc: 0 .. a power-of-two style band above the answer.
     * coins/xp: answers span five orders of magnitude (a lobster vs a Twisted
       bow), so the band is a power-of-ten window at least two decades wide; the
       client renders these kinds on a log-scale slider with k/m/b formatting.
+    * everything else: the answer's position in a 0..upper band is drawn
+      deterministically per question, seeded by `salt` + `key`, then the bound is
+      rounded up to two significant figures so it reads as a clean scale mark.
+      (The old doubling scheme guaranteed the answer sat in the second quarter of
+      every slider — a player parking at ~35% was never far off.) The salt is a
+      server-side secret (see _get_slider_salt): without it the seed would be
+      fully derivable from the served question text, letting a client invert the
+      bound back to the answer.
     """
     if answer <= 0:
         return 0.0, 10.0
     if answer_kind in ("coins", "xp"):
-        import math
         lo_exp = math.floor(math.log10(answer)) - 1
         hi_exp = math.ceil(math.log10(answer)) + 1
         if hi_exp - lo_exp < 3:  # guarantee >= 3 decades so the band can't pin
             hi_exp = lo_exp + 3
         return float(10 ** max(lo_exp, 0)), float(10 ** hi_exp)
-    upper = 10.0
-    while upper < answer * 2:
-        upper *= 2
-    return 0.0, round(upper)
+    rng = _deterministic_rng("slider-bounds", salt, key or str(answer))
+    frac = rng.uniform(0.18, 0.82)   # where in the band the answer lands
+    upper = max(10.0, answer / frac)
+    mag = 10 ** max(0, math.floor(math.log10(upper)) - 1)
+    upper = math.ceil(upper / mag) * mag
+    return 0.0, float(upper)
 
 
 def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str | None = None) -> dict:
@@ -178,6 +231,7 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     ).fetchall()
 
     rng = _deterministic_rng(game_mode, period)
+    salt = _get_slider_salt(conn)
     # Bias the per-period selection toward famous, recent content while still
     # surfacing the classics occasionally.
     weights = [_era_weight(row["era_year"]) for row in pool]
@@ -191,7 +245,8 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
         if row["display_min"] is not None and row["display_max"] is not None:
             smin, smax = row["display_min"], row["display_max"]
         else:
-            smin, smax = _slider_bounds(row["verified_answer"], row["answer_kind"])
+            smin, smax = _slider_bounds(row["verified_answer"], row["answer_kind"],
+                                        row["question_string"], salt)
         questions.append({
             "tracking_token": token,
             "question_text": row["question_string"],
@@ -235,7 +290,8 @@ def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None 
     if row["display_min"] is not None and row["display_max"] is not None:
         smin, smax = row["display_min"], row["display_max"]
     else:
-        smin, smax = _slider_bounds(row["verified_answer"], row["answer_kind"])
+        smin, smax = _slider_bounds(row["verified_answer"], row["answer_kind"],
+                                    row["question_string"], _get_slider_salt(conn))
     return {
         "game_mode": FREE_PRACTICE_MODE,
         "question": {

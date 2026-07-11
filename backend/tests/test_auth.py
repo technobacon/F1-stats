@@ -563,3 +563,49 @@ def test_garage_endpoints_require_auth(client):
                  "/api/v1/user/play-history"):
         assert client.get(path).status_code == 401
         assert client.get(path, headers={"Authorization": "Bearer nope"}).status_code == 401
+
+
+# ── Password byte-length symmetry ────────────────────────────────────────────
+def test_multibyte_password_within_byte_cap_round_trips(client):
+    """A password under the cap in BYTES (not just characters) must register and
+    log in — registration and verification hash the same input."""
+    pw = "🏎️" * 30 + "aa"  # multibyte, comfortably under 1024 bytes
+    r = client.post("/api/v1/auth/register", json={"username": "emoji", "password": pw})
+    assert r.status_code == 200
+    r2 = client.post("/api/v1/auth/login", json={"username": "emoji", "password": pw})
+    assert r2.status_code == 200
+
+
+def test_multibyte_password_over_byte_cap_is_rejected_up_front(client):
+    """Length caps are enforced in bytes at REGISTRATION. Before this, a password
+    of <=1024 characters but >1024 bytes registered against a full-length hash
+    while login truncated to 1024 bytes — a silent, permanent lockout."""
+    pw = "🏎" * 300  # 300 chars but ~1200 UTF-8 bytes
+    r = client.post("/api/v1/auth/register", json={"username": "walled", "password": pw})
+    assert r.status_code == 400
+    assert "too long" in r.json()["detail"]
+
+
+def test_verify_password_never_truncates():
+    stored = auth.hash_password("🏎" * 100)  # 400 bytes, hashed in full
+    assert auth.verify_password("🏎" * 100, stored)
+    assert not auth.verify_password(("🏎" * 100)[:-1], stored)
+
+
+# ── Session housekeeping ─────────────────────────────────────────────────────
+def test_prune_expired_sessions_removes_only_expired(client):
+    hdr = _register(client, "pruned")
+    conn = db.connect()
+    try:
+        # Backdate one extra session to expired; the live one must survive.
+        expired = auth.create_session(conn, conn.execute(
+            "SELECT id FROM users WHERE username = 'pruned'").fetchone()["id"])
+        conn.execute("UPDATE auth_sessions SET expires_at = '2000-01-01T00:00:00+0000' "
+                     "WHERE token = ?", (expired,))
+        conn.commit()
+        removed = auth.prune_expired_sessions(conn)
+        assert removed == 1
+        assert auth.session_user(conn, expired) is None
+    finally:
+        conn.close()
+    assert client.get("/api/v1/auth/me", headers=hdr).status_code == 200

@@ -70,3 +70,19 @@ def test_tiny_actual_is_brutal_by_design():
     MIN_COIN_ANSWER gate keeps sub-50-coin answers out of the bank."""
     assert score_guess(2, 1) == round(MAX_SCORE * math.exp(-DEFAULT_LAMBDA))
     assert score_guess(10, 1) == 0  # 900% error decays to nothing
+
+
+def test_slider_bounds_change_with_the_server_salt():
+    """The band position must depend on a server-side secret: with an empty or
+    known salt the seed is just the public question string plus a public
+    algorithm, so a client could re-run the RNG and invert the bound back to
+    the answer within a few percent."""
+    from app.service import _slider_bounds
+    differing = 0
+    for i in range(50):
+        answer = 10 + i * 3
+        key = f"question {i}"
+        if _slider_bounds(answer, "count", key, "salt-a") != _slider_bounds(answer, "count", key, "salt-b"):
+            differing += 1
+    # The salt must actually move the bounds for (nearly) every question.
+    assert differing > 45

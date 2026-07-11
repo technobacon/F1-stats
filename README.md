@@ -134,6 +134,17 @@ frontend/
 docs/               # original design documents
 ```
 
+### `scapemaster/` — a deliberate fork, not shared code
+
+[`scapemaster/`](./scapemaster) is a second game (OSRS trivia) built by copying
+this app's backend and frontend wholesale. It is a **fork by design**: every
+module has since diverged (different data model, question kinds, theming), and
+there is no shared package between the two. The consequence is a standing
+porting tax — **any fix to the shared engine pieces (scoring, auth, service
+trust boundary, db, main) must be consciously applied twice**, once here and
+once under `scapemaster/`. When touching those files, check whether the sibling
+needs the same change; the test suites on both sides are the safety net.
+
 ## API
 
 | Method | Path | Notes |
