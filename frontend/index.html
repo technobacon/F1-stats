@@ -4,18 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>GridMaster</title>
-  <meta name="description" content="Guess the Formula 1 stat, get scored on how close you are. A new daily F1 challenge every day — drivers, teams and circuits across every era." />
+  <meta name="description" content="Guess the Formula 1 stat, get scored on how close you are. A new daily F1 challenge every day: drivers, teams and circuits across every era." />
 
   <!-- Rich link previews for shared results (Open Graph + Twitter Card), so a
        pasted GridMaster link unfurls into a card instead of a bare URL. -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="GridMaster" />
-  <meta property="og:title" content="GridMaster — the daily Formula 1 stats challenge" />
-  <meta property="og:description" content="Guess the F1 stat, get scored on how close you are. New daily challenge — can you beat your friends?" />
+  <meta property="og:title" content="GridMaster: the daily Formula 1 stats challenge" />
+  <meta property="og:description" content="Guess the F1 stat, get scored on how close you are. New daily challenge. Can you beat your friends?" />
   <meta property="og:image" content="/static/icon-180.png" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="GridMaster — the daily Formula 1 stats challenge" />
-  <meta name="twitter:description" content="Guess the F1 stat, get scored on how close you are. New daily challenge — can you beat your friends?" />
+  <meta name="twitter:title" content="GridMaster: the daily Formula 1 stats challenge" />
+  <meta name="twitter:description" content="Guess the F1 stat, get scored on how close you are. New daily challenge. Can you beat your friends?" />
   <meta name="twitter:image" content="/static/icon-180.png" />
 
   <!-- PWA / iOS add-to-home-screen -->
@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=31" />
+  <link rel="stylesheet" href="/static/style.css?v=32" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -88,11 +88,11 @@
         <span class="hud-label" id="countdown-label">NEXT SESSION</span>
         <span class="hud-timer" id="countdown-timer">--:--:--:--</span>
       </div>
-      <button id="sound-toggle" class="sound-toggle" title="Sound on — click to mute"
+      <button id="sound-toggle" class="sound-toggle" title="Sound on. Click to mute"
               aria-pressed="true" aria-label="Toggle sound effects">
         <span class="sound-icon" id="sound-icon" data-icon="volume-2" aria-hidden="true"></span>
       </button>
-      <button id="theme-toggle" class="sound-toggle theme-toggle" title="Dark mode — click for light"
+      <button id="theme-toggle" class="sound-toggle theme-toggle" title="Dark mode. Click for light"
               aria-pressed="false" aria-label="Toggle light or dark theme">
         <span class="theme-icon" id="theme-icon" data-icon="moon" aria-hidden="true"></span>
       </button>
@@ -162,7 +162,7 @@
         <div class="hero-inner">
           <p class="hero-eyebrow">Welcome to</p>
           <h1 class="hero-title">GRID<span class="accent">MASTER</span></h1>
-          <p class="hero-sub">Test your Formula 1 knowledge across every era — from Senna and
+          <p class="hero-sub">Test your Formula 1 knowledge across every era, from Senna and
              Prost to the modern grid. Guess the stat, get scored on how close you are.</p>
           <div class="hero-cta">
             <button class="btn-primary" data-view="quiz" data-mode="daily">Play the Daily Challenge</button>
@@ -185,7 +185,7 @@
         <div class="rw-head">
           <div>
             <p class="rw-eyebrow">Next race weekend</p>
-            <h2 class="rw-title" id="rw-title">—</h2>
+            <h2 class="rw-title" id="rw-title">–</h2>
           </div>
           <div class="rw-next" id="rw-next">
             <span class="rw-next-label">Next session in</span>
@@ -201,7 +201,7 @@
         <button class="mode-card" data-view="quiz" data-mode="daily">
           <span class="mc-icon" data-icon="flag" aria-hidden="true"></span>
           <h3>Daily Challenge</h3>
-          <p>Six questions spanning all of F1 history — drivers, teams, circuits and
+          <p>Six questions spanning all of F1 history: drivers, teams, circuits and
              race-day feats. One run a day. How close can you get?</p>
           <span class="mc-cta">Play now →</span>
         </button>
@@ -210,14 +210,14 @@
           <span class="mc-icon" data-icon="tyre" aria-hidden="true"></span>
           <h3>Free Practice</h3>
           <p>Unlimited random questions to sharpen your instincts. Your score shows here
-             but is never saved or ranked — just practice, for fun.</p>
+             but is never saved or ranked. Just practice, for fun.</p>
           <span class="mc-cta">Play now →</span>
         </button>
 
         <button class="mode-card" data-view="arcade">
           <span class="mc-icon" data-icon="zap" aria-hidden="true"></span>
           <h3>Arcade</h3>
-          <p>Endless "who has more?" head-to-heads between drivers. No timer, no cap — just
+          <p>Endless "who has more?" head-to-heads between drivers. No timer, no cap. Just
              build the longest streak you can.</p>
           <span class="mc-cta">Play now →</span>
         </button>
@@ -244,7 +244,7 @@
 
       <div id="quiz-intro" class="card">
         <h2 id="quiz-title">Daily General Challenge</h2>
-        <p id="quiz-desc">Six questions. Guess the stat — the closer you are, the more
+        <p id="quiz-desc">Six questions. Guess the stat. The closer you are, the more
            of the 5,000 points you keep.</p>
         <div id="quiz-cap" class="cap-note hidden"></div>
         <button class="btn-primary" id="start-quiz">Start Session</button>
@@ -335,8 +335,8 @@
           <div class="timeline-node actual" id="node-actual"><span>Actual</span></div>
         </div>
         <div class="reveal-numbers">
-          <div>Your guess: <strong id="reveal-guess">—</strong></div>
-          <div>Actual: <strong id="reveal-actual">—</strong></div>
+          <div>Your guess: <strong id="reveal-guess">–</strong></div>
+          <div>Actual: <strong id="reveal-actual">–</strong></div>
         </div>
         <div class="odometer" id="odometer">0</div>
         <p class="reveal-insight hidden" id="reveal-insight"></p>
@@ -369,8 +369,8 @@
             <button class="ns-btn" data-view="arcade">
               <i class="ic" data-icon="zap" aria-hidden="true"></i> Arcade</button>
           </div>
-          <p class="muted ns-signup hidden" id="summary-signup">Playing as a guest —
-            <button type="button" class="link-btn" data-auth="open">create a free account</button>
+          <p class="muted ns-signup hidden" id="summary-signup">Playing as a guest?
+            <button type="button" class="link-btn" data-auth="open">Create a free account</button>
             to get these points on the board.</p>
         </div>
         <button class="btn-secondary" id="summary-back">Back to Modes</button>
@@ -382,15 +382,15 @@
     <section id="view-arcade" class="view">
       <div class="card arcade-shell">
         <h2>Arcade Over/Under <span class="badge">∞ unlimited</span></h2>
-        <p class="muted">Who has more? Build your streak — pick the driver with the higher total.</p>
+        <p class="muted">Who has more? Build your streak: pick the driver with the higher total.</p>
         <div class="arcade-metric-wrap">
           <p class="arcade-eyebrow"><i class="ic" data-icon="zap" aria-hidden="true"></i> Who has more</p>
           <div class="arcade-metric" id="arcade-metric">…</div>
         </div>
         <div class="arcade-pair">
-          <button class="arcade-card" id="arcade-a"><span class="name">—</span><span class="val">?</span></button>
+          <button class="arcade-card" id="arcade-a"><span class="name">–</span><span class="val">?</span></button>
           <div class="vs" aria-hidden="true">VS</div>
-          <button class="arcade-card" id="arcade-b"><span class="name">—</span><span class="val">?</span></button>
+          <button class="arcade-card" id="arcade-b"><span class="name">–</span><span class="val">?</span></button>
         </div>
         <div class="arcade-streak">
           <span class="as-chip"><span class="as-label">Streak</span><strong id="arcade-streak">0</strong></span>
@@ -405,10 +405,10 @@
       <div class="card">
         <h2>Profile <span class="badge" id="guest-badge">guest</span></h2>
         <dl class="stats">
-          <dt>Favourite team</dt><dd id="p-team">—</dd>
+          <dt>Favourite team</dt><dd id="p-team">–</dd>
           <dt>Lifetime points</dt><dd id="p-points">0</dd>
           <dt>Games played</dt><dd id="p-games">0</dd>
-          <dt>Avg. accuracy</dt><dd id="p-accuracy">—</dd>
+          <dt>Avg. accuracy</dt><dd id="p-accuracy">–</dd>
           <dt>Daily streak</dt><dd id="p-streak">0</dd>
           <dt>Achievements</dt><dd id="p-achievements">none yet</dd>
         </dl>
@@ -419,7 +419,7 @@
           <button class="btn-secondary" id="open-auth-btn">Create account / Sign in →</button>
         </div>
         <div id="account-member" class="hidden">
-          <p class="muted">Signed in as <strong id="account-username">—</strong>.
+          <p class="muted">Signed in as <strong id="account-username">–</strong>.
              Your points are saved to your account and counted on the leaderboard.</p>
           <button class="btn-secondary" id="logout-btn">Log out</button>
         </div>
@@ -430,7 +430,7 @@
            signed in, local otherwise). Filled by renderHeatmap(). -->
       <div class="card">
         <div class="ach-head"><h2>Daily streak history</h2></div>
-        <p class="muted">Each square is a day — the brighter, the more you played.</p>
+        <p class="muted">Each square is a day. The brighter, the more you played.</p>
         <div class="heatmap heatmap-lg" id="profile-heatmap"></div>
       </div>
 
@@ -464,7 +464,7 @@
         <ol class="leaderboard" id="leaderboard-list">
           <li class="muted">Loading…</li>
         </ol>
-        <p class="muted">Ranked by points the server scored — local totals can't be posted directly.</p>
+        <p class="muted">Ranked by points the server scored; local totals can't be posted directly.</p>
       </div>
 
       <!-- Constructors' Championship (PRD §5.3): every player's verified points
@@ -486,23 +486,23 @@
       <div id="about-top" class="about-hero">
         <p class="hero-eyebrow">About</p>
         <h1 class="section-title about-title">How GridMaster works</h1>
-        <p class="about-lead">A daily Formula 1 stats game built on real, verified data —
-           no trivia scraped from forums, no answers a model made up. Here's exactly how
+        <p class="about-lead">A daily Formula 1 stats game built on real, verified data.
+           No trivia scraped from forums, no answers a model made up. Here's exactly how
            it's put together.</p>
       </div>
 
       <div class="card about-card" id="about-play">
         <h2>The game</h2>
-        <p>Every question asks for a single number — career wins, pole positions, points in
-           a season — and you're scored on <strong>how close</strong> you get, not just
+        <p>Every question asks for a single number (career wins, pole positions, points in
+           a season) and you're scored on <strong>how close</strong> you get, not just
            right or wrong. Three ways to play:</p>
         <ul class="about-list">
-          <li><strong>Daily Challenge</strong> — six questions, the same set for everyone,
+          <li><strong>Daily Challenge</strong>: six questions, the same set for everyone,
               once a day. This is the ranked, competitive mode.</li>
-          <li><strong>Free Practice</strong> — endless single questions to warm up. Never
+          <li><strong>Free Practice</strong>: endless single questions to warm up. Never
               recorded and never ranked, with a short delay after a wild guess so the bank
               can't be farmed for answers.</li>
-          <li><strong>Arcade Over/Under</strong> — endless "who has more?" head-to-heads,
+          <li><strong>Arcade Over/Under</strong>: endless "who has more?" head-to-heads,
               played for a streak.</li>
         </ul>
       </div>
@@ -511,7 +511,7 @@
         <h2>How scoring works</h2>
         <p>Each question is worth up to <strong>5,000 points</strong>. The score follows an
            <strong>exponential-decay curve</strong>: a perfect guess banks the full amount,
-           and points fall away the further off you are — gently at first, then steeply.
+           and points fall away the further off you are: gently at first, then steeply.
            Every kind of answer is judged on a fair yardstick: counts and points totals by
            <strong>percentage error</strong>, year answers by <strong>how many years off</strong>
            you are, and percentage answers by <strong>points of percentage</strong>.</p>
@@ -519,7 +519,7 @@
            points, by kind); a little further out is a <em>green</em> one (within 25%, three
            years, or five points).</p>
         <p>Your guess never leaves your device until you lock it in, and the answer is only
-           revealed afterwards — scoring happens <strong>on the server</strong>, so leaderboard
+           revealed afterwards; scoring happens <strong>on the server</strong>, so leaderboard
            totals can't be forged by the client.</p>
       </div>
 
@@ -529,7 +529,7 @@
            which covers every World Championship round from <strong>1950 to today</strong>. The
            site ships a committed snapshot of that data, so it loads instantly and works with
            no live API calls.</p>
-        <p>The mix leans modern — more questions from the hybrid era (2014+) — with a deliberate
+        <p>The mix leans modern, with more questions from the hybrid era (2014+), a deliberate
            boost for the Senna/Prost and Schumacher generations, and older eras turning up now
            and then.</p>
       </div>
@@ -538,7 +538,7 @@
         <h2>How every answer is verified</h2>
         <p>This is the part most trivia games skip. <strong>No answer is hand-written or taken
            on trust.</strong> Before a question can ship, the answer is <strong>recomputed from
-           the underlying race data</strong> by a validation step — if the computed number
+           the underlying race data</strong> by a validation step. If the computed number
            doesn't match, the question is thrown out. That gate is the whole point: it's what
            keeps a wrong or hallucinated stat from ever reaching you.</p>
         <p>Spotted something that still looks off? Every question can be flagged from the in-app
@@ -548,13 +548,13 @@
       <div class="card about-card" id="about-privacy">
         <h2>Privacy</h2>
         <p>GridMaster is <strong>guest-first</strong>: you can play straight away with everything
-           kept in your browser's local storage — no account, no tracking that follows you
+           kept in your browser's local storage; no account, no tracking that follows you
            around.</p>
         <ul class="about-list">
           <li><strong>Accounts are optional.</strong> If you create one, passwords are stored
               salted and hashed (PBKDF2), never in the clear.</li>
           <li><strong>Email is optional</strong> and only used for the streak reminders you opt
-              into — nothing else.</li>
+              into, nothing else.</li>
           <li><strong>Analytics are pseudonymous and aggregate.</strong> They measure how the
               game is used in total and <em>never</em> feed your score or leaderboard position.</li>
           <li><strong>Reminders are local.</strong> The streak nudge runs in your browser; there
@@ -567,7 +567,7 @@
         <p>GridMaster is a fan-made project, not affiliated with Formula 1. Found a bug, a wrong
            answer, or have an idea? The code and issue tracker live on
            <a class="about-link" href="https://github.com/technobacon/f1-stats" target="_blank"
-              rel="noopener">GitHub</a> — that's the best place to reach the project and to see
+              rel="noopener">GitHub</a>. That's the best place to reach the project and to see
            what's changed.</p>
         <p class="about-disclaimer">F1, FORMULA 1 and related marks are trademarks of Formula
            One Licensing BV. This site is unofficial and is not associated in any way with the
@@ -611,7 +611,7 @@
         <label class="data-flag-filter"><input type="checkbox" id="data-flagged-only" /> Flagged only</label>
         <button class="btn-ghost data-close" id="data-close"><i class="ic" data-icon="x" aria-hidden="true"></i> Close</button>
       </div>
-      <p class="muted data-note">Development tool — every active question with its verified answer,
+      <p class="muted data-note">Development tool: every active question with its verified answer,
          recomputed from the staging data. Click a column header to sort; use the flag button to flag
          a question you want to revisit later.</p>
       <div class="data-table-wrap">
@@ -662,7 +662,7 @@
                placeholder="at least 8 characters" required minlength="8" />
         <!-- Optional email: register only, for opt-in streak/daily reminders. -->
         <div id="auth-email-row">
-          <label for="auth-email">Email <span class="auth-optional">optional — for streak reminders</span></label>
+          <label for="auth-email">Email <span class="auth-optional">optional, for streak reminders</span></label>
           <input type="email" id="auth-email" name="email" autocomplete="email"
                  placeholder="you@example.com (optional)" />
         </div>
@@ -731,7 +731,7 @@
         <button class="game-exit" id="scoring-close" aria-label="Close"><i class="ic" data-icon="x" aria-hidden="true"></i></button>
       </div>
       <div class="scoring-body">
-        <p>You guess a number. You're scored on <strong>how close</strong> you land — not just
+        <p>You guess a number. You're scored on <strong>how close</strong> you land, not just
            right or wrong.</p>
         <svg class="scoring-curve" viewBox="0 0 280 120" role="img"
              aria-label="A curve showing points falling off as your guess gets further from the answer">
@@ -740,16 +740,16 @@
           <path class="sc-area" d="M20,18 C70,22 110,55 160,80 C200,98 240,99 270,100 L270,100 L20,100 Z" />
           <path class="sc-line" d="M20,18 C70,22 110,55 160,80 C200,98 240,99 270,100" />
           <circle class="sc-dot" cx="20" cy="18" r="5" />
-          <text x="26" y="16" class="sc-tag">5,000 — spot on</text>
+          <text x="26" y="16" class="sc-tag">5,000 = spot on</text>
           <text x="150" y="116" class="sc-axis-label">further from the answer →</text>
         </svg>
         <ul class="scoring-points">
-          <li><span class="sc-chip purple">Purple</span> within 10% — the fastest sector</li>
-          <li><span class="sc-chip green">Green</span> within 25% — still strong</li>
+          <li><span class="sc-chip purple">Purple</span> within 10%, the fastest sector</li>
+          <li><span class="sc-chip green">Green</span> within 25%, still strong</li>
           <li>Up to <strong>5,000 points</strong> per question; six per Daily.</li>
         </ul>
       </div>
-      <button class="btn-primary scoring-go" id="scoring-go">Got it — let's race</button>
+      <button class="btn-primary scoring-go" id="scoring-go">Got it, let's race</button>
     </div>
   </div>
 
@@ -772,8 +772,8 @@
   </div>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-  <script src="/static/icons.js?v=31"></script>
-  <script src="/static/sound.js?v=31"></script>
-  <script src="/static/app.js?v=31"></script>
+  <script src="/static/icons.js?v=32"></script>
+  <script src="/static/sound.js?v=32"></script>
+  <script src="/static/app.js?v=32"></script>
 </body>
 </html>

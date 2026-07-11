@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
-  <title>GridMaster — Analytics</title>
+  <title>GridMaster Analytics</title>
   <style>
     :root { --bg:#0a0d12; --surface:#151b24; --line:#252d38; --text:#eef2f7;
             --muted:#8b95a5; --accent:#FF8000; --green:#2ecc71; --amber:#f1c40f; }
@@ -51,7 +51,7 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>GridMaster — Analytics</h1>
+    <h1>GridMaster Analytics</h1>
     <p class="muted">First-party, pseudonymous engagement metrics. Combines client
        events with server-verified play. Data is token-gated.</p>
 
@@ -69,7 +69,7 @@
     <div id="report" class="hidden">
       <div class="grid" id="kpis"></div>
 
-      <h2>Active users — visitors vs players</h2>
+      <h2>Active users: visitors vs players</h2>
       <div class="card">
         <div class="chart" id="active-chart"></div>
         <div class="legend"><span><i style="background:var(--accent)"></i>Visitors</span>
@@ -104,8 +104,8 @@
     const API = "/api/v1";
     const $ = (id) => document.getElementById(id);
     const TOKEN_KEY = "f1sg_analytics_token";
-    const fmt = (n) => (n == null ? "—" : Number(n).toLocaleString());
-    const pct = (r) => (r == null ? "—" : Math.round(r * 100) + "%");
+    const fmt = (n) => (n == null ? "–" : Number(n).toLocaleString());
+    const pct = (r) => (r == null ? "–" : Math.round(r * 100) + "%");
 
     $("token").value = localStorage.getItem(TOKEN_KEY) || "";
     $("load").addEventListener("click", load);

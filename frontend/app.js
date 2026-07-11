@@ -79,13 +79,13 @@ document.addEventListener("visibilitychange", () => {
 const MODES = {
   daily: {
     title: "Daily Challenge",
-    desc: "Six questions spanning all of F1 history — drivers, teams, circuits and race-day feats. The closer your guess, the more of the 5,000 points per question you keep.",
+    desc: "Six questions spanning all of F1 history: drivers, teams, circuits and race-day feats. The closer your guess, the more of the 5,000 points per question you keep.",
     capKey: () => utcDate(), capLabel: "today's Daily Challenge", slider: true,
   },
   free_practice: {
     title: "Free Practice",
     desc: "Unlimited random questions to sharpen your instincts. Your score is shown here " +
-      "but never saved or ranked — it's pure practice. To keep it fair, scoring under " +
+      "but never saved or ranked; it's pure practice. To keep it fair, scoring under " +
       "1,000 points on a question hands your team a 10-second penalty before the next one " +
       "(an anti-scouting measure, explained when it happens).",
     capKey: null, capLabel: "", slider: true, free: true,
@@ -303,7 +303,7 @@ function renderRaceWeek() {
   const next = SESSIONS.find((s) => s.when > now);
   if (!next) {
     document.getElementById("rw-title").textContent = `${SEASON_2027_OPENER[0]} · 2027`;
-    list.innerHTML = `<li class="muted" style="padding:.6rem .2rem">Season complete — see you in 2027.</li>`;
+    list.innerHTML = `<li class="muted" style="padding:.6rem .2rem">Season complete. See you in 2027.</li>`;
     return;
   }
   const weekend = SESSIONS.filter((s) => s.name === next.name);
@@ -543,7 +543,7 @@ async function nextPracticeQuestion() {
     quiz.questions = [q]; qPos = 0;
     practiceCount += 1;
   } catch {
-    toast("Couldn't load the next question — tap to retry.");
+    toast("Couldn't load the next question. Tap to retry.");
     btn.disabled = false; btn.textContent = "Next question";
     return;
   }
@@ -573,7 +573,7 @@ function startPracticePenalty(score) {
       `${Icons.svg("flag")} <strong>${PRACTICE_PENALTY_SECONDS} SECONDS PENALTY TO ${escapeHtml(teamName.toUpperCase())}.</strong> ` +
       `You scored under ${PRACTICE_PENALTY_THRESHOLD.toLocaleString()} points, so the stewards ` +
       `hold you on the grid for ${remaining}s. This is necessary to discourage ` +
-      `<em>quiz-scouting</em> — guessing wildly just to reveal and memorise answers — ` +
+      `<em>quiz-scouting</em>: guessing wildly just to reveal and memorise answers, ` +
       `which would let players farm the bank and spoil the challenge for everyone. ` +
       `Take a breath and read the result.`;
     btn.textContent = `Next question in ${remaining}s`;
@@ -780,7 +780,7 @@ async function submitGuess() {
     evaluateAchievements();
     revealScore(q, result);
   } catch (e) {
-    toast("Couldn't score that — try again.");
+    toast("Couldn't score that. Try again.");
     submitBtn.disabled = false; submitBtn.textContent = "Lock In Guess";
   }
 }
@@ -1125,7 +1125,7 @@ function buildShareText() {
     brag = `\nBeat ${avg}% of players`;
   }
   // Spoiler-free: shares the closeness pattern and total, never the answers.
-  return `🏁 GridMaster — ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts${brag}` +
+  return `🏁 GridMaster ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts${brag}` +
     `\nCan you beat me? ${shareLink()}`;
 }
 
@@ -1146,7 +1146,7 @@ document.getElementById("share-result").addEventListener("click", async () => {
   track("share", { mode: currentMode });
   const a = ensureAch(); a.shares = (a.shares || 0) + 1; saveState(state);
   evaluateAchievements();
-  await shareOrCopy(buildShareText(), "Result copied — paste it anywhere to share.");
+  await shareOrCopy(buildShareText(), "Result copied. Paste it anywhere to share.");
 });
 
 /* Direct "I dare you" invite — same deep link, framed as a head-to-head challenge
@@ -1159,7 +1159,7 @@ document.getElementById("challenge-friend").addEventListener("click", async () =
             : currentMode === "daily" ? "Daily Challenge" : "GridMaster run";
   const text = `🏁 I just scored ${sessionScore.toLocaleString()} on today's GridMaster ${tag}. ` +
     `Think you can beat me?\n${shareLink()}`;
-  await shareOrCopy(text, "Challenge copied — send it to a friend.");
+  await shareOrCopy(text, "Challenge copied. Send it to a friend.");
 });
 
 /* ===================== ARCADE OVER/UNDER ===================== */
@@ -1211,7 +1211,7 @@ function pick(which) {
     ? "a dead heat, so either pick counts"
     : `${winner.full_name} had it by ${diff.toLocaleString()}`;
   document.getElementById("arcade-result").textContent =
-    pickedHigher ? `Correct — ${margin}. Next up…` : `Wrong — ${margin}. Streak reset.`;
+    pickedHigher ? `Correct: ${margin}. Next up…` : `Wrong: ${margin}. Streak reset.`;
   // A miss earns a beat longer to read the margin before the board rotates.
   setTimeout(loadArcade, pickedHigher ? 1600 : 2400);
 }
@@ -1242,7 +1242,7 @@ function renderStreakBanner() {
   const playedToday = isCapped("daily");
   el.innerHTML = playedToday
     ? `<span class="flame">${Icons.svg("flame")}</span> <span><strong>${n}-day streak</strong> secured. See you tomorrow.</span>`
-    : `<span class="flame">${Icons.svg("flame")}</span> <span><strong>${n}-day streak</strong> — play today's Daily to keep it alive</span>`;
+    : `<span class="flame">${Icons.svg("flame")}</span> <span><strong>${n}-day streak</strong>. Play today's Daily to keep it alive</span>`;
   el.classList.remove("hidden");
 }
 
@@ -1257,8 +1257,8 @@ function renderProfile() {
     signedIn && serverStats ? serverStats.questions_answered : state.games_played;
   document.getElementById("p-accuracy").textContent =
     signedIn && serverStats
-      ? (serverStats.questions_answered ? `${Math.round(serverStats.average_accuracy * 100)}%` : "—")
-      : (state._q_count ? `${Math.round(state.average_closeness * 100)}%` : "—");
+      ? (serverStats.questions_answered ? `${Math.round(serverStats.average_accuracy * 100)}%` : "–")
+      : (state._q_count ? `${Math.round(state.average_closeness * 100)}%` : "–");
 
   // Streak: server-derived when signed in (authoritative across devices),
   // local otherwise.
@@ -1312,7 +1312,7 @@ async function loadLeaderboard() {
             <span class="lb-name">${escapeHtml(e.username)} <em class="lb-team">${(TEAMS[e.selected_team] || {}).name || ""}</em></span>
             <span class="lb-points">${e.lifetime_points.toLocaleString()}</span>
           </li>`).join("")
-      : `<li class="muted">No scores ${lbPeriod === "all" ? "yet" : "in this window"} — be the first to post one.</li>`;
+      : `<li class="muted">No scores ${lbPeriod === "all" ? "yet" : "in this window"}. Be the first to post one.</li>`;
   } catch {
     list.innerHTML = `<li class="muted">Leaderboard unavailable right now.</li>`;
   }
@@ -1367,7 +1367,7 @@ async function loadHomeTower() {
             <span class="tt-pts">${fmtCompact(e.points)}</span>
           </li>`;
         }).join("")
-      : `<li class="muted">No team has scored ${towerPeriod === "all" ? "yet" : "in this window"} \u2014 pledge a team and post the first.</li>`;
+      : `<li class="muted">No team has scored ${towerPeriod === "all" ? "yet" : "in this window"} . Pledge a team and post the first.</li>`;
   } catch {
     list.innerHTML = `<li class="muted">Standings unavailable right now.</li>`;
   }
@@ -1430,12 +1430,12 @@ function rankMovement(period, rank) {
   let prev = null;
   try { prev = JSON.parse(localStorage.getItem(key) || "null"); } catch { /* ignore */ }
   const today = utcDate();
-  let html = `<span class="g-move flat">—</span>`;
+  let html = `<span class="g-move flat">–</span>`;
   if (prev && prev.date !== today && Number.isFinite(prev.rank)) {
     const up = prev.rank - rank;                 // smaller rank number = moved up
     html = up > 0 ? `<span class="g-move up">▲${up}</span>`
          : up < 0 ? `<span class="g-move down">▼${-up}</span>`
-         : `<span class="g-move flat">—</span>`;
+         : `<span class="g-move flat">–</span>`;
   }
   if (!prev || prev.date !== today) localStorage.setItem(key, JSON.stringify({ rank, date: today }));
   return html;
@@ -1452,7 +1452,7 @@ function garageBadgesCard() {
             <div class="gb-bar"><i style="width:${Math.round(p.pct * 100)}%"></i></div>
           </div>
         </div>`).join("")
-    : `<p class="muted g-empty">Every badge unlocked — you're a Hall of Famer. 🏛️</p>`;
+    : `<p class="muted g-empty">Every badge unlocked. You're a Hall of Famer. 🏛️</p>`;
   return `<div class="g-card g-badges">
       <p class="g-card-label">Almost there</p>
       ${rows}
@@ -1479,7 +1479,7 @@ async function renderGarage() {
     : `Sign in to save your progress, back a constructor and climb the boards.`;
   const last = state.last_daily_percentile;
   const lastBit = (last && last.pct != null)
-    ? `<p class="g-last">${Icons.svg("chart")} Last Daily — you beat <strong>${last.pct}%</strong> of players.</p>` : "";
+    ? `<p class="g-last">${Icons.svg("chart")} Last Daily: you beat <strong>${last.pct}%</strong> of players.</p>` : "";
 
   // Card shells (rank + team fill in async; badges + heatmap are local/instant).
   el.innerHTML = `
@@ -1493,7 +1493,7 @@ async function renderGarage() {
         ${signedIn
           ? `<span class="sk-line sk-h" style="width:52%"></span>
              <span class="sk-line sk-b" style="width:78%;margin-top:.2rem"></span>`
-          : `<p class="g-big">—</p><p class="g-note">Sign in to rank on the leaderboard.</p>
+          : `<p class="g-big">–</p><p class="g-note">Sign in to rank on the leaderboard.</p>
              <button class="g-link" data-auth="open">Create an account →</button>`}
       </div>
       <div class="g-card g-team" id="g-team" style="--g-accent:${team.primary}">
@@ -1539,7 +1539,7 @@ async function renderGarage() {
       if (box) box.innerHTML = `<p class="g-card-label">Constructors' Championship</p>
         <p class="g-team-name">Racing for <strong>${escapeHtml(t.name)}</strong>${d.team_rank ? ` · <span class="g-pos">P${d.team_rank}</span>` : ""}</p>
         ${d.your_rank_in_team
-          ? `<p class="g-note">You've banked <strong>${fmtCompact(d.your_points)}</strong> pts — #${d.your_rank_in_team} of ${d.members} in your team.</p>`
+          ? `<p class="g-note">You've banked <strong>${fmtCompact(d.your_points)}</strong> pts, #${d.your_rank_in_team} of ${d.members} in your team.</p>`
           : `<p class="g-note muted">Play today's Daily to score for your team.</p>`}`;
     }
   } catch { /* offline */ }
@@ -1565,7 +1565,7 @@ async function initServiceWorker() {
 }
 
 function notifyStreak(streak) {
-  const body = `Your ${streak}-day streak ends at midnight UTC — play today's Daily to keep it alive.`;
+  const body = `Your ${streak}-day streak ends at midnight UTC. Play today's Daily to keep it alive.`;
   const opts = { body, icon: "/static/icon-180.png", badge: "/static/icon-180.png", tag: "streak" };
   try {
     if (swReg && swReg.showNotification) swReg.showNotification("GridMaster", opts);
@@ -1583,7 +1583,7 @@ function scheduleStreakReminder() {
   try {
     swReg.showNotification("GridMaster", {
       tag: "streak-scheduled", icon: "/static/icon-180.png",
-      body: "Don't lose your streak — today's Daily is waiting.",
+      body: "Don't lose your streak: today's Daily is waiting.",
       showTrigger: new window.TimestampTrigger(target),
     });
   } catch { /* triggers unsupported -> on-open reminder only */ }
@@ -1609,7 +1609,7 @@ async function toggleReminder() {
     if (perm !== "granted") perm = await Notification.requestPermission();
     if (perm === "granted") {
       localStorage.setItem(REMIND_KEY, "1");
-      toast("Streak reminders on — we'll nudge you before midnight UTC.");
+      toast("Streak reminders on. We'll nudge you before midnight UTC.");
       scheduleStreakReminder();
     } else {
       toast("Allow notifications in your browser to enable reminders.");
@@ -1738,7 +1738,7 @@ const Auth = (() => {
       evaluateAchievements();  // "Contract Signed" + any points-based unlocks from the merge
       close();
       toast(body.claimed_events
-        ? `Signed in as ${body.username} — ${body.claimed_events} guest result${body.claimed_events === 1 ? "" : "s"} saved to your account.`
+        ? `Signed in as ${body.username}. ${body.claimed_events} guest result${body.claimed_events === 1 ? "" : "s"} saved to your account.`
         : `Signed in as ${body.username}.`);
       renderProfile();
       renderGarage();
@@ -1834,9 +1834,9 @@ const TeamPicker = (() => {
     const lead = leader
       ? ` <strong>${escapeHtml((TEAMS[leader.team] || {}).name || leader.team)}</strong> ` +
         `lead the Constructors' Championship with ${leader.points.toLocaleString()} pts.`
-      : " No team has scored yet — be the first to put points on the board.";
+      : " No team has scored yet. Be the first to put points on the board.";
     return `${players} already picked a side.${lead} Every question you answer adds your ` +
-           `score to your team's tally — choose yours:`;
+           `score to your team's tally. Choose yours:`;
   }
 
   function cardFooter(key) {
@@ -2160,10 +2160,10 @@ const DataCheck = (() => {
         <td>${esc(r.answer_kind)}</td>
         <td>${esc((r.category || "").replace(/_/g, " "))}</td>
         <td>${esc(r.game_mode.replace("_", "-"))}</td>
-        <td class="num">${r.era_year ?? "—"}</td>
+        <td class="num">${r.era_year ?? "–"}</td>
         <td><button class="dt-flag-btn ${r.flagged ? "on" : ""}"
               data-q="${esc(r.question_string)}"
-              title="${r.flagged ? "Flagged — click to clear" : "Flag for review"}"
+              title="${r.flagged ? "Flagged. Click to clear" : "Flag for review"}"
               aria-pressed="${r.flagged}">${Icons.svg("flag")}</button></td>
       </tr>`).join("");
     document.querySelectorAll(".data-table th").forEach((th) => {
@@ -2265,7 +2265,7 @@ const SoundToggle = (() => {
     icon.innerHTML = Icons.svg(on ? "volume-2" : "volume-x");
     btn.setAttribute("aria-pressed", String(on));
     btn.classList.toggle("muted", !on);
-    btn.title = on ? "Sound on — click to mute" : "Sound off — click to enable";
+    btn.title = on ? "Sound on. Click to mute" : "Sound off. Click to enable";
   }
   function init() {
     const btn = document.getElementById("sound-toggle");
@@ -2295,7 +2295,7 @@ const ThemeToggle = (() => {
     const light = theme === "light";
     icon.innerHTML = Icons.svg(light ? "sun" : "moon");
     btn.setAttribute("aria-pressed", String(light));
-    btn.title = light ? "Light mode \u2014 click for dark" : "Dark mode \u2014 click for light";
+    btn.title = light ? "Light mode. Click for dark" : "Dark mode. Click for light";
   }
   function apply(theme) {
     const root = document.documentElement;
