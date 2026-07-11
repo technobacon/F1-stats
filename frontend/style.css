@@ -242,40 +242,30 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
   background:repeating-linear-gradient(118deg, transparent 0 44px, rgba(255,255,255,.022) 44px 47px);
   -webkit-mask:linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
           mask:linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent); }
-.hero-track { position:absolute; right:-6%; top:50%; transform:translateY(-50%);
-              height:118%; width:auto; z-index:1; opacity:.16; pointer-events:none; }
-.hero-track path { fill:none; stroke:var(--color-primary); stroke-width:3;
-                   stroke-linejoin:round; stroke-linecap:round; vector-effect:non-scaling-stroke; }
-.hero-track-sf { fill:var(--color-primary); }
-@media (max-width:560px) { .hero-track { opacity:.1; right:-20%; } }
-.hero-inner { position:relative; z-index:2; padding:clamp(2.8rem,8vw,5.5rem) 1.5rem clamp(3.4rem,7vw,4.6rem);
+.hero-inner { position:relative; z-index:2; padding:clamp(2.8rem,8vw,5.5rem) 1.5rem clamp(2rem,5vw,3rem);
               text-align:center; }
 
-/* ===================== HERO SCENE ===================== *
- * Original SVG art: an F1 car in the player's livery crossing the finish line
- * at the foot of the hero, trailing speed streaks, over a ground-effect glow
- * in the team accent. Decorative — behind the copy, no pointer events. */
-.hero-scene { position:absolute; left:clamp(-24px,-2vw,0px); bottom:9px; z-index:1;
-              width:min(66%,600px); height:auto; pointer-events:none;
-              filter:drop-shadow(0 10px 18px rgba(0,0,0,.45));
-              animation:hs-drive .9s var(--ease) both; }
-@keyframes hs-drive { from { transform:translateX(-42px); opacity:0; }
-                      to   { transform:none; opacity:1; } }
-.hsc-body { fill:var(--team-livery); stroke:rgba(255,255,255,.14); stroke-width:1; }
-.hsc-sec  { fill:var(--color-secondary); }
-.hsc-dark { fill:#10151c; }
-.hsc-halo { stroke:#5d6878; stroke-width:5; stroke-linecap:round; }
-.hsc-halo-post { fill:#5d6878; }
-.hsc-helmet { fill:#e9eef5; stroke:#0b0e13; stroke-width:1.5; }
-.hsw-tyre { fill:#171b22; stroke:rgba(255,255,255,.10); stroke-width:1.5; }
-.hsw-wall { fill:#262d39; }
-.hsw-rim  { fill:#6b7486; }
-.hs-glow-c { stop-color:var(--color-primary); }
-/* Light theme: white speed streaks vanish on a bright hero — invert them, and
- * give pale liveries (Cadillac white) a readable outline. */
-:root[data-theme="light"] .hs-streaks { filter:invert(1); opacity:.6; }
-:root[data-theme="light"] .hsc-body { stroke:rgba(20,24,32,.28); }
-:root[data-theme="light"] .hero-scene { filter:drop-shadow(0 8px 14px rgba(30,40,55,.25)); }
+/* ===================== HERO TRAILS ===================== *
+ * Abstract hero art: three light-trail ribbons — long-exposure lines through
+ * an apex — in the game's timing palette (team accent, purple sector, green
+ * sector). Full-bleed behind the copy; they draw themselves in on load
+ * (pathLength=1 + dashoffset), which the reduced-motion clamp snaps to done. */
+.hero-trails { position:absolute; inset:0; width:100%; height:100%; z-index:1;
+               pointer-events:none; }
+.ht-trail { fill:none; stroke-linecap:round;
+            stroke-dasharray:1; stroke-dashoffset:1;
+            animation:ht-draw 1.3s var(--ease) forwards; }
+.ht-1 { stroke-width:13; animation-delay:.05s;
+        filter:drop-shadow(0 0 14px color-mix(in srgb, var(--color-primary) 55%, transparent)); }
+.ht-2 { stroke-width:6; animation-delay:.22s;
+        filter:drop-shadow(0 0 10px rgba(177,59,255,.5)); }
+.ht-3 { stroke-width:3;  animation-delay:.38s;
+        filter:drop-shadow(0 0 8px rgba(51,209,122,.45)); }
+@keyframes ht-draw { to { stroke-dashoffset:0; } }
+.ht-accent { stop-color:var(--color-primary); }
+/* Light theme: the light-trails metaphor still works on the bright pit-wall
+ * hero, just quieter. */
+:root[data-theme="light"] .hero-trails { opacity:.5; }
 .hero-eyebrow { letter-spacing:.45em; text-transform:uppercase; font-size:.72rem;
                 color:var(--color-ink); font-weight:700; margin:0 0 .4rem; }
 .hero-title { font-weight:900; font-style:italic; text-transform:uppercase; letter-spacing:.01em;
@@ -777,7 +767,7 @@ body.in-game #next-question { display:block; margin:.2rem auto 0; min-width:240p
   .toast { bottom:calc(4.9rem + env(safe-area-inset-bottom)); }
 
   .hero-title { font-size:clamp(2rem,10vw,3rem); }
-  .hero-scene { width:min(74%,320px); bottom:7px; opacity:.95; }
+  .hero-trails { opacity:.72; }              /* the slice crop magnifies the ribbons */
   .odometer { font-size:2.8rem; } .summary-score { font-size:3rem; }
   .arcade-card { padding:1.1rem .75rem; } .arcade-card .name { font-size:1rem; }
   .btn-primary, .btn-secondary, .btn-ghost { padding:.8rem 1.2rem; }
