@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=29" />
+  <link rel="stylesheet" href="/static/style.css?v=30" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -154,6 +154,66 @@
                Populated by renderStreakBanner(); hidden when there's no streak. -->
           <button class="streak-banner hidden" id="streak-banner" data-view="quiz" data-mode="daily"></button>
         </div>
+        <!-- Hero scene (original art): a modern-silhouette F1 car in the
+             player's livery crossing the finish line at the foot of the hero,
+             trailing speed streaks, with a ground-effect glow in the team
+             accent. Pure SVG — no photo assets, re-themes live per team. -->
+        <svg class="hero-scene" viewBox="0 0 560 120" aria-hidden="true" preserveAspectRatio="xMidYMax meet">
+          <defs>
+            <linearGradient id="hs-streak" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+              <stop offset="1" stop-color="#fff" stop-opacity=".22"/>
+            </linearGradient>
+            <radialGradient id="hs-glow" cx=".5" cy=".5" r=".5">
+              <stop offset="0" class="hs-glow-c" stop-opacity=".6"/>
+              <stop offset="1" class="hs-glow-c" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <!-- ground-effect glow under the floor -->
+          <ellipse class="hs-glow" cx="330" cy="103" rx="220" ry="17" fill="url(#hs-glow)"/>
+          <!-- speed streaks trailing off the tail -->
+          <g class="hs-streaks">
+            <rect x="0"  y="38" width="150" height="3.5" rx="1.75" fill="url(#hs-streak)"/>
+            <rect x="24" y="58" width="196" height="4"   rx="2"    fill="url(#hs-streak)"/>
+            <rect x="0"  y="78" width="130" height="3.5" rx="1.75" fill="url(#hs-streak)"/>
+          </g>
+          <g class="hs-car">
+            <!-- rear wing: endplate, main plane, beam wing, pylon -->
+            <path class="hsc-dark" d="M196 24 L204 24 L200 78 L192 78 Z"/>
+            <rect class="hsc-body" x="160" y="26" width="46" height="8" rx="3"/>
+            <rect class="hsc-sec"  x="163" y="42" width="40" height="5" rx="2.5"/>
+            <rect class="hsc-dark" x="184" y="34" width="6"  height="46" rx="2"/>
+            <!-- engine cover + shark fin sweeping to the cockpit -->
+            <path class="hsc-body" d="M190 76 C196 46 216 38 252 40 L288 44
+                     C296 44 300 48 306 52 L322 60 L240 78 Z"/>
+            <path class="hsc-sec"  d="M214 40 L252 40 L252 46 L210 46 Z"/>
+            <!-- floor + sidepod + nose running to the tip -->
+            <path class="hsc-body" d="M208 92 L216 66 C238 60 268 58 300 60 L344 62
+                     C372 62 406 66 428 74 L494 84 C500 85 501 90 495 92
+                     L468 96 L232 96 C216 96 208 96 208 92 Z"/>
+            <!-- cockpit opening + halo -->
+            <path class="hsc-dark" d="M296 56 C300 46 316 44 324 50 L316 60 Z"/>
+            <path class="hsc-halo" d="M294 58 C302 42 326 40 336 52" fill="none"/>
+            <rect class="hsc-halo-post" x="316" y="46" width="4" height="14" rx="2"/>
+            <circle class="hsc-helmet" cx="312" cy="52" r="7"/>
+            <!-- front wing stack, nose pillar + endplate -->
+            <rect class="hsc-body" x="478" y="88" width="60" height="5" rx="2.5"/>
+            <rect class="hsc-sec"  x="486" y="81" width="48" height="4" rx="2"/>
+            <rect class="hsc-dark" x="504" y="82" width="7"  height="8" rx="1.5"/>
+            <path class="hsc-dark" d="M534 76 L540 76 L540 94 L534 94 Z"/>
+            <!-- wheels: tyre, sidewall ring, rim -->
+            <g class="hs-wheel">
+              <circle class="hsw-tyre" cx="248" cy="88" r="24"/>
+              <circle class="hsw-wall" cx="248" cy="88" r="15"/>
+              <circle class="hsw-rim"  cx="248" cy="88" r="9"/>
+            </g>
+            <g class="hs-wheel">
+              <circle class="hsw-tyre" cx="452" cy="88" r="24"/>
+              <circle class="hsw-wall" cx="452" cy="88" r="15"/>
+              <circle class="hsw-rim"  cx="452" cy="88" r="9"/>
+            </g>
+          </g>
+        </svg>
         <div class="hero-checkers" aria-hidden="true"></div>
       </div>
       </div><!-- /home-top -->
@@ -754,8 +814,8 @@
   </div>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-  <script src="/static/icons.js?v=29"></script>
-  <script src="/static/sound.js?v=29"></script>
-  <script src="/static/app.js?v=29"></script>
+  <script src="/static/icons.js?v=30"></script>
+  <script src="/static/sound.js?v=30"></script>
+  <script src="/static/app.js?v=30"></script>
 </body>
 </html>
