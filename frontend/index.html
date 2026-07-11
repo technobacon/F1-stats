@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=28" />
+  <link rel="stylesheet" href="/static/style.css?v=29" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -68,12 +68,19 @@
       </span><span class="brand-word">GRID<span class="bw-accent">MASTER</span></span>
     </a>
 
+    <!-- Primary nav: inline pills on desktop; on phones it becomes a fixed
+         bottom tab bar (thumb reach) with icons — see the mobile media block. -->
     <nav class="modes" id="modes">
-      <button class="mode-tab active" data-view="home">Home</button>
-      <button class="mode-tab" data-view="quiz" data-mode="daily">Daily</button>
-      <button class="mode-tab" data-view="quiz" data-mode="free_practice">Free Practice</button>
-      <button class="mode-tab" data-view="arcade">Arcade</button>
-      <button class="mode-tab" data-view="profile">Profile</button>
+      <button class="mode-tab active" data-view="home">
+        <span class="mt-ic" data-icon="home" aria-hidden="true"></span><span class="mt-label">Home</span></button>
+      <button class="mode-tab" data-view="quiz" data-mode="daily">
+        <span class="mt-ic" data-icon="flag" aria-hidden="true"></span><span class="mt-label">Daily</span></button>
+      <button class="mode-tab" data-view="quiz" data-mode="free_practice">
+        <span class="mt-ic" data-icon="tyre" aria-hidden="true"></span><span class="mt-label"><span class="mt-long">Free </span>Practice</span></button>
+      <button class="mode-tab" data-view="arcade">
+        <span class="mt-ic" data-icon="zap" aria-hidden="true"></span><span class="mt-label">Arcade</span></button>
+      <button class="mode-tab" data-view="profile">
+        <span class="mt-ic" data-icon="user" aria-hidden="true"></span><span class="mt-label">Profile</span></button>
     </nav>
 
     <div class="hud-profile">
@@ -747,8 +754,8 @@
   </div>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-  <script src="/static/icons.js?v=28"></script>
-  <script src="/static/sound.js?v=28"></script>
-  <script src="/static/app.js?v=28"></script>
+  <script src="/static/icons.js?v=29"></script>
+  <script src="/static/sound.js?v=29"></script>
+  <script src="/static/app.js?v=29"></script>
 </body>
 </html>
