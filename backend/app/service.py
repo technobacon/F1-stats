@@ -181,6 +181,10 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     # golden eras) while still surfacing older questions occasionally.
     weights = [_era_weight(row["era_year"]) for row in pool]
     rows = _weighted_sample(rng, pool, weights, count)
+    # Difficulty ramp (design review G4): serve the set easiest -> hardest, so
+    # every session opens with a confidence-builder and closes on a final-lap
+    # question. Deterministic tie-break keeps the per-period order stable.
+    rows.sort(key=lambda r: (r["difficulty_weight"], r["id"]))
 
     questions = []
     for row in rows:

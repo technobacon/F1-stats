@@ -182,7 +182,10 @@ a { color:inherit; text-decoration:none; }
 .hud-brand { display:flex; align-items:center; gap:.45rem; font-weight:900; font-style:italic;
              letter-spacing:.02em; cursor:pointer; }
 .brand-mark { display:inline-flex; align-items:center; justify-content:center; }
-.brand-logo { width:1.6rem; height:1.6rem; display:block; color:var(--color-ink); }
+/* The Chequered G: base cells in the neutral text colour; the claimed cell
+ * (the G's crossbar tip) burns in the team accent. */
+.brand-logo { width:1.6rem; height:1.6rem; display:block; color:var(--text); }
+.brand-logo .bg-claim { fill:var(--color-primary); }
 .brand-word { font-size:1.02rem; letter-spacing:.04em; }
 .bw-accent { color:var(--color-ink); }
 

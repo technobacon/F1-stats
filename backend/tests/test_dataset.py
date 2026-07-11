@@ -129,3 +129,18 @@ def test_arcade_pairs_are_close_calls():
     # The sampler falls back to the closest pair it found, so the vast majority
     # (here, all) of matchups should clear the gap on the real snapshot.
     assert close >= trials * 0.9
+
+
+def test_daily_serves_a_difficulty_ramp():
+    """The Daily plays easiest -> hardest (design review G4): the served order
+    is non-decreasing in difficulty_weight, so the set opens gently and closes
+    on a final-lap question."""
+    if not seed.DATASET_PATH.exists():
+        pytest.skip("committed dataset not present")
+    conn = db.connect(":memory:")
+    seed.load_dataset(conn)
+    for period in ("2026-07-01", "2026-07-02", "2026-07-03"):
+        served = service.build_quiz(conn, "daily", period=period)["questions"]
+        weights = [q["difficulty_weight"] for q in served]
+        assert weights == sorted(weights), weights
+    conn.close()
