@@ -18,7 +18,7 @@ this describes the code as it actually runs.
 > Championship**, server-side **streaks**, free **durable storage** (Litestream),
 > and first-party **analytics** — see §9–§11. A feel-good **sound layer** and a
 > first-run **team-selection onboarding** prompt round out the client (§12).
-> **139 tests pass.**
+> **167 tests pass (~20s).**
 
 ---
 
@@ -296,7 +296,7 @@ front rows, DNFs), again computed through the same validation engine.
 ```bash
 cd backend
 F1_DATA_SOURCE=dataset ./run.sh   # install, load the committed bank, serve :8000
-python -m pytest -q               # 139 tests (offline)
+python -m pytest -q               # 167 tests (offline, ~20s)
 ```
 
 Test coverage of note:

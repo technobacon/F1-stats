@@ -102,7 +102,9 @@ The folder is self-contained and deploys independently of the F1 app.
 
 Production env: `OSRS_DATA_SOURCE=dataset`, `OSRS_DEV_TOOLS=0` (turns off the
 answer-revealing proofreading endpoint), `OSRS_ANALYTICS_TOKEN` (optional, gates
-the `/analytics` dashboard).
+the `/analytics` dashboard), `OSRS_SLIDER_SALT` (optional; the server-side
+secret seeding derived slider bounds — auto-generated and persisted in `app_kv`
+when unset).
 
 ### Free durable accounts
 

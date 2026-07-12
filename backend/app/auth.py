@@ -619,11 +619,12 @@ def team_detail(conn: sqlite3.Connection, user_id: str, team: str, period: str =
         "ORDER BY points DESC, u.username ASC",
         (team, *base_params),
     ).fetchall()
-    leaders = [
-        {"rank": i + 1, "username": r["username"], "points": int(r["points"] or 0)}
-        for i, r in enumerate(rows)
-    ]
-    me = next((e for e in leaders if rows[e["rank"] - 1]["uid"] == user_id), None)
+    leaders, me = [], None
+    for i, r in enumerate(rows):
+        entry = {"rank": i + 1, "username": r["username"], "points": int(r["points"] or 0)}
+        if r["uid"] == user_id:
+            me = entry
+        leaders.append(entry)
     return {
         "team": team,
         "team_rank": team_rank,

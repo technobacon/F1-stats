@@ -209,6 +209,29 @@ def _slider_bounds(answer: float, answer_kind: str = "count",
     return 0.0, float(upper)
 
 
+def _provision_question(row: sqlite3.Row, game_mode: str, salt: str) -> dict:
+    """Mint a tracking token for one question row and build its client-facing
+    payload. The verified answer goes into the server-side token store, NEVER
+    into the payload; slider bounds prefer the row's explicit display bounds and
+    otherwise fall back to the salted non-revealing band."""
+    token = secrets.token_urlsafe(16)
+    _TOKEN_STORE[token] = (row["id"], row["verified_answer"], game_mode, time.monotonic())
+    if row["display_min"] is not None and row["display_max"] is not None:
+        smin, smax = row["display_min"], row["display_max"]
+    else:
+        smin, smax = _slider_bounds(row["verified_answer"], row["answer_kind"],
+                                    row["question_string"], salt)
+    return {
+        "tracking_token": token,
+        "question_text": row["question_string"],
+        "difficulty_weight": row["difficulty_weight"],
+        "answer_kind": row["answer_kind"],
+        "category": row["category"] or "",
+        "slider_min": smin,
+        "slider_max": smax,
+    }
+
+
 def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str | None = None) -> dict:
     """Provision a quiz session: deterministically pick verified questions for the
     given mode + period, mint tracking tokens.
@@ -237,25 +260,7 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     weights = [_era_weight(row["era_year"]) for row in pool]
     rows = _weighted_sample(rng, pool, weights, count)
 
-    questions = []
-    for row in rows:
-        token = secrets.token_urlsafe(16)
-        _TOKEN_STORE[token] = (row["id"], row["verified_answer"], game_mode, time.monotonic())
-        # Prefer explicit display bounds (year/percentage); else a non-revealing band.
-        if row["display_min"] is not None and row["display_max"] is not None:
-            smin, smax = row["display_min"], row["display_max"]
-        else:
-            smin, smax = _slider_bounds(row["verified_answer"], row["answer_kind"],
-                                        row["question_string"], salt)
-        questions.append({
-            "tracking_token": token,
-            "question_text": row["question_string"],
-            "difficulty_weight": row["difficulty_weight"],
-            "answer_kind": row["answer_kind"],
-            "category": row["category"] or "",
-            "slider_min": smin,
-            "slider_max": smax,
-        })
+    questions = [_provision_question(row, game_mode, salt) for row in rows]
     return {"game_mode": game_mode, "questions": questions}
 
 
@@ -284,25 +289,9 @@ def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None 
         return None
 
     row = rng.choice(pool)
-
-    token = secrets.token_urlsafe(16)
-    _TOKEN_STORE[token] = (row["id"], row["verified_answer"], FREE_PRACTICE_MODE, time.monotonic())
-    if row["display_min"] is not None and row["display_max"] is not None:
-        smin, smax = row["display_min"], row["display_max"]
-    else:
-        smin, smax = _slider_bounds(row["verified_answer"], row["answer_kind"],
-                                    row["question_string"], _get_slider_salt(conn))
     return {
         "game_mode": FREE_PRACTICE_MODE,
-        "question": {
-            "tracking_token": token,
-            "question_text": row["question_string"],
-            "difficulty_weight": row["difficulty_weight"],
-            "answer_kind": row["answer_kind"],
-            "category": row["category"] or "",
-            "slider_min": smin,
-            "slider_max": smax,
-        },
+        "question": _provision_question(row, FREE_PRACTICE_MODE, _get_slider_salt(conn)),
     }
 
 

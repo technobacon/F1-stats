@@ -99,7 +99,7 @@ Seed complete. Committed 6 questions, rejected 1.
 
 ```bash
 cd backend
-python3 -m pytest -q     # 139 tests: scoring, validation, trust boundary, all modes, accounts, leaderboards, analytics, ETL
+python3 -m pytest -q     # 167 tests (~20s): scoring, validation, trust boundary, all modes, accounts, leaderboards, analytics, ETL, security
 ```
 
 ### Install on your phone (PWA)
@@ -151,7 +151,7 @@ needs the same change; the test suites on both sides are the safety net.
 |---|---|---|
 | `GET`  | `/api/v1/health` | liveness + active question count |
 | `GET`  | `/api/v1/quiz/{mode}` | `daily` (6) from the general bank; tracking tokens, **no answers** |
-| `GET`  | `/api/v1/practice/question` | one **random** Free Practice question; unlimited, non-competitive, **no answers** |
+| `GET`  | `/api/v1/practice/question` | one **random** Free Practice question; non-competitive, **no answers**; rate-limited per client (60 / 10 min) so the bank can't be script-farmed |
 | `POST` | `/api/v1/quiz/verify` | `{tracking_token, guess, anon_id?}` → server-side score; also **records** the scored result (to the signed-in user, or to `anon_id` for a guest) — **except Free Practice**, which is never recorded |
 | `GET`  | `/api/v1/arcade/pair` | over/under matchup (non-competitive v1) |
 | `POST` | `/api/v1/auth/register` | `{username, password, anon_id?}` → session token + server stats; claims guest events |
@@ -253,6 +253,22 @@ boundary.
   conversion rates, **D1 / D7 retention**, **mode popularity**, and **account
   growth** over a 7/14/30-day window.
 - Rows older than 180 days are pruned on boot to bound growth.
+
+### Security hardening
+
+Beyond the three core invariants, the service ships with defense-in-depth:
+
+- **Salted slider bounds** — derived slider bands are seeded with a server-side
+  secret (`F1_SLIDER_SALT`, or a random value generated once and persisted in
+  the `app_kv` table), so the public bounds algorithm can't be re-run client-side
+  to invert a bound back to the answer.
+- **Free Practice throttle** — 60 question draws per 10 minutes per client,
+  server-side, so the answer key can't be scripted out of the practice oracle.
+- **Security headers** — a strict CSP (`script-src 'self'`, no inline scripts),
+  `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `X-Frame-Options`.
+- **Auth hygiene** — PBKDF2 passwords with byte-length caps enforced identically
+  at registration and login, a login brute-force limiter, and bulk pruning of
+  expired sessions at boot.
 
 ## Implemented systems
 

@@ -143,6 +143,7 @@ FastAPI (main.py)
 | `F1_DEV_TOOLS` | `1` (set to `0` in prod) | `/api/v1/dev/questions` answer-key endpoint on/off |
 | `F1_ANALYTICS_TOKEN` | unset | Gates the `/analytics` dashboard + summary API; unset = disabled |
 | `F1_ETL_START_YEAR` / `F1_ETL_END_YEAR` | `2004`/current (CI uses `1950`) | ETL ingest span |
+| `F1_SLIDER_SALT` | unset (auto-generated, persisted in `app_kv`) | Server-side secret seeding the derived slider bounds so they can't be inverted client-side |
 | `PORT` | `8000` | Server port (Render injects it) |
 | `LITESTREAM_REPLICA_BUCKET` | unset | Object-storage bucket; **unset = ephemeral DB** |
 | `LITESTREAM_REPLICA_ENDPOINT` / `_REGION` / `_PATH` | — / — / `f1stats` | S3-compatible target |

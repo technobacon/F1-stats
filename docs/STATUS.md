@@ -1,12 +1,35 @@
 # Project status & roadmap
 
-_Last updated: 2026-06-27_
+_Last updated: 2026-07-12_
 
 A snapshot of where **GridMaster** is, how it fits together, and what could
 come next. New here? Read [`HANDOFF.md`](./HANDOFF.md) first — it's the full
 engineering handoff. For question design see [`question-types.md`](./question-types.md).
 
-> **Latest work (professional-polish passes):** six back-to-back design
+> **Latest work (security & robustness pass + refactor):** a fresh-eyes code
+> review, fixed and shipped. **(1) Trust boundary** — derived slider bounds are
+> now seeded with a **server-side secret** (`F1_SLIDER_SALT` or a persisted
+> random salt in the new `app_kv` table), closing an exploit where the public
+> bounds algorithm could be inverted to recover the answer within a few percent;
+> **Free Practice is rate-limited server-side** (60 draws / 10 min / client) so
+> the bank can't be script-farmed for answers. **(2) Auth** — password length
+> caps are enforced in **bytes, identically at registration and login** (a
+> multibyte password >1024 bytes could previously register but never log in);
+> expired sessions are bulk-pruned at boot. **(3) Hardening** — a security-headers
+> middleware (strict CSP with `script-src 'self'`, nosniff, Referrer-Policy,
+> X-Frame-Options); the analytics dashboard's inline script moved to
+> `frontend/analytics.js` to comply. **(4) Plumbing** — one request-scoped DB
+> connection shared via a FastAPI dependency (`main.db_conn`) replaces the
+> per-endpoint open/close boilerplate *and* the per-request schema DDL;
+> score-recording failures are logged instead of silently swallowed; test runs
+> no longer dirty the working tree (`dataset_meta.json` stamps next to the
+> export target). **(5) Tests** — the suite runs in ~20s (was ~2.5 min) via a
+> once-per-session seeded template DB + test-only PBKDF2 rounds, with new
+> regression tests for the salt, password symmetry, throttle, headers and
+> session pruning. The same pass was ported to the `scapemaster/` fork (the
+> fork policy is now documented in the root README).
+>
+> **Earlier (professional-polish passes):** six back-to-back design
 > passes to shed the "AI-generated" tells. **(1) Visual identity** — a
 > documented `:root` **design-token** system (neutral ramp, type scale, radii,
 > elevation, motion), a real **type pairing** (Titillium Web for UI + headings,
@@ -147,11 +170,13 @@ Live deploy target: **Render** (free tier), auto-deploying the `main` branch.
   (`/api/v1/teams/overview`).
 
 ### Quality
-- **148 tests passing** (`cd backend && python3 -m pytest -q`): scoring,
+- **167 tests passing in ~20s** (`cd backend && python3 -m pytest -q`): scoring,
   validation (incl. every metric/aggregation), API trust boundary, all modes,
   accounts/leaderboards/streaks, the personal rank / team-stake / play-history
   garage endpoints, the replay-proof dedup, analytics ingest + reporting + token
-  gate, ETL ingestion, and the dataset export→load→serve round-trip.
+  gate, ETL ingestion, the dataset export→load→serve round-trip, and the
+  security regressions (salted bounds, password byte-caps, practice throttle,
+  security headers, session pruning).
 
 ---
 
@@ -205,7 +230,8 @@ cd backend && python3 -m pytest -q
 
 Key env vars: `F1_DATA_SOURCE` (`dataset` | `jolpica` | `synthetic`),
 `F1_DB_PATH`, `F1_ETL_START_YEAR` / `F1_ETL_END_YEAR`, `F1_DEV_TOOLS` (`0` in
-prod), `F1_ANALYTICS_TOKEN`, and the `LITESTREAM_*` replica vars. Full table in
+prod), `F1_ANALYTICS_TOKEN`, `F1_SLIDER_SALT` (optional; else auto-generated and
+persisted in `app_kv`), and the `LITESTREAM_*` replica vars. Full table in
 [`HANDOFF.md`](./HANDOFF.md) §6.
 
 ---

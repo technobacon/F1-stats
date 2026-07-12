@@ -27,9 +27,11 @@ from __future__ import annotations
 
 import logging
 import os
+import sqlite3
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Annotated
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
@@ -132,13 +134,28 @@ async def security_headers(request: Request, call_next):
     return response
 
 
-def get_conn():
-    # One connection per request keeps the prototype simple; production swaps in a
-    # pooled Postgres session. Schema creation/migration happens once at boot
-    # (lifespan) — and in tests via the seed fixtures — NOT here: running the DDL
-    # script per request added write traffic that competes with score writes
-    # under WAL.
-    return db.connect()
+def db_conn():
+    """Request-scoped SQLite connection: opened once per request, shared by every
+    dependency and endpoint that declares it (FastAPI caches a dependency's value
+    within a request), closed when the response is done. Production swaps in a
+    pooled Postgres session. Schema creation/migration happens once at boot
+    (lifespan) — and in tests via the seed fixtures — NOT here: running the DDL
+    script per request added write traffic that competes with score writes
+    under WAL."""
+    conn = db.connect()
+    try:
+        yield conn
+    finally:
+        conn.close()
+
+
+Conn = Annotated[sqlite3.Connection, Depends(db_conn)]
+
+
+def _normalize_period(period: str) -> str:
+    """Clamp a leaderboard window to a known value ('all' | 'daily' | 'weekly');
+    anything else falls back to all-time."""
+    return period if period in ("all", "daily", "weekly") else "all"
 
 
 def _bearer(authorization: str | None) -> str | None:
@@ -149,27 +166,20 @@ def _bearer(authorization: str | None) -> str | None:
     return token.strip() if scheme.lower() == "bearer" and token else None
 
 
-def require_user(authorization: str | None = Header(default=None)) -> dict:
-    """FastAPI dependency: resolve the bearer token to a user or 401."""
-    conn = get_conn()
-    try:
-        user = auth.session_user(conn, _bearer(authorization))
-    finally:
-        conn.close()
+def require_user(conn: Conn, authorization: str | None = Header(default=None)) -> dict:
+    """FastAPI dependency: resolve the bearer token to a user or 401. Shares the
+    request's connection with the endpoint (one connection per request)."""
+    user = auth.session_user(conn, _bearer(authorization))
     if user is None:
         raise HTTPException(401, "Not signed in (missing or expired session).")
     return user
 
 
 @app.get("/api/v1/health")
-def health():
-    conn = get_conn()
-    try:
-        count = conn.execute(
-            "SELECT COUNT(*) AS n FROM production_trivia_questions WHERE is_active = 1"
-        ).fetchone()["n"]
-    finally:
-        conn.close()
+def health(conn: Conn):
+    count = conn.execute(
+        "SELECT COUNT(*) AS n FROM production_trivia_questions WHERE is_active = 1"
+    ).fetchone()["n"]
     return {"status": "ok", "active_questions": count}
 
 
@@ -186,14 +196,10 @@ def data_status():
 
 
 @app.get("/api/v1/quiz/{mode}", response_model=DailyQuizResponse)
-def quiz(mode: str):
+def quiz(conn: Conn, mode: str):
     if mode not in service.MODE_QUESTION_COUNT:
         raise HTTPException(404, f"Unknown game mode '{mode}'.")
-    conn = get_conn()
-    try:
-        payload = service.build_quiz(conn, game_mode=mode)
-    finally:
-        conn.close()
+    payload = service.build_quiz(conn, game_mode=mode)
     if not payload["questions"]:
         raise HTTPException(503, "No questions provisioned. Run the seed pipeline.")
     return payload
@@ -241,24 +247,20 @@ def reset_practice_limits() -> None:
 
 
 @app.get("/api/v1/practice/question", response_model=PracticeQuestionResponse)
-def practice_question(request: Request):
+def practice_question(conn: Conn, request: Request):
     """Serve one random Training Grounds question. The mode is unlimited and its
     scores are never recorded (see quiz_verify), so there is no daily cap and no
     deterministic per-period seeding — every request is a fresh random draw.
     Rate-limited per client so the bank can't be scripted-farmed for answers."""
     _check_practice_allowed(request.client.host if request.client else "unknown")
-    conn = get_conn()
-    try:
-        payload = service.build_practice_question(conn)
-    finally:
-        conn.close()
+    payload = service.build_practice_question(conn)
     if payload is None:
         raise HTTPException(503, "No questions provisioned. Run the seed pipeline.")
     return payload
 
 
 @app.post("/api/v1/quiz/verify", response_model=VerifyResponse)
-def quiz_verify(req: VerifyRequest, authorization: str | None = Header(default=None)):
+def quiz_verify(conn: Conn, req: VerifyRequest, authorization: str | None = Header(default=None)):
     result = service.verify_guess(req.tracking_token, req.guess)
     if result is None:
         raise HTTPException(404, "Unknown or expired tracking token.")
@@ -271,7 +273,6 @@ def quiz_verify(req: VerifyRequest, authorization: str | None = Header(default=N
     meta = service.token_meta(req.tracking_token)
     if meta is not None and meta[1] != service.FREE_PRACTICE_MODE:
         question_id, game_mode = meta
-        conn = get_conn()
         try:
             user = auth.session_user(conn, _bearer(authorization))
             auth.record_event(
@@ -292,32 +293,26 @@ def quiz_verify(req: VerifyRequest, authorization: str | None = Header(default=N
             # Still best-effort, but a systemic storage failure (every score shown
             # to players silently vanishing from their totals) must be discoverable.
             logger.exception("Failed to record play event for question %s", question_id)
-        finally:
-            conn.close()
     return result
 
 
 # Back-compat alias for the daily-only endpoint shape.
 @app.post("/api/v1/quiz/daily/verify", response_model=VerifyResponse)
-def daily_verify(req: VerifyRequest, authorization: str | None = Header(default=None)):
-    return quiz_verify(req, authorization)
+def daily_verify(conn: Conn, req: VerifyRequest, authorization: str | None = Header(default=None)):
+    return quiz_verify(conn, req, authorization)
 
 
 @app.post("/api/v1/auth/register", response_model=AuthResponse)
-def auth_register(req: RegisterRequest):
-    conn = get_conn()
+def auth_register(conn: Conn, req: RegisterRequest):
     try:
-        try:
-            user = auth.create_user(
-                conn, req.username, req.password, req.selected_god, req.email
-            )
-        except auth.AuthError as exc:
-            raise HTTPException(400, str(exc))
-        claimed = auth.claim_anon_events(conn, req.anon_id, user["id"])
-        token = auth.create_session(conn, user["id"])
-        stats = auth.user_stats(conn, user["id"])
-    finally:
-        conn.close()
+        user = auth.create_user(
+            conn, req.username, req.password, req.selected_god, req.email
+        )
+    except auth.AuthError as exc:
+        raise HTTPException(400, str(exc))
+    claimed = auth.claim_anon_events(conn, req.anon_id, user["id"])
+    token = auth.create_session(conn, user["id"])
+    stats = auth.user_stats(conn, user["id"])
     return {
         "token": token, "username": user["username"],
         "selected_god": user["selected_god"], "stats": stats,
@@ -326,7 +321,7 @@ def auth_register(req: RegisterRequest):
 
 
 @app.post("/api/v1/auth/login", response_model=AuthResponse)
-def auth_login(req: LoginRequest):
+def auth_login(conn: Conn, req: LoginRequest):
     # Brute-force guard: too many recent failures for this username -> 429.
     try:
         auth.check_login_allowed(req.username)
@@ -334,18 +329,14 @@ def auth_login(req: LoginRequest):
         raise HTTPException(
             429, str(exc), headers={"Retry-After": str(exc.retry_after)}
         )
-    conn = get_conn()
-    try:
-        user = auth.authenticate(conn, req.username, req.password)
-        if user is None:
-            auth.note_failed_login(req.username)
-            raise HTTPException(401, "Incorrect username or password.")
-        auth.clear_failed_logins(req.username)
-        claimed = auth.claim_anon_events(conn, req.anon_id, user["id"])
-        token = auth.create_session(conn, user["id"])
-        stats = auth.user_stats(conn, user["id"])
-    finally:
-        conn.close()
+    user = auth.authenticate(conn, req.username, req.password)
+    if user is None:
+        auth.note_failed_login(req.username)
+        raise HTTPException(401, "Incorrect username or password.")
+    auth.clear_failed_logins(req.username)
+    claimed = auth.claim_anon_events(conn, req.anon_id, user["id"])
+    token = auth.create_session(conn, user["id"])
+    stats = auth.user_stats(conn, user["id"])
     return {
         "token": token, "username": user["username"],
         "selected_god": user["selected_god"], "stats": stats,
@@ -354,121 +345,81 @@ def auth_login(req: LoginRequest):
 
 
 @app.post("/api/v1/auth/logout")
-def auth_logout(authorization: str | None = Header(default=None)):
-    conn = get_conn()
-    try:
-        auth.delete_session(conn, _bearer(authorization))
-    finally:
-        conn.close()
+def auth_logout(conn: Conn, authorization: str | None = Header(default=None)):
+    auth.delete_session(conn, _bearer(authorization))
     return {"status": "ok"}
 
 
 @app.get("/api/v1/auth/me", response_model=MeResponse)
-def auth_me(user: dict = Depends(require_user)):
-    conn = get_conn()
-    try:
-        stats = auth.user_stats(conn, user["id"])
-    finally:
-        conn.close()
+def auth_me(conn: Conn, user: dict = Depends(require_user)):
+    stats = auth.user_stats(conn, user["id"])
     return {"username": user["username"], "selected_god": user["selected_god"], "stats": stats}
 
 
 @app.post("/api/v1/sync/claim", response_model=MeResponse)
-def sync_claim(req: ClaimRequest, user: dict = Depends(require_user)):
+def sync_claim(conn: Conn, req: ClaimRequest, user: dict = Depends(require_user)):
     """Merge a guest device's verified events into the signed-in account, then
     return the refreshed server-derived profile."""
-    conn = get_conn()
-    try:
-        auth.claim_anon_events(conn, req.anon_id, user["id"])
-        stats = auth.user_stats(conn, user["id"])
-    finally:
-        conn.close()
+    auth.claim_anon_events(conn, req.anon_id, user["id"])
+    stats = auth.user_stats(conn, user["id"])
     return {"username": user["username"], "selected_god": user["selected_god"], "stats": stats}
 
 
 @app.get("/api/v1/leaderboard", response_model=LeaderboardResponse)
-def leaderboard(limit: int = 20, period: str = "all"):
-    period = period if period in ("all", "daily", "weekly") else "all"
-    conn = get_conn()
-    try:
-        entries = auth.leaderboard(conn, limit=max(1, min(limit, 100)), period=period)
-    finally:
-        conn.close()
+def leaderboard(conn: Conn, limit: int = 20, period: str = "all"):
+    period = _normalize_period(period)
+    entries = auth.leaderboard(conn, limit=max(1, min(limit, 100)), period=period)
     return {"entries": entries, "period": period}
 
 
 @app.get("/api/v1/leaderboard/gods", response_model=GodLeaderboardResponse)
-def god_leaderboard(period: str = "all"):
+def god_leaderboard(conn: Conn, period: str = "all"):
     """God Wars championship — server-verified points by god faction."""
-    period = period if period in ("all", "daily", "weekly") else "all"
-    conn = get_conn()
-    try:
-        entries = auth.god_leaderboard(conn, period=period)
-    finally:
-        conn.close()
+    period = _normalize_period(period)
+    entries = auth.god_leaderboard(conn, period=period)
     return {"entries": entries, "period": period}
 
 
 @app.get("/api/v1/leaderboard/me", response_model=MyRankResponse)
-def leaderboard_me(period: str = "all", user: dict = Depends(require_user)):
+def leaderboard_me(conn: Conn, period: str = "all", user: dict = Depends(require_user)):
     """The signed-in player's own global rank + percentile for a window — the
     personal HiScores card. Movement (▲/▼) is diffed client-side."""
-    period = period if period in ("all", "daily", "weekly") else "all"
-    conn = get_conn()
-    try:
-        data = auth.my_rank(conn, user["id"], period=period)
-    finally:
-        conn.close()
+    period = _normalize_period(period)
+    data = auth.my_rank(conn, user["id"], period=period)
     return {**data, "period": period}
 
 
 @app.get("/api/v1/leaderboard/god", response_model=GodDetailResponse)
-def leaderboard_god(period: str = "all", user: dict = Depends(require_user)):
+def leaderboard_god(conn: Conn, period: str = "all", user: dict = Depends(require_user)):
     """The caller's personal stake in the God Wars championship: their god's
     standing plus a within-faction leaderboard with the caller located."""
-    period = period if period in ("all", "daily", "weekly") else "all"
-    conn = get_conn()
-    try:
-        data = auth.god_detail(conn, user["id"], user["selected_god"], period=period)
-    finally:
-        conn.close()
+    period = _normalize_period(period)
+    data = auth.god_detail(conn, user["id"], user["selected_god"], period=period)
     return {**data, "period": period}
 
 
 @app.get("/api/v1/user/play-history", response_model=PlayHistoryResponse)
-def user_play_history(days: int = 126, user: dict = Depends(require_user)):
+def user_play_history(conn: Conn, days: int = 126, user: dict = Depends(require_user)):
     """Per-day Daily Slayer Task play totals for the signed-in player's streak
     heatmap. Guests fall back to a localStorage history on the client."""
-    conn = get_conn()
-    try:
-        return auth.play_history(conn, user["id"], days=days)
-    finally:
-        conn.close()
+    return auth.play_history(conn, user["id"], days=days)
 
 
 @app.get("/api/v1/gods/overview", response_model=GodOverviewResponse)
-def gods_overview():
+def gods_overview(conn: Conn):
     """First-run god picker snapshot: every god with its registered headcount
     and all-time God Wars points. Public — it shows a newcomer how many players
     back each side and how the war is going before they pledge."""
-    conn = get_conn()
-    try:
-        return auth.god_overview(conn)
-    finally:
-        conn.close()
+    return auth.god_overview(conn)
 
 
 @app.post("/api/v1/profile/god", response_model=MeResponse)
-def set_god(req: SetGodRequest, user: dict = Depends(require_user)):
+def set_god(conn: Conn, req: SetGodRequest, user: dict = Depends(require_user)):
     """Persist the signed-in player's god faction. Cosmetic for the player, but
     it also assigns their points to a side in the God Wars championship, so it
     lives server-side rather than only in localStorage."""
-    conn = get_conn()
-    try:
-        god = auth.set_selected_god(conn, user["id"], req.selected_god)
-        stats = auth.user_stats(conn, user["id"])
-    finally:
-        conn.close()
+    god = auth.set_selected_god(conn, user["id"], req.selected_god)
+    stats = auth.user_stats(conn, user["id"])
     return {"username": user["username"], "selected_god": god, "stats": stats}
 
 
@@ -480,26 +431,22 @@ def require_dev_tools() -> None:
 
 
 @app.get("/api/v1/dev/questions")
-def dev_questions(_: None = Depends(require_dev_tools)):
+def dev_questions(conn: Conn, _: None = Depends(require_dev_tools)):
     """Development proofreading tool: the full active question bank INCLUDING the
     verified answers, so the stats can be eyeballed against the wiki. Each row
     also carries `flagged` — whether a maintainer has marked it for review (see
     POST /api/v1/dev/flag). This intentionally crosses the no-answers-to-the-
     client trust boundary — set OSRS_DEV_TOOLS=0 to switch it off."""
-    conn = get_conn()
-    try:
-        rows = conn.execute(
-            "SELECT q.question_string, q.verified_answer, q.answer_kind, q.category, "
-            "       q.game_mode, q.era_year, q.difficulty_weight, "
-            "       (f.question_string IS NOT NULL) AS flagged "
-            "FROM production_trivia_questions q "
-            "LEFT JOIN dev_flagged_questions f "
-            "       ON f.question_string = q.question_string "
-            "WHERE q.is_active = 1 "
-            "ORDER BY q.category, q.question_string"
-        ).fetchall()
-    finally:
-        conn.close()
+    rows = conn.execute(
+        "SELECT q.question_string, q.verified_answer, q.answer_kind, q.category, "
+        "       q.game_mode, q.era_year, q.difficulty_weight, "
+        "       (f.question_string IS NOT NULL) AS flagged "
+        "FROM production_trivia_questions q "
+        "LEFT JOIN dev_flagged_questions f "
+        "       ON f.question_string = q.question_string "
+        "WHERE q.is_active = 1 "
+        "ORDER BY q.category, q.question_string"
+    ).fetchall()
     questions = [{**dict(r), "flagged": bool(r["flagged"])} for r in rows]
     return {
         "count": len(questions),
@@ -509,69 +456,56 @@ def dev_questions(_: None = Depends(require_dev_tools)):
 
 
 @app.post("/api/v1/dev/flag", response_model=DevFlagResponse)
-def dev_flag(req: DevFlagRequest, _: None = Depends(require_dev_tools)):
+def dev_flag(conn: Conn, req: DevFlagRequest, _: None = Depends(require_dev_tools)):
     """Flag/unflag a question for later review. Idempotent: flagging an
     already-flagged question (or clearing an unflagged one) is a no-op. Stored by
     question_string so a flag survives the boot-time bank reseed."""
-    conn = get_conn()
-    try:
-        exists = conn.execute(
-            "SELECT 1 FROM production_trivia_questions WHERE question_string = ?",
+    exists = conn.execute(
+        "SELECT 1 FROM production_trivia_questions WHERE question_string = ?",
+        (req.question_string,),
+    ).fetchone()
+    if not exists:
+        raise HTTPException(404, "No such question in the active bank.")
+    if req.flagged:
+        conn.execute(
+            "INSERT INTO dev_flagged_questions (question_string, note) VALUES (?, ?) "
+            "ON CONFLICT(question_string) DO UPDATE SET note = excluded.note",
+            (req.question_string, req.note),
+        )
+    else:
+        conn.execute(
+            "DELETE FROM dev_flagged_questions WHERE question_string = ?",
             (req.question_string,),
-        ).fetchone()
-        if not exists:
-            raise HTTPException(404, "No such question in the active bank.")
-        if req.flagged:
-            conn.execute(
-                "INSERT INTO dev_flagged_questions (question_string, note) VALUES (?, ?) "
-                "ON CONFLICT(question_string) DO UPDATE SET note = excluded.note",
-                (req.question_string, req.note),
-            )
-        else:
-            conn.execute(
-                "DELETE FROM dev_flagged_questions WHERE question_string = ?",
-                (req.question_string,),
-            )
-        conn.commit()
-        total = conn.execute("SELECT COUNT(*) AS n FROM dev_flagged_questions").fetchone()["n"]
-    finally:
-        conn.close()
+        )
+    conn.commit()
+    total = conn.execute("SELECT COUNT(*) AS n FROM dev_flagged_questions").fetchone()["n"]
     return {"question_string": req.question_string, "flagged": req.flagged, "flagged_count": total}
 
 
 @app.get("/api/v1/dev/flags")
-def dev_flags(_: None = Depends(require_dev_tools)):
+def dev_flags(conn: Conn, _: None = Depends(require_dev_tools)):
     """The review queue: every flagged question (newest first), for triage or to
     drive a follow-up cull of the committed bank."""
-    conn = get_conn()
-    try:
-        rows = conn.execute(
-            "SELECT question_string, note, created_at "
-            "FROM dev_flagged_questions ORDER BY created_at DESC"
-        ).fetchall()
-    finally:
-        conn.close()
+    rows = conn.execute(
+        "SELECT question_string, note, created_at "
+        "FROM dev_flagged_questions ORDER BY created_at DESC"
+    ).fetchall()
     return {"count": len(rows), "flags": [dict(r) for r in rows]}
 
 
 @app.get("/api/v1/arcade/pair", response_model=ArcadePairResponse)
-def arcade_pair():
-    conn = get_conn()
-    try:
-        return service.build_arcade_pair(conn)
-    finally:
-        conn.close()
+def arcade_pair(conn: Conn):
+    return service.build_arcade_pair(conn)
 
 
 # ── Analytics ────────────────────────────────────────────────────────────────
 @app.post("/api/v1/analytics/collect", response_model=AnalyticsCollectResponse)
-def analytics_collect(batch: AnalyticsBatch, authorization: str | None = Header(default=None)):
+def analytics_collect(conn: Conn, batch: AnalyticsBatch, authorization: str | None = Header(default=None)):
     """Ingest a batch of pseudonymous client events (sendBeacon-friendly). Public
     and best-effort: malformed/unknown events are dropped, the batch is bounded,
     and any failure is swallowed so analytics can never break gameplay. Events are
     attributed to the signed-in user when a bearer token is present, else to the
     guest anon_id only — this is AGGREGATE telemetry, never scoring input."""
-    conn = get_conn()
     try:
         user = auth.session_user(conn, _bearer(authorization))
         stored = analytics.record_events(
@@ -583,8 +517,6 @@ def analytics_collect(batch: AnalyticsBatch, authorization: str | None = Header(
         )
     except Exception:  # noqa: BLE001 — telemetry must never surface an error to the client
         stored = 0
-    finally:
-        conn.close()
     return {"stored": stored}
 
 
@@ -598,15 +530,11 @@ def require_analytics(authorization: str | None = Header(default=None)) -> None:
 
 
 @app.get("/api/v1/analytics/summary")
-def analytics_summary(days: int = 14, _: None = Depends(require_analytics)):
+def analytics_summary(conn: Conn, days: int = 14, _: None = Depends(require_analytics)):
     """Engagement report: DAU/WAU/MAU, the play funnel, D1/D7 retention, mode mix
     and account growth. Token-gated; combines client events with server-verified
     play_events. Returns a plain dict (rich nested shape) by design."""
-    conn = get_conn()
-    try:
-        return analytics.summary(conn, days=days)
-    finally:
-        conn.close()
+    return analytics.summary(conn, days=days)
 
 
 @app.get("/analytics")

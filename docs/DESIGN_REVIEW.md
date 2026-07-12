@@ -9,6 +9,13 @@ Everything here is grounded in the actual code (file references throughout).
 Items already on the [`ENGAGEMENT.md`](./ENGAGEMENT.md) backlog are only repeated
 where this review changes or extends them.
 
+> **Status note (2026-07):** this is a point-in-time review; several findings
+> have since shipped (see [`STATUS.md`](./STATUS.md) for the source of truth).
+> Notably G1/G2 (kind-aware scoring), **G3 (randomized, server-salted slider
+> bounds)**, G4 (the difficulty ramp), and the server-side half of G6 (a
+> practice rate limit that stops scripted answer-farming without punishing
+> humans). Inline notes below mark the shipped items.
+
 **Contents**
 
 1. [What's already working](#1-whats-already-working)
@@ -98,7 +105,12 @@ This also removes the temptation to filter zero-answer questions out of the
 bank (they're often the most interesting: "how many DNFs did the champion
 have?").
 
-### G3 — The slider bounds leak where the answer is *(exploit)*
+### G3 — The slider bounds leak where the answer is *(exploit)* — ✅ shipped
+
+> **Shipped:** `_slider_bounds` now draws the answer's position in the band from
+> an RNG seeded by the question text **plus a server-side secret**
+> (`F1_SLIDER_SALT` / persisted `app_kv` salt), so neither the old 25–50% pin
+> nor a client-side seed reconstruction can recover the answer.
 
 `_slider_bounds` (`backend/app/service.py:133`) doubles an upper bound until it
 exceeds `2 × answer`. Consequence: for every count/points question using
@@ -157,7 +169,11 @@ difficulty (the value gap between the pair shrinks as the streak grows —
 `ARCADE_MAX_GAP` already exists server-side to tune), a run token so the streak
 is server-verified, a daily arcade leaderboard, and a share card.
 
-### G6 — Free Practice's penalty punishes learners, not scouts
+### G6 — Free Practice's penalty punishes learners, not scouts — ◐ partly shipped
+
+> **Shipped (server side):** practice draws are now rate-limited per client
+> (60 / 10 min), which is what actually stops scripted answer-farming; the
+> client-side penalty below remains a UX question.
 
 The 10-second "stewards' penalty" (`startPracticePenalty`) fires on any score
 under 1,000 — but a newcomer who is *honestly bad* at F1 stats scores under

@@ -40,6 +40,12 @@ services:
       # runs); set any strong secret to view metrics at /analytics.
       - key: F1_ANALYTICS_TOKEN
         sync: false
+      # OPTIONAL: server-side secret seeding the derived slider bounds (so they
+      # can't be inverted client-side). Unset -> a random salt is generated once
+      # and persisted in the DB (durable with Litestream below). Set it only if
+      # you run WITHOUT Litestream and want bounds stable across redeploys.
+      - key: F1_SLIDER_SALT
+        sync: false
 
       # ── Free durable accounts (Litestream → S3-compatible object storage) ────
       # The question bank is rebuilt from the committed snapshot on every boot, but
