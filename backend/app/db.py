@@ -29,7 +29,15 @@ DB_PATH = Path(os.environ.get("F1_DB_PATH", Path(__file__).resolve().parent.pare
 def connect(db_path: Path | str | None = None) -> sqlite3.Connection:
     # Resolve DB_PATH at call time (not as a default arg) so tests/hosts can
     # override the module attribute and have it take effect.
-    conn = sqlite3.connect(str(db_path if db_path is not None else DB_PATH))
+    # check_same_thread=False: the request-scoped dependency (main.db_conn) opens
+    # the connection in one threadpool thread, but FastAPI may run the endpoint
+    # (and the generator's cleanup) in a DIFFERENT thread — with the default
+    # check the app 500s intermittently under a real server ("SQLite objects
+    # created in a thread can only be used in that same thread"). Access is
+    # strictly sequential within the request, so cross-thread hand-off is safe.
+    conn = sqlite3.connect(
+        str(db_path if db_path is not None else DB_PATH), check_same_thread=False
+    )
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     # Robustness: one connection-per-request means score writes (verify) can
