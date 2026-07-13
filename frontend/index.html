@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/static/style.css?v=32" />
+  <link rel="stylesheet" href="/static/style.css?v=33" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -247,6 +247,15 @@
         <p id="quiz-desc">Six questions. Guess the stat. The closer you are, the more
            of the 5,000 points you keep.</p>
         <div id="quiz-cap" class="cap-note hidden"></div>
+        <p class="next-daily hidden" id="next-daily-intro"></p>
+        <!-- Free Practice focus: optional era/topic chips that narrow the draw
+             (see /api/v1/practice/question?era=&category=). Rendered by
+             PracticeFocus in app.js; hidden on competitive modes. -->
+        <div class="practice-focus hidden" id="practice-focus">
+          <p class="pf-label">Focus your practice <span class="pf-optional">optional</span></p>
+          <div class="pf-row" id="pf-era" role="group" aria-label="Era focus"></div>
+          <div class="pf-row" id="pf-cat" role="group" aria-label="Topic focus"></div>
+        </div>
         <button class="btn-primary" id="start-quiz">Start Session</button>
         <button class="btn-secondary hidden" id="replay-quiz">Replay (testing)</button>
         <!-- Shown when today's Daily is done: don't dead-end a warmed-up player. -->
@@ -318,7 +327,16 @@
           </div>
         </div>
 
-        <button class="btn-primary" id="submit-guess">Lock In Guess</button>
+        <!-- Pit Wall Radio: once per question the server narrows the band around
+             the answer, at a fixed cost taken off the eventual score. -->
+        <p class="radio-note hidden" id="pit-wall-note" aria-live="polite"></p>
+        <div class="play-actions">
+          <button class="btn-primary" id="submit-guess">Lock In Guess</button>
+          <button type="button" class="btn-ghost pit-wall-btn" id="pit-wall-btn"
+                  title="The pit wall narrows your guess to a range that contains the answer, for 40% of this question's score">
+            <i class="ic" data-icon="radio" aria-hidden="true"></i>
+            <span id="pit-wall-label">Pit Wall (−40%)</span></button>
+        </div>
       </div>
 
       <!-- Score reveal -->
@@ -339,6 +357,7 @@
           <div>Actual: <strong id="reveal-actual">–</strong></div>
         </div>
         <div class="odometer" id="odometer">0</div>
+        <p class="reveal-hint-note hidden" id="reveal-hint-note"></p>
         <p class="reveal-insight hidden" id="reveal-insight"></p>
         <p class="penalty-note hidden" id="practice-penalty"></p>
         <button class="btn-primary" id="next-question">Next</button>
@@ -352,7 +371,9 @@
         <p>points this session</p>
         <div class="summary-grid" id="summary-grid" aria-label="Your result grid"></div>
         <div class="accuracy-row" id="accuracy-row"></div>
+        <p class="summary-field hidden" id="summary-field"></p>
         <div class="summary-streak hidden" id="summary-streak"></div>
+        <p class="next-daily hidden" id="next-daily-summary"></p>
         <p class="summary-insight hidden" id="summary-insight"></p>
         <div class="ad-slot ad-summary" data-ad="summary-display">ad · summary display</div>
         <button class="btn-primary" id="share-result">Share Result</button>
@@ -772,8 +793,8 @@
   </div>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-  <script src="/static/icons.js?v=32"></script>
-  <script src="/static/sound.js?v=32"></script>
-  <script src="/static/app.js?v=32"></script>
+  <script src="/static/icons.js?v=33"></script>
+  <script src="/static/sound.js?v=33"></script>
+  <script src="/static/app.js?v=33"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
 const API = "/api/v1";
 // Build identifier, surfaced in the footer as a real "this is shipped software"
 // signal. Bump alongside the asset version when cutting a release.
-const APP_VERSION = "2026.07.10";
+const APP_VERSION = "2026.07.13";
 // NOTE: these localStorage keys keep the legacy "f1statguesser_" prefix on
 // purpose — the product is now GridMaster, but renaming the keys would orphan
 // every existing player's saved progress, session and guest id. Leave them.
@@ -85,12 +85,88 @@ const MODES = {
   free_practice: {
     title: "Free Practice",
     desc: "Unlimited random questions to sharpen your instincts. Your score is shown here " +
-      "but never saved or ranked; it's pure practice. To keep it fair, scoring under " +
+      "but never saved or ranked; it's pure practice. Narrow the drills to one era or " +
+      "topic below, or leave it open. To keep it fair, scoring under " +
       "1,000 points on a question hands your team a 10-second penalty before the next one " +
       "(an anti-scouting measure, explained when it happens).",
     capKey: null, capLabel: "", slider: true, free: true,
   },
 };
+
+/* ===================== FREE PRACTICE FOCUS ===================== *
+ * Optional training filters: narrow the practice draw to one era and/or one
+ * topic (served by /practice/question?era=&category=). The choice persists
+ * across visits; competitive modes never see it. If a focus matches nothing the
+ * server falls back to the full bank and flags it, and we say so once. */
+const PracticeFocus = (() => {
+  const KEY = "gm_practice_focus";
+  const ERAS = [
+    ["", "All eras"], ["2020s", "2020s"], ["2010s", "2010s"], ["2000s", "2000s"],
+    ["1990s", "1990s"], ["1980s", "1980s"], ["classic", "Pre-1980"],
+  ];
+  const TOPICS = [
+    ["", "All topics"], ["career", "Careers"], ["team", "Teams"],
+    ["single_season", "Single seasons"], ["milestone", "Milestones"],
+    ["qualifying", "Qualifying"], ["venue", "Venues"], ["rates", "Rates"],
+    ["consistency", "Consistency"], ["racecraft", "Racecraft"],
+    ["reliability", "Reliability"], ["feats", "Feats"], ["circuit", "Circuits"],
+    ["head_to_head", "Head-to-head"],
+  ];
+  let focus = { era: "", category: "" };
+  try { focus = { ...focus, ...JSON.parse(localStorage.getItem(KEY) || "{}") }; }
+  catch { /* corrupt save — keep the defaults */ }
+  let missToasted = false;   // "focus matched nothing" — mention it once per focus
+
+  function save() { localStorage.setItem(KEY, JSON.stringify(focus)); }
+
+  function chipRow(el, options, key) {
+    if (!el) return;
+    el.innerHTML = options.map(([value, label]) => {
+      const on = (focus[key] || "") === value;
+      return `<button type="button" class="pf-chip${on ? " on" : ""}"
+                      data-value="${value}" aria-pressed="${on}">${label}</button>`;
+    }).join("");
+    el.querySelectorAll(".pf-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        focus[key] = chip.dataset.value;
+        save();
+        missToasted = false;   // a fresh focus deserves a fresh warning if empty
+        Sound.tick();
+        renderIntro();
+      });
+    });
+  }
+
+  /* Paint (or hide) the intro chips — visible only on the Free Practice intro. */
+  function renderIntro() {
+    const box = document.getElementById("practice-focus");
+    if (!box) return;
+    const isPractice = !!(MODES[currentMode] && MODES[currentMode].free);
+    box.classList.toggle("hidden", !isPractice);
+    if (!isPractice) return;
+    chipRow(document.getElementById("pf-era"), ERAS, "era");
+    chipRow(document.getElementById("pf-cat"), TOPICS, "category");
+  }
+
+  function queryString() {
+    const p = new URLSearchParams();
+    if (focus.era) p.set("era", focus.era);
+    if (focus.category) p.set("category", focus.category);
+    const s = p.toString();
+    return s ? `?${s}` : "";
+  }
+
+  /* Called with each drawn question's focus_matched verdict from the server. */
+  function noteMiss(missed) {
+    if (!missed || missToasted) return;
+    missToasted = true;
+    toast("No questions match that focus yet, so you're drawing from the full bank.");
+  }
+
+  return { renderIntro, queryString, noteMiss,
+    active: () => !!(focus.era || focus.category),
+    snapshot: () => ({ ...focus }) };
+})();
 
 /* Free Practice anti-scouting rule: a question scored under the threshold blocks
  * the Next button for a few seconds. This deters "quiz-scouting" — burning through
@@ -291,6 +367,20 @@ function tickCountdown() {
     rwTimer.textContent = `${pad(d)}:${pad(h)}:${pad(m)}:${pad(s)}`;
     document.getElementById("rw-next-name").textContent = target ? target.text : SEASON_2027_OPENER[0];
   }
+
+  // "Next Daily in …" — the fresh set drops at 00:00 UTC. The same tick drives
+  // the capped intro and the session summary; hidden elements are skipped.
+  const midnight = new Date(now);
+  midnight.setUTCHours(24, 0, 0, 0);
+  const nd = midnight - now;
+  const ndText = `Next Daily in ${pad(Math.floor(nd / 36e5))}:` +
+    `${pad(Math.floor(nd % 36e5 / 6e4))}:${pad(Math.floor(nd % 6e4 / 1e3))}`;
+  for (const id of ["next-daily-intro", "next-daily-summary"]) {
+    const el = document.getElementById(id);
+    if (el && !el.classList.contains("hidden")) {
+      el.innerHTML = `${Icons.svg("clock")} ${ndText}`;
+    }
+  }
 }
 
 /* ===================== NEXT RACE WEEKEND PANEL ===================== */
@@ -435,6 +525,9 @@ let quiz = null, qPos = 0, sessionScore = 0, sessionCloseness = 0;
 let sessionResults = [];
 // Per-question "beat X% of players" percentiles (social proof), when available.
 let sessionInsights = [];
+// Today's-field position ({rank, players, beat_percent}) fetched after a Daily
+// finishes; folded into the summary and the share text.
+let sessionField = null;
 // Purple sectors (guesses within 10%) hit this session — for the Grand Slam etc.
 let sessionPurpleCount = 0;
 let practiceCount = 0, practiceTimer = null; // Free Practice: questions answered + penalty countdown
@@ -470,6 +563,12 @@ function renderQuizIntro() {
   }
   // A capped Daily shouldn't dead-end a warmed-up player: surface the next laps.
   document.getElementById("intro-next")?.classList.toggle("hidden", !isCapped(currentMode));
+  // Free Practice gets its focus chips; a capped Daily gets the live countdown
+  // to tomorrow's set (ticked by tickCountdown).
+  PracticeFocus.renderIntro();
+  document.getElementById("next-daily-intro")?.classList.toggle(
+    "hidden", !(currentMode === "daily" && isCapped(currentMode)));
+  tickCountdown();   // paint the countdown immediately, not on the next beat
 }
 
 document.getElementById("start-quiz").addEventListener("click", () => {
@@ -488,7 +587,7 @@ async function startQuiz() {
     quiz = await res.json();
     track("quiz_start", { mode: currentMode });
     qPos = 0; sessionScore = 0; sessionCloseness = 0; sessionResults = []; sessionInsights = [];
-    sessionPurpleCount = 0;
+    sessionPurpleCount = 0; sessionField = null;
     document.getElementById("q-total").textContent = quiz.questions.length;
     document.getElementById("q-mode-badge").textContent = currentMode.replace("_", "-");
     hide("quiz-intro"); show("quiz-play"); hide("quiz-summary"); hide("quiz-reveal");
@@ -507,9 +606,11 @@ async function startQuiz() {
  * for feedback but is NEVER recorded (the server skips persistence for this mode),
  * so there is no summary, cap or leaderboard write — just a rolling session tally. */
 async function fetchPracticeQuestion() {
-  const res = await fetch(`${API}/practice/question`);
+  const res = await fetch(`${API}/practice/question${PracticeFocus.queryString()}`);
   if (!res.ok) throw new Error(await res.text());
-  return (await res.json()).question;
+  const body = await res.json();
+  PracticeFocus.noteMiss(body.focus_matched === false);
+  return body.question;
 }
 
 async function startFreePractice() {
@@ -520,6 +621,7 @@ async function startFreePractice() {
   try {
     const q = await fetchPracticeQuestion();
     track("practice_start");
+    if (PracticeFocus.active()) track("practice_focus", PracticeFocus.snapshot());
     quiz = { questions: [q], free: true };
     qPos = 0;
     document.getElementById("q-total").textContent = "∞";
@@ -725,10 +827,81 @@ function renderQuestion() {
 
   const btn = document.getElementById("submit-guess");
   btn.disabled = false; btn.textContent = "Lock In Guess";
+  PitWall.reset();   // the radio is available again for the new question
 }
 
 const submitBtn = document.getElementById("submit-guess");
 submitBtn.addEventListener("click", submitGuess);
+
+/* ===================== PIT WALL RADIO (hint) ===================== *
+ * Once per question the player can radio the pit wall: the server replies with
+ * a band guaranteed to contain the answer (its placement is salted server-side,
+ * so nothing about the answer's position inside it is derivable) and takes a
+ * fixed cut of whatever the question goes on to score. The client only narrows
+ * the slider to the band — every number stays behind the trust boundary. */
+const PitWall = (() => {
+  let used = false;
+  const btn = () => document.getElementById("pit-wall-btn");
+
+  /* Fresh question: the radio becomes available again. */
+  function reset() {
+    used = false;
+    const b = btn();
+    if (b) { b.disabled = false; b.classList.remove("used"); }
+    const label = document.getElementById("pit-wall-label");
+    if (label) label.textContent = "Pit Wall (−40%)";
+    document.getElementById("pit-wall-note")?.classList.add("hidden");
+  }
+
+  async function call() {
+    if (used || !quiz) return;
+    const q = quiz.questions[qPos];
+    const b = btn();
+    b.disabled = true;
+    try {
+      const res = await fetch(`${API}/quiz/hint`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tracking_token: q.tracking_token }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const h = await res.json();
+      used = true;
+      track("hint", { mode: currentMode });
+      Sound.play("uiClick");
+      b.classList.add("used");
+      const label = document.getElementById("pit-wall-label");
+      if (label) label.textContent = "Pit wall consulted";
+
+      // Narrow the playing field to the radioed band, keeping the current guess
+      // where possible so the player doesn't lose their place.
+      const input = document.getElementById("q-input");
+      const kind = q.answer_kind || "count";
+      const useSlider = kind === "year" || MODES[currentMode].slider;
+      const clamped = Math.min(h.hint_max,
+        Math.max(h.hint_min, parseFloat(input.value) || h.hint_min));
+      input.min = h.hint_min; input.max = h.hint_max; input.value = clamped;
+      CurveSlider.configure({
+        min: +h.hint_min, max: +h.hint_max, value: clamped, visible: useSlider,
+        onChange: (v) => { input.value = v; },
+      });
+      const note = document.getElementById("pit-wall-note");
+      if (note) {
+        note.innerHTML = `${Icons.svg("radio")} <strong>Pit wall:</strong> ` +
+          `"Copy. It's between <strong>${(+h.hint_min).toLocaleString()}</strong> and ` +
+          `<strong>${(+h.hint_max).toLocaleString()}</strong>." ` +
+          `<span class="rn-cost">The call costs ${h.cost_percent}% of this question's ` +
+          `score (best case ${h.max_score_after.toLocaleString()}).</span>`;
+        note.classList.remove("hidden");
+      }
+    } catch {
+      b.disabled = false;
+      toast("The pit wall isn't answering. Try again.");
+    }
+  }
+
+  function init() { btn()?.addEventListener("click", call); }
+  return { init, reset };
+})();
 
 /* Fine-tune steppers (−10 / −1 / +1 / +10) around the typed input. They write
  * the input and fire its input event, so the existing handler keeps the curve
@@ -835,6 +1008,16 @@ function revealScore(q, result) {
   actualText.classList.add("pending");
   document.getElementById("odometer").textContent = "0";
   document.getElementById("reveal-insight").classList.add("hidden");
+  // Own up to the radio cost right where the score lands.
+  const hintNote = document.getElementById("reveal-hint-note");
+  if (hintNote) {
+    if (result.hint_used) {
+      hintNote.innerHTML = `${Icons.svg("radio")} Pit wall assist — this score paid the 40% radio cost.`;
+      hintNote.classList.remove("hidden");
+    } else {
+      hintNote.classList.add("hidden");
+    }
+  }
   document.getElementById("timeline-fill").style.width = "0%";
   document.getElementById("reveal-verdict").hidden = true;
 
@@ -1044,6 +1227,13 @@ function finishSession() {
   // home banner and (signed-in) the authoritative server streak.
   renderSummaryEngagement();
   renderStreakBanner();
+  // Daily extras: your position in today's field, and the live countdown to
+  // tomorrow's set (ticked by tickCountdown).
+  document.getElementById("summary-field")?.classList.add("hidden");
+  document.getElementById("next-daily-summary")?.classList.toggle(
+    "hidden", currentMode !== "daily");
+  tickCountdown();   // paint the countdown immediately, not on the next beat
+  if (currentMode === "daily") loadDailyField();
   // Highest-intent moment for the account ask: fresh points that a guest can
   // put on the board. Hidden for members.
   document.getElementById("summary-signup")?.classList.toggle("hidden", isSignedIn());
@@ -1081,6 +1271,32 @@ function renderSummaryEngagement() {
 }
 
 document.getElementById("summary-back").addEventListener("click", () => navigate("home"));
+
+/* Where you finished among everyone — member or guest — who has played today's
+ * Daily so far. Server-computed from scored events (it can't be spoofed), shown
+ * on the summary and folded into the share text. Best-effort: the summary works
+ * fine without it. */
+async function loadDailyField() {
+  sessionField = null;
+  const el = document.getElementById("summary-field");
+  try {
+    const r = await fetch(`${API}/quiz/daily/field?anon_id=${encodeURIComponent(anonId())}`,
+      { headers: authHeaders() });
+    if (!r.ok) return;
+    const f = await r.json();
+    if (!f.rank) return;
+    sessionField = f;
+    if (el) {
+      const context = f.players === 1
+        ? "First on track today — you've set the benchmark."
+        : f.rank === 1 ? "You lead today's field."
+        : `You beat ${f.beat_percent}% of today's field.`;
+      el.innerHTML = `${Icons.svg("flag")} <strong>P${f.rank}</strong> of ` +
+        `${f.players} in today's field · ${context}`;
+      el.classList.remove("hidden");
+    }
+  } catch { /* offline — leave it hidden */ }
+}
 
 /* Map a per-question closeness (0..1) to a coloured square — the spoiler-free
  * Wordle-style result. No numbers that reveal the answer, just how close.
@@ -1124,6 +1340,11 @@ function buildShareText() {
     const avg = Math.round(sessionInsights.reduce((a, b) => a + b, 0) / sessionInsights.length);
     brag = `\nBeat ${avg}% of players`;
   }
+  // The field position is the strongest brag there is — "P3 of 41 today" reads
+  // like a timing screen and invites a comeback.
+  if (currentMode === "daily" && sessionField && sessionField.rank) {
+    brag += `\nP${sessionField.rank} of ${sessionField.players} in today's field`;
+  }
   // Spoiler-free: shares the closeness pattern and total, never the answers.
   return `🏁 GridMaster ${tag}\n${grid}\n${sessionScore.toLocaleString()} / ${max.toLocaleString()} pts${brag}` +
     `\nCan you beat me? ${shareLink()}`;
@@ -1157,8 +1378,10 @@ document.getElementById("challenge-friend").addEventListener("click", async () =
   evaluateAchievements();
   const tag = currentMode === "race_week" ? "Daily Race Challenge"
             : currentMode === "daily" ? "Daily Challenge" : "GridMaster run";
-  const text = `🏁 I just scored ${sessionScore.toLocaleString()} on today's GridMaster ${tag}. ` +
-    `Think you can beat me?\n${shareLink()}`;
+  const fieldBit = (currentMode === "daily" && sessionField && sessionField.rank)
+    ? ` That's P${sessionField.rank} of ${sessionField.players} today.` : "";
+  const text = `🏁 I just scored ${sessionScore.toLocaleString()} on today's GridMaster ${tag}.` +
+    `${fieldBit} Think you can beat me?\n${shareLink()}`;
   await shareOrCopy(text, "Challenge copied. Send it to a friend.");
 });
 
@@ -2437,6 +2660,35 @@ document.addEventListener("keydown", (e) => {
   if (so && !so.classList.contains("hidden")) { so.classList.add("hidden"); return; }
 });
 
+/* ===================== ENTER-KEY PLAY FLOW ===================== *
+ * Enter drives the run forward: it locks in the guess from the number field and
+ * advances past the reveal, so a keyboard (or external-keypad) player never has
+ * to reach for the pointer. Deliberately inert while any dialog is open, and
+ * when a button/input has focus (those already handle Enter natively). */
+function anyDialogOpen() {
+  return ["auth-overlay", "team-overlay", "settings-overlay", "exit-overlay",
+          "scoring-overlay", "data-overlay"].some((id) => {
+    const el = document.getElementById(id);
+    return el && !el.classList.contains("hidden");
+  });
+}
+document.getElementById("q-input").addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  const btn = document.getElementById("submit-guess");
+  if (!btn.disabled && !document.getElementById("quiz-play").classList.contains("hidden")) {
+    e.preventDefault();
+    btn.click();
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" || anyDialogOpen()) return;
+  const tag = ((document.activeElement || {}).tagName || "").toLowerCase();
+  if (["button", "input", "textarea", "select", "a"].includes(tag)) return;
+  const reveal = document.getElementById("quiz-reveal");
+  const nextBtn = document.getElementById("next-question");
+  if (reveal && !reveal.classList.contains("hidden") && !nextBtn.disabled) nextBtn.click();
+});
+
 /* ---- Boot ---- */
 function show(id) { document.getElementById(id).classList.remove("hidden"); }
 function hide(id) { document.getElementById(id).classList.add("hidden"); }
@@ -2445,6 +2697,7 @@ saveState(state);
 renderQuizIntro();
 renderStreakBanner();
 CurveSlider.init();
+PitWall.init();
 DataCheck.init();
 TeamPicker.init();
 ExitConfirm.init();

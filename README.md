@@ -151,8 +151,10 @@ needs the same change; the test suites on both sides are the safety net.
 |---|---|---|
 | `GET`  | `/api/v1/health` | liveness + active question count |
 | `GET`  | `/api/v1/quiz/{mode}` | `daily` (6) from the general bank; tracking tokens, **no answers** |
-| `GET`  | `/api/v1/practice/question` | one **random** Free Practice question; non-competitive, **no answers**; rate-limited per client (60 / 10 min) so the bank can't be script-farmed |
+| `GET`  | `/api/v1/practice/question` | one **random** Free Practice question; non-competitive, **no answers**; optional focus filters `?category=` and `?era=` (decade windows, e.g. `2010s` / `classic`) with a full-bank fallback flagged by `focus_matched`; rate-limited per client (60 / 10 min) so the bank can't be script-farmed |
 | `POST` | `/api/v1/quiz/verify` | `{tracking_token, guess, anon_id?}` → server-side score; also **records** the scored result (to the signed-in user, or to `anon_id` for a guest) — **except Free Practice**, which is never recorded |
+| `POST` | `/api/v1/quiz/hint` | **Pit Wall Radio**: `{tracking_token}` → a salted, non-revealing band guaranteed to contain the answer, always tighter than the served slider band; marks the token so `verify` takes 40% off the eventual score. Idempotent per token; the exact answer still never leaves the server |
+| `GET`  | `/api/v1/quiz/daily/field` | **Today's Field** — where the caller finished among *everyone* (members **and** guests) who played today's Daily: `{players, rank, points, beat_percent}`; identity from the bearer token, else `?anon_id=` |
 | `GET`  | `/api/v1/arcade/pair` | over/under matchup (non-competitive v1) |
 | `POST` | `/api/v1/auth/register` | `{username, password, anon_id?}` → session token + server stats; claims guest events |
 | `POST` | `/api/v1/auth/login` | `{username, password, anon_id?}` → session token + server stats; claims guest events |
@@ -276,6 +278,21 @@ Beyond the three core invariants, the service ships with defense-in-depth:
   bank) + unlimited **Free Practice** (non-competitive, never recorded, with a
   10-second anti-scouting team penalty on low scores) + Arcade Over/Under
   (matchups biased toward close, within-30% calls)
+- **Pit Wall Radio** — once per question, radio the pit wall and it narrows the
+  guess to a band guaranteed to contain the answer, for 40% of whatever the
+  question goes on to score. The band's width is capped below the served slider
+  band (the call always buys real information) and its placement is drawn from a
+  secret-salted, per-token RNG, so the answer's position inside it can't be
+  re-derived client-side — the trust boundary holds
+- **Today's Field** — after a Daily, the summary (and the share text) shows where
+  you finished among everyone who has played that day's set so far, guests
+  included: "P4 of 23 in today's field". Computed only from server-scored events
+- **Free Practice focus** — optional era (decade) and topic chips narrow the
+  practice draw ("2010s · Qualifying"), persisted across visits, with a graceful
+  full-bank fallback when a focus matches nothing
+- **Next-Daily countdown** on the capped intro and the finish summary, and an
+  **Enter-key play flow** (Enter locks in a guess and advances past the reveal;
+  inert while any dialog is open)
 - Server-authoritative exp-decay scoring, **kind-aware** (counts/points by
   percentage error; years by years-off; percentages by points-of-percentage);
   answers never leave the server

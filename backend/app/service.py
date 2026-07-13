@@ -26,11 +26,12 @@ from pathlib import Path
 from . import scoring
 from .validation import compute_metric
 
-# tracking_token -> (question_id, verified_answer, game_mode, issued_at,
-# answer_kind). Server-side only; the answer is never serialized to the client.
-# The kind rides along so verify() can score each answer on the right error
-# scale (years off vs percentage error). Redis in production.
-_TOKEN_STORE: dict[str, tuple[str, float, str, float, str]] = {}
+# tracking_token -> {question_id, answer, game_mode, issued, kind, hint}.
+# Server-side only; the answer is never serialized to the client. The kind rides
+# along so verify() can score each answer on the right error scale (years off vs
+# percentage error); hint holds the Pit Wall band once one has been called for
+# (None until then), so verify() can apply the cost. Redis in production.
+_TOKEN_STORE: dict[str, dict] = {}
 # Robustness: this in-memory store would otherwise grow without bound (a new
 # token per question served, forever). Tokens expire after a generous play window
 # and the store is capped, evicting the oldest. Redis TTLs replace this in prod.
@@ -41,22 +42,22 @@ _TOKEN_STORE_MAX = 100_000
 def _prune_tokens() -> None:
     """Drop expired tokens, then enforce the size cap by evicting the oldest."""
     now = time.monotonic()
-    expired = [t for t, v in _TOKEN_STORE.items() if now - v[3] > _TOKEN_TTL_SECONDS]
+    expired = [t for t, v in _TOKEN_STORE.items() if now - v["issued"] > _TOKEN_TTL_SECONDS]
     for t in expired:
         del _TOKEN_STORE[t]
     overflow = len(_TOKEN_STORE) - _TOKEN_STORE_MAX
     if overflow > 0:
-        for t in sorted(_TOKEN_STORE, key=lambda k: _TOKEN_STORE[k][3])[:overflow]:
+        for t in sorted(_TOKEN_STORE, key=lambda k: _TOKEN_STORE[k]["issued"])[:overflow]:
             del _TOKEN_STORE[t]
 
 
-def _live_token(token: str) -> tuple[str, float, str, float, str] | None:
+def _live_token(token: str) -> dict | None:
     """Return a token's entry if present and not expired, else None (expired
     tokens are dropped, so the caller sees them as unknown)."""
     entry = _TOKEN_STORE.get(token)
     if entry is None:
         return None
-    if time.monotonic() - entry[3] > _TOKEN_TTL_SECONDS:
+    if time.monotonic() - entry["issued"] > _TOKEN_TTL_SECONDS:
         del _TOKEN_STORE[token]
         return None
     return entry
@@ -206,12 +207,21 @@ def _provision_question(row: sqlite3.Row, game_mode: str, salt: str) -> dict:
     into the payload; slider bounds prefer the row's explicit display bounds and
     otherwise fall back to the salted non-revealing band."""
     token = secrets.token_urlsafe(16)
-    _TOKEN_STORE[token] = (row["id"], row["verified_answer"], game_mode,
-                           time.monotonic(), row["answer_kind"] or "count")
     if row["display_min"] is not None and row["display_max"] is not None:
         smin, smax = row["display_min"], row["display_max"]
     else:
         smin, smax = _slider_bounds(row["verified_answer"], row["question_string"], salt)
+    _TOKEN_STORE[token] = {
+        "question_id": row["id"],
+        "answer": row["verified_answer"],
+        "game_mode": game_mode,
+        "issued": time.monotonic(),
+        "kind": row["answer_kind"] or "count",
+        # The served band, kept so a Pit Wall call can be guaranteed to narrow it.
+        "smin": float(smin),
+        "smax": float(smax),
+        "hint": None,
+    }
     return {
         "tracking_token": token,
         "question_text": row["question_string"],
@@ -259,7 +269,24 @@ def build_quiz(conn: sqlite3.Connection, game_mode: str = "daily", period: str |
     return {"game_mode": game_mode, "questions": questions}
 
 
-def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None = None) -> dict | None:
+# Free Practice focus filters: the decade windows a player can train on. Keys
+# are the public API values (?era=2010s); values are inclusive era_year bounds.
+PRACTICE_ERAS = {
+    "2020s": (2020, 9999),
+    "2010s": (2010, 2019),
+    "2000s": (2000, 2009),
+    "1990s": (1990, 1999),
+    "1980s": (1980, 1989),
+    "classic": (0, 1979),   # everything before 1980
+}
+
+
+def build_practice_question(
+    conn: sqlite3.Connection,
+    rng: random.Random | None = None,
+    category: str | None = None,
+    era: str | None = None,
+) -> dict | None:
     """Provision a single random Free Practice question, or None if the bank is empty.
 
     Unlike the daily/race sets, Free Practice is unlimited and personal:
@@ -270,21 +297,44 @@ def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None 
     verified answer is stashed in the token store (tagged free_practice) and never
     returned to the client; because the token carries that mode, verify() records
     nothing for it.
+
+    A focus can narrow the draw: `category` limits it to one question category
+    (e.g. 'qualifying') and `era` to one PRACTICE_ERAS decade window. If the
+    focused pool is empty the draw falls back to the whole bank and the payload
+    says so (focus_matched=False), so a stale/empty focus never breaks practice.
     """
     rng = rng or random.Random()
     _prune_tokens()  # keep the in-memory token store bounded
 
-    pool = conn.execute(
+    where = ["is_active = 1"]
+    params: list = []
+    if category:
+        where.append("category = ?")
+        params.append(category)
+    if era in PRACTICE_ERAS:
+        lo, hi = PRACTICE_ERAS[era]
+        where.append("era_year IS NOT NULL AND era_year BETWEEN ? AND ?")
+        params.extend((lo, hi))
+
+    select = (
         "SELECT id, question_string, verified_answer, answer_kind, category, "
         "       display_min, display_max, difficulty_weight, era_year "
-        "FROM production_trivia_questions WHERE is_active = 1 ORDER BY id"
-    ).fetchall()
+        "FROM production_trivia_questions WHERE {} ORDER BY id"
+    )
+    pool = conn.execute(select.format(" AND ".join(where)), params).fetchall()
+    focus_matched = True
+    if not pool and len(where) > 1:
+        # Nothing matches this focus — serve from the full bank rather than 404,
+        # and tell the client so it can explain the substitution.
+        focus_matched = False
+        pool = conn.execute(select.format("is_active = 1")).fetchall()
     if not pool:
         return None
 
     row = rng.choice(pool)
     return {
         "game_mode": FREE_PRACTICE_MODE,
+        "focus_matched": focus_matched,
         "question": _provision_question(row, FREE_PRACTICE_MODE, _get_slider_salt(conn)),
     }
 
@@ -292,13 +342,23 @@ def build_practice_question(conn: sqlite3.Connection, rng: random.Random | None 
 def verify_guess(token: str, guess: float) -> dict | None:
     """Score a guess server-side. Returns None if the token is unknown/expired.
     Scoring is kind-aware: years and percentages decay on absolute error, counts
-    and points on percentage error (see scoring.score_guess)."""
+    and points on percentage error (see scoring.score_guess). If the Pit Wall was
+    called for this question, the radio cost comes off the score here — the
+    recorded play_event and the leaderboard see the post-cost number."""
     entry = _live_token(token)
     if entry is None:
         return None
-    _question_id, actual, _game_mode, _issued, kind = entry
-    score = scoring.score_guess(guess, actual, kind=kind)
-    return {"score": score, "actual": actual, "guess": guess, "max_score": scoring.MAX_SCORE}
+    score = scoring.score_guess(guess, entry["answer"], kind=entry["kind"])
+    hint_used = entry["hint"] is not None
+    if hint_used:
+        score = int(round(score * (1.0 - HINT_COST)))
+    return {
+        "score": score,
+        "actual": entry["answer"],
+        "guess": guess,
+        "max_score": scoring.MAX_SCORE,
+        "hint_used": hint_used,
+    }
 
 
 def token_meta(token: str) -> tuple[str, str] | None:
@@ -307,8 +367,79 @@ def token_meta(token: str) -> tuple[str, str] | None:
     entry = _live_token(token)
     if entry is None:
         return None
-    question_id, _actual, game_mode, _issued, _kind = entry
-    return question_id, game_mode
+    return entry["question_id"], entry["game_mode"]
+
+
+# ── Pit Wall Radio (the hint call) ───────────────────────────────────────────
+# Once per question the player can radio the pit wall, which narrows the guess
+# to a band guaranteed to contain the answer — at a fixed fraction of whatever
+# the guess goes on to score. The band is wide enough that blindly parking in
+# the middle is no better than an informed open guess (the call converts partial
+# knowledge, it doesn't sell the answer), and the answer's position inside the
+# band is drawn from a salted, per-token RNG so it can't be re-derived
+# client-side (same reasoning as _slider_bounds).
+HINT_COST = 0.4               # fraction of the eventual score the call costs
+HINT_WIDTH_YEAR = 10.0        # a decade window for 'in which year…'
+HINT_WIDTH_PERCENTAGE = 20.0  # 20 points of percentage
+HINT_REL_WIDTH = 0.8          # counts/points: the band spans 80% of the answer
+HINT_MIN_WIDTH = 10.0         # floor so tiny counts still get a real spread
+
+
+def _hint_band(answer: float, kind: str, token: str, salt: str,
+               served_span: float | None = None) -> tuple[float, float]:
+    """A rounded band that contains `answer` without centring on it. The
+    placement fraction comes from a secret-salted RNG keyed by the (random,
+    per-session) tracking token, so the same question gets a differently-placed
+    band every time it is served and the offset is never predictable.
+
+    The width is also capped at 60% of the band the player is already looking at
+    (served_span), so a radio call always buys real information — without the cap
+    a small-count question whose slider is already at the 0-10 floor would get a
+    "hint" no tighter than the slider itself."""
+    if kind == "year":
+        width = HINT_WIDTH_YEAR
+    elif kind == "percentage":
+        width = HINT_WIDTH_PERCENTAGE
+    else:
+        width = max(HINT_MIN_WIDTH, HINT_REL_WIDTH * abs(answer))
+    if served_span and served_span > 0:
+        width = min(width, 0.6 * served_span)
+    width = max(width, 4.0)   # never pin the answer to a sliver
+    rng = _deterministic_rng("pit-wall", salt, token)
+    frac = rng.uniform(0.25, 0.75)   # where in the band the answer sits
+    lo = answer - frac * width
+    hi = lo + width
+    # Keep the band on the answer's natural scale: never below zero, and never
+    # past 100 for percentages. Shifting preserves the width, and the answer
+    # stays inside because it is itself within those limits.
+    if lo < 0:
+        lo, hi = 0.0, width
+    if kind == "percentage" and hi > 100:
+        lo, hi = 100.0 - width, 100.0
+    # Round outward to clean integers (floor/ceil only ever widens the band).
+    return float(math.floor(lo)), float(math.ceil(hi))
+
+
+def request_hint(conn: sqlite3.Connection, token: str) -> dict | None:
+    """Answer a Pit Wall call for a served question: mark the token as
+    hint-assisted (verify() then applies HINT_COST) and return the narrowed
+    band. Returns None for an unknown/expired token. Idempotent — calling again
+    returns the same band without stacking any further cost."""
+    entry = _live_token(token)
+    if entry is None:
+        return None
+    if entry["hint"] is None:
+        entry["hint"] = _hint_band(
+            entry["answer"], entry["kind"], token, _get_slider_salt(conn),
+            served_span=entry["smax"] - entry["smin"],
+        )
+    lo, hi = entry["hint"]
+    return {
+        "hint_min": lo,
+        "hint_max": hi,
+        "cost_percent": int(round(HINT_COST * 100)),
+        "max_score_after": int(round(scoring.MAX_SCORE * (1.0 - HINT_COST))),
+    }
 
 
 def _career_total(conn: sqlite3.Connection, driver_id: str, metric: str) -> float:

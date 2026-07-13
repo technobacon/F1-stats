@@ -32,6 +32,8 @@ EVENT_NAMES = frozenset({
     "share",           # tapped Share on the result (props.mode)
     "arcade_play",     # made an Over/Under pick
     "practice_start",  # began Free Practice
+    "practice_focus",  # narrowed Free Practice to an era/category (props.era, props.category)
+    "hint",            # radioed the Pit Wall on a question (props.mode)
     "signup_open",     # opened the account modal
     "signup_success",  # created an account
     "login_success",   # signed in

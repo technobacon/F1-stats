@@ -497,6 +497,38 @@ def leaderboard(conn: sqlite3.Connection, limit: int = 20, period: str = "all") 
     ]
 
 
+def daily_field(conn: sqlite3.Connection, identity_key: str | None,
+                period: str | None = None) -> dict:
+    """Today's Daily field: everyone — member or guest — who has scored in the
+    day's Daily Challenge, and where the caller finished among them. Built from
+    the same server-scored play_events as the leaderboard (Architecture §2.2), so
+    a field position can't be forged; unlike the leaderboard it counts guest
+    identities too, so a brand-new player still gets a real 'P4 of 23 today'.
+
+    Returns {players, rank, points, beat_percent}; rank is 0 when the caller
+    hasn't scored in the window (players still reports the field size). Ties
+    share the better rank."""
+    period = period or _now().strftime("%Y-%m-%d")
+    rows = conn.execute(
+        "SELECT identity_key AS ik, COALESCE(SUM(score), 0) AS pts "
+        "FROM play_events "
+        "WHERE game_mode = 'daily' AND period = ? "
+        "  AND identity_key IS NOT NULL AND identity_key != '' "
+        "GROUP BY identity_key",
+        (period,),
+    ).fetchall()
+    players = len(rows)
+    points = next(
+        (int(r["pts"]) for r in rows if identity_key and r["ik"] == identity_key), None
+    )
+    if points is None:
+        return {"players": players, "rank": 0, "points": 0, "beat_percent": 0}
+    rank = 1 + sum(1 for r in rows if r["pts"] > points)
+    beaten = sum(1 for r in rows if r["pts"] < points)
+    beat_percent = int(round(beaten / (players - 1) * 100)) if players > 1 else 0
+    return {"players": players, "rank": rank, "points": points, "beat_percent": beat_percent}
+
+
 def team_leaderboard(conn: sqlite3.Connection, period: str = "all") -> list[dict]:
     """The Constructors' Championship (PRD §5.3): every player's server-verified
     points bucketed by the constructor faction they pledged to, ranked to show

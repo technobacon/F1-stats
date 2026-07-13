@@ -35,6 +35,9 @@ class PracticeQuestionResponse(BaseModel):
     answer field — but served one at a time and never recorded server-side."""
     game_mode: str
     question: DailyQuestion
+    # False when a requested focus (?category= / ?era=) matched nothing and the
+    # question was drawn from the full bank instead, so the client can say so.
+    focus_matched: bool = True
 
 
 class VerifyRequest(BaseModel):
@@ -59,10 +62,36 @@ class VerifyResponse(BaseModel):
     actual: float = Field(..., description="True value, revealed only AFTER the guess")
     guess: float
     max_score: int = 5000
+    # True when the Pit Wall was radioed for this question — the returned score
+    # already has the call's cost taken off (service.HINT_COST).
+    hint_used: bool = False
     # Aggregate comparison vs. other players. Present only for recorded competitive
     # modes once enough players have answered; None for Free Practice and new
     # questions (it is never derivable into the answer).
     insight: QuestionInsight | None = None
+
+
+class HintRequest(BaseModel):
+    tracking_token: str
+
+
+class HintResponse(BaseModel):
+    """The Pit Wall's reply: a band guaranteed to contain the answer, wide enough
+    that its midpoint is no better than an informed guess. Requesting it marks the
+    token, and verify() takes cost_percent off the eventual score."""
+    hint_min: float
+    hint_max: float
+    cost_percent: int
+    max_score_after: int
+
+
+class DailyFieldResponse(BaseModel):
+    """Where the caller finished among everyone (members AND guests) who played
+    today's Daily. rank is 0 when the caller hasn't scored today."""
+    players: int
+    rank: int
+    points: int
+    beat_percent: int = Field(..., ge=0, le=100)
 
 
 class RegisterRequest(BaseModel):
