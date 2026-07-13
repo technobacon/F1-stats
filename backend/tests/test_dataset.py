@@ -144,3 +144,50 @@ def test_daily_serves_a_difficulty_ramp():
         weights = [q["difficulty_weight"] for q in served]
         assert weights == sorted(weights), weights
     conn.close()
+
+
+# ── Modern-era floor in the export sampler ───────────────────────────────────
+
+def _pool_row(i, era_year, category="career", mode="daily"):
+    return {"question_string": f"q{i} ({era_year}, {category})",
+            "verified_answer": float(i), "answer_kind": "count",
+            "category": category, "display_min": None, "display_max": None,
+            "difficulty_weight": 1.0, "game_mode": mode, "era_year": era_year}
+
+
+def test_sample_dataset_enforces_modern_floor():
+    """With plenty of post-2020 supply, at least MODERN_MIN_SHARE of the sampled
+    bank must be modern-era questions — the guarantee that keeps the committed
+    bank leaning on the current grid across weekly refreshes."""
+    rows = [_pool_row(i, 1985) for i in range(400)]
+    rows += [_pool_row(400 + i, 2023) for i in range(300)]
+    chosen = seed._sample_dataset(rows, 200)
+    assert len(chosen) == 200
+    modern = sum(1 for r in chosen if seed._is_modern(r))
+    assert modern >= int(200 * seed.MODERN_MIN_SHARE)
+    # No duplicates sneak in through the swap.
+    assert len({r["question_string"] for r in chosen}) == 200
+
+
+def test_sample_dataset_modern_floor_degrades_gracefully():
+    """A pool that simply doesn't have enough modern questions must still fill
+    the bank (the floor is a preference, never a crash or a short bank)."""
+    rows = [_pool_row(i, 1975) for i in range(190)]
+    rows += [_pool_row(900 + i, 2024) for i in range(10)]
+    chosen = seed._sample_dataset(rows, 100)
+    assert len(chosen) == 100
+    # Every modern question there is gets used.
+    assert sum(1 for r in chosen if seed._is_modern(r)) == 10
+
+
+def test_sample_dataset_modern_swap_spares_flavor_categories():
+    """The swap that raises the modern share must come out of the driver-question
+    bulk, not the flavor categories that guarantee variety."""
+    rows = [_pool_row(i, 1985, category="team") for i in range(50)]
+    rows += [_pool_row(200 + i, 1985) for i in range(150)]
+    rows += [_pool_row(600 + i, 2022) for i in range(200)]
+    chosen = seed._sample_dataset(rows, 200)
+    flavor_now = sum(1 for r in chosen if r["category"] in seed._FLAVOR_CATEGORIES)
+    # The flavor quota (n // 4, capped by supply) survives the modern swap.
+    assert flavor_now == 50
+    assert sum(1 for r in chosen if seed._is_modern(r)) >= int(200 * seed.MODERN_MIN_SHARE)

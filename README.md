@@ -296,9 +296,12 @@ Beyond the three core invariants, the service ships with defense-in-depth:
 - Server-authoritative exp-decay scoring, **kind-aware** (counts/points by
   percentage error; years by years-off; percentages by points-of-percentage);
   answers never leave the server
-- Deterministic anti-hallucination validation; a **committed 2,000-question bank**
-  (`backend/app/data/questions.json`), sampled era-weighted from a ~4,600-question
-  validated, significance-gated pool rebuilt weekly from the full 1950→now record
+- Deterministic anti-hallucination validation; a **committed 2,500-question bank**
+  (`backend/app/data/questions.json`), sampled era-weighted from a validated,
+  significance-gated pool rebuilt weekly from the full 1950→now record, with a
+  **modern-era floor**: at least 55% of the bank sits in the post-2020 era
+  (`seed.MODERN_MIN_SHARE`, enforced at export and gated in
+  `scripts/verify_bank.py` so the weekly refresh preserves the composition)
 - 35+ question types across drivers, teams and circuits — career totals, season
   spotlights ("how many races did Verstappen win in 2023?"), dominant-team
   seasons, win streaks/spans, head-to-head rivalries — era-biased toward the

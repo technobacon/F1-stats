@@ -1099,6 +1099,20 @@ def _era_weighted_sample(rng: random.Random, rows: list, k: int) -> list:
 # Variety categories kept in full so the bank isn't all driver questions.
 _FLAVOR_CATEGORIES = {"team", "venue", "head_to_head"}
 
+# Modern-era floor for the exported bank: at least this share of the committed
+# questions must sit in the current era (era_year >= MODERN_ERA_START), supply
+# permitting. The live service already era-weights what it SERVES; this floor
+# makes sure the bank underneath actually carries enough current-grid material
+# to rotate through — without it the pool's deep history dilutes the modern
+# questions the current audience recognises. Enforced at export, so the weekly
+# refresh preserves the composition.
+MODERN_ERA_START = 2020
+MODERN_MIN_SHARE = 0.55
+
+
+def _is_modern(row) -> bool:
+    return (row["era_year"] or 0) >= MODERN_ERA_START
+
 
 def _mode_balanced(rng: random.Random, rows: list, n: int) -> list:
     """Era-weighted sample of n rows that preserves the per-mode mix (so every
@@ -1120,12 +1134,29 @@ def _mode_balanced(rng: random.Random, rows: list, n: int) -> list:
 
 def _sample_dataset(rows: list, n: int, seed: int = 42) -> list:
     """Pick ~n questions: keep the variety (team/venue/head-to-head) categories in
-    full, then fill the rest era-weighted while preserving the per-mode mix."""
+    full, then fill the rest era-weighted while preserving the per-mode mix.
+    Finally enforce the modern-era floor (MODERN_MIN_SHARE post-2020) by swapping
+    older non-flavor picks for unpicked modern pool rows — flavor categories are
+    never drained, and the floor degrades gracefully when the pool runs short of
+    either modern spares or swappable older picks."""
     rng = random.Random(seed)
     flavor = [r for r in rows if r["category"] in _FLAVOR_CATEGORIES]
     rest = [r for r in rows if r["category"] not in _FLAVOR_CATEGORIES]
     chosen = _era_weighted_sample(rng, flavor, min(len(flavor), n // 4))
     chosen += _mode_balanced(rng, rest, max(0, n - len(chosen)))
+
+    deficit = int(len(chosen) * MODERN_MIN_SHARE) - sum(1 for r in chosen if _is_modern(r))
+    if deficit > 0:
+        picked = {r["question_string"] for r in chosen}
+        spare_modern = [r for r in rows
+                        if _is_modern(r) and r["question_string"] not in picked]
+        rng.shuffle(spare_modern)
+        swappable = [i for i, r in enumerate(chosen)
+                     if not _is_modern(r) and r["category"] not in _FLAVOR_CATEGORIES]
+        rng.shuffle(swappable)
+        swaps = min(deficit, len(spare_modern), len(swappable))
+        for slot, replacement in zip(swappable[:swaps], spare_modern[:swaps]):
+            chosen[slot] = replacement
     return chosen
 
 
