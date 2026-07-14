@@ -44,12 +44,15 @@ from .models import (
     ArcadePairResponse,
     AuthResponse,
     ClaimRequest,
+    DailyFieldResponse,
     DailyQuizResponse,
     DevFlagRequest,
     DevFlagResponse,
     GodDetailResponse,
     GodLeaderboardResponse,
     GodOverviewResponse,
+    HintRequest,
+    HintResponse,
     LeaderboardResponse,
     LoginRequest,
     MeResponse,
@@ -246,14 +249,33 @@ def reset_practice_limits() -> None:
     _practice_hits.clear()
 
 
+def _normalize_practice_focus(category: str | None, era: str | None) -> tuple[str | None, str | None]:
+    """Clamp the practice focus params to safe, known values. Category is a short
+    lowercase slug (the bank's category names); era must be a PRACTICE_ERAS key.
+    Anything else becomes None (no filter) — same forgiving style as
+    _normalize_period."""
+    cat = (category or "").strip().lower()
+    if not cat or len(cat) > 32 or not all(c.isalnum() or c == "_" for c in cat):
+        cat = None
+    e = (era or "").strip().lower()
+    if e not in service.PRACTICE_ERAS:
+        e = None
+    return cat, e
+
+
 @app.get("/api/v1/practice/question", response_model=PracticeQuestionResponse)
-def practice_question(conn: Conn, request: Request):
+def practice_question(conn: Conn, request: Request,
+                      category: str | None = None, era: str | None = None):
     """Serve one random Training Grounds question. The mode is unlimited and its
     scores are never recorded (see quiz_verify), so there is no daily cap and no
     deterministic per-period seeding — every request is a fresh random draw.
-    Rate-limited per client so the bank can't be scripted-farmed for answers."""
+    An optional focus narrows the draw to one category (item / monster / quest /
+    skill) and/or content-era window (see service.PRACTICE_ERAS); an empty focus
+    falls back to the full bank with focus_matched=False. Rate-limited per client
+    so the bank can't be scripted-farmed for answers."""
     _check_practice_allowed(request.client.host if request.client else "unknown")
-    payload = service.build_practice_question(conn)
+    category, era = _normalize_practice_focus(category, era)
+    payload = service.build_practice_question(conn, category=category, era=era)
     if payload is None:
         raise HTTPException(503, "No questions provisioned. Run the seed pipeline.")
     return payload
@@ -300,6 +322,30 @@ def quiz_verify(conn: Conn, req: VerifyRequest, authorization: str | None = Head
 @app.post("/api/v1/quiz/daily/verify", response_model=VerifyResponse)
 def daily_verify(conn: Conn, req: VerifyRequest, authorization: str | None = Header(default=None)):
     return quiz_verify(conn, req, authorization)
+
+
+@app.post("/api/v1/quiz/hint", response_model=HintResponse)
+def quiz_hint(conn: Conn, req: HintRequest):
+    """Consult the Wise Old Man about a served question: returns a salted,
+    non-revealing band that contains the answer and marks the token so verify()
+    applies his fee. Idempotent per token — asking twice returns the same band
+    without stacking the cost. The exact answer still never leaves the server."""
+    hint = service.request_hint(conn, req.tracking_token)
+    if hint is None:
+        raise HTTPException(404, "Unknown or expired tracking token.")
+    return hint
+
+
+@app.get("/api/v1/quiz/daily/field", response_model=DailyFieldResponse)
+def quiz_daily_field(conn: Conn, anon_id: str | None = None,
+                     authorization: str | None = Header(default=None)):
+    """Where the caller finished among everyone who has played today's Slayer
+    Task so far — members and guests alike (identity comes from the bearer token
+    when present, else the guest anon_id). Powers the post-session 'P4 of 23 in
+    today's field' line; built only from server-scored events."""
+    user = auth.session_user(conn, _bearer(authorization))
+    identity = user["id"] if user else (anon_id or None)
+    return auth.daily_field(conn, identity)
 
 
 @app.post("/api/v1/auth/register", response_model=AuthResponse)

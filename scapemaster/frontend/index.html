@@ -32,7 +32,7 @@
   <!-- Type pairing: a humanist system stack for prose, Pixelify Sans (bundled,
        OFL — see /static/fonts/OFL.txt) for headings, numbers and labels. No
        Jagex fonts are used. -->
-  <link rel="stylesheet" href="/static/style.css?v=1" />
+  <link rel="stylesheet" href="/static/style.css?v=2" />
 </head>
 <body>
   <!-- ===================== TOP BAR ===================== -->
@@ -198,6 +198,15 @@
         <p id="quiz-desc">Six questions. Guess the stat — the closer you are, the more
            of the 5,000 XP you keep.</p>
         <div id="quiz-cap" class="cap-note hidden"></div>
+        <p class="next-daily hidden" id="next-daily-intro"></p>
+        <!-- Training Grounds focus: optional era/topic chips that narrow the draw
+             (see /api/v1/practice/question?era=&category=). Rendered by
+             PracticeFocus in app.js; hidden on competitive modes. -->
+        <div class="practice-focus hidden" id="practice-focus">
+          <p class="pf-label">Focus your training <span class="pf-optional">optional</span></p>
+          <div class="pf-row" id="pf-era" role="group" aria-label="Era focus"></div>
+          <div class="pf-row" id="pf-cat" role="group" aria-label="Topic focus"></div>
+        </div>
         <button class="btn-primary" id="start-quiz">Accept the Task</button>
         <button class="btn-secondary hidden" id="replay-quiz">Replay (testing)</button>
         <p class="muted" id="quiz-status"></p>
@@ -241,7 +250,18 @@
           <input type="number" id="q-input" min="0" value="0" />
         </div>
 
-        <button class="btn-primary" id="submit-guess">Lock In Guess</button>
+        <!-- The Wise Old Man: once per question the server narrows the band
+             around the answer, at a fixed cost taken off the eventual score.
+             (Element ids stay pit-wall-* for structural parity with the F1
+             sibling — the fork's porting tax is paid in copy, not plumbing.) -->
+        <p class="radio-note hidden" id="pit-wall-note" aria-live="polite"></p>
+        <div class="play-actions">
+          <button class="btn-primary" id="submit-guess">Lock In Guess</button>
+          <button type="button" class="btn-ghost pit-wall-btn" id="pit-wall-btn"
+                  title="The Wise Old Man narrows your guess to a range that contains the answer, for 40% of this question's XP">
+            <i class="ic" data-icon="sparkles" aria-hidden="true"></i>
+            <span id="pit-wall-label">Wise Old Man (−40%)</span></button>
+        </div>
       </div>
 
       <!-- Score reveal -->
@@ -263,6 +283,7 @@
         </div>
         <div class="odometer-wrap"><div class="odometer" id="odometer">0</div></div>
         <p class="chatline hidden" id="reveal-chatline"></p>
+        <p class="reveal-hint-note hidden" id="reveal-hint-note"></p>
         <p class="reveal-insight hidden" id="reveal-insight"></p>
         <p class="penalty-note hidden" id="practice-penalty"></p>
         <button class="btn-primary" id="next-question">Next</button>
@@ -276,7 +297,9 @@
         <p>XP this task</p>
         <div class="summary-grid" id="summary-grid" aria-label="Your result grid"></div>
         <div class="accuracy-row" id="accuracy-row"></div>
+        <p class="summary-field hidden" id="summary-field"></p>
         <div class="summary-streak hidden" id="summary-streak"></div>
+        <p class="next-daily hidden" id="next-daily-summary"></p>
         <p class="summary-insight hidden" id="summary-insight"></p>
         <div class="ad-slot ad-summary" data-ad="summary-display">ad · summary display</div>
         <button class="btn-primary" id="share-result">Share Result</button>
@@ -663,8 +686,8 @@
   </div>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-  <script src="/static/icons.js?v=1"></script>
-  <script src="/static/sound.js?v=1"></script>
-  <script src="/static/app.js?v=1"></script>
+  <script src="/static/icons.js?v=2"></script>
+  <script src="/static/sound.js?v=2"></script>
+  <script src="/static/app.js?v=2"></script>
 </body>
 </html>

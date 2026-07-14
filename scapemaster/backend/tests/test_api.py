@@ -319,3 +319,170 @@ def test_slider_bounds_use_the_server_salt(client):
         salted = service._slider_bounds(actual, q["answer_kind"], q["question_text"], salt)
         assert (q["slider_min"], q["slider_max"]) == salted
         checked += 1
+
+
+# ── The Wise Old Man (hint) ───────────────────────────────────────────────────
+
+import math
+
+from app import service as _service
+
+
+def test_hint_band_contains_answer_and_costs_score(client):
+    """The Wise Old Man's band really contains the answer, and the eventual
+    score pays the advertised fee — even on a perfect guess."""
+    quiz = client.get("/api/v1/quiz/daily").json()
+    for q in quiz["questions"]:
+        token = q["tracking_token"]
+        h = client.post("/api/v1/quiz/hint", json={"tracking_token": token})
+        assert h.status_code == 200
+        hint = h.json()
+        assert hint["cost_percent"] == int(_service.HINT_COST * 100)
+        assert hint["hint_min"] < hint["hint_max"]
+        # Any verify reveals the actual — the band must contain it.
+        r = client.post("/api/v1/quiz/verify",
+                        json={"tracking_token": token, "guess": hint["hint_min"]}).json()
+        assert hint["hint_min"] <= r["actual"] <= hint["hint_max"]
+        assert r["hint_used"] is True
+        # An exact hit after the consultation keeps only (1 - fee) of the max.
+        exact = client.post("/api/v1/quiz/verify",
+                            json={"tracking_token": token, "guess": r["actual"]}).json()
+        assert exact["score"] == round(5000 * (1 - _service.HINT_COST))
+        assert exact["score"] == hint["max_score_after"]
+
+
+def test_hint_band_is_meaningfully_narrower(client):
+    """The band must be strictly tighter than the band the player is already
+    looking at, for every answer kind. coins/xp ride a log-scale slider, so
+    their tightness is measured as a ratio (decades), not a difference."""
+    quiz = client.get("/api/v1/quiz/daily").json()
+    for q in quiz["questions"]:
+        hint = client.post("/api/v1/quiz/hint",
+                           json={"tracking_token": q["tracking_token"]}).json()
+        if q["answer_kind"] in ("coins", "xp"):
+            served = math.log10(max(q["slider_max"], 10)) - math.log10(max(q["slider_min"], 1))
+            got = math.log10(max(hint["hint_max"], 10)) - math.log10(max(hint["hint_min"], 1))
+            assert got < served, f"log hint no tighter for {q['question_text']!r}"
+        else:
+            assert (hint["hint_max"] - hint["hint_min"]) < (q["slider_max"] - q["slider_min"]), \
+                f"hint band no tighter than the slider for {q['question_text']!r}"
+        # ...and inside it: the slider offers nothing beyond the served band.
+        assert q["slider_min"] <= hint["hint_min"] <= hint["hint_max"] <= q["slider_max"], \
+            f"hint band escapes the slider for {q['question_text']!r}"
+
+
+def test_hint_is_idempotent_per_token(client):
+    q = client.get("/api/v1/quiz/daily").json()["questions"][0]
+    first = client.post("/api/v1/quiz/hint", json={"tracking_token": q["tracking_token"]}).json()
+    second = client.post("/api/v1/quiz/hint", json={"tracking_token": q["tracking_token"]}).json()
+    assert first == second
+
+
+def test_hint_unknown_token_404(client):
+    assert client.post("/api/v1/quiz/hint", json={"tracking_token": "nope"}).status_code == 404
+
+
+def test_no_hint_means_no_cost(client):
+    q = client.get("/api/v1/quiz/daily").json()["questions"][0]
+    r = client.post("/api/v1/quiz/verify",
+                    json={"tracking_token": q["tracking_token"], "guess": 1}).json()
+    assert r["hint_used"] is False
+    exact = client.post("/api/v1/quiz/verify",
+                        json={"tracking_token": q["tracking_token"], "guess": r["actual"]}).json()
+    assert exact["score"] == 5000
+
+
+def test_hint_cost_reaches_the_recorded_totals(client):
+    """The HiScores must see the post-fee score: an exact hit after a
+    consultation banks 60%, not the full 5,000."""
+    q = client.get("/api/v1/quiz/daily").json()["questions"][0]
+    token = q["tracking_token"]
+    client.post("/api/v1/quiz/hint", json={"tracking_token": token})
+    actual = client.post("/api/v1/quiz/verify",
+                         json={"tracking_token": token, "guess": 0}).json()["actual"]
+    client.post("/api/v1/quiz/verify",
+                json={"tracking_token": token, "guess": actual, "anon_id": "hint-device"})
+    acct = client.post("/api/v1/auth/register",
+                       json={"username": "hinter", "password": "supersecret",
+                             "anon_id": "hint-device"}).json()
+    assert acct["stats"]["lifetime_points"] == round(5000 * (1 - _service.HINT_COST))
+
+
+# ── Today's task board (daily rank among today's players) ────────────────────
+
+def test_daily_field_ranks_guests_and_members(client):
+    q = client.get("/api/v1/quiz/daily").json()["questions"][0]
+    token = q["tracking_token"]
+    actual = client.post("/api/v1/quiz/verify",
+                         json={"tracking_token": token, "guess": 0}).json()["actual"]
+    client.post("/api/v1/quiz/verify",
+                json={"tracking_token": token, "guess": actual, "anon_id": "field-a"})
+    client.post("/api/v1/quiz/verify",
+                json={"tracking_token": token, "guess": actual * 40 + 1000, "anon_id": "field-b"})
+
+    top = client.get("/api/v1/quiz/daily/field?anon_id=field-a").json()
+    assert top["players"] == 2 and top["rank"] == 1
+    assert top["points"] == 5000 and top["beat_percent"] == 100
+    bottom = client.get("/api/v1/quiz/daily/field?anon_id=field-b").json()
+    assert bottom["players"] == 2 and bottom["rank"] == 2 and bottom["beat_percent"] == 0
+
+    outsider = client.get("/api/v1/quiz/daily/field?anon_id=nobody").json()
+    assert outsider["players"] == 2 and outsider["rank"] == 0
+
+    acct = client.post("/api/v1/auth/register",
+                       json={"username": "fielder", "password": "supersecret",
+                             "anon_id": "field-b"}).json()
+    mine = client.get("/api/v1/quiz/daily/field",
+                      headers={"Authorization": f"Bearer {acct['token']}"}).json()
+    assert mine["players"] == 2 and mine["rank"] == 2
+
+
+def test_daily_field_empty_day(client):
+    r = client.get("/api/v1/quiz/daily/field?anon_id=whoever")
+    assert r.status_code == 200
+    assert r.json() == {"players": 0, "rank": 0, "points": 0, "beat_percent": 0}
+
+
+def test_daily_field_ignores_practice_scores(client):
+    q = client.get("/api/v1/practice/question").json()["question"]
+    client.post("/api/v1/quiz/verify",
+                json={"tracking_token": q["tracking_token"], "guess": 1,
+                      "anon_id": "practice-only"})
+    r = client.get("/api/v1/quiz/daily/field?anon_id=practice-only").json()
+    assert r["players"] == 0 and r["rank"] == 0
+
+
+# ── Training Grounds focus filters ───────────────────────────────────────────
+
+def test_practice_focus_by_category(client):
+    r = client.get("/api/v1/practice/question?category=monster")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["focus_matched"] is True
+    assert body["question"]["category"] == "monster"
+
+
+def test_practice_focus_by_era(client):
+    """An era focus must serve a question whose content-release year sits in the
+    requested window (checked via the dev proofreading endpoint)."""
+    rows = client.get("/api/v1/dev/questions").json()["questions"]
+    era_by_text = {r["question_string"]: r["era_year"] for r in rows}
+    lo, hi = _service.PRACTICE_ERAS["osrs"]
+    r = client.get("/api/v1/practice/question?era=osrs")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["focus_matched"] is True
+    assert lo <= era_by_text[body["question"]["question_text"]] <= hi
+
+
+def test_practice_focus_falls_back_when_empty(client):
+    r = client.get("/api/v1/practice/question?category=definitely_not_a_category")
+    assert r.status_code == 200
+    assert r.json()["focus_matched"] is False
+
+
+def test_practice_focus_bogus_params_are_ignored(client):
+    r = client.get("/api/v1/practice/question",
+                   params={"category": "no'; DROP TABLE--", "era": "1800s"})
+    assert r.status_code == 200
+    assert r.json()["focus_matched"] is True

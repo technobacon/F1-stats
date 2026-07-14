@@ -961,3 +961,42 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .chatline { text-align:center; font-family:var(--font-display); font-size:.95rem;
   margin:.5rem 0 0; color:var(--osrs-orange); text-shadow:0 1px 0 rgba(0,0,0,.5); }
 :root[data-theme="light"] .chatline { color:#9a5b00; text-shadow:none; }
+
+/* ============== WISE OLD MAN / FOCUS / TODAY'S TASK BOARD ============== */
+/* Lock-in and the consultation sit side by side; the old man is the quieter option. */
+.play-actions { display:flex; align-items:stretch; justify-content:center; gap:.6rem; flex-wrap:wrap; }
+.pit-wall-btn { display:inline-flex; align-items:center; gap:.45rem; font-size:.9rem; padding:.8rem 1rem; }
+.pit-wall-btn:disabled { opacity:.55; cursor:default; }
+.pit-wall-btn:disabled:hover { border-color:var(--line); }
+
+/* The Wise Old Man's reply — sage styling, distinct from the tutors' amber. */
+.radio-note { background:color-mix(in srgb, var(--color-primary) 10%, var(--surface));
+              border:1px solid color-mix(in srgb, var(--color-primary) 35%, var(--line));
+              color:var(--text); border-radius:var(--r-md); padding:.7rem .9rem;
+              margin:.4rem 0 .9rem; font-size:.88rem; line-height:1.45; text-align:left;
+              animation:insight-fade .3s ease; }
+.radio-note strong { color:var(--color-ink); }
+.radio-note .rn-cost { display:block; margin-top:.25rem; color:var(--muted); font-size:.8rem; }
+.reveal-hint-note { text-align:center; color:var(--muted); font-size:.82rem; margin:.35rem 0 0; }
+
+/* Today's task-board position on the daily summary — reads like the HiScores. */
+.summary-field { text-align:center; margin:.4rem 0 0; font-size:.95rem; color:var(--text); }
+.summary-field strong { color:var(--color-ink); font-size:1.1rem; }
+
+/* Countdown to tomorrow's task (capped intro + summary). */
+.next-daily { display:flex; align-items:center; justify-content:center; gap:.4rem;
+              color:var(--muted); font-size:.9rem; margin:.6rem 0;
+              font-variant-numeric:tabular-nums; }
+
+/* Training Grounds focus chips (era + topic) on the practice intro. */
+.practice-focus { margin:0 0 1.1rem; text-align:left; }
+.pf-label { font-size:.8rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+            color:var(--muted); margin:0 0 .45rem; }
+.pf-optional { font-weight:400; text-transform:none; letter-spacing:0; opacity:.8; }
+.pf-row { display:flex; flex-wrap:wrap; gap:.35rem; margin-bottom:.45rem; }
+.pf-chip { font-size:.78rem; padding:.32rem .7rem; border-radius:var(--r-pill); cursor:pointer;
+           background:var(--bg2); color:var(--text); border:1px solid var(--line);
+           font-family:inherit; transition:border-color var(--t-fast); }
+.pf-chip:hover { border-color:var(--color-primary); }
+.pf-chip.on { background:color-mix(in srgb, var(--color-primary) 18%, var(--bg2));
+              border-color:var(--color-primary); color:var(--color-ink); font-weight:700; }
