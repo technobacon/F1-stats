@@ -333,6 +333,12 @@ _ERA_WINDOWS = [
     (2020, 2029, "the 2020s"),
 ]
 
+# A post-2020 driver season qualifies for the deep spotlight treatment at this
+# many championship points — low enough to reach the midfield seasons the
+# current audience knows (Gasly '23, Hülkenberg '24), high enough to skip
+# backmarker filler. Historic seasons keep the stricter 4-wins signature bar.
+MODERN_SEASON_MIN_POINTS = 60.0
+
 
 def _p(entity: str, **kw) -> dict:
     """Build a validation_parameters payload."""
@@ -797,9 +803,12 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
     # ---- Season-spotlight questions ----
     # Single seasons someone actually remembers: every "signature season" in
     # history (4+ wins — Schumacher '04, Senna '88, Mansell '92) plus every
-    # substantial season by the current grid (2020+, 100+ points). These are the
-    # bank's most tellable questions — "how many races did Verstappen win in
-    # 2023?" — and they land squarely on the 2020s + legends content brief.
+    # substantial season by the current grid (2020+, MODERN_SEASON_MIN_POINTS).
+    # These are the bank's most tellable questions — "how many races did
+    # Verstappen win in 2023?" — and they land squarely on the 2020s + legends
+    # content brief. Modern seasons get a much deeper shape set than historic
+    # ones: the current era is what the audience recognises, so it carries the
+    # bank's modern-share floor (seed.MODERN_MIN_SHARE).
     for r in conn.execute(
         "SELECT driver_id, year, "
         "       SUM(CASE WHEN position = 1 THEN 1 ELSE 0 END) AS w, "
@@ -810,7 +819,7 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
         if sd not in span_by_id:
             continue
         signature = r["w"] >= 4
-        modern = sy >= 2020 and r["pts"] >= 100
+        modern = sy >= MODERN_ERA_START and r["pts"] >= MODERN_SEASON_MIN_POINTS
         if not (signature or modern):
             continue
         sname = name_by_id[sd]
@@ -824,6 +833,76 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
           Y(metric_target="points"), "daily", 3.5, kind="points", category="single_season")
         E(f"How many pole positions did {sname} take in the {sy} season?",
           Y(metric_target="poles"), "race_week", 3.5, category="qualifying", min_answer=2)
+        if not modern:
+            continue
+        # ---- Modern-only spotlight extensions (post-2020 seasons) ----
+        E(f"How many fastest laps did {sname} set in the {sy} season?",
+          Y(metric_target="fastest_laps"), "race_week", 3.5,
+          category="single_season", min_answer=2)
+        E(f"How many points-scoring finishes (top 10) did {sname} record in the {sy} season?",
+          Y(metric_target="points_finishes"), "race_week", 3.0,
+          category="consistency", min_answer=5)
+        E(f"How many front-row starts did {sname} take in the {sy} season?",
+          Y(metric_target="front_rows"), "race_week", 3.5,
+          category="qualifying", min_answer=2)
+        E(f"How many times did {sname} fail to finish (DNF) in the {sy} season?",
+          Y(metric_target="dnfs"), "race_week", 3.5,
+          category="reliability", min_answer=2)
+        E(f"Net across the {sy} season, how many positions did {sname} gain from the grid?",
+          Y(metric_target="positions_gained"), "race_week", 4.0,
+          category="racecraft", min_answer=5)
+        E(f"How many times did {sname} climb 10+ places from the grid in the {sy} season?",
+          Y(metric_target="big_comebacks"), "race_week", 4.0,
+          category="racecraft", min_answer=2)
+        E(f"How many runner-up (P2) finishes did {sname} take in the {sy} season?",
+          Y(metric_target="second_places"), "race_week", 3.0,
+          category="single_season", min_answer=2)
+
+    # ---- "In the 2020s" decade questions for the veterans ----
+    # Drivers whose careers started BEFORE 2020 get their current-decade record
+    # asked separately from their career totals ("how many races has Hamilton
+    # won in the 2020s?" is a very different question from his career count —
+    # and a much harder one). Post-2020 debutants are excluded: their career
+    # questions already cover the identical window.
+    decade_label = "the 2020s"
+    for d in drivers:
+        name, did = d.full_name, d.driver_id
+        if did not in span_by_id:
+            continue
+        lo, hi = span_by_id[did]
+        if not (lo < MODERN_ERA_START <= hi):
+            continue
+        current = d.active_to >= data_hi - 1
+        D = lambda **kw: _p(did, start_year=MODERN_ERA_START, end_year=data_hi, **kw)
+        E(f"How many races has {name} won in {decade_label}?" if current else
+          f"How many races did {name} win in {decade_label}?",
+          D(metric_target="wins"), "daily", 3.0, category="career", min_answer=2)
+        E(f"How many podium finishes has {name} taken in {decade_label}?" if current else
+          f"How many podium finishes did {name} take in {decade_label}?",
+          D(metric_target="podiums"), "daily", 3.0, category="career", min_answer=2)
+        E(f"How many pole positions has {name} taken in {decade_label}?" if current else
+          f"How many pole positions did {name} take in {decade_label}?",
+          D(metric_target="poles"), "race_week", 3.5, category="qualifying", min_answer=2)
+        E(f"How many championship points has {name} scored in {decade_label}?" if current else
+          f"How many championship points did {name} score in {decade_label}?",
+          D(metric_target="points"), "daily", 3.5, kind="points", category="career")
+        E(f"How many fastest laps has {name} set in {decade_label}?" if current else
+          f"How many fastest laps did {name} set in {decade_label}?",
+          D(metric_target="fastest_laps"), "race_week", 3.5, category="career", min_answer=2)
+        E(f"How many points-scoring finishes (top 10) has {name} recorded in {decade_label}?" if current else
+          f"How many points-scoring finishes (top 10) did {name} record in {decade_label}?",
+          D(metric_target="points_finishes"), "race_week", 3.0,
+          category="consistency", min_answer=5)
+        E(f"How many times has {name} failed to finish (DNF) in {decade_label}?" if current else
+          f"How many times did {name} fail to finish (DNF) in {decade_label}?",
+          D(metric_target="dnfs"), "race_week", 3.5, category="reliability", min_answer=2)
+        E(f"How many Grands Prix has {name} started in {decade_label}?" if current else
+          f"How many Grands Prix did {name} start in {decade_label}?",
+          D(metric_target="starts"), "daily", 2.5, category="career", min_answer=10)
+        E(f"In {decade_label}, in what percentage of races has {name} finished on the podium?" if current else
+          f"In {decade_label}, in what percentage of races did {name} finish on the podium?",
+          D(metric_target="podiums", aggregation="percentage_of_races"), "race_week", 4.0,
+          kind="percentage", category="rates", dmin=0, dmax=100, min_starts=20)
 
     # ---- Constructor (team) questions, scoped per era window ----
     # Real teams only (>= 5 career wins) so the pool stays interesting.
@@ -902,6 +981,34 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
             E(f"How many championship points did {tn} score in the {sy} season?",
               TY(metric_target="points"), "race_week", 4.0, kind="points", category="team")
 
+        # ---- Modern team season spotlights (post-2020, 100+ points) ----
+        # The dominant-season bar (8+ wins) reaches only the outliers; every
+        # substantial current-era campaign is askable material for today's
+        # audience ("how many podiums did Ferrari take in 2024?").
+        for sr in conn.execute(
+            "SELECT year, COALESCE(SUM(points), 0) AS pts "
+            "FROM staging_race_results WHERE constructor_id = ? AND year >= ? "
+            "GROUP BY year HAVING pts >= 100 ORDER BY year",
+            (cid, MODERN_ERA_START),
+        ).fetchall():
+            sy = sr["year"]
+            TM = lambda **kw: {"target_entity": "constructor", "entity_id": cid,
+                               "start_year": sy, "end_year": sy, **kw}
+            E(f"How many races did {tn} win in the {sy} season?",
+              TM(metric_target="wins"), "daily", 3.0, category="team", min_answer=2)
+            E(f"How many podium finishes did {tn} score in the {sy} season?",
+              TM(metric_target="podiums"), "race_week", 3.0, category="team", min_answer=2)
+            E(f"How many championship points did {tn} score in the {sy} season?",
+              TM(metric_target="points"), "race_week", 3.5, kind="points", category="team")
+            E(f"How many pole positions did {tn} take in the {sy} season?",
+              TM(metric_target="poles"), "race_week", 3.5, category="team", min_answer=2)
+            E(f"How many points-scoring finishes (top 10) did {tn} record in the {sy} season?",
+              TM(metric_target="points_finishes"), "race_week", 3.0,
+              category="team", min_answer=5)
+            E(f"How many fastest laps did {tn} set in the {sy} season?",
+              TM(metric_target="fastest_laps"), "race_week", 3.5,
+              category="team", min_answer=2)
+
     # ---- Circuit (venue) questions ----
     for cr in conn.execute(
         "SELECT circuit_id, COUNT(DISTINCT year || '-' || round) AS n "
@@ -928,6 +1035,19 @@ def generate_questions(conn: sqlite3.Connection, drivers: list[Driver] | None = 
           V(metric_target="wins_off_pole"), "race_week", 4.0, category="venue")
         E(f"At {vn}, what is the furthest back on the grid a race winner has started?",
           V(metric_target="deepest_win_grid"), "race_week", 4.0, category="venue", dmin=1, dmax=30)
+        # ---- Current-decade cut of the venue record (calendar venues only) ----
+        if vhi >= MODERN_ERA_START:
+            VM = lambda **kw: {"target_entity": "circuit", "entity_id": ccid,
+                               "start_year": MODERN_ERA_START, "end_year": vhi, **kw}
+            E(f"How many different drivers have won at {vn} in the 2020s?",
+              VM(metric_target="distinct_winners"), "race_week", 3.5,
+              category="venue", min_answer=2)
+            E(f"How many races at {vn} in the 2020s have been won from pole position?",
+              VM(metric_target="pole_wins"), "race_week", 3.5,
+              category="venue", min_answer=2)
+            E(f"What is the most wins by a single driver at {vn} in the 2020s?",
+              VM(metric_target="most_wins_one_driver"), "race_week", 3.5,
+              category="venue", min_answer=2)
 
     # ---- Head-to-head differences (overlapping eras) ----
     # Curated rivalries when their drivers are present (synthetic seed); otherwise
