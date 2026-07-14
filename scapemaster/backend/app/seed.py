@@ -169,14 +169,12 @@ def generate_questions(conn: sqlite3.Connection) -> list[dict]:
         E(f"How much experience do you need to advance from level {a} to level {a + 1}?",
           SK(metric_target="xp_between", level_a=a, level_b=a + 1), 4.0,
           kind="xp", category="skill", era=2001)
-    for skill in conn.execute("SELECT name, release_year FROM staging_skills"):
-        sn, sy = skill["name"], skill["release_year"]
-        E(f"How much total experience is a level 99 in {sn} worth?",
-          SK(metric_target="xp_for_level", level=99), 2.5,
-          kind="xp", category="skill", era=sy)
-        E(f"{sn} is halfway to 99 at level 92 — how much experience is that?",
-          SK(metric_target="xp_for_level", level=92), 3.0,
-          kind="xp", category="skill", era=sy)
+    # NOTE: deliberately NO per-skill copies of the level-99 / level-92 facts.
+    # The XP table is skill-independent, so "a level 99 in Thieving" and
+    # "a level 99 in Fishing" are the same question with the same 13,034,431 —
+    # a per-skill loop once filled 36 bank slots with two literal answers a
+    # player could memorise for free 5,000s. The generic _XP_LEVELS questions
+    # above already cover both milestones once each.
 
     # ---- Items ----
     items = conn.execute(

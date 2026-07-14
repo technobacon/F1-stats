@@ -612,17 +612,12 @@ const CurveSlider = (() => {
   function place() {
     if (!built) build();
     const t = tForValue(value);
-    const p = ptAtT(t), box = $("curve-slider").getBoundingClientRect();
+    const p = ptAtT(t);
     const car = $("car-thumb");
     car.style.left = (p.x / 1000) * 100 + "%";
-    // Ride a touch above the line rather than sitting on it — the lift is in
-    // screen px so it's unaffected by the tangent rotate.
-    car.style.top = `calc(${(p.y / 280) * 100}% - 9px)`;
-    // Rotate the marker to the curve tangent (viewBox delta -> screen delta).
-    const a = ptAtT(t - 0.012), b = ptAtT(t + 0.012);
-    const dx = (b.x - a.x) * (box.width / 1000), dy = (b.y - a.y) * (box.height / 280);
-    const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-    car.style.transform = `translate(-50%,-50%) rotate(${ang}deg)`;
+    // The orb sits centred on the straight track.
+    car.style.top = `${(p.y / 280) * 100}%`;
+    car.style.transform = "translate(-50%,-50%)";
     car.setAttribute("aria-valuenow", Math.round(value));
     const fill = $("curve-fill");
     fill.style.strokeDasharray = len;
@@ -851,19 +846,16 @@ async function submitGuess() {
   }
 }
 
-/* Stylized scimitar, reused for the slider thumb (inline in index.html) and the
- * two reveal markers. Blade takes the god's primary colour, the guard its
- * secondary; pass "car-ghost" for the translucent grey actual marker. Original
- * art — no game sprites. Keep in sync with the inline #car-thumb SVG. */
+/* Stylized rune orb, reused for the slider thumb (inline in index.html) and the
+ * two reveal markers. The body is the god's primary colour with a small
+ * specular highlight; pass "car-ghost" for the translucent grey actual marker.
+ * Original art — no game sprites. Keep in sync with the inline #car-thumb SVG. */
 const MARKER_SHAPES =
-  '<circle class="car-hub" cx="12" cy="42" r="5.5"/>' +
-  '<rect class="car-dark" x="13" y="38" width="18" height="8" rx="3"/>' +
-  '<rect class="car-wing" x="30" y="30" width="7" height="21" rx="2"/>' +
-  '<path class="car-body" d="M38 44 C64 41 94 31 116 13 ' +
-    'C121 9 124 15 120 20 C101 36 68 46 40 48 C37 48 36 45 38 44 Z"/>' +
-  '<path class="car-cockpit" d="M44 42 C68 39 94 30 112 17 L114 19 C96 32 70 41 45 44 Z"/>';
+  '<circle class="car-dark" cx="26" cy="26" r="24"/>' +
+  '<circle class="car-body" cx="26" cy="26" r="21"/>' +
+  '<circle class="car-cockpit" cx="19" cy="18" r="6"/>';
 function markerSVG(extraClass = "") {
-  return `<svg class="car-sprite ${extraClass}" viewBox="0 0 128 52" aria-hidden="true">${MARKER_SHAPES}</svg>`;
+  return `<svg class="car-sprite ${extraClass}" viewBox="0 0 52 52" aria-hidden="true">${MARKER_SHAPES}</svg>`;
 }
 // Drop a full (locked-in guess) and a ghost (actual answer) marker into the reveal.
 document.getElementById("node-guess").insertAdjacentHTML("afterbegin", markerSVG());

@@ -161,9 +161,13 @@ a { color:inherit; text-decoration:none; }
      the typographic pairing — humanist sans for prose, technical mono for the
      numbers and labels that read like a pit-wall readout. — */
 .hud-timer,.hud-points,.hud-label,.rw-next-timer,.rw-time,.rw-day .dnum,
-.tt-pts,.tt-rank,.lb-points,.lb-rank,.g-big,.gb-frac,.odometer,.summary-score,
-.curve-readout,.curve-end,.arcade-card .val,.game-points,.data-table .num {
+.tt-pts,.tt-rank,.lb-points,.lb-rank,.g-big,.gb-frac,
+.curve-end,.arcade-card .val,.game-points,.data-table .num {
   font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
+/* The big score/guess numbers read in the sans face — the pixel display face
+   is charming for labels but genuinely hard to read at score sizes. */
+.odometer,.summary-score,.curve-readout {
+  font-family:var(--font-sans); font-variant-numeric:tabular-nums; }
 /* Short labels only — long eyebrow phrases stay in the sans face so the
    wider mono glyphs don't force awkward wraps in the narrow timing tower. */
 .hud-label,.rw-next-label,.g-card-label,.rw-day .dow,.rw-kind {
@@ -424,16 +428,16 @@ main { flex:1; max-width:920px; margin:0 auto; width:100%; padding:1.5rem 1.5rem
 
 /* ===================== CURVED RACE-LINE SLIDER ===================== */
 .curve-wrap { display:flex; flex-direction:column; align-items:center; gap:1rem; margin:1.5rem 0 1.75rem; }
-.curve-readout { font-size:clamp(2.4rem,8vw,3.6rem); font-weight:900; font-family:var(--font-display);
+.curve-readout { font-size:clamp(2.4rem,8vw,3.6rem); font-weight:900; font-family:var(--font-sans);
                  color:var(--color-ink); font-variant-numeric:tabular-nums; line-height:1;
                  text-shadow:0 6px 26px color-mix(in srgb, var(--color-primary) 30%, transparent); }
-.curve-slider { position:relative; width:100%; height:clamp(140px,26vw,210px);
+.curve-slider { position:relative; width:100%; height:clamp(72px,12vw,110px);
                 touch-action:none; user-select:none; -webkit-user-select:none; }
 .curve-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
 .curve-track { fill:none; stroke:var(--line); stroke-width:10; stroke-linecap:round; }
 .curve-fill  { fill:none; stroke:var(--color-primary); stroke-width:10; stroke-linecap:round;
                filter:drop-shadow(0 0 6px color-mix(in srgb, var(--color-primary) 55%, transparent)); }
-.car-thumb { position:absolute; left:0; top:0; width:clamp(54px,9vw,72px);
+.car-thumb { position:absolute; left:0; top:0; width:clamp(30px,5vw,40px);
              transform:translate(-50%,-50%); cursor:grab; touch-action:none;
              transition:filter var(--t-fast); filter:drop-shadow(0 6px 12px rgba(0,0,0,.5)); }
 .car-thumb:focus-visible { outline:none; }
@@ -539,9 +543,9 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 #reveal-actual.pending { opacity:.35; }
 #reveal-actual.revealed { animation:pop .35s ease-out; }
 @keyframes pop { 0%{transform:scale(1.5);opacity:0} 60%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
-.odometer { font-size:3.5rem; font-weight:900; font-family:var(--font-display); text-align:center;
+.odometer { font-size:3.5rem; font-weight:900; font-family:var(--font-sans); text-align:center;
             color:var(--color-ink); font-variant-numeric:tabular-nums; margin:1rem 0; }
-.summary-score { font-size:4rem; font-weight:900; font-family:var(--font-display); color:var(--color-ink); text-align:center; }
+.summary-score { font-size:4rem; font-weight:900; font-family:var(--font-sans); color:var(--color-ink); text-align:center; }
 
 /* Ads */
 .ad-slot { border:1px dashed var(--line); color:var(--muted); text-align:center; font-size:.7rem;
@@ -1000,3 +1004,11 @@ body.in-game #submit-guess { display:block; margin:0 auto; min-width:240px; }
 .pf-chip:hover { border-color:var(--color-primary); }
 .pf-chip.on { background:color-mix(in srgb, var(--color-primary) 18%, var(--bg2));
               border-color:var(--color-primary); color:var(--color-ink); font-weight:700; }
+
+/* ===================== SQUARED-OFF CONTROLS ===================== */
+/* Buttons read as crisp near-rectangles rather than rounded pills. */
+:root { --r-btn: 2px; }
+.btn-primary, .btn-secondary, .btn-ghost, .stepper, .ns-btn, .pit-wall-btn,
+.link-btn, .lb-period-tab, .tt-period-tab, .ach-filter-tab {
+  border-radius: var(--r-btn);
+}
