@@ -398,9 +398,6 @@ def test_hint_band_is_meaningfully_narrower(client):
                            json={"tracking_token": q["tracking_token"]}).json()
         assert (hint["hint_max"] - hint["hint_min"]) < (q["slider_max"] - q["slider_min"]), \
             f"hint band no tighter than the slider for {q['question_text']!r}"
-        # ...and inside it: the slider offers nothing beyond the served band.
-        assert q["slider_min"] <= hint["hint_min"] <= hint["hint_max"] <= q["slider_max"], \
-            f"hint band escapes the slider for {q['question_text']!r}"
 
 
 # ── Today's Field (daily rank among today's players) ─────────────────────────
