@@ -749,7 +749,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Bandos tassets trade for on the Grand Exchange?",
-  "verified_answer": 15416691.0,
+  "verified_answer": 15488390.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -781,30 +781,30 @@
   "era_year": 2022
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Rune platebody?",
-  "verified_answer": 39000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Rune platelegs first released?",
+  "verified_answer": 2001.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2001
  },
  {
-  "question_string": "In which year was the Oak logs first released?",
-  "verified_answer": 2002.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Oak logs (per 4 hours)?",
+  "verified_answer": 15000.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2002
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Redwood logs trade for on the Grand Exchange?",
-  "verified_answer": 729.0,
+  "verified_answer": 739.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -814,23 +814,23 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which year was the Elidinis' ward first released?",
-  "verified_answer": 2022.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
-  "era_year": 2022
- },
- {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dragonstone?",
-  "verified_answer": 6000.0,
+  "question_string": "How many coins does the High Alchemy spell yield for one Osmumten's fang?",
+  "verified_answer": 600000.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
+  "difficulty_weight": 3.5,
+  "game_mode": "daily",
+  "era_year": 2022
+ },
+ {
+  "question_string": "In which year was the Oak logs first released?",
+  "verified_answer": 2002.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2002
@@ -847,9 +847,9 @@
   "era_year": 2016
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Dragon dagger (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Dragon dagger?",
+  "verified_answer": 18000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -880,9 +880,9 @@
   "era_year": 2001
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Ring of the gods (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Ring of the gods?",
+  "verified_answer": 30000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -924,9 +924,9 @@
   "era_year": 2017
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Lightbearer?",
-  "verified_answer": 600000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Lightbearer (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -957,79 +957,79 @@
   "era_year": 2019
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Slayer's staff?",
-  "verified_answer": 12600.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Granite maul first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Bow string (per 4 hours)?",
-  "verified_answer": 13000.0,
-  "answer_kind": "count",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
-  "era_year": 2002
- },
- {
-  "question_string": "In which year was the Rune full helm first released?",
+  "question_string": "In which year was the Amulet of power first released?",
   "verified_answer": 2001.0,
   "answer_kind": "year",
   "category": "item",
   "display_min": 1999.0,
   "display_max": 2026.0,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2001
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Spectral spirit shield?",
-  "verified_answer": 1200000.0,
+  "question_string": "As of the latest weekly snapshot, what does one Rune full helm trade for on the Grand Exchange?",
+  "verified_answer": 20480.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
-  "era_year": 2014
+  "era_year": 2001
  },
  {
-  "question_string": "In which year was the Yew longbow first released?",
-  "verified_answer": 2002.0,
+  "question_string": "In which year was the Elysian spirit shield first released?",
+  "verified_answer": 2014.0,
   "answer_kind": "year",
   "category": "item",
   "display_min": 1999.0,
   "display_max": 2026.0,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
-  "era_year": 2002
- },
- {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dark crab?",
-  "verified_answer": 192.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.5,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2014
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Grimy snapdragon trade for on the Grand Exchange?",
-  "verified_answer": 7864.0,
+  "question_string": "As of the latest weekly snapshot, what does one Yew longbow trade for on the Grand Exchange?",
+  "verified_answer": 512.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 3.5,
+  "game_mode": "daily",
+  "era_year": 2002
+ },
+ {
+  "question_string": "In which year was the Dragon pickaxe first released?",
+  "verified_answer": 2014.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 3.5,
+  "game_mode": "daily",
+  "era_year": 2014
+ },
+ {
+  "question_string": "What is the Grand Exchange buy limit for Grimy snapdragon (per 4 hours)?",
+  "verified_answer": 11000.0,
+  "answer_kind": "count",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -1045,35 +1045,35 @@
   "era_year": 2018
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Super combat potion(4) (per 4 hours)?",
-  "verified_answer": 2000.0,
+  "question_string": "How many coins does the High Alchemy spell yield for one Super combat potion(4)?",
+  "verified_answer": 150.0,
+  "answer_kind": "coins",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
+  "game_mode": "daily",
+  "era_year": 2014
+ },
+ {
+  "question_string": "What is the Grand Exchange buy limit for Black chinchompa (per 4 hours)?",
+  "verified_answer": 11000.0,
+  "answer_kind": "count",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 4.0,
+  "game_mode": "daily",
+  "era_year": 2014
+ },
+ {
+  "question_string": "What is the Grand Exchange buy limit for Dragon scimitar (per 4 hours)?",
+  "verified_answer": 70.0,
   "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2014
- },
- {
-  "question_string": "As of the latest weekly snapshot, what does one Black chinchompa trade for on the Grand Exchange?",
-  "verified_answer": 2921.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2014
- },
- {
-  "question_string": "As of the latest weekly snapshot, what does one Dragon scimitar trade for on the Grand Exchange?",
-  "verified_answer": 59214.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -1100,13 +1100,13 @@
   "era_year": 2018
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Granite maul?",
-  "verified_answer": 30000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Abyssal whip first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -1155,13 +1155,13 @@
   "era_year": 2018
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Ahrim's staff?",
-  "verified_answer": 51000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Dragon scimitar first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -1199,13 +1199,13 @@
   "era_year": 2022
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Dragon 2h sword trade for on the Grand Exchange?",
-  "verified_answer": 132164.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Dragon 2h sword (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2006
  },
@@ -1221,7 +1221,18 @@
   "era_year": 2003
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Harmonised orb (per 4 hours)?",
+  "question_string": "In which year was the Harmonised orb first released?",
+  "verified_answer": 2020.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
+  "game_mode": "daily",
+  "era_year": 2020
+ },
+ {
+  "question_string": "What is the Grand Exchange buy limit for Ancestral hat (per 4 hours)?",
   "verified_answer": 8.0,
   "answer_kind": "count",
   "category": "item",
@@ -1229,38 +1240,27 @@
   "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
-  "era_year": 2020
- },
- {
-  "question_string": "In which year was the Ancestral hat first released?",
-  "verified_answer": 2017.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
   "era_year": 2017
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Rune platebody trade for on the Grand Exchange?",
-  "verified_answer": 38395.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "daily",
-  "era_year": 2001
- },
- {
-  "question_string": "As of the latest weekly snapshot, what does one Rune pickaxe trade for on the Grand Exchange?",
-  "verified_answer": 18553.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Rune platebody (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 3.5,
+  "game_mode": "daily",
+  "era_year": 2001
+ },
+ {
+  "question_string": "What is the Grand Exchange buy limit for Rune pickaxe (per 4 hours)?",
+  "verified_answer": 40.0,
+  "answer_kind": "count",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2003
  },
@@ -1287,20 +1287,20 @@
   "era_year": 2006
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Dragon hunter crossbow trade for on the Grand Exchange?",
-  "verified_answer": 34834335.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Dragon hunter crossbow (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2017
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Osmumten's fang?",
-  "verified_answer": 600000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Osmumten's fang (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -1320,59 +1320,59 @@
   "era_year": 2018
  },
  {
-  "question_string": "In which year was the Rune scimitar first released?",
-  "verified_answer": 2001.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Rune scimitar trade for on the Grand Exchange?",
+  "verified_answer": 14878.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2001
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Magic seed trade for on the Grand Exchange?",
-  "verified_answer": 70196.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2005
- },
- {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dragon scimitar?",
-  "verified_answer": 60000.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2005
- },
- {
-  "question_string": "How many coins does the High Alchemy spell yield for one Ancestral robe bottom?",
-  "verified_answer": 48000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Magic seed (per 4 hours)?",
+  "verified_answer": 200.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
-  "era_year": 2017
+  "era_year": 2005
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dragon dagger?",
-  "verified_answer": 18000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Slayer's staff (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.5,
   "game_mode": "daily",
-  "era_year": 2004
+  "era_year": 2005
+ },
+ {
+  "question_string": "In which year was the Ancestral robe top first released?",
+  "verified_answer": 2017.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
+  "game_mode": "daily",
+  "era_year": 2017
+ },
+ {
+  "question_string": "In which year was the Rune kiteshield first released?",
+  "verified_answer": 2001.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
+  "game_mode": "daily",
+  "era_year": 2001
  },
  {
   "question_string": "What is the Grand Exchange buy limit for Torstol (per 4 hours)?",
@@ -1397,9 +1397,9 @@
   "era_year": 2022
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Guthan's warspear (per 4 hours)?",
-  "verified_answer": 15.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Guthan's warspear?",
+  "verified_answer": 60000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -1409,7 +1409,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Manta ray trade for on the Grand Exchange?",
-  "verified_answer": 1481.0,
+  "verified_answer": 1422.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -1453,7 +1453,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Tormented bracelet trade for on the Grand Exchange?",
-  "verified_answer": 18766005.0,
+  "verified_answer": 19242102.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -1474,8 +1474,8 @@
   "era_year": 2016
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Grapes (per 4 hours)?",
-  "verified_answer": 20000.0,
+  "question_string": "What is the Grand Exchange buy limit for Chocolate cake (per 4 hours)?",
+  "verified_answer": 6000.0,
   "answer_kind": "count",
   "category": "item",
   "display_min": null,
@@ -1518,30 +1518,30 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which year was the Logs first released?",
-  "verified_answer": 2001.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
-  "era_year": 2001
- },
- {
-  "question_string": "What is the Grand Exchange buy limit for Mahogany logs (per 4 hours)?",
-  "verified_answer": 11000.0,
+  "question_string": "What is the Grand Exchange buy limit for Logs (per 4 hours)?",
+  "verified_answer": 15000.0,
   "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
+  "era_year": 2001
+ },
+ {
+  "question_string": "In which year was the Magic seed first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
+  "game_mode": "daily",
   "era_year": 2005
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Sanguinesti staff (uncharged) trade for on the Grand Exchange?",
-  "verified_answer": 20112364.0,
+  "verified_answer": 21854670.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -1562,20 +1562,20 @@
   "era_year": 2013
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Amulet of glory?",
-  "verified_answer": 10575.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Dragonstone first released?",
+  "verified_answer": 2002.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2002
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Onyx (per 4 hours)?",
-  "verified_answer": 11000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Onyx?",
+  "verified_answer": 120000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -1595,30 +1595,30 @@
   "era_year": 2013
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Toxic staff (uncharged)?",
-  "verified_answer": 600003.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Blessed spirit shield (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 4.5,
   "game_mode": "daily",
-  "era_year": 2015
+  "era_year": 2014
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Cooked karambwan?",
-  "verified_answer": 150.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Dragon chainbody first released?",
+  "verified_answer": 2004.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2004
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Toxic blowpipe (empty) trade for on the Grand Exchange?",
-  "verified_answer": 10360004.0,
+  "verified_answer": 10654238.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -1628,13 +1628,13 @@
   "era_year": 2015
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Kraken tentacle trade for on the Grand Exchange?",
-  "verified_answer": 258168.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Kraken tentacle (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2014
  },
@@ -1661,35 +1661,35 @@
   "era_year": 2006
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Stamina potion(4) trade for on the Grand Exchange?",
-  "verified_answer": 3624.0,
+  "question_string": "What is the Grand Exchange buy limit for Stamina potion(4) (per 4 hours)?",
+  "verified_answer": 2000.0,
+  "answer_kind": "count",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
+  "game_mode": "daily",
+  "era_year": 2014
+ },
+ {
+  "question_string": "As of the latest weekly snapshot, what does one Super restore(4) trade for on the Grand Exchange?",
+  "verified_answer": 10606.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 3.0,
   "game_mode": "daily",
-  "era_year": 2014
- },
- {
-  "question_string": "In which year was the Super restore(4) first released?",
-  "verified_answer": 2004.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
   "era_year": 2004
  },
  {
-  "question_string": "In which year was the Osmumten's fang first released?",
-  "verified_answer": 2022.0,
-  "answer_kind": "year",
+  "question_string": "How many coins does the High Alchemy spell yield for one Zaryte vambraces?",
+  "verified_answer": 120000.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2022
  },
@@ -1705,13 +1705,13 @@
   "era_year": 2002
  },
  {
-  "question_string": "In which year was the Rune platebody first released?",
-  "verified_answer": 2001.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Rune platebody trade for on the Grand Exchange?",
+  "verified_answer": 38343.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2001
  },
@@ -1760,12 +1760,12 @@
   "era_year": 2018
  },
  {
-  "question_string": "In which year was the Rune arrow first released?",
-  "verified_answer": 2002.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Rune arrow (per 4 hours)?",
+  "verified_answer": 11000.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2002
@@ -1782,9 +1782,9 @@
   "era_year": 2013
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Toxic staff (uncharged) (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Toxic staff (uncharged)?",
+  "verified_answer": 600003.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -1793,13 +1793,13 @@
   "era_year": 2015
  },
  {
-  "question_string": "In which year was the Super combat potion(4) first released?",
-  "verified_answer": 2014.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Super combat potion(4) trade for on the Grand Exchange?",
+  "verified_answer": 12434.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2014
  },
@@ -1815,9 +1815,20 @@
   "era_year": 2023
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Ancestral robe bottom (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "In which year was the Grimy snapdragon first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
+  "game_mode": "daily",
+  "era_year": 2005
+ },
+ {
+  "question_string": "How many coins does the High Alchemy spell yield for one Ancestral robe bottom?",
+  "verified_answer": 48000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -1826,19 +1837,19 @@
   "era_year": 2017
  },
  {
-  "question_string": "In which year was the Stamina potion(4) first released?",
-  "verified_answer": 2014.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Stamina potion(4) trade for on the Grand Exchange?",
+  "verified_answer": 3666.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2014
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Ring of suffering trade for on the Grand Exchange?",
-  "verified_answer": 18540546.0,
+  "verified_answer": 19175130.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -1848,26 +1859,15 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which year was the Dragon pickaxe first released?",
-  "verified_answer": 2014.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2014
- },
- {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dragon platelegs?",
-  "verified_answer": 162000.0,
+  "question_string": "As of the latest weekly snapshot, what does one Dragon pickaxe trade for on the Grand Exchange?",
+  "verified_answer": 568390.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
-  "era_year": 2005
+  "era_year": 2014
  },
  {
   "question_string": "What is the Grand Exchange buy limit for Salmon (per 4 hours)?",
@@ -1903,35 +1903,24 @@
   "era_year": 2022
  },
  {
-  "question_string": "In which year was the Spectral spirit shield first released?",
-  "verified_answer": 2014.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
-  "era_year": 2014
- },
- {
-  "question_string": "What is the Grand Exchange buy limit for Grimy snapdragon (per 4 hours)?",
-  "verified_answer": 11000.0,
+  "question_string": "What is the Grand Exchange buy limit for Spectral spirit shield (per 4 hours)?",
+  "verified_answer": 8.0,
   "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
-  "era_year": 2005
+  "era_year": 2014
  },
  {
-  "question_string": "In which year was the Abyssal whip first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Abyssal whip trade for on the Grand Exchange?",
+  "verified_answer": 1011227.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -1947,13 +1936,13 @@
   "era_year": 2001
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Runite bar?",
-  "verified_answer": 3000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Adamantite bar (per 4 hours)?",
+  "verified_answer": 10000.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 4.5,
   "game_mode": "daily",
   "era_year": 2001
  },
@@ -1969,9 +1958,9 @@
   "era_year": 2015
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Antifire potion(4) (per 4 hours)?",
-  "verified_answer": 2000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Antifire potion(4)?",
+  "verified_answer": 198.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -1980,9 +1969,9 @@
   "era_year": 2004
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Dragon platelegs (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Dragon platelegs?",
+  "verified_answer": 162000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2024,30 +2013,19 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which year was the Dragon hunter crossbow first released?",
-  "verified_answer": 2017.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2017
- },
- {
-  "question_string": "As of the latest weekly snapshot, what does one Ring of dueling(8) trade for on the Grand Exchange?",
-  "verified_answer": 894.0,
+  "question_string": "As of the latest weekly snapshot, what does one Dragon hunter crossbow trade for on the Grand Exchange?",
+  "verified_answer": 36488518.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
-  "era_year": 2004
+  "era_year": 2017
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Ring of wealth (per 4 hours)?",
-  "verified_answer": 10000.0,
+  "question_string": "What is the Grand Exchange buy limit for Ring of dueling(8) (per 4 hours)?",
+  "verified_answer": 15000.0,
   "answer_kind": "count",
   "category": "item",
   "display_min": null,
@@ -2057,20 +2035,31 @@
   "era_year": 2004
  },
  {
-  "question_string": "In which year was the Archers ring first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "How many coins does the High Alchemy spell yield for one Ring of wealth?",
+  "verified_answer": 10575.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
+  "game_mode": "daily",
+  "era_year": 2004
+ },
+ {
+  "question_string": "As of the latest weekly snapshot, what does one Archers ring trade for on the Grand Exchange?",
+  "verified_answer": 2360063.0,
+  "answer_kind": "coins",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Tyrannical ring?",
-  "verified_answer": 30000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Ring of the gods (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2101,20 +2090,20 @@
   "era_year": 2013
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Nightmare staff trade for on the Grand Exchange?",
-  "verified_answer": 43766689.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Nightmare staff first released?",
+  "verified_answer": 2020.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2020
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Palm tree seed (per 4 hours)?",
-  "verified_answer": 200.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Palm tree seed?",
+  "verified_answer": 152.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2134,9 +2123,9 @@
   "era_year": 2020
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Kraken tentacle (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Kraken tentacle?",
+  "verified_answer": 50004.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2145,15 +2134,15 @@
   "era_year": 2014
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dragon battleaxe?",
-  "verified_answer": 120000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Rune battleaxe (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 4.5,
   "game_mode": "daily",
-  "era_year": 2002
+  "era_year": 2001
  },
  {
   "question_string": "In which year was the Magus ring first released?",
@@ -2233,13 +2222,13 @@
   "era_year": 2015
  },
  {
-  "question_string": "In which year was the Snapdragon first released?",
-  "verified_answer": 2004.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Snapdragon trade for on the Grand Exchange?",
+  "verified_answer": 7903.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2004
  },
@@ -2266,15 +2255,15 @@
   "era_year": 2018
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Antifire potion(4)?",
-  "verified_answer": 198.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Zamorak brew(4) (per 4 hours)?",
+  "verified_answer": 2000.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 4.5,
   "game_mode": "daily",
-  "era_year": 2004
+  "era_year": 2002
  },
  {
   "question_string": "What is the Grand Exchange buy limit for Saradomin sword (per 4 hours)?",
@@ -2299,17 +2288,6 @@
   "era_year": 2013
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dragon chainbody?",
-  "verified_answer": 150000.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
-  "era_year": 2004
- },
- {
   "question_string": "How many coins does the High Alchemy spell yield for one Bandos chestplate?",
   "verified_answer": 174006.0,
   "answer_kind": "coins",
@@ -2319,6 +2297,28 @@
   "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2013
+ },
+ {
+  "question_string": "How many coins does the High Alchemy spell yield for one Amulet of glory?",
+  "verified_answer": 10575.0,
+  "answer_kind": "coins",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
+  "game_mode": "daily",
+  "era_year": 2002
+ },
+ {
+  "question_string": "What is the Grand Exchange buy limit for Dragon harpoon (per 4 hours)?",
+  "verified_answer": 5.0,
+  "answer_kind": "count",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 4.0,
+  "game_mode": "daily",
+  "era_year": 2017
  },
  {
   "question_string": "What is the Grand Exchange buy limit for Amulet of glory (per 4 hours)?",
@@ -2332,31 +2332,9 @@
   "era_year": 2002
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Dragon harpoon trade for on the Grand Exchange?",
-  "verified_answer": 2071708.0,
+  "question_string": "How many coins does the High Alchemy spell yield for one Dragon pickaxe?",
+  "verified_answer": 58770.0,
   "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2017
- },
- {
-  "question_string": "As of the latest weekly snapshot, what does one Amulet of glory trade for on the Grand Exchange?",
-  "verified_answer": 10705.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.0,
-  "game_mode": "daily",
-  "era_year": 2002
- },
- {
-  "question_string": "What is the Grand Exchange buy limit for Dragon pickaxe (per 4 hours)?",
-  "verified_answer": 40.0,
-  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2377,7 +2355,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Armadyl godsword trade for on the Grand Exchange?",
-  "verified_answer": 7399996.0,
+  "verified_answer": 7603950.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -2410,7 +2388,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Torstol trade for on the Grand Exchange?",
-  "verified_answer": 3176.0,
+  "verified_answer": 3208.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -2420,20 +2398,20 @@
   "era_year": 2002
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Zaryte vambraces (per 4 hours)?",
-  "verified_answer": 7.0,
-  "answer_kind": "count",
+  "question_string": "As of the latest weekly snapshot, what does one Zaryte vambraces trade for on the Grand Exchange?",
+  "verified_answer": 76179996.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2022
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Saradomin brew(4) (per 4 hours)?",
-  "verified_answer": 2000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Saradomin brew(4)?",
+  "verified_answer": 120.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2453,13 +2431,13 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which year was the Dragon platelegs first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Dragon platelegs trade for on the Grand Exchange?",
+  "verified_answer": 161042.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -2475,12 +2453,23 @@
   "era_year": 2001
  },
  {
-  "question_string": "In which year was the Elysian spirit shield first released?",
-  "verified_answer": 2014.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Gilded platebody (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 4.5,
+  "game_mode": "daily",
+  "era_year": 2004
+ },
+ {
+  "question_string": "What is the Grand Exchange buy limit for Elysian spirit shield (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2014
@@ -2497,13 +2486,13 @@
   "era_year": 2001
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Blessed spirit shield?",
-  "verified_answer": 720000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Arcane spirit shield first released?",
+  "verified_answer": 2014.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2014
  },
@@ -2519,13 +2508,13 @@
   "era_year": 2023
  },
  {
-  "question_string": "In which year was the Grimy snapdragon first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Grimy snapdragon trade for on the Grand Exchange?",
+  "verified_answer": 7809.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -2541,12 +2530,12 @@
   "era_year": 2016
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Bow of faerdhinen (inactive)?",
-  "verified_answer": 3000000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Bow of faerdhinen (inactive) first released?",
+  "verified_answer": 2021.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2021
@@ -2563,8 +2552,19 @@
   "era_year": 2023
  },
  {
+  "question_string": "In which year was the Super restore(4) first released?",
+  "verified_answer": 2004.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 3.5,
+  "game_mode": "daily",
+  "era_year": 2004
+ },
+ {
   "question_string": "As of the latest weekly snapshot, what does one Old school bond trade for on the Grand Exchange?",
-  "verified_answer": 12224643.0,
+  "verified_answer": 12432552.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -2574,12 +2574,12 @@
   "era_year": 2015
  },
  {
-  "question_string": "In which year was the Cooked karambwan first released?",
-  "verified_answer": 2004.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Cooked karambwan (per 4 hours)?",
+  "verified_answer": 10000.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2004
@@ -2596,31 +2596,31 @@
   "era_year": 2006
  },
  {
-  "question_string": "In which year was the Magic longbow first released?",
-  "verified_answer": 2002.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
-  "era_year": 2002
- },
- {
-  "question_string": "How many coins does the High Alchemy spell yield for one Occult necklace?",
-  "verified_answer": 27000.0,
+  "question_string": "As of the latest weekly snapshot, what does one Magic longbow trade for on the Grand Exchange?",
+  "verified_answer": 1108.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 3.5,
   "game_mode": "daily",
+  "era_year": 2002
+ },
+ {
+  "question_string": "In which year was the Black chinchompa first released?",
+  "verified_answer": 2014.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
+  "game_mode": "daily",
   "era_year": 2014
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Rune platelegs (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Rune platelegs?",
+  "verified_answer": 38400.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2640,12 +2640,12 @@
   "era_year": 2002
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Ring of wealth?",
-  "verified_answer": 10575.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Ring of dueling(8) first released?",
+  "verified_answer": 2004.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2004
@@ -2662,42 +2662,42 @@
   "era_year": 2001
  },
  {
-  "question_string": "In which year was the Onyx first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Onyx (per 4 hours)?",
+  "verified_answer": 11000.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Mystic robe top trade for on the Grand Exchange?",
-  "verified_answer": 71586.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Mystic robe top (per 4 hours)?",
+  "verified_answer": 125.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Elysian spirit shield?",
-  "verified_answer": 1200000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Super combat potion(4) first released?",
+  "verified_answer": 2014.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2014
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Kodai wand (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Kodai wand?",
+  "verified_answer": 90000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2706,12 +2706,12 @@
   "era_year": 2017
  },
  {
-  "question_string": "In which year was the Kodai wand first released?",
-  "verified_answer": 2017.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Kodai wand (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2017
@@ -2761,9 +2761,9 @@
   "era_year": 2014
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Rune scimitar (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Rune scimitar?",
+  "verified_answer": 15360.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2816,24 +2816,24 @@
   "era_year": 2023
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Green d'hide body?",
-  "verified_answer": 4680.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Rune platebody first released?",
+  "verified_answer": 2001.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
-  "era_year": 2004
+  "era_year": 2001
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Occult necklace trade for on the Grand Exchange?",
-  "verified_answer": 384821.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Occult necklace (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2014
  },
@@ -2860,9 +2860,9 @@
   "era_year": 2017
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Dragon hunter crossbow (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Dragon hunter crossbow?",
+  "verified_answer": 48000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2871,9 +2871,9 @@
   "era_year": 2017
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Runite bar (per 4 hours)?",
-  "verified_answer": 10000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Runite bar?",
+  "verified_answer": 3000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2894,7 +2894,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Saradomin godsword trade for on the Grand Exchange?",
-  "verified_answer": 22904346.0,
+  "verified_answer": 24144273.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -2904,9 +2904,9 @@
   "era_year": 2013
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Black chinchompa (per 4 hours)?",
-  "verified_answer": 11000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Black chinchompa?",
+  "verified_answer": 144.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2915,13 +2915,13 @@
   "era_year": 2014
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Wyvern bones?",
-  "verified_answer": 96.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Dragon axe first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -2970,9 +2970,9 @@
   "era_year": 2014
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Rune platebody (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Rune platebody?",
+  "verified_answer": 39000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2981,9 +2981,9 @@
   "era_year": 2001
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Black d'hide body (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Black d'hide body?",
+  "verified_answer": 8088.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -2992,9 +2992,9 @@
   "era_year": 2004
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Amulet of power (per 4 hours)?",
-  "verified_answer": 125.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Amulet of power?",
+  "verified_answer": 2115.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3003,9 +3003,9 @@
   "era_year": 2001
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Ancestral hat (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Ancestral hat?",
+  "verified_answer": 27000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3015,7 +3015,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Shark trade for on the Grand Exchange?",
-  "verified_answer": 964.0,
+  "verified_answer": 950.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -3059,7 +3059,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Ghrazi rapier trade for on the Grand Exchange?",
-  "verified_answer": 25833935.0,
+  "verified_answer": 24711090.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -3069,24 +3069,24 @@
   "era_year": 2018
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Saradomin brew(4) trade for on the Grand Exchange?",
-  "verified_answer": 7088.0,
+  "question_string": "What is the Grand Exchange buy limit for Saradomin brew(4) (per 4 hours)?",
+  "verified_answer": 2000.0,
+  "answer_kind": "count",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
+  "game_mode": "daily",
+  "era_year": 2005
+ },
+ {
+  "question_string": "As of the latest weekly snapshot, what does one Dragon axe trade for on the Grand Exchange?",
+  "verified_answer": 68695.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 3.0,
-  "game_mode": "daily",
-  "era_year": 2005
- },
- {
-  "question_string": "In which year was the Dragon axe first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -3102,19 +3102,19 @@
   "era_year": 2013
  },
  {
-  "question_string": "In which year was the Ancestral robe top first released?",
-  "verified_answer": 2017.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Ancestral robe top (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2017
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Eternal boots trade for on the Grand Exchange?",
-  "verified_answer": 3655876.0,
+  "verified_answer": 4122465.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -3146,20 +3146,20 @@
   "era_year": 2006
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Lightbearer (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "As of the latest weekly snapshot, what does one Lightbearer trade for on the Grand Exchange?",
+  "verified_answer": 3908560.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2022
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Karil's crossbow (per 4 hours)?",
-  "verified_answer": 15.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Karil's crossbow?",
+  "verified_answer": 96000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3168,13 +3168,13 @@
   "era_year": 2005
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Super combat potion(4) trade for on the Grand Exchange?",
-  "verified_answer": 12354.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Super combat potion(4) (per 4 hours)?",
+  "verified_answer": 2000.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2014
  },
@@ -3190,12 +3190,12 @@
   "era_year": 2018
  },
  {
-  "question_string": "In which year was the Flax first released?",
-  "verified_answer": 2002.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Flax (per 4 hours)?",
+  "verified_answer": 13000.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2002
@@ -3212,35 +3212,35 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which year was the Occult necklace first released?",
-  "verified_answer": 2014.0,
+  "question_string": "As of the latest weekly snapshot, what does one Occult necklace trade for on the Grand Exchange?",
+  "verified_answer": 392026.0,
+  "answer_kind": "coins",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
+  "game_mode": "daily",
+  "era_year": 2014
+ },
+ {
+  "question_string": "In which year was the Dragon hunter crossbow first released?",
+  "verified_answer": 2017.0,
   "answer_kind": "year",
   "category": "item",
   "display_min": 1999.0,
   "display_max": 2026.0,
   "difficulty_weight": 3.5,
   "game_mode": "daily",
-  "era_year": 2014
- },
- {
-  "question_string": "How many coins does the High Alchemy spell yield for one Ancestral hat?",
-  "verified_answer": 27000.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
   "era_year": 2017
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dragon halberd?",
-  "verified_answer": 150000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Cooked karambwan first released?",
+  "verified_answer": 2004.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2004
  },
@@ -3256,13 +3256,13 @@
   "era_year": 2013
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Ahrim's robetop trade for on the Grand Exchange?",
-  "verified_answer": 1674288.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Ahrim's robetop (per 4 hours)?",
+  "verified_answer": 15.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -3300,13 +3300,13 @@
   "era_year": 2002
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Ranarr seed (per 4 hours)?",
+  "question_string": "What is the Grand Exchange buy limit for Palm tree seed (per 4 hours)?",
   "verified_answer": 200.0,
   "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 4.5,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -3322,12 +3322,12 @@
   "era_year": 2015
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Karil's crossbow?",
-  "verified_answer": 96000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Guthan's warspear first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
@@ -3355,9 +3355,9 @@
   "era_year": 2016
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Cooked karambwan (per 4 hours)?",
-  "verified_answer": 10000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Cooked karambwan?",
+  "verified_answer": 150.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3366,13 +3366,13 @@
   "era_year": 2004
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dragon pickaxe?",
-  "verified_answer": 58770.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Trident of the seas (full) first released?",
+  "verified_answer": 2014.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2014
  },
@@ -3410,34 +3410,34 @@
   "era_year": 2013
  },
  {
-  "question_string": "In which year was the Kraken tentacle first released?",
-  "verified_answer": 2014.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Kraken tentacle trade for on the Grand Exchange?",
+  "verified_answer": 267306.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2014
  },
  {
-  "question_string": "In which year was the Ring of dueling(8) first released?",
-  "verified_answer": 2004.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Ring of dueling(8) trade for on the Grand Exchange?",
+  "verified_answer": 862.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2004
  },
  {
-  "question_string": "In which year was the Dharok's platebody first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Dharok's platebody (per 4 hours)?",
+  "verified_answer": 15.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
@@ -3465,13 +3465,13 @@
   "era_year": 2007
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Elidinis' ward (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "As of the latest weekly snapshot, what does one Elidinis' ward trade for on the Grand Exchange?",
+  "verified_answer": 3252862.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2022
  },
@@ -3509,9 +3509,9 @@
   "era_year": 2022
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Elidinis' ward?",
-  "verified_answer": 3000000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Elidinis' ward (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3520,9 +3520,9 @@
   "era_year": 2022
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Gilded platebody?",
-  "verified_answer": 39000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Dragon halberd (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3531,9 +3531,9 @@
   "era_year": 2004
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Harmonised orb?",
-  "verified_answer": 2400000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Harmonised orb (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3553,13 +3553,13 @@
   "era_year": 2015
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Berserker ring trade for on the Grand Exchange?",
-  "verified_answer": 2972667.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Berserker ring (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -3586,9 +3586,9 @@
   "era_year": 2002
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Rune kiteshield (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Rune kiteshield?",
+  "verified_answer": 32640.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3663,13 +3663,13 @@
   "era_year": 2022
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Snapdragon trade for on the Grand Exchange?",
-  "verified_answer": 7978.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Snapdragon (per 4 hours)?",
+  "verified_answer": 11000.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2004
  },
@@ -3729,24 +3729,24 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which year was the Magic seed first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
-  "era_year": 2005
- },
- {
-  "question_string": "As of the latest weekly snapshot, what does one Prayer potion(4) trade for on the Grand Exchange?",
-  "verified_answer": 8550.0,
+  "question_string": "As of the latest weekly snapshot, what does one Magic seed trade for on the Grand Exchange?",
+  "verified_answer": 72481.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.0,
+  "difficulty_weight": 3.5,
+  "game_mode": "daily",
+  "era_year": 2005
+ },
+ {
+  "question_string": "What is the Grand Exchange buy limit for Prayer potion(4) (per 4 hours)?",
+  "verified_answer": 2000.0,
+  "answer_kind": "count",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2002
  },
@@ -3762,13 +3762,13 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which year was the Saradomin brew(4) first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Saradomin brew(4) trade for on the Grand Exchange?",
+  "verified_answer": 7092.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -3795,12 +3795,12 @@
   "era_year": 2019
  },
  {
-  "question_string": "In which year was the Karil's crossbow first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Karil's crossbow (per 4 hours)?",
+  "verified_answer": 15.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
@@ -3839,9 +3839,9 @@
   "era_year": 2006
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Ancestral robe top (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Ancestral robe top?",
+  "verified_answer": 72000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3894,9 +3894,9 @@
   "era_year": 2001
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Verac's flail?",
-  "verified_answer": 96000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Torag's hammers (per 4 hours)?",
+  "verified_answer": 15.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3927,19 +3927,19 @@
   "era_year": 2013
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Arcane spirit shield?",
-  "verified_answer": 1200000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Spectral spirit shield first released?",
+  "verified_answer": 2014.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2014
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Anglerfish trade for on the Grand Exchange?",
-  "verified_answer": 2809.0,
+  "verified_answer": 2778.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -3949,9 +3949,9 @@
   "era_year": 2016
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Zaryte vambraces?",
-  "verified_answer": 120000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Zaryte vambraces (per 4 hours)?",
+  "verified_answer": 7.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3971,9 +3971,9 @@
   "era_year": 2016
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Dragon axe (per 4 hours)?",
-  "verified_answer": 40.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Dragon axe?",
+  "verified_answer": 33000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -3993,9 +3993,9 @@
   "era_year": 2015
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Obsidian cape?",
-  "verified_answer": 36000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Tzhaar-ket-om (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -4004,13 +4004,13 @@
   "era_year": 2005
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Willow logs (per 4 hours)?",
-  "verified_answer": 15000.0,
-  "answer_kind": "count",
+  "question_string": "In which year was the Yew logs first released?",
+  "verified_answer": 2002.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2002
  },
@@ -4048,9 +4048,9 @@
   "era_year": 2016
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Rune 2h sword (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Rune 2h sword?",
+  "verified_answer": 38400.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -4059,20 +4059,20 @@
   "era_year": 2001
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Granite maul trade for on the Grand Exchange?",
-  "verified_answer": 132449.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Granite maul (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Ranging potion(4) (per 4 hours)?",
-  "verified_answer": 2000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Ranging potion(4)?",
+  "verified_answer": 216.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -4092,35 +4092,35 @@
   "era_year": 2006
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Stamina potion(4)?",
-  "verified_answer": 240.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Treasonous ring (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.5,
   "game_mode": "daily",
   "era_year": 2014
  },
  {
-  "question_string": "In which year was the Amulet of fury first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2005
- },
- {
-  "question_string": "As of the latest weekly snapshot, what does one Dragon chainbody trade for on the Grand Exchange?",
-  "verified_answer": 182602.0,
+  "question_string": "As of the latest weekly snapshot, what does one Amulet of fury trade for on the Grand Exchange?",
+  "verified_answer": 2789982.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 3.0,
+  "game_mode": "daily",
+  "era_year": 2005
+ },
+ {
+  "question_string": "What is the Grand Exchange buy limit for Dragon chainbody (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2004
  },
@@ -4136,24 +4136,24 @@
   "era_year": 2017
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Berserker ring?",
-  "verified_answer": 6000.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2005
- },
- {
-  "question_string": "What is the Grand Exchange buy limit for Osmumten's fang (per 4 hours)?",
+  "question_string": "What is the Grand Exchange buy limit for Warrior ring (per 4 hours)?",
   "verified_answer": 8.0,
   "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.5,
+  "game_mode": "daily",
+  "era_year": 2005
+ },
+ {
+  "question_string": "As of the latest weekly snapshot, what does one Osmumten's fang trade for on the Grand Exchange?",
+  "verified_answer": 18143139.0,
+  "answer_kind": "coins",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2022
  },
@@ -4181,7 +4181,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Voidwaker trade for on the Grand Exchange?",
-  "verified_answer": 38935582.0,
+  "verified_answer": 38322286.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -4269,7 +4269,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Dragon warhammer trade for on the Grand Exchange?",
-  "verified_answer": 15345165.0,
+  "verified_answer": 15338556.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -4279,9 +4279,9 @@
   "era_year": 2016
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Arcane spirit shield (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Arcane spirit shield?",
+  "verified_answer": 1200000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -4290,12 +4290,12 @@
   "era_year": 2014
  },
  {
-  "question_string": "In which year was the Mahogany logs first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Mahogany logs (per 4 hours)?",
+  "verified_answer": 11000.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
@@ -4334,41 +4334,41 @@
   "era_year": 2016
  },
  {
-  "question_string": "In which year was the Harmonised orb first released?",
-  "verified_answer": 2020.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
-  "game_mode": "daily",
-  "era_year": 2020
- },
- {
-  "question_string": "In which year was the Dragon dagger first released?",
-  "verified_answer": 2004.0,
-  "answer_kind": "year",
-  "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2004
- },
- {
-  "question_string": "How many coins does the High Alchemy spell yield for one Gold bar?",
-  "verified_answer": 180.0,
+  "question_string": "How many coins does the High Alchemy spell yield for one Bow of faerdhinen (inactive)?",
+  "verified_answer": 3000000.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
+  "era_year": 2021
+ },
+ {
+  "question_string": "As of the latest weekly snapshot, what does one Dragon dagger trade for on the Grand Exchange?",
+  "verified_answer": 17186.0,
+  "answer_kind": "coins",
+  "category": "item",
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
+  "game_mode": "daily",
+  "era_year": 2004
+ },
+ {
+  "question_string": "In which year was the Steel bar first released?",
+  "verified_answer": 2001.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
+  "game_mode": "daily",
   "era_year": 2001
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Primordial boots trade for on the Grand Exchange?",
-  "verified_answer": 19231694.0,
+  "verified_answer": 18910817.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -4378,20 +4378,20 @@
   "era_year": 2015
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dharok's greataxe?",
-  "verified_answer": 124800.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Ahrim's robetop first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Magic logs (per 4 hours)?",
-  "verified_answer": 12000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Magic logs?",
+  "verified_answer": 192.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -4466,24 +4466,24 @@
   "era_year": 2006
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dragon hunter crossbow?",
-  "verified_answer": 48000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Kodai wand first released?",
+  "verified_answer": 2017.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2017
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Amulet of power trade for on the Grand Exchange?",
-  "verified_answer": 2012.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Amulet of power (per 4 hours)?",
+  "verified_answer": 125.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2001
  },
@@ -4565,9 +4565,9 @@
   "era_year": 2019
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Tzhaar-ket-om (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Tzhaar-ket-om?",
+  "verified_answer": 30000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -4587,13 +4587,13 @@
   "era_year": 2016
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dharok's platebody?",
-  "verified_answer": 168000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Dharok's greataxe first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.0,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -4609,20 +4609,20 @@
   "era_year": 2013
  },
  {
-  "question_string": "In which year was the Arcane spirit shield first released?",
-  "verified_answer": 2014.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Arcane spirit shield (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2014
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Elysian spirit shield (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Elysian spirit shield?",
+  "verified_answer": 1200000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -4642,9 +4642,9 @@
   "era_year": 2017
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Treasonous ring?",
-  "verified_answer": 30000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Tyrannical ring (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -4664,12 +4664,12 @@
   "era_year": 2015
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Ancestral robe top?",
-  "verified_answer": 72000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Ancestral hat first released?",
+  "verified_answer": 2017.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2017
@@ -4719,13 +4719,13 @@
   "era_year": 2013
  },
  {
-  "question_string": "In which year was the Rune axe first released?",
-  "verified_answer": 2001.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Rune axe trade for on the Grand Exchange?",
+  "verified_answer": 7066.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2001
  },
@@ -4741,23 +4741,23 @@
   "era_year": 2002
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Yew logs?",
-  "verified_answer": 96.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Magic logs first released?",
+  "verified_answer": 2002.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2002
  },
  {
-  "question_string": "In which year was the Teak logs first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Teak logs (per 4 hours)?",
+  "verified_answer": 13000.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
@@ -4829,7 +4829,7 @@
   "era_year": 2007
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Chocolate cake (per 4 hours)?",
+  "question_string": "What is the Grand Exchange buy limit for Cake (per 4 hours)?",
   "verified_answer": 6000.0,
   "answer_kind": "count",
   "category": "item",
@@ -4851,23 +4851,23 @@
   "era_year": 2007
  },
  {
-  "question_string": "In which year was the Black chinchompa first released?",
-  "verified_answer": 2014.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Black chinchompa trade for on the Grand Exchange?",
+  "verified_answer": 2912.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2014
  },
  {
-  "question_string": "In which year was the Guthan's warspear first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Guthan's warspear (per 4 hours)?",
+  "verified_answer": 15.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
@@ -4884,9 +4884,9 @@
   "era_year": 2013
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Slayer's staff (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Slayer's staff?",
+  "verified_answer": 12600.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -4895,12 +4895,12 @@
   "era_year": 2005
  },
  {
-  "question_string": "In which year was the Bow string first released?",
-  "verified_answer": 2002.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Bow string (per 4 hours)?",
+  "verified_answer": 13000.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2002
@@ -4918,7 +4918,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Armadyl crossbow trade for on the Grand Exchange?",
-  "verified_answer": 41750664.0,
+  "verified_answer": 38864512.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -4994,9 +4994,9 @@
   "era_year": 2006
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Treasonous ring (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Treasonous ring?",
+  "verified_answer": 30000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5005,13 +5005,13 @@
   "era_year": 2014
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Amulet of fury trade for on the Grand Exchange?",
-  "verified_answer": 2711775.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Amulet of fury (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -5027,9 +5027,9 @@
   "era_year": 2002
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Dharok's greataxe (per 4 hours)?",
-  "verified_answer": 15.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Dharok's greataxe?",
+  "verified_answer": 124800.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5049,19 +5049,19 @@
   "era_year": 2001
  },
  {
-  "question_string": "In which year was the Prayer potion(4) first released?",
-  "verified_answer": 2002.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Prayer potion(4) trade for on the Grand Exchange?",
+  "verified_answer": 8791.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2002
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Dragon hunter lance trade for on the Grand Exchange?",
-  "verified_answer": 52098634.0,
+  "verified_answer": 54329320.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -5082,19 +5082,19 @@
   "era_year": 2023
  },
  {
-  "question_string": "In which year was the Gold bar first released?",
-  "verified_answer": 2001.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Gold bar (per 4 hours)?",
+  "verified_answer": 10000.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2001
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Rune crossbow trade for on the Grand Exchange?",
-  "verified_answer": 9458.0,
+  "verified_answer": 9152.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -5159,20 +5159,20 @@
   "era_year": 2018
  },
  {
-  "question_string": "In which year was the Berserker ring first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Berserker ring trade for on the Grand Exchange?",
+  "verified_answer": 3040864.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 3.5,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.0,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Tyrannical ring (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Tyrannical ring?",
+  "verified_answer": 30000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5181,9 +5181,9 @@
   "era_year": 2014
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Super restore(4) (per 4 hours)?",
-  "verified_answer": 2000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Super restore(4)?",
+  "verified_answer": 180.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5192,9 +5192,9 @@
   "era_year": 2004
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Stamina potion(4) (per 4 hours)?",
-  "verified_answer": 2000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Stamina potion(4)?",
+  "verified_answer": 240.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5214,9 +5214,9 @@
   "era_year": 2015
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Mystic air staff (per 4 hours)?",
-  "verified_answer": 18000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Mystic air staff?",
+  "verified_answer": 25500.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5258,19 +5258,19 @@
   "era_year": 2018
  },
  {
-  "question_string": "In which year was the Amulet of power first released?",
-  "verified_answer": 2001.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Amulet of power trade for on the Grand Exchange?",
+  "verified_answer": 2170.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2001
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Abyssal bludgeon trade for on the Grand Exchange?",
-  "verified_answer": 17244515.0,
+  "verified_answer": 17143945.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -5302,13 +5302,13 @@
   "era_year": 2001
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Archers ring trade for on the Grand Exchange?",
-  "verified_answer": 2081586.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Archers ring (per 4 hours)?",
+  "verified_answer": 8.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
@@ -5335,24 +5335,24 @@
   "era_year": 2013
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Onyx?",
-  "verified_answer": 120000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Uncut onyx (per 4 hours)?",
+  "verified_answer": 11000.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 4.5,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
-  "question_string": "In which year was the Steel bar first released?",
-  "verified_answer": 2001.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Steel bar trade for on the Grand Exchange?",
+  "verified_answer": 582.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2001
  },
@@ -5379,9 +5379,9 @@
   "era_year": 2022
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Obsidian cape (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Obsidian cape?",
+  "verified_answer": 36000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5401,24 +5401,24 @@
   "era_year": 2022
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Mystic robe top?",
-  "verified_answer": 72000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Dragon platelegs first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Black chinchompa?",
-  "verified_answer": 144.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Dark fishing bait (per 4 hours)?",
+  "verified_answer": 8000.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 4.5,
   "game_mode": "daily",
   "era_year": 2014
  },
@@ -5434,20 +5434,20 @@
   "era_year": 2022
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Rune axe trade for on the Grand Exchange?",
-  "verified_answer": 7094.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Rune axe (per 4 hours)?",
+  "verified_answer": 40.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2001
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Mystic air staff?",
-  "verified_answer": 25500.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Dragon battleaxe (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5467,9 +5467,9 @@
   "era_year": 2006
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Dragon harpoon (per 4 hours)?",
-  "verified_answer": 5.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Dragon harpoon?",
+  "verified_answer": 33000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5522,20 +5522,20 @@
   "era_year": 2002
  },
  {
-  "question_string": "In which year was the Rune 2h sword first released?",
-  "verified_answer": 2001.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Rune 2h sword trade for on the Grand Exchange?",
+  "verified_answer": 37880.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2001
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Dragon mace (per 4 hours)?",
-  "verified_answer": 70.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Dragon mace?",
+  "verified_answer": 30000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5544,20 +5544,20 @@
   "era_year": 2004
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Black d'hide body trade for on the Grand Exchange?",
-  "verified_answer": 7296.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Black d'hide body (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2004
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Uncut onyx?",
-  "verified_answer": 120000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Obsidian cape (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5566,24 +5566,24 @@
   "era_year": 2005
  },
  {
-  "question_string": "In which year was the Rune pickaxe first released?",
-  "verified_answer": 2003.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Rune pickaxe trade for on the Grand Exchange?",
+  "verified_answer": 18448.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2003
  },
  {
-  "question_string": "In which year was the Elder maul first released?",
-  "verified_answer": 2017.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Elder maul trade for on the Grand Exchange?",
+  "verified_answer": 99448464.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2017
  },
@@ -5610,9 +5610,9 @@
   "era_year": 2018
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Ahrim's robetop (per 4 hours)?",
-  "verified_answer": 15.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Ahrim's robetop?",
+  "verified_answer": 30000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5633,7 +5633,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Dragon claws trade for on the Grand Exchange?",
-  "verified_answer": 40036417.0,
+  "verified_answer": 39385281.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -5643,9 +5643,9 @@
   "era_year": 2017
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Tzhaar-ket-om?",
-  "verified_answer": 30000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Toktz-xil-ak (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5665,15 +5665,15 @@
   "era_year": 2022
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Dragon 2h sword?",
-  "verified_answer": 132000.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Wyvern bones (per 4 hours)?",
+  "verified_answer": 7500.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 4.5,
   "game_mode": "daily",
-  "era_year": 2006
+  "era_year": 2005
  },
  {
   "question_string": "In which year was the Magic fang first released?",
@@ -5687,13 +5687,13 @@
   "era_year": 2015
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Lightbearer trade for on the Grand Exchange?",
-  "verified_answer": 3850830.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Lightbearer first released?",
+  "verified_answer": 2022.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2022
  },
@@ -5709,9 +5709,9 @@
   "era_year": 2016
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Magic seed (per 4 hours)?",
-  "verified_answer": 200.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Magic seed?",
+  "verified_answer": 253.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5753,9 +5753,9 @@
   "era_year": 2023
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Spectral spirit shield (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Spectral spirit shield?",
+  "verified_answer": 1200000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5765,7 +5765,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Superior dragon bones trade for on the Grand Exchange?",
-  "verified_answer": 20434.0,
+  "verified_answer": 21090.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -5775,9 +5775,9 @@
   "era_year": 2018
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Blessed spirit shield (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Blessed spirit shield?",
+  "verified_answer": 720000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5797,9 +5797,9 @@
   "era_year": 2007
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Warrior ring (per 4 hours)?",
-  "verified_answer": 8.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Warrior ring?",
+  "verified_answer": 6000.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5808,20 +5808,20 @@
   "era_year": 2005
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Dragon dagger trade for on the Grand Exchange?",
-  "verified_answer": 17135.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Dragon dagger (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2004
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Steel bar (per 4 hours)?",
-  "verified_answer": 10000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Steel bar?",
+  "verified_answer": 60.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5830,35 +5830,35 @@
   "era_year": 2001
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Ranging potion(4) trade for on the Grand Exchange?",
-  "verified_answer": 2092.0,
-  "answer_kind": "coins",
-  "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
-  "game_mode": "daily",
-  "era_year": 2002
- },
- {
-  "question_string": "What is the Grand Exchange buy limit for Snapdragon seed (per 4 hours)?",
-  "verified_answer": 200.0,
+  "question_string": "What is the Grand Exchange buy limit for Ranging potion(4) (per 4 hours)?",
+  "verified_answer": 2000.0,
   "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.5,
+  "difficulty_weight": 4.0,
+  "game_mode": "daily",
+  "era_year": 2002
+ },
+ {
+  "question_string": "In which year was the Ranarr seed first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
+  "category": "item",
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Rune platelegs trade for on the Grand Exchange?",
-  "verified_answer": 37746.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Rune platelegs (per 4 hours)?",
+  "verified_answer": 70.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.0,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2001
  },
@@ -5885,20 +5885,20 @@
   "era_year": 2007
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Black d'hide body?",
-  "verified_answer": 8088.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Antifire potion(4) (per 4 hours)?",
+  "verified_answer": 2000.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 4.5,
   "game_mode": "daily",
   "era_year": 2004
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Yew seed?",
-  "verified_answer": 85.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Snapdragon seed (per 4 hours)?",
+  "verified_answer": 200.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -5907,19 +5907,19 @@
   "era_year": 2005
  },
  {
-  "question_string": "In which year was the Granite maul first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "As of the latest weekly snapshot, what does one Granite maul trade for on the Grand Exchange?",
+  "verified_answer": 116822.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
-  "difficulty_weight": 4.0,
+  "display_min": null,
+  "display_max": null,
+  "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Bandos chestplate trade for on the Grand Exchange?",
-  "verified_answer": 23168147.0,
+  "verified_answer": 23214239.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -5929,15 +5929,15 @@
   "era_year": 2013
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Rune 2h sword?",
-  "verified_answer": 38400.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Rune pickaxe first released?",
+  "verified_answer": 2003.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
-  "era_year": 2001
+  "era_year": 2003
  },
  {
   "question_string": "What is the Grand Exchange buy limit for Abyssal dagger (per 4 hours)?",
@@ -5974,7 +5974,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Runite ore trade for on the Grand Exchange?",
-  "verified_answer": 10323.0,
+  "verified_answer": 10187.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -6017,12 +6017,12 @@
   "era_year": 2002
  },
  {
-  "question_string": "In which year was the Dharok's greataxe first released?",
-  "verified_answer": 2005.0,
-  "answer_kind": "year",
+  "question_string": "What is the Grand Exchange buy limit for Dharok's greataxe (per 4 hours)?",
+  "verified_answer": 15.0,
+  "answer_kind": "count",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
@@ -6039,34 +6039,34 @@
   "era_year": 2003
  },
  {
-  "question_string": "In which year was the Nightmare staff first released?",
-  "verified_answer": 2020.0,
-  "answer_kind": "year",
+  "question_string": "How many coins does the High Alchemy spell yield for one Harmonised orb?",
+  "verified_answer": 2400000.0,
+  "answer_kind": "coins",
   "category": "item",
-  "display_min": 1999.0,
-  "display_max": 2026.0,
+  "display_min": null,
+  "display_max": null,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2020
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Logs (per 4 hours)?",
-  "verified_answer": 15000.0,
+  "question_string": "What is the Grand Exchange buy limit for Dragon mace (per 4 hours)?",
+  "verified_answer": 70.0,
   "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 4.0,
+  "difficulty_weight": 4.5,
   "game_mode": "daily",
-  "era_year": 2001
+  "era_year": 2004
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Kodai wand?",
-  "verified_answer": 90000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Elder maul first released?",
+  "verified_answer": 2017.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2017
@@ -6128,7 +6128,7 @@
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Pegasian boots trade for on the Grand Exchange?",
-  "verified_answer": 31247086.0,
+  "verified_answer": 32519041.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -6149,19 +6149,19 @@
   "era_year": 2013
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Torag's hammers?",
-  "verified_answer": 96000.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Karil's crossbow first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 4.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2005
  },
  {
   "question_string": "As of the latest weekly snapshot, what does one Bandos godsword trade for on the Grand Exchange?",
-  "verified_answer": 17211687.0,
+  "verified_answer": 18383472.0,
   "answer_kind": "coins",
   "category": "item",
   "display_min": null,
@@ -6193,13 +6193,13 @@
   "era_year": 2016
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Rune scimitar?",
-  "verified_answer": 15360.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Rune 2h sword first released?",
+  "verified_answer": 2001.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
-  "difficulty_weight": 3.5,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2001
  },
@@ -6259,9 +6259,9 @@
   "era_year": 2017
  },
  {
-  "question_string": "What is the Grand Exchange buy limit for Adamantite bar (per 4 hours)?",
-  "verified_answer": 10000.0,
-  "answer_kind": "count",
+  "question_string": "How many coins does the High Alchemy spell yield for one Adamantite bar?",
+  "verified_answer": 384.0,
+  "answer_kind": "coins",
   "category": "item",
   "display_min": null,
   "display_max": null,
@@ -6292,13 +6292,13 @@
   "era_year": 2001
  },
  {
-  "question_string": "As of the latest weekly snapshot, what does one Green d'hide body trade for on the Grand Exchange?",
-  "verified_answer": 4326.0,
-  "answer_kind": "coins",
+  "question_string": "What is the Grand Exchange buy limit for Green d'hide body (per 4 hours)?",
+  "verified_answer": 125.0,
+  "answer_kind": "count",
   "category": "item",
   "display_min": null,
   "display_max": null,
-  "difficulty_weight": 3.5,
+  "difficulty_weight": 4.0,
   "game_mode": "daily",
   "era_year": 2004
  },
@@ -6314,12 +6314,12 @@
   "era_year": 2016
  },
  {
-  "question_string": "How many coins does the High Alchemy spell yield for one Saradomin brew(4)?",
-  "verified_answer": 120.0,
-  "answer_kind": "coins",
+  "question_string": "In which year was the Amulet of fury first released?",
+  "verified_answer": 2005.0,
+  "answer_kind": "year",
   "category": "item",
-  "display_min": null,
-  "display_max": null,
+  "display_min": 1999.0,
+  "display_max": 2026.0,
   "difficulty_weight": 3.5,
   "game_mode": "daily",
   "era_year": 2005
