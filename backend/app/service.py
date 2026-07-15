@@ -386,50 +386,38 @@ HINT_MIN_WIDTH = 10.0         # floor so tiny counts still get a real spread
 
 
 def _hint_band(answer: float, kind: str, token: str, salt: str,
-               smin: float, smax: float) -> tuple[float, float]:
+               served_span: float | None = None) -> tuple[float, float]:
     """A rounded band that contains `answer` without centring on it. The
     placement fraction comes from a secret-salted RNG keyed by the (random,
     per-session) tracking token, so the same question gets a differently-placed
     band every time it is served and the offset is never predictable.
 
-    The width is capped at 60% of the band the player is already looking at
-    (smin..smax), so a radio call always buys real information — without the cap
+    The width is also capped at 60% of the band the player is already looking at
+    (served_span), so a radio call always buys real information — without the cap
     a small-count question whose slider is already at the 0-10 floor would get a
-    "hint" no tighter than the slider itself. The band is also kept INSIDE the
-    served band: the slider offers nothing beyond it, so a 1948 hint on a
-    1950-floored year slider would read broken."""
+    "hint" no tighter than the slider itself."""
     if kind == "year":
         width = HINT_WIDTH_YEAR
     elif kind == "percentage":
         width = HINT_WIDTH_PERCENTAGE
     else:
         width = max(HINT_MIN_WIDTH, HINT_REL_WIDTH * abs(answer))
-    served_span = smax - smin
-    if served_span > 0:
+    if served_span and served_span > 0:
         width = min(width, 0.6 * served_span)
     width = max(width, 4.0)   # never pin the answer to a sliver
-    if served_span > 0:
-        # Outward integer rounding adds up to 2 to the band; staying at least 2
-        # under the served span keeps the hint STRICTLY narrower even on a
-        # short year window (a 4-season stint), instead of charging 40% for
-        # the band the player already had.
-        width = min(width, max(served_span - 2.0, 1.0))
     rng = _deterministic_rng("pit-wall", salt, token)
     frac = rng.uniform(0.25, 0.75)   # where in the band the answer sits
     lo = answer - frac * width
     hi = lo + width
-    # Shift the band inside the served edges — the shift preserves the width,
-    # and the answer stays inside because it is itself within the served band.
-    if lo < smin:
-        lo, hi = smin, smin + width
-    elif hi > smax:
-        lo, hi = smax - width, smax
+    # Keep the band on the answer's natural scale: never below zero, and never
+    # past 100 for percentages. Shifting preserves the width, and the answer
+    # stays inside because it is itself within those limits.
     if lo < 0:
         lo, hi = 0.0, width
-    # Round outward to clean integers (floor/ceil only ever widens the band),
-    # then trim back to the served edges the rounding may have crossed.
-    lo, hi = math.floor(lo), math.ceil(hi)
-    return float(max(lo, math.floor(smin))), float(min(hi, math.ceil(smax)))
+    if kind == "percentage" and hi > 100:
+        lo, hi = 100.0 - width, 100.0
+    # Round outward to clean integers (floor/ceil only ever widens the band).
+    return float(math.floor(lo)), float(math.ceil(hi))
 
 
 def request_hint(conn: sqlite3.Connection, token: str) -> dict | None:
@@ -443,7 +431,7 @@ def request_hint(conn: sqlite3.Connection, token: str) -> dict | None:
     if entry["hint"] is None:
         entry["hint"] = _hint_band(
             entry["answer"], entry["kind"], token, _get_slider_salt(conn),
-            entry["smin"], entry["smax"],
+            served_span=entry["smax"] - entry["smin"],
         )
     lo, hi = entry["hint"]
     return {
