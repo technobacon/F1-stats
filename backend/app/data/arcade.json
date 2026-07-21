@@ -25,7 +25,7 @@
     "podiums": 207,
     "poles": 104,
     "fastest_laps": 69,
-    "points_finishes": 340,
+    "points_finishes": 341,
     "front_rows": 177,
     "dnfs": 32
    }
@@ -102,7 +102,7 @@
     "fastest_laps": 12,
     "points_finishes": 186,
     "front_rows": 13,
-    "dnfs": 34
+    "dnfs": 35
    }
   },
   {
@@ -142,11 +142,11 @@
    "active_to": 2026,
    "stats": {
     "wins": 71,
-    "podiums": 129,
+    "podiums": 130,
     "poles": 48,
     "fastest_laps": 37,
-    "points_finishes": 201,
-    "front_rows": 87,
+    "points_finishes": 202,
+    "front_rows": 88,
     "dnfs": 33
    }
   },
@@ -222,7 +222,7 @@
     "fastest_laps": 0,
     "points_finishes": 66,
     "front_rows": 2,
-    "dnfs": 32
+    "dnfs": 33
    }
   },
   {
@@ -262,10 +262,10 @@
    "active_to": 2026,
    "stats": {
     "wins": 9,
-    "podiums": 53,
+    "podiums": 54,
     "poles": 27,
     "fastest_laps": 11,
-    "points_finishes": 139,
+    "points_finishes": 140,
     "front_rows": 45,
     "dnfs": 26
    }
@@ -331,6 +331,36 @@
    }
   },
   {
+   "driver_id": "russell",
+   "full_name": "George Russell",
+   "active_from": 2019,
+   "active_to": 2026,
+   "stats": {
+    "wins": 7,
+    "podiums": 29,
+    "poles": 12,
+    "fastest_laps": 11,
+    "points_finishes": 93,
+    "front_rows": 23,
+    "dnfs": 18
+   }
+  },
+  {
+   "driver_id": "norris",
+   "full_name": "Lando Norris",
+   "active_from": 2019,
+   "active_to": 2026,
+   "stats": {
+    "wins": 11,
+    "podiums": 46,
+    "poles": 16,
+    "fastest_laps": 20,
+    "points_finishes": 128,
+    "front_rows": 30,
+    "dnfs": 13
+   }
+  },
+  {
    "driver_id": "senna",
    "full_name": "Ayrton Senna",
    "active_from": 1984,
@@ -343,36 +373,6 @@
     "points_finishes": 104,
     "front_rows": 87,
     "dnfs": 53
-   }
-  },
-  {
-   "driver_id": "russell",
-   "full_name": "George Russell",
-   "active_from": 2019,
-   "active_to": 2026,
-   "stats": {
-    "wins": 7,
-    "podiums": 29,
-    "poles": 12,
-    "fastest_laps": 11,
-    "points_finishes": 93,
-    "front_rows": 23,
-    "dnfs": 17
-   }
-  },
-  {
-   "driver_id": "norris",
-   "full_name": "Lando Norris",
-   "active_from": 2019,
-   "active_to": 2026,
-   "stats": {
-    "wins": 11,
-    "podiums": 46,
-    "poles": 16,
-    "fastest_laps": 19,
-    "points_finishes": 127,
-    "front_rows": 30,
-    "dnfs": 13
    }
   },
   {
@@ -460,7 +460,7 @@
     "podiums": 28,
     "poles": 6,
     "fastest_laps": 9,
-    "points_finishes": 61,
+    "points_finishes": 62,
     "front_rows": 17,
     "dnfs": 7
    }
