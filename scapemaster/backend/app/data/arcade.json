@@ -4,7 +4,7 @@
    "entity_id": "2",
    "full_name": "Steel cannonball",
    "stats": {
-    "ge_price": 263,
+    "ge_price": 244,
     "high_alch": 3,
     "buy_limit": 11000
    }
@@ -13,7 +13,7 @@
    "entity_id": "207",
    "full_name": "Grimy ranarr weed",
    "stats": {
-    "ge_price": 5196,
+    "ge_price": 5250,
     "high_alch": 18,
     "buy_limit": 11000
    }
@@ -22,7 +22,7 @@
    "entity_id": "245",
    "full_name": "Wine of zamorak",
    "stats": {
-    "ge_price": 940,
+    "ge_price": 1070,
     "high_alch": 1,
     "buy_limit": 11000
    }
@@ -31,7 +31,7 @@
    "entity_id": "257",
    "full_name": "Ranarr weed",
    "stats": {
-    "ge_price": 5278,
+    "ge_price": 5444,
     "high_alch": 15,
     "buy_limit": 11000
    }
@@ -40,7 +40,7 @@
    "entity_id": "269",
    "full_name": "Torstol",
    "stats": {
-    "ge_price": 3208,
+    "ge_price": 3222,
     "high_alch": 45,
     "buy_limit": 11000
    }
@@ -67,7 +67,7 @@
    "entity_id": "377",
    "full_name": "Raw lobster",
    "stats": {
-    "ge_price": 122,
+    "ge_price": 132,
     "high_alch": 42,
     "buy_limit": 15000
    }
@@ -76,7 +76,7 @@
    "entity_id": "379",
    "full_name": "Lobster",
    "stats": {
-    "ge_price": 111,
+    "ge_price": 100,
     "high_alch": 42,
     "buy_limit": 6000
    }
@@ -85,7 +85,7 @@
    "entity_id": "383",
    "full_name": "Raw shark",
    "stats": {
-    "ge_price": 703,
+    "ge_price": 748,
     "high_alch": 102,
     "buy_limit": 15000
    }
@@ -94,7 +94,7 @@
    "entity_id": "385",
    "full_name": "Shark",
    "stats": {
-    "ge_price": 950,
+    "ge_price": 1001,
     "high_alch": 102,
     "buy_limit": 10000
    }
@@ -103,7 +103,7 @@
    "entity_id": "391",
    "full_name": "Manta ray",
    "stats": {
-    "ge_price": 1422,
+    "ge_price": 1431,
     "high_alch": 120,
     "buy_limit": 10000
    }
@@ -112,7 +112,7 @@
    "entity_id": "440",
    "full_name": "Iron ore",
    "stats": {
-    "ge_price": 74,
+    "ge_price": 76,
     "high_alch": 10,
     "buy_limit": 13000
    }
@@ -121,7 +121,7 @@
    "entity_id": "444",
    "full_name": "Gold ore",
    "stats": {
-    "ge_price": 156,
+    "ge_price": 154,
     "high_alch": 90,
     "buy_limit": 30000
    }
@@ -130,7 +130,7 @@
    "entity_id": "449",
    "full_name": "Adamantite ore",
    "stats": {
-    "ge_price": 556,
+    "ge_price": 551,
     "high_alch": 240,
     "buy_limit": 4500
    }
@@ -139,7 +139,7 @@
    "entity_id": "451",
    "full_name": "Runite ore",
    "stats": {
-    "ge_price": 10187,
+    "ge_price": 10300,
     "high_alch": 1920,
     "buy_limit": 4500
    }
@@ -148,7 +148,7 @@
    "entity_id": "453",
    "full_name": "Coal",
    "stats": {
-    "ge_price": 143,
+    "ge_price": 149,
     "high_alch": 27,
     "buy_limit": 13000
    }
@@ -157,7 +157,7 @@
    "entity_id": "526",
    "full_name": "Bones",
    "stats": {
-    "ge_price": 31,
+    "ge_price": 30,
     "high_alch": 1,
     "buy_limit": 3000
    }
@@ -166,7 +166,7 @@
    "entity_id": "532",
    "full_name": "Big bones",
    "stats": {
-    "ge_price": 239,
+    "ge_price": 254,
     "high_alch": 1,
     "buy_limit": 3000
    }
@@ -175,7 +175,7 @@
    "entity_id": "536",
    "full_name": "Dragon bones",
    "stats": {
-    "ge_price": 3136,
+    "ge_price": 3314,
     "high_alch": 96,
     "buy_limit": 7500
    }
@@ -184,7 +184,7 @@
    "entity_id": "560",
    "full_name": "Death rune",
    "stats": {
-    "ge_price": 180,
+    "ge_price": 182,
     "high_alch": 108,
     "buy_limit": 25000
    }
@@ -193,7 +193,7 @@
    "entity_id": "561",
    "full_name": "Nature rune",
    "stats": {
-    "ge_price": 138,
+    "ge_price": 142,
     "high_alch": 108,
     "buy_limit": 18000
    }
@@ -202,7 +202,7 @@
    "entity_id": "562",
    "full_name": "Chaos rune",
    "stats": {
-    "ge_price": 107,
+    "ge_price": 106,
     "high_alch": 54,
     "buy_limit": 18000
    }
@@ -220,7 +220,7 @@
    "entity_id": "564",
    "full_name": "Cosmic rune",
    "stats": {
-    "ge_price": 116,
+    "ge_price": 120,
     "high_alch": 30,
     "buy_limit": 18000
    }
@@ -229,7 +229,7 @@
    "entity_id": "565",
    "full_name": "Blood rune",
    "stats": {
-    "ge_price": 332,
+    "ge_price": 357,
     "high_alch": 240,
     "buy_limit": 25000
    }
@@ -247,7 +247,7 @@
    "entity_id": "855",
    "full_name": "Yew longbow",
    "stats": {
-    "ge_price": 512,
+    "ge_price": 506,
     "high_alch": 768,
     "buy_limit": 18000
    }
@@ -256,7 +256,7 @@
    "entity_id": "859",
    "full_name": "Magic longbow",
    "stats": {
-    "ge_price": 1108,
+    "ge_price": 1082,
     "high_alch": 1536,
     "buy_limit": 18000
    }
@@ -265,7 +265,7 @@
    "entity_id": "861",
    "full_name": "Magic shortbow",
    "stats": {
-    "ge_price": 719,
+    "ge_price": 712,
     "high_alch": 960,
     "buy_limit": 18000
    }
@@ -274,7 +274,7 @@
    "entity_id": "892",
    "full_name": "Rune arrow",
    "stats": {
-    "ge_price": 50,
+    "ge_price": 52,
     "high_alch": 240,
     "buy_limit": 11000
    }
@@ -283,7 +283,7 @@
    "entity_id": "1079",
    "full_name": "Rune platelegs",
    "stats": {
-    "ge_price": 37802,
+    "ge_price": 37790,
     "high_alch": 38400,
     "buy_limit": 70
    }
@@ -292,7 +292,7 @@
    "entity_id": "1127",
    "full_name": "Rune platebody",
    "stats": {
-    "ge_price": 38343,
+    "ge_price": 38404,
     "high_alch": 39000,
     "buy_limit": 70
    }
@@ -310,7 +310,7 @@
    "entity_id": "1163",
    "full_name": "Rune full helm",
    "stats": {
-    "ge_price": 20480,
+    "ge_price": 20596,
     "high_alch": 21120,
     "buy_limit": 70
    }
@@ -319,7 +319,7 @@
    "entity_id": "1201",
    "full_name": "Rune kiteshield",
    "stats": {
-    "ge_price": 31898,
+    "ge_price": 32007,
     "high_alch": 32640,
     "buy_limit": 70
    }
@@ -328,7 +328,7 @@
    "entity_id": "1215",
    "full_name": "Dragon dagger",
    "stats": {
-    "ge_price": 17186,
+    "ge_price": 17118,
     "high_alch": 18000,
     "buy_limit": 70
    }
@@ -337,7 +337,7 @@
    "entity_id": "1275",
    "full_name": "Rune pickaxe",
    "stats": {
-    "ge_price": 18448,
+    "ge_price": 18516,
     "high_alch": 19200,
     "buy_limit": 40
    }
@@ -346,7 +346,7 @@
    "entity_id": "1319",
    "full_name": "Rune 2h sword",
    "stats": {
-    "ge_price": 37880,
+    "ge_price": 37868,
     "high_alch": 38400,
     "buy_limit": 70
    }
@@ -364,7 +364,7 @@
    "entity_id": "1359",
    "full_name": "Rune axe",
    "stats": {
-    "ge_price": 7066,
+    "ge_price": 7164,
     "high_alch": 7680,
     "buy_limit": 40
    }
@@ -373,7 +373,7 @@
    "entity_id": "1511",
    "full_name": "Logs",
    "stats": {
-    "ge_price": 24,
+    "ge_price": 26,
     "high_alch": 2,
     "buy_limit": 15000
    }
@@ -382,7 +382,7 @@
    "entity_id": "1513",
    "full_name": "Magic logs",
    "stats": {
-    "ge_price": 811,
+    "ge_price": 816,
     "high_alch": 192,
     "buy_limit": 12000
    }
@@ -391,7 +391,7 @@
    "entity_id": "1515",
    "full_name": "Yew logs",
    "stats": {
-    "ge_price": 115,
+    "ge_price": 116,
     "high_alch": 96,
     "buy_limit": 12000
    }
@@ -409,7 +409,7 @@
    "entity_id": "1521",
    "full_name": "Oak logs",
    "stats": {
-    "ge_price": 34,
+    "ge_price": 35,
     "high_alch": 12,
     "buy_limit": 15000
    }
@@ -418,7 +418,7 @@
    "entity_id": "1615",
    "full_name": "Dragonstone",
    "stats": {
-    "ge_price": 11046,
+    "ge_price": 10724,
     "high_alch": 6000,
     "buy_limit": 11000
    }
@@ -427,7 +427,7 @@
    "entity_id": "1704",
    "full_name": "Amulet of glory",
    "stats": {
-    "ge_price": 11406,
+    "ge_price": 11982,
     "high_alch": 10575,
     "buy_limit": 10000
    }
@@ -436,7 +436,7 @@
    "entity_id": "1731",
    "full_name": "Amulet of power",
    "stats": {
-    "ge_price": 2170,
+    "ge_price": 2040,
     "high_alch": 2115,
     "buy_limit": 125
    }
@@ -445,7 +445,7 @@
    "entity_id": "1777",
    "full_name": "Bow string",
    "stats": {
-    "ge_price": 167,
+    "ge_price": 175,
     "high_alch": 6,
     "buy_limit": 13000
    }
@@ -463,7 +463,7 @@
    "entity_id": "2353",
    "full_name": "Steel bar",
    "stats": {
-    "ge_price": 582,
+    "ge_price": 576,
     "high_alch": 60,
     "buy_limit": 10000
    }
@@ -472,7 +472,7 @@
    "entity_id": "2357",
    "full_name": "Gold bar",
    "stats": {
-    "ge_price": 87,
+    "ge_price": 89,
     "high_alch": 180,
     "buy_limit": 10000
    }
@@ -481,7 +481,7 @@
    "entity_id": "2363",
    "full_name": "Runite bar",
    "stats": {
-    "ge_price": 12268,
+    "ge_price": 12270,
     "high_alch": 3000,
     "buy_limit": 10000
    }
@@ -490,7 +490,7 @@
    "entity_id": "2434",
    "full_name": "Prayer potion(4)",
    "stats": {
-    "ge_price": 8791,
+    "ge_price": 8918,
     "high_alch": 114,
     "buy_limit": 2000
    }
@@ -499,7 +499,7 @@
    "entity_id": "2444",
    "full_name": "Ranging potion(4)",
    "stats": {
-    "ge_price": 2002,
+    "ge_price": 2109,
     "high_alch": 216,
     "buy_limit": 2000
    }
@@ -508,7 +508,7 @@
    "entity_id": "2503",
    "full_name": "Black d'hide body",
    "stats": {
-    "ge_price": 7249,
+    "ge_price": 7200,
     "high_alch": 8088,
     "buy_limit": 70
    }
@@ -517,7 +517,7 @@
    "entity_id": "2552",
    "full_name": "Ring of dueling(8)",
    "stats": {
-    "ge_price": 862,
+    "ge_price": 825,
     "high_alch": 765,
     "buy_limit": 15000
    }
@@ -526,7 +526,7 @@
    "entity_id": "2572",
    "full_name": "Ring of wealth",
    "stats": {
-    "ge_price": 11012,
+    "ge_price": 10549,
     "high_alch": 10575,
     "buy_limit": 10000
    }
@@ -535,7 +535,7 @@
    "entity_id": "3000",
    "full_name": "Snapdragon",
    "stats": {
-    "ge_price": 7903,
+    "ge_price": 7924,
     "high_alch": 35,
     "buy_limit": 11000
    }
@@ -544,7 +544,7 @@
    "entity_id": "3024",
    "full_name": "Super restore(4)",
    "stats": {
-    "ge_price": 10606,
+    "ge_price": 10531,
     "high_alch": 180,
     "buy_limit": 2000
    }
@@ -553,7 +553,7 @@
    "entity_id": "3051",
    "full_name": "Grimy snapdragon",
    "stats": {
-    "ge_price": 7809,
+    "ge_price": 7798,
     "high_alch": 12,
     "buy_limit": 11000
    }
@@ -562,7 +562,7 @@
    "entity_id": "3140",
    "full_name": "Dragon chainbody",
    "stats": {
-    "ge_price": 206380,
+    "ge_price": 177538,
     "high_alch": 150000,
     "buy_limit": 70
    }
@@ -571,7 +571,7 @@
    "entity_id": "3144",
    "full_name": "Cooked karambwan",
    "stats": {
-    "ge_price": 417,
+    "ge_price": 416,
     "high_alch": 150,
     "buy_limit": 10000
    }
@@ -580,7 +580,7 @@
    "entity_id": "4087",
    "full_name": "Dragon platelegs",
    "stats": {
-    "ge_price": 161042,
+    "ge_price": 160974,
     "high_alch": 162000,
     "buy_limit": 70
    }
@@ -589,7 +589,7 @@
    "entity_id": "4091",
    "full_name": "Mystic robe top",
    "stats": {
-    "ge_price": 71238,
+    "ge_price": 71758,
     "high_alch": 72000,
     "buy_limit": 125
    }
@@ -598,7 +598,7 @@
    "entity_id": "4151",
    "full_name": "Abyssal whip",
    "stats": {
-    "ge_price": 1011227,
+    "ge_price": 1013627,
     "high_alch": 72000,
     "buy_limit": 70
    }
@@ -607,7 +607,7 @@
    "entity_id": "4153",
    "full_name": "Granite maul",
    "stats": {
-    "ge_price": 116822,
+    "ge_price": 128496,
     "high_alch": 30000,
     "buy_limit": 70
    }
@@ -616,7 +616,7 @@
    "entity_id": "4587",
    "full_name": "Dragon scimitar",
    "stats": {
-    "ge_price": 59365,
+    "ge_price": 59395,
     "high_alch": 60000,
     "buy_limit": 70
    }
@@ -625,7 +625,7 @@
    "entity_id": "4712",
    "full_name": "Ahrim's robetop",
    "stats": {
-    "ge_price": 1593667,
+    "ge_price": 1565502,
     "high_alch": 30000,
     "buy_limit": 15
    }
@@ -634,7 +634,7 @@
    "entity_id": "4718",
    "full_name": "Dharok's greataxe",
    "stats": {
-    "ge_price": 2204242,
+    "ge_price": 1894416,
     "high_alch": 124800,
     "buy_limit": 15
    }
@@ -643,7 +643,7 @@
    "entity_id": "4720",
    "full_name": "Dharok's platebody",
    "stats": {
-    "ge_price": 989006,
+    "ge_price": 861100,
     "high_alch": 168000,
     "buy_limit": 15
    }
@@ -652,7 +652,7 @@
    "entity_id": "4726",
    "full_name": "Guthan's warspear",
    "stats": {
-    "ge_price": 85830,
+    "ge_price": 92260,
     "high_alch": 60000,
     "buy_limit": 15
    }
@@ -661,7 +661,7 @@
    "entity_id": "4734",
    "full_name": "Karil's crossbow",
    "stats": {
-    "ge_price": 100790,
+    "ge_price": 97313,
     "high_alch": 96000,
     "buy_limit": 15
    }
@@ -670,7 +670,7 @@
    "entity_id": "5295",
    "full_name": "Ranarr seed",
    "stats": {
-    "ge_price": 27196,
+    "ge_price": 29029,
     "high_alch": 30,
     "buy_limit": 200
    }
@@ -679,7 +679,7 @@
    "entity_id": "5316",
    "full_name": "Magic seed",
    "stats": {
-    "ge_price": 72481,
+    "ge_price": 74352,
     "high_alch": 253,
     "buy_limit": 200
    }
@@ -688,7 +688,7 @@
    "entity_id": "6332",
    "full_name": "Mahogany logs",
    "stats": {
-    "ge_price": 172,
+    "ge_price": 164,
     "high_alch": 30,
     "buy_limit": 11000
    }
@@ -697,7 +697,7 @@
    "entity_id": "6333",
    "full_name": "Teak logs",
    "stats": {
-    "ge_price": 103,
+    "ge_price": 132,
     "high_alch": 18,
     "buy_limit": 13000
    }
@@ -706,7 +706,7 @@
    "entity_id": "6573",
    "full_name": "Onyx",
    "stats": {
-    "ge_price": 2831800,
+    "ge_price": 2788505,
     "high_alch": 120000,
     "buy_limit": 11000
    }
@@ -715,7 +715,7 @@
    "entity_id": "6585",
    "full_name": "Amulet of fury",
    "stats": {
-    "ge_price": 2789982,
+    "ge_price": 2765366,
     "high_alch": 121200,
     "buy_limit": 8
    }
@@ -724,7 +724,7 @@
    "entity_id": "6685",
    "full_name": "Saradomin brew(4)",
    "stats": {
-    "ge_price": 7092,
+    "ge_price": 7177,
     "high_alch": 120,
     "buy_limit": 2000
    }
@@ -733,7 +733,7 @@
    "entity_id": "6733",
    "full_name": "Archers ring",
    "stats": {
-    "ge_price": 2360063,
+    "ge_price": 2340198,
     "high_alch": 6000,
     "buy_limit": 8
    }
@@ -742,7 +742,7 @@
    "entity_id": "6737",
    "full_name": "Berserker ring",
    "stats": {
-    "ge_price": 3040864,
+    "ge_price": 3069718,
     "high_alch": 6000,
     "buy_limit": 8
    }
@@ -751,7 +751,7 @@
    "entity_id": "6739",
    "full_name": "Dragon axe",
    "stats": {
-    "ge_price": 68695,
+    "ge_price": 70076,
     "high_alch": 33000,
     "buy_limit": 40
    }
@@ -760,7 +760,7 @@
    "entity_id": "7158",
    "full_name": "Dragon 2h sword",
    "stats": {
-    "ge_price": 133059,
+    "ge_price": 139090,
     "high_alch": 132000,
     "buy_limit": 8
    }
@@ -778,7 +778,7 @@
    "entity_id": "7946",
    "full_name": "Monkfish",
    "stats": {
-    "ge_price": 192,
+    "ge_price": 190,
     "high_alch": 138,
     "buy_limit": 13000
    }
@@ -787,7 +787,7 @@
    "entity_id": "8901",
    "full_name": "Black mask (10)",
    "stats": {
-    "ge_price": 1416473,
+    "ge_price": 1607972,
     "high_alch": 1800,
     "buy_limit": 70
    }
@@ -796,7 +796,7 @@
    "entity_id": "9075",
    "full_name": "Astral rune",
    "stats": {
-    "ge_price": 106,
+    "ge_price": 114,
     "high_alch": 30,
     "buy_limit": 25000
    }
@@ -805,7 +805,7 @@
    "entity_id": "9185",
    "full_name": "Rune crossbow",
    "stats": {
-    "ge_price": 9152,
+    "ge_price": 9373,
     "high_alch": 9720,
     "buy_limit": 70
    }
@@ -814,7 +814,7 @@
    "entity_id": "10034",
    "full_name": "Red chinchompa",
    "stats": {
-    "ge_price": 1400,
+    "ge_price": 1402,
     "high_alch": 96,
     "buy_limit": 7000
    }
@@ -823,7 +823,7 @@
    "entity_id": "10350",
    "full_name": "3rd age full helmet",
    "stats": {
-    "ge_price": 37484258,
+    "ge_price": 36296902,
     "high_alch": 54000,
     "buy_limit": 8
    }
@@ -832,7 +832,7 @@
    "entity_id": "11212",
    "full_name": "Dragon arrow",
    "stats": {
-    "ge_price": 2446,
+    "ge_price": 1940,
     "high_alch": 480,
     "buy_limit": 11000
    }
@@ -841,7 +841,7 @@
    "entity_id": "11230",
    "full_name": "Dragon dart",
    "stats": {
-    "ge_price": 1192,
+    "ge_price": 1040,
     "high_alch": 300,
     "buy_limit": 11000
    }
@@ -850,7 +850,7 @@
    "entity_id": "11235",
    "full_name": "Dark bow",
    "stats": {
-    "ge_price": 995136,
+    "ge_price": 882352,
     "high_alch": 72001,
     "buy_limit": 8
    }
@@ -859,7 +859,7 @@
    "entity_id": "11284",
    "full_name": "Dragonfire shield",
    "stats": {
-    "ge_price": 3742822,
+    "ge_price": 3505410,
     "high_alch": 1200000,
     "buy_limit": 8
    }
@@ -868,7 +868,7 @@
    "entity_id": "11335",
    "full_name": "Dragon full helm",
    "stats": {
-    "ge_price": 49913238,
+    "ge_price": 51146458,
     "high_alch": 90000,
     "buy_limit": 8
    }
@@ -877,7 +877,7 @@
    "entity_id": "11785",
    "full_name": "Armadyl crossbow",
    "stats": {
-    "ge_price": 38864512,
+    "ge_price": 38465896,
     "high_alch": 594000,
     "buy_limit": 8
    }
@@ -886,7 +886,7 @@
    "entity_id": "11791",
    "full_name": "Staff of the dead",
    "stats": {
-    "ge_price": 5685190,
+    "ge_price": 5194604,
     "high_alch": 600003,
     "buy_limit": 8
    }
@@ -895,7 +895,7 @@
    "entity_id": "11802",
    "full_name": "Armadyl godsword",
    "stats": {
-    "ge_price": 7603950,
+    "ge_price": 7430592,
     "high_alch": 750000,
     "buy_limit": 8
    }
@@ -904,7 +904,7 @@
    "entity_id": "11804",
    "full_name": "Bandos godsword",
    "stats": {
-    "ge_price": 18383472,
+    "ge_price": 18542330,
     "high_alch": 750000,
     "buy_limit": 8
    }
@@ -913,7 +913,7 @@
    "entity_id": "11806",
    "full_name": "Saradomin godsword",
    "stats": {
-    "ge_price": 24144273,
+    "ge_price": 24962297,
     "high_alch": 750000,
     "buy_limit": 8
    }
@@ -922,7 +922,7 @@
    "entity_id": "11808",
    "full_name": "Zamorak godsword",
    "stats": {
-    "ge_price": 16116136,
+    "ge_price": 16180261,
     "high_alch": 750000,
     "buy_limit": 8
    }
@@ -931,7 +931,7 @@
    "entity_id": "11824",
    "full_name": "Zamorakian spear",
    "stats": {
-    "ge_price": 1138196,
+    "ge_price": 1170167,
     "high_alch": 60003,
     "buy_limit": 8
    }
@@ -940,7 +940,7 @@
    "entity_id": "11826",
    "full_name": "Armadyl helmet",
    "stats": {
-    "ge_price": 8990606,
+    "ge_price": 9177961,
     "high_alch": 173400,
     "buy_limit": 8
    }
@@ -949,7 +949,7 @@
    "entity_id": "11828",
    "full_name": "Armadyl chestplate",
    "stats": {
-    "ge_price": 36223530,
+    "ge_price": 35743756,
     "high_alch": 174000,
     "buy_limit": 8
    }
@@ -958,7 +958,7 @@
    "entity_id": "11830",
    "full_name": "Armadyl chainskirt",
    "stats": {
-    "ge_price": 26882774,
+    "ge_price": 26556386,
     "high_alch": 173940,
     "buy_limit": 8
    }
@@ -967,7 +967,7 @@
    "entity_id": "11832",
    "full_name": "Bandos chestplate",
    "stats": {
-    "ge_price": 23214239,
+    "ge_price": 22839384,
     "high_alch": 174006,
     "buy_limit": 8
    }
@@ -976,7 +976,7 @@
    "entity_id": "11834",
    "full_name": "Bandos tassets",
    "stats": {
-    "ge_price": 15488390,
+    "ge_price": 15178058,
     "high_alch": 173946,
     "buy_limit": 8
    }
@@ -985,7 +985,7 @@
    "entity_id": "11838",
    "full_name": "Saradomin sword",
    "stats": {
-    "ge_price": 108635,
+    "ge_price": 141108,
     "high_alch": 78000,
     "buy_limit": 8
    }
@@ -994,7 +994,7 @@
    "entity_id": "11840",
    "full_name": "Dragon boots",
    "stats": {
-    "ge_price": 232207,
+    "ge_price": 230532,
     "high_alch": 12000,
     "buy_limit": 70
    }
@@ -1003,7 +1003,7 @@
    "entity_id": "11905",
    "full_name": "Trident of the seas (full)",
    "stats": {
-    "ge_price": 769383,
+    "ge_price": 810308,
     "high_alch": 41400,
     "buy_limit": 8
    }
@@ -1012,7 +1012,7 @@
    "entity_id": "11920",
    "full_name": "Dragon pickaxe",
    "stats": {
-    "ge_price": 568390,
+    "ge_price": 567924,
     "high_alch": 58770,
     "buy_limit": 40
    }
@@ -1021,7 +1021,7 @@
    "entity_id": "11959",
    "full_name": "Black chinchompa",
    "stats": {
-    "ge_price": 2912,
+    "ge_price": 3050,
     "high_alch": 144,
     "buy_limit": 11000
    }
@@ -1030,7 +1030,7 @@
    "entity_id": "12002",
    "full_name": "Occult necklace",
    "stats": {
-    "ge_price": 392026,
+    "ge_price": 394642,
     "high_alch": 27000,
     "buy_limit": 8
    }
@@ -1039,7 +1039,7 @@
    "entity_id": "12004",
    "full_name": "Kraken tentacle",
    "stats": {
-    "ge_price": 267306,
+    "ge_price": 266580,
     "high_alch": 50004,
     "buy_limit": 70
    }
@@ -1048,7 +1048,7 @@
    "entity_id": "12625",
    "full_name": "Stamina potion(4)",
    "stats": {
-    "ge_price": 3666,
+    "ge_price": 3440,
     "high_alch": 240,
     "buy_limit": 2000
    }
@@ -1057,7 +1057,7 @@
    "entity_id": "12695",
    "full_name": "Super combat potion(4)",
    "stats": {
-    "ge_price": 12434,
+    "ge_price": 12762,
     "high_alch": 150,
     "buy_limit": 2000
    }
@@ -1066,7 +1066,7 @@
    "entity_id": "12817",
    "full_name": "Elysian spirit shield",
    "stats": {
-    "ge_price": 518403464,
+    "ge_price": 523055556,
     "high_alch": 1200000,
     "buy_limit": 8
    }
@@ -1075,7 +1075,7 @@
    "entity_id": "12821",
    "full_name": "Spectral spirit shield",
    "stats": {
-    "ge_price": 26956045,
+    "ge_price": 27279482,
     "high_alch": 1200000,
     "buy_limit": 8
    }
@@ -1084,7 +1084,7 @@
    "entity_id": "12825",
    "full_name": "Arcane spirit shield",
    "stats": {
-    "ge_price": 121991744,
+    "ge_price": 122121260,
     "high_alch": 1200000,
     "buy_limit": 8
    }
@@ -1093,7 +1093,7 @@
    "entity_id": "12902",
    "full_name": "Toxic staff (uncharged)",
    "stats": {
-    "ge_price": 9221066,
+    "ge_price": 8987558,
     "high_alch": 600003,
     "buy_limit": 8
    }
@@ -1102,7 +1102,7 @@
    "entity_id": "12922",
    "full_name": "Tanzanite fang",
    "stats": {
-    "ge_price": 10511438,
+    "ge_price": 10557500,
     "high_alch": 66000,
     "buy_limit": 5
    }
@@ -1111,7 +1111,7 @@
    "entity_id": "12924",
    "full_name": "Toxic blowpipe (empty)",
    "stats": {
-    "ge_price": 10654238,
+    "ge_price": 10859052,
     "high_alch": 72000,
     "buy_limit": 8
    }
@@ -1120,7 +1120,7 @@
    "entity_id": "12927",
    "full_name": "Serpentine visage",
    "stats": {
-    "ge_price": 3550046,
+    "ge_price": 3525500,
     "high_alch": 63000,
     "buy_limit": 5
    }
@@ -1129,7 +1129,7 @@
    "entity_id": "12932",
    "full_name": "Magic fang",
    "stats": {
-    "ge_price": 3505090,
+    "ge_price": 3536466,
     "high_alch": 61200,
     "buy_limit": 5
    }
@@ -1138,7 +1138,7 @@
    "entity_id": "12934",
    "full_name": "Zulrah's scales",
    "stats": {
-    "ge_price": 177,
+    "ge_price": 178,
     "high_alch": 12,
     "buy_limit": 30000
    }
@@ -1147,7 +1147,7 @@
    "entity_id": "13190",
    "full_name": "Old school bond",
    "stats": {
-    "ge_price": 12432552,
+    "ge_price": 12005476,
     "buy_limit": 100
    }
   },
@@ -1155,7 +1155,7 @@
    "entity_id": "13235",
    "full_name": "Eternal boots",
    "stats": {
-    "ge_price": 4122465,
+    "ge_price": 3923105,
     "high_alch": 45000,
     "buy_limit": 15
    }
@@ -1164,7 +1164,7 @@
    "entity_id": "13237",
    "full_name": "Pegasian boots",
    "stats": {
-    "ge_price": 32519041,
+    "ge_price": 34672077,
     "high_alch": 45000,
     "buy_limit": 15
    }
@@ -1173,7 +1173,7 @@
    "entity_id": "13239",
    "full_name": "Primordial boots",
    "stats": {
-    "ge_price": 18910817,
+    "ge_price": 18960007,
     "high_alch": 45000,
     "buy_limit": 15
    }
@@ -1182,7 +1182,7 @@
    "entity_id": "13263",
    "full_name": "Abyssal bludgeon",
    "stats": {
-    "ge_price": 17143945,
+    "ge_price": 17683021,
     "high_alch": 156000,
     "buy_limit": 8
    }
@@ -1191,7 +1191,7 @@
    "entity_id": "13265",
    "full_name": "Abyssal dagger",
    "stats": {
-    "ge_price": 1344290,
+    "ge_price": 1351660,
     "high_alch": 69000,
     "buy_limit": 8
    }
@@ -1200,7 +1200,7 @@
    "entity_id": "13441",
    "full_name": "Anglerfish",
    "stats": {
-    "ge_price": 2778,
+    "ge_price": 2741,
     "high_alch": 270,
     "buy_limit": 10000
    }
@@ -1209,7 +1209,7 @@
    "entity_id": "13576",
    "full_name": "Dragon warhammer",
    "stats": {
-    "ge_price": 15338556,
+    "ge_price": 14608228,
     "high_alch": 72000,
     "buy_limit": 8
    }
@@ -1218,7 +1218,7 @@
    "entity_id": "13652",
    "full_name": "Dragon claws",
    "stats": {
-    "ge_price": 39385281,
+    "ge_price": 39955810,
     "high_alch": 123000,
     "buy_limit": 8
    }
@@ -1227,7 +1227,7 @@
    "entity_id": "19481",
    "full_name": "Heavy ballista",
    "stats": {
-    "ge_price": 985114,
+    "ge_price": 963722,
     "high_alch": 570000,
     "buy_limit": 8
    }
@@ -1236,7 +1236,7 @@
    "entity_id": "19493",
    "full_name": "Zenyte",
    "stats": {
-    "ge_price": 20000000,
+    "ge_price": 19249444,
     "high_alch": 45000,
     "buy_limit": 11000
    }
@@ -1245,7 +1245,7 @@
    "entity_id": "19529",
    "full_name": "Zenyte shard",
    "stats": {
-    "ge_price": 16022060,
+    "ge_price": 15884388,
     "high_alch": 45000,
     "buy_limit": 11000
    }
@@ -1254,7 +1254,7 @@
    "entity_id": "19544",
    "full_name": "Tormented bracelet",
    "stats": {
-    "ge_price": 19242102,
+    "ge_price": 19094606,
     "high_alch": 120600,
     "buy_limit": 8
    }
@@ -1263,7 +1263,7 @@
    "entity_id": "19547",
    "full_name": "Necklace of anguish",
    "stats": {
-    "ge_price": 19039599,
+    "ge_price": 19270402,
     "high_alch": 121200,
     "buy_limit": 8
    }
@@ -1272,7 +1272,7 @@
    "entity_id": "19550",
    "full_name": "Ring of suffering",
    "stats": {
-    "ge_price": 19175130,
+    "ge_price": 19032512,
     "high_alch": 120600,
     "buy_limit": 8
    }
@@ -1281,7 +1281,7 @@
    "entity_id": "19553",
    "full_name": "Amulet of torture",
    "stats": {
-    "ge_price": 19283112,
+    "ge_price": 19115400,
     "high_alch": 121200,
     "buy_limit": 8
    }
@@ -1290,7 +1290,7 @@
    "entity_id": "19669",
    "full_name": "Redwood logs",
    "stats": {
-    "ge_price": 739,
+    "ge_price": 757,
     "high_alch": 270,
     "buy_limit": 12000
    }
@@ -1308,7 +1308,7 @@
    "entity_id": "20724",
    "full_name": "Imbued heart",
    "stats": {
-    "ge_price": 95709486,
+    "ge_price": 92663128,
     "high_alch": 300000,
     "buy_limit": 8
    }
@@ -1317,7 +1317,7 @@
    "entity_id": "20997",
    "full_name": "Twisted bow",
    "stats": {
-    "ge_price": 1478845059,
+    "ge_price": 1485208959,
     "high_alch": 2400000,
     "buy_limit": 8
    }
@@ -1326,7 +1326,7 @@
    "entity_id": "21000",
    "full_name": "Twisted buckler",
    "stats": {
-    "ge_price": 17907854,
+    "ge_price": 18042750,
     "high_alch": 54000,
     "buy_limit": 8
    }
@@ -1335,7 +1335,7 @@
    "entity_id": "21003",
    "full_name": "Elder maul",
    "stats": {
-    "ge_price": 99448464,
+    "ge_price": 101015258,
     "high_alch": 300006,
     "buy_limit": 8
    }
@@ -1344,7 +1344,7 @@
    "entity_id": "21006",
    "full_name": "Kodai wand",
    "stats": {
-    "ge_price": 68138642,
+    "ge_price": 68852760,
     "high_alch": 90000,
     "buy_limit": 8
    }
@@ -1353,7 +1353,7 @@
    "entity_id": "21012",
    "full_name": "Dragon hunter crossbow",
    "stats": {
-    "ge_price": 36488518,
+    "ge_price": 36863645,
     "high_alch": 48000,
     "buy_limit": 8
    }
@@ -1362,7 +1362,7 @@
    "entity_id": "21018",
    "full_name": "Ancestral hat",
    "stats": {
-    "ge_price": 52728816,
+    "ge_price": 55064728,
     "high_alch": 27000,
     "buy_limit": 8
    }
@@ -1371,7 +1371,7 @@
    "entity_id": "21021",
    "full_name": "Ancestral robe top",
    "stats": {
-    "ge_price": 123715578,
+    "ge_price": 120498456,
     "high_alch": 72000,
     "buy_limit": 8
    }
@@ -1380,7 +1380,7 @@
    "entity_id": "21024",
    "full_name": "Ancestral robe bottom",
    "stats": {
-    "ge_price": 81932646,
+    "ge_price": 80582680,
     "high_alch": 48000,
     "buy_limit": 8
    }
@@ -1389,7 +1389,7 @@
    "entity_id": "21028",
    "full_name": "Dragon harpoon",
    "stats": {
-    "ge_price": 2453443,
+    "ge_price": 2512921,
     "high_alch": 33000,
     "buy_limit": 5
    }
@@ -1398,7 +1398,7 @@
    "entity_id": "21880",
    "full_name": "Wrath rune",
    "stats": {
-    "ge_price": 366,
+    "ge_price": 336,
     "high_alch": 300,
     "buy_limit": 25000
    }
@@ -1407,7 +1407,7 @@
    "entity_id": "22124",
    "full_name": "Superior dragon bones",
    "stats": {
-    "ge_price": 21090,
+    "ge_price": 20625,
     "high_alch": 96,
     "buy_limit": 7500
    }
@@ -1416,7 +1416,7 @@
    "entity_id": "22324",
    "full_name": "Ghrazi rapier",
    "stats": {
-    "ge_price": 24711090,
+    "ge_price": 26700932,
     "high_alch": 3000000,
     "buy_limit": 8
    }
@@ -1425,7 +1425,7 @@
    "entity_id": "22327",
    "full_name": "Justiciar chestguard",
    "stats": {
-    "ge_price": 9699362,
+    "ge_price": 9879008,
     "high_alch": 3600000,
     "buy_limit": 8
    }
@@ -1434,7 +1434,7 @@
    "entity_id": "22477",
    "full_name": "Avernic defender hilt",
    "stats": {
-    "ge_price": 30599536,
+    "ge_price": 31559878,
     "high_alch": 1500000,
     "buy_limit": 8
    }
@@ -1443,7 +1443,7 @@
    "entity_id": "22481",
    "full_name": "Sanguinesti staff (uncharged)",
    "stats": {
-    "ge_price": 21854670,
+    "ge_price": 22980238,
     "high_alch": 3000000,
     "buy_limit": 8
    }
@@ -1452,7 +1452,7 @@
    "entity_id": "22486",
    "full_name": "Scythe of vitur (uncharged)",
    "stats": {
-    "ge_price": 1292617208,
+    "ge_price": 1295716752,
     "high_alch": 2400000,
     "buy_limit": 8
    }
@@ -1461,7 +1461,7 @@
    "entity_id": "22978",
    "full_name": "Dragon hunter lance",
    "stats": {
-    "ge_price": 54329320,
+    "ge_price": 56373406,
     "high_alch": 180000,
     "buy_limit": 8
    }
@@ -1470,7 +1470,7 @@
    "entity_id": "23997",
    "full_name": "Blade of saeldor (inactive)",
    "stats": {
-    "ge_price": 126167798,
+    "ge_price": 127564082,
     "high_alch": 3000000,
     "buy_limit": 8
    }
@@ -1479,7 +1479,7 @@
    "entity_id": "24417",
    "full_name": "Inquisitor's mace",
    "stats": {
-    "ge_price": 328915328,
+    "ge_price": 350879762,
     "high_alch": 3000000,
     "buy_limit": 8
    }
@@ -1488,7 +1488,7 @@
    "entity_id": "24422",
    "full_name": "Nightmare staff",
    "stats": {
-    "ge_price": 38743087,
+    "ge_price": 39940832,
     "high_alch": 360000,
     "buy_limit": 8
    }
@@ -1497,7 +1497,7 @@
    "entity_id": "24511",
    "full_name": "Harmonised orb",
    "stats": {
-    "ge_price": 367321228,
+    "ge_price": 374696834,
     "high_alch": 2400000,
     "buy_limit": 8
    }
@@ -1506,7 +1506,7 @@
    "entity_id": "25862",
    "full_name": "Bow of faerdhinen (inactive)",
    "stats": {
-    "ge_price": 126764992,
+    "ge_price": 127895030,
     "high_alch": 3000000
    }
   },
@@ -1514,7 +1514,7 @@
    "entity_id": "25975",
    "full_name": "Lightbearer",
    "stats": {
-    "ge_price": 3908560,
+    "ge_price": 3968680,
     "high_alch": 600000,
     "buy_limit": 8
    }
@@ -1523,7 +1523,7 @@
    "entity_id": "25985",
    "full_name": "Elidinis' ward",
    "stats": {
-    "ge_price": 3252862,
+    "ge_price": 3302298,
     "high_alch": 3000000,
     "buy_limit": 8
    }
@@ -1532,7 +1532,7 @@
    "entity_id": "26219",
    "full_name": "Osmumten's fang",
    "stats": {
-    "ge_price": 18143139,
+    "ge_price": 18429990,
     "high_alch": 600000,
     "buy_limit": 8
    }
@@ -1541,7 +1541,7 @@
    "entity_id": "26235",
    "full_name": "Zaryte vambraces",
    "stats": {
-    "ge_price": 76179996,
+    "ge_price": 74923392,
     "high_alch": 120000,
     "buy_limit": 7
    }
@@ -1550,7 +1550,7 @@
    "entity_id": "26374",
    "full_name": "Zaryte crossbow",
    "stats": {
-    "ge_price": 387555935,
+    "ge_price": 382842541,
     "high_alch": 594000,
     "buy_limit": 8
    }
@@ -1559,7 +1559,7 @@
    "entity_id": "26382",
    "full_name": "Torva full helm",
    "stats": {
-    "ge_price": 216164260,
+    "ge_price": 221119272,
     "high_alch": 120000,
     "buy_limit": 8
    }
@@ -1568,7 +1568,7 @@
    "entity_id": "26384",
    "full_name": "Torva platebody",
    "stats": {
-    "ge_price": 178483258,
+    "ge_price": 175623791,
     "high_alch": 360000,
     "buy_limit": 8
    }
@@ -1577,7 +1577,7 @@
    "entity_id": "26386",
    "full_name": "Torva platelegs",
    "stats": {
-    "ge_price": 117600278,
+    "ge_price": 117125718,
     "high_alch": 240000,
     "buy_limit": 8
    }
@@ -1586,7 +1586,7 @@
    "entity_id": "27226",
    "full_name": "Masori mask",
    "stats": {
-    "ge_price": 11028489,
+    "ge_price": 10986230,
     "high_alch": 480000,
     "buy_limit": 8
    }
@@ -1595,7 +1595,7 @@
    "entity_id": "27229",
    "full_name": "Masori body",
    "stats": {
-    "ge_price": 41877707,
+    "ge_price": 42012644,
     "high_alch": 720000,
     "buy_limit": 8
    }
@@ -1604,7 +1604,7 @@
    "entity_id": "27232",
    "full_name": "Masori chaps",
    "stats": {
-    "ge_price": 28191404,
+    "ge_price": 28095672,
     "high_alch": 600000,
     "buy_limit": 8
    }
@@ -1613,7 +1613,7 @@
    "entity_id": "27277",
    "full_name": "Tumeken's shadow (uncharged)",
    "stats": {
-    "ge_price": 827966856,
+    "ge_price": 819907660,
     "high_alch": 4200000,
     "buy_limit": 8
    }
@@ -1622,7 +1622,7 @@
    "entity_id": "27690",
    "full_name": "Voidwaker",
    "stats": {
-    "ge_price": 38322286,
+    "ge_price": 38931508,
     "high_alch": 1200000,
     "buy_limit": 70
    }
@@ -1631,7 +1631,7 @@
    "entity_id": "28307",
    "full_name": "Ultor ring",
    "stats": {
-    "ge_price": 117443947,
+    "ge_price": 117375970,
     "high_alch": 84000
    }
   },
@@ -1639,7 +1639,7 @@
    "entity_id": "28310",
    "full_name": "Venator ring",
    "stats": {
-    "ge_price": 49659619,
+    "ge_price": 49949936,
     "high_alch": 84000
    }
   },
@@ -1647,7 +1647,7 @@
    "entity_id": "28313",
    "full_name": "Magus ring",
    "stats": {
-    "ge_price": 26093000,
+    "ge_price": 26191443,
     "high_alch": 84000
    }
   },
@@ -1655,7 +1655,7 @@
    "entity_id": "28316",
    "full_name": "Bellator ring",
    "stats": {
-    "ge_price": 23962560,
+    "ge_price": 24692932,
     "high_alch": 84000
    }
   },
@@ -1663,7 +1663,7 @@
    "entity_id": "28338",
    "full_name": "Soulreaper axe",
    "stats": {
-    "ge_price": 375778536,
+    "ge_price": 416194556,
     "high_alch": 144000,
     "buy_limit": 5
    }
