@@ -25,7 +25,7 @@
     "podiums": 207,
     "poles": 104,
     "fastest_laps": 69,
-    "points_finishes": 341,
+    "points_finishes": 342,
     "front_rows": 177,
     "dnfs": 32
    }
@@ -102,7 +102,22 @@
     "fastest_laps": 12,
     "points_finishes": 186,
     "front_rows": 13,
-    "dnfs": 35
+    "dnfs": 36
+   }
+  },
+  {
+   "driver_id": "bottas",
+   "full_name": "Valtteri Bottas",
+   "active_from": 2013,
+   "active_to": 2026,
+   "stats": {
+    "wins": 10,
+    "podiums": 67,
+    "poles": 20,
+    "fastest_laps": 19,
+    "points_finishes": 145,
+    "front_rows": 46,
+    "dnfs": 32
    }
   },
   {
@@ -121,31 +136,16 @@
    }
   },
   {
-   "driver_id": "bottas",
-   "full_name": "Valtteri Bottas",
-   "active_from": 2013,
-   "active_to": 2026,
-   "stats": {
-    "wins": 10,
-    "podiums": 67,
-    "poles": 20,
-    "fastest_laps": 19,
-    "points_finishes": 145,
-    "front_rows": 46,
-    "dnfs": 31
-   }
-  },
-  {
    "driver_id": "max_verstappen",
    "full_name": "Max Verstappen",
    "active_from": 2015,
    "active_to": 2026,
    "stats": {
     "wins": 71,
-    "podiums": 130,
+    "podiums": 131,
     "poles": 48,
     "fastest_laps": 37,
-    "points_finishes": 202,
+    "points_finishes": 203,
     "front_rows": 88,
     "dnfs": 33
    }
@@ -196,21 +196,6 @@
    }
   },
   {
-   "driver_id": "prost",
-   "full_name": "Alain Prost",
-   "active_from": 1980,
-   "active_to": 1993,
-   "stats": {
-    "wins": 51,
-    "podiums": 106,
-    "poles": 33,
-    "fastest_laps": 0,
-    "points_finishes": 138,
-    "front_rows": 86,
-    "dnfs": 59
-   }
-  },
-  {
    "driver_id": "stroll",
    "full_name": "Lance Stroll",
    "active_from": 2017,
@@ -223,6 +208,21 @@
     "points_finishes": 66,
     "front_rows": 2,
     "dnfs": 33
+   }
+  },
+  {
+   "driver_id": "prost",
+   "full_name": "Alain Prost",
+   "active_from": 1980,
+   "active_to": 1993,
+   "stats": {
+    "wins": 51,
+    "podiums": 106,
+    "poles": 33,
+    "fastest_laps": 0,
+    "points_finishes": 138,
+    "front_rows": 86,
+    "dnfs": 59
    }
   },
   {
@@ -264,9 +264,9 @@
     "wins": 9,
     "podiums": 54,
     "poles": 27,
-    "fastest_laps": 11,
-    "points_finishes": 140,
-    "front_rows": 45,
+    "fastest_laps": 12,
+    "points_finishes": 141,
+    "front_rows": 46,
     "dnfs": 26
    }
   },
@@ -316,6 +316,36 @@
    }
   },
   {
+   "driver_id": "russell",
+   "full_name": "George Russell",
+   "active_from": 2019,
+   "active_to": 2026,
+   "stats": {
+    "wins": 7,
+    "podiums": 29,
+    "poles": 12,
+    "fastest_laps": 11,
+    "points_finishes": 94,
+    "front_rows": 23,
+    "dnfs": 18
+   }
+  },
+  {
+   "driver_id": "norris",
+   "full_name": "Lando Norris",
+   "active_from": 2019,
+   "active_to": 2026,
+   "stats": {
+    "wins": 12,
+    "podiums": 47,
+    "poles": 17,
+    "fastest_laps": 20,
+    "points_finishes": 129,
+    "front_rows": 31,
+    "dnfs": 13
+   }
+  },
+  {
    "driver_id": "hakkinen",
    "full_name": "Mika Häkkinen",
    "active_from": 1991,
@@ -328,36 +358,6 @@
     "points_finishes": 96,
     "front_rows": 39,
     "dnfs": 60
-   }
-  },
-  {
-   "driver_id": "russell",
-   "full_name": "George Russell",
-   "active_from": 2019,
-   "active_to": 2026,
-   "stats": {
-    "wins": 7,
-    "podiums": 29,
-    "poles": 12,
-    "fastest_laps": 11,
-    "points_finishes": 93,
-    "front_rows": 23,
-    "dnfs": 18
-   }
-  },
-  {
-   "driver_id": "norris",
-   "full_name": "Lando Norris",
-   "active_from": 2019,
-   "active_to": 2026,
-   "stats": {
-    "wins": 11,
-    "podiums": 46,
-    "poles": 16,
-    "fastest_laps": 20,
-    "points_finishes": 128,
-    "front_rows": 30,
-    "dnfs": 13
    }
   },
   {
@@ -462,7 +462,7 @@
     "fastest_laps": 9,
     "points_finishes": 62,
     "front_rows": 17,
-    "dnfs": 7
+    "dnfs": 8
    }
   },
   {
@@ -505,7 +505,7 @@
     "podiums": 0,
     "poles": 0,
     "fastest_laps": 0,
-    "points_finishes": 17,
+    "points_finishes": 18,
     "front_rows": 0,
     "dnfs": 6
    }
