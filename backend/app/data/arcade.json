@@ -10,7 +10,7 @@
     "podiums": 106,
     "poles": 22,
     "fastest_laps": 25,
-    "points_finishes": 282,
+    "points_finishes": 283,
     "front_rows": 42,
     "dnfs": 79
    }
@@ -25,7 +25,7 @@
     "podiums": 207,
     "poles": 104,
     "fastest_laps": 69,
-    "points_finishes": 342,
+    "points_finishes": 343,
     "front_rows": 177,
     "dnfs": 32
    }
@@ -117,7 +117,7 @@
     "fastest_laps": 19,
     "points_finishes": 145,
     "front_rows": 46,
-    "dnfs": 32
+    "dnfs": 33
    }
   },
   {
@@ -147,7 +147,7 @@
     "fastest_laps": 37,
     "points_finishes": 203,
     "front_rows": 88,
-    "dnfs": 33
+    "dnfs": 34
    }
   },
   {
@@ -207,7 +207,7 @@
     "fastest_laps": 0,
     "points_finishes": 66,
     "front_rows": 2,
-    "dnfs": 33
+    "dnfs": 34
    }
   },
   {
@@ -237,7 +237,7 @@
     "fastest_laps": 1,
     "points_finishes": 96,
     "front_rows": 0,
-    "dnfs": 25
+    "dnfs": 26
    }
   },
   {
@@ -250,7 +250,7 @@
     "podiums": 6,
     "poles": 0,
     "fastest_laps": 3,
-    "points_finishes": 82,
+    "points_finishes": 83,
     "front_rows": 1,
     "dnfs": 24
    }
@@ -264,8 +264,8 @@
     "wins": 9,
     "podiums": 54,
     "poles": 27,
-    "fastest_laps": 12,
-    "points_finishes": 141,
+    "fastest_laps": 13,
+    "points_finishes": 142,
     "front_rows": 46,
     "dnfs": 26
    }
@@ -322,11 +322,11 @@
    "active_to": 2026,
    "stats": {
     "wins": 7,
-    "podiums": 29,
+    "podiums": 30,
     "poles": 12,
     "fastest_laps": 11,
-    "points_finishes": 94,
-    "front_rows": 23,
+    "points_finishes": 95,
+    "front_rows": 24,
     "dnfs": 18
    }
   },
@@ -336,12 +336,12 @@
    "active_from": 2019,
    "active_to": 2026,
    "stats": {
-    "wins": 12,
-    "podiums": 47,
-    "poles": 17,
+    "wins": 13,
+    "podiums": 48,
+    "poles": 18,
     "fastest_laps": 20,
-    "points_finishes": 129,
-    "front_rows": 31,
+    "points_finishes": 130,
+    "front_rows": 32,
     "dnfs": 13
    }
   },
@@ -424,7 +424,7 @@
    "driver_id": "tsunoda",
    "full_name": "Yuki Tsunoda",
    "active_from": 2021,
-   "active_to": 2025,
+   "active_to": 2026,
    "stats": {
     "wins": 0,
     "podiums": 0,
@@ -460,7 +460,7 @@
     "podiums": 28,
     "poles": 6,
     "fastest_laps": 9,
-    "points_finishes": 62,
+    "points_finishes": 63,
     "front_rows": 17,
     "dnfs": 8
    }
@@ -505,7 +505,7 @@
     "podiums": 0,
     "poles": 0,
     "fastest_laps": 0,
-    "points_finishes": 18,
+    "points_finishes": 19,
     "front_rows": 0,
     "dnfs": 6
    }
