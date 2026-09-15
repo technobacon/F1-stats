@@ -27,7 +27,7 @@
     "fastest_laps": 69,
     "points_finishes": 344,
     "front_rows": 177,
-    "dnfs": 32
+    "dnfs": 33
    }
   },
   {
@@ -102,7 +102,7 @@
     "fastest_laps": 12,
     "points_finishes": 186,
     "front_rows": 13,
-    "dnfs": 36
+    "dnfs": 37
    }
   },
   {
@@ -142,10 +142,10 @@
    "active_to": 2026,
    "stats": {
     "wins": 71,
-    "podiums": 132,
+    "podiums": 133,
     "poles": 48,
     "fastest_laps": 37,
-    "points_finishes": 204,
+    "points_finishes": 205,
     "front_rows": 88,
     "dnfs": 34
    }
@@ -162,7 +162,7 @@
     "fastest_laps": 4,
     "points_finishes": 152,
     "front_rows": 15,
-    "dnfs": 43
+    "dnfs": 44
    }
   },
   {
@@ -181,6 +181,21 @@
    }
   },
   {
+   "driver_id": "stroll",
+   "full_name": "Lance Stroll",
+   "active_from": 2017,
+   "active_to": 2026,
+   "stats": {
+    "wins": 0,
+    "podiums": 3,
+    "poles": 1,
+    "fastest_laps": 0,
+    "points_finishes": 66,
+    "front_rows": 2,
+    "dnfs": 36
+   }
+  },
+  {
    "driver_id": "piquet",
    "full_name": "Nelson Piquet",
    "active_from": 1978,
@@ -193,21 +208,6 @@
     "points_finishes": 115,
     "front_rows": 44,
     "dnfs": 83
-   }
-  },
-  {
-   "driver_id": "stroll",
-   "full_name": "Lance Stroll",
-   "active_from": 2017,
-   "active_to": 2026,
-   "stats": {
-    "wins": 0,
-    "podiums": 3,
-    "poles": 1,
-    "fastest_laps": 0,
-    "points_finishes": 66,
-    "front_rows": 2,
-    "dnfs": 35
    }
   },
   {
@@ -265,7 +265,7 @@
     "podiums": 54,
     "poles": 27,
     "fastest_laps": 13,
-    "points_finishes": 142,
+    "points_finishes": 143,
     "front_rows": 46,
     "dnfs": 27
    }
@@ -301,6 +301,36 @@
    }
   },
   {
+   "driver_id": "russell",
+   "full_name": "George Russell",
+   "active_from": 2019,
+   "active_to": 2026,
+   "stats": {
+    "wins": 7,
+    "podiums": 31,
+    "poles": 12,
+    "fastest_laps": 12,
+    "points_finishes": 97,
+    "front_rows": 25,
+    "dnfs": 18
+   }
+  },
+  {
+   "driver_id": "norris",
+   "full_name": "Lando Norris",
+   "active_from": 2019,
+   "active_to": 2026,
+   "stats": {
+    "wins": 13,
+    "podiums": 49,
+    "poles": 19,
+    "fastest_laps": 20,
+    "points_finishes": 132,
+    "front_rows": 33,
+    "dnfs": 13
+   }
+  },
+  {
    "driver_id": "villeneuve",
    "full_name": "Jacques Villeneuve",
    "active_from": 1996,
@@ -313,36 +343,6 @@
     "points_finishes": 86,
     "front_rows": 23,
     "dnfs": 57
-   }
-  },
-  {
-   "driver_id": "russell",
-   "full_name": "George Russell",
-   "active_from": 2019,
-   "active_to": 2026,
-   "stats": {
-    "wins": 7,
-    "podiums": 31,
-    "poles": 12,
-    "fastest_laps": 11,
-    "points_finishes": 96,
-    "front_rows": 25,
-    "dnfs": 18
-   }
-  },
-  {
-   "driver_id": "norris",
-   "full_name": "Lando Norris",
-   "active_from": 2019,
-   "active_to": 2026,
-   "stats": {
-    "wins": 13,
-    "podiums": 48,
-    "poles": 18,
-    "fastest_laps": 20,
-    "points_finishes": 131,
-    "front_rows": 32,
-    "dnfs": 13
    }
   },
   {
@@ -460,7 +460,7 @@
     "podiums": 28,
     "poles": 6,
     "fastest_laps": 9,
-    "points_finishes": 64,
+    "points_finishes": 65,
     "front_rows": 17,
     "dnfs": 8
    }
@@ -505,7 +505,7 @@
     "podiums": 0,
     "poles": 0,
     "fastest_laps": 0,
-    "points_finishes": 19,
+    "points_finishes": 20,
     "front_rows": 0,
     "dnfs": 6
    }
