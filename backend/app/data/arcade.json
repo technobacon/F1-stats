@@ -10,9 +10,9 @@
     "podiums": 106,
     "poles": 22,
     "fastest_laps": 25,
-    "points_finishes": 283,
+    "points_finishes": 284,
     "front_rows": 42,
-    "dnfs": 80
+    "dnfs": 81
    }
   },
   {
@@ -22,11 +22,11 @@
    "active_to": 2026,
    "stats": {
     "wins": 106,
-    "podiums": 207,
+    "podiums": 208,
     "poles": 104,
     "fastest_laps": 69,
-    "points_finishes": 344,
-    "front_rows": 177,
+    "points_finishes": 346,
+    "front_rows": 178,
     "dnfs": 33
    }
   },
@@ -117,7 +117,7 @@
     "fastest_laps": 19,
     "points_finishes": 145,
     "front_rows": 46,
-    "dnfs": 33
+    "dnfs": 34
    }
   },
   {
@@ -141,12 +141,12 @@
    "active_from": 2015,
    "active_to": 2026,
    "stats": {
-    "wins": 71,
-    "podiums": 133,
-    "poles": 48,
-    "fastest_laps": 37,
-    "points_finishes": 205,
-    "front_rows": 88,
+    "wins": 72,
+    "podiums": 135,
+    "poles": 49,
+    "fastest_laps": 38,
+    "points_finishes": 207,
+    "front_rows": 89,
     "dnfs": 34
    }
   },
@@ -160,9 +160,24 @@
     "podiums": 29,
     "poles": 6,
     "fastest_laps": 4,
-    "points_finishes": 152,
+    "points_finishes": 153,
     "front_rows": 15,
     "dnfs": 44
+   }
+  },
+  {
+   "driver_id": "stroll",
+   "full_name": "Lance Stroll",
+   "active_from": 2017,
+   "active_to": 2026,
+   "stats": {
+    "wins": 0,
+    "podiums": 3,
+    "poles": 1,
+    "fastest_laps": 0,
+    "points_finishes": 66,
+    "front_rows": 2,
+    "dnfs": 37
    }
   },
   {
@@ -178,21 +193,6 @@
     "points_finishes": 144,
     "front_rows": 60,
     "dnfs": 29
-   }
-  },
-  {
-   "driver_id": "stroll",
-   "full_name": "Lance Stroll",
-   "active_from": 2017,
-   "active_to": 2026,
-   "stats": {
-    "wins": 0,
-    "podiums": 3,
-    "poles": 1,
-    "fastest_laps": 0,
-    "points_finishes": 66,
-    "front_rows": 2,
-    "dnfs": 36
    }
   },
   {
@@ -235,7 +235,7 @@
     "podiums": 4,
     "poles": 0,
     "fastest_laps": 1,
-    "points_finishes": 96,
+    "points_finishes": 97,
     "front_rows": 0,
     "dnfs": 26
    }
@@ -252,7 +252,7 @@
     "fastest_laps": 3,
     "points_finishes": 84,
     "front_rows": 2,
-    "dnfs": 24
+    "dnfs": 25
    }
   },
   {
@@ -265,8 +265,8 @@
     "podiums": 54,
     "poles": 27,
     "fastest_laps": 13,
-    "points_finishes": 143,
-    "front_rows": 46,
+    "points_finishes": 145,
+    "front_rows": 47,
     "dnfs": 27
    }
   },
@@ -306,12 +306,12 @@
    "active_from": 2019,
    "active_to": 2026,
    "stats": {
-    "wins": 7,
-    "podiums": 31,
-    "poles": 12,
-    "fastest_laps": 12,
-    "points_finishes": 97,
-    "front_rows": 25,
+    "wins": 8,
+    "podiums": 32,
+    "poles": 13,
+    "fastest_laps": 13,
+    "points_finishes": 98,
+    "front_rows": 26,
     "dnfs": 18
    }
   },
@@ -325,9 +325,9 @@
     "podiums": 49,
     "poles": 19,
     "fastest_laps": 20,
-    "points_finishes": 132,
+    "points_finishes": 133,
     "front_rows": 33,
-    "dnfs": 13
+    "dnfs": 14
    }
   },
   {
@@ -402,7 +402,7 @@
     "fastest_laps": 1,
     "points_finishes": 52,
     "front_rows": 0,
-    "dnfs": 25
+    "dnfs": 27
    }
   },
   {
@@ -460,7 +460,7 @@
     "podiums": 28,
     "poles": 6,
     "fastest_laps": 9,
-    "points_finishes": 65,
+    "points_finishes": 66,
     "front_rows": 17,
     "dnfs": 8
    }
@@ -505,7 +505,7 @@
     "podiums": 0,
     "poles": 0,
     "fastest_laps": 0,
-    "points_finishes": 20,
+    "points_finishes": 21,
     "front_rows": 0,
     "dnfs": 6
    }
@@ -520,9 +520,24 @@
     "podiums": 0,
     "poles": 0,
     "fastest_laps": 0,
-    "points_finishes": 14,
+    "points_finishes": 15,
     "front_rows": 0,
     "dnfs": 6
+   }
+  },
+  {
+   "driver_id": "antonelli",
+   "full_name": "Andrea Kimi Antonelli",
+   "active_from": 2025,
+   "active_to": 2026,
+   "stats": {
+    "wins": 8,
+    "podiums": 16,
+    "poles": 6,
+    "fastest_laps": 10,
+    "points_finishes": 28,
+    "front_rows": 10,
+    "dnfs": 4
    }
   }
  ]
