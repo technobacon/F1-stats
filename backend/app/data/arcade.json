@@ -25,7 +25,7 @@
     "podiums": 208,
     "poles": 104,
     "fastest_laps": 69,
-    "points_finishes": 346,
+    "points_finishes": 347,
     "front_rows": 178,
     "dnfs": 33
    }
@@ -141,12 +141,12 @@
    "active_from": 2015,
    "active_to": 2026,
    "stats": {
-    "wins": 72,
-    "podiums": 135,
-    "poles": 49,
+    "wins": 73,
+    "podiums": 136,
+    "poles": 50,
     "fastest_laps": 38,
-    "points_finishes": 207,
-    "front_rows": 89,
+    "points_finishes": 208,
+    "front_rows": 90,
     "dnfs": 34
    }
   },
@@ -177,7 +177,7 @@
     "fastest_laps": 0,
     "points_finishes": 66,
     "front_rows": 2,
-    "dnfs": 37
+    "dnfs": 38
    }
   },
   {
@@ -262,11 +262,11 @@
    "active_to": 2026,
    "stats": {
     "wins": 9,
-    "podiums": 54,
+    "podiums": 55,
     "poles": 27,
-    "fastest_laps": 13,
-    "points_finishes": 145,
-    "front_rows": 47,
+    "fastest_laps": 14,
+    "points_finishes": 146,
+    "front_rows": 48,
     "dnfs": 27
    }
   },
@@ -310,7 +310,7 @@
     "podiums": 32,
     "poles": 13,
     "fastest_laps": 13,
-    "points_finishes": 98,
+    "points_finishes": 99,
     "front_rows": 26,
     "dnfs": 18
    }
@@ -325,7 +325,7 @@
     "podiums": 49,
     "poles": 19,
     "fastest_laps": 20,
-    "points_finishes": 133,
+    "points_finishes": 134,
     "front_rows": 33,
     "dnfs": 14
    }
@@ -460,7 +460,7 @@
     "podiums": 28,
     "poles": 6,
     "fastest_laps": 9,
-    "points_finishes": 66,
+    "points_finishes": 67,
     "front_rows": 17,
     "dnfs": 8
    }
@@ -505,7 +505,7 @@
     "podiums": 0,
     "poles": 0,
     "fastest_laps": 0,
-    "points_finishes": 21,
+    "points_finishes": 22,
     "front_rows": 0,
     "dnfs": 6
    }
@@ -532,10 +532,10 @@
    "active_to": 2026,
    "stats": {
     "wins": 8,
-    "podiums": 16,
+    "podiums": 17,
     "poles": 6,
     "fastest_laps": 10,
-    "points_finishes": 28,
+    "points_finishes": 29,
     "front_rows": 10,
     "dnfs": 4
    }
